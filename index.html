@@ -30,10 +30,26 @@
         .toast.show { transform: translateY(0); opacity: 1; }
         .whatsapp-float { position: fixed; bottom: 24px; right: 24px; z-index: 50; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.4); transition: transform 0.3s ease; }
         .whatsapp-float:hover { transform: scale(1.1); }
+        /* Modal Styles */
+        .modal-overlay { opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { transform: translateY(20px) scale(0.95); opacity: 0; transition: all 0.3s ease; }
+        .modal-overlay.active .modal-content { transform: translateY(0) scale(1); opacity: 1; }
+        .tab-btn { transition: all 0.3s ease; }
+        .tab-btn.active { color: #06b6d4; border-color: #06b6d4; background: rgba(6,182,212,0.08); }
+        .tab-btn:not(.active) { color: #64748b; border-color: transparent; }
+        .tab-btn:not(.active):hover { color: #94a3b8; background: rgba(255,255,255,0.02); }
+        .modal-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; transition: all 0.3s; }
+        .modal-input:focus { border-color: rgba(6,182,212,0.5); outline: none; box-shadow: 0 0 0 3px rgba(6,182,212,0.08); background: rgba(255,255,255,0.07); }
+        .modal-input::placeholder { color: #475569; }
+        .error-msg { color: #f87171; font-size: 11px; margin-top: 4px; display: none; }
+        .error-msg.show { display: block; }
+        .input-error { border-color: #f87171 !important; }
     </style>
 </head>
 <body class="bg-[#020617] text-white">
 
+    <!-- Toast -->
     <div id="toast" class="toast fixed bottom-6 right-24 z-[100] bg-cyan-900/90 border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
         <span class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
         <span id="toast-msg" class="text-sm font-medium">Message sent!</span>
@@ -43,6 +59,7 @@
         <span class="iconify text-white text-3xl" data-icon="mdi:whatsapp"></span>
     </a>
 
+    <!-- Nav -->
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2.5">
@@ -66,9 +83,10 @@
                     <span class="iconify text-base" data-icon="mdi:phone"></span>
                     0769 799 110
                 </a>
-                <a href="merchants.html" class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors">
+                <button onclick="openAuthModal()" class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors flex items-center gap-2">
+                    <span class="iconify text-base" data-icon="mdi:storefront"></span>
                     Join as Merchant
-                </a>
+                </button>
             </div>
             <button id="menu-btn" class="md:hidden text-white p-2">
                 <span class="iconify text-2xl" data-icon="mdi:menu"></span>
@@ -76,6 +94,7 @@
         </div>
     </nav>
 
+    <!-- Mobile Menu -->
     <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 bottom-0 w-72 z-[60] bg-[#0f172a] border-l border-white/10 p-6">
         <div class="flex justify-end mb-8">
             <button id="close-menu" class="text-white p-2"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
@@ -90,13 +109,122 @@
             <a href="tel:0769799110" class="text-cyan-400 text-sm flex items-center gap-2">
                 <span class="iconify" data-icon="mdi:phone"></span> 0769 799 110
             </a>
-            <a href="merchants.html" class="mobile-link bg-cyan-500 text-white text-sm font-medium px-5 py-3 rounded-lg text-center hover:bg-cyan-400 transition-colors mt-2">
+            <button onclick="closeMenu(); openAuthModal()" class="bg-cyan-500 text-white text-sm font-medium px-5 py-3 rounded-lg text-center hover:bg-cyan-400 transition-colors mt-2">
                 Join as Merchant
-            </a>
+            </button>
         </div>
     </div>
     <div id="menu-overlay" class="fixed inset-0 z-[55] bg-black/60 hidden"></div>
 
+    <!-- AUTH MODAL -->
+    <div id="authModal" class="modal-overlay fixed inset-0 z-[70] bg-black/70 flex items-center justify-center p-4">
+        <div class="modal-content w-full max-w-md relative">
+            <!-- Close Button -->
+            <button onclick="closeAuthModal()" class="absolute -top-12 right-0 text-slate-400 hover:text-white transition-colors">
+                <span class="iconify text-2xl" data-icon="mdi:close"></span>
+            </button>
+
+            <!-- Modal Card -->
+            <div class="bg-[#0f172a] border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl">
+                
+                <!-- Modal Header -->
+                <div class="p-6 pb-0 text-center">
+                    <div class="w-14 h-14 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <span class="iconify text-cyan-400 text-2xl" data-icon="mdi:storefront"></span>
+                    </div>
+                    <h2 class="text-xl font-medium text-white mb-1">Merchant Portal</h2>
+                    <p class="text-slate-500 text-sm">Access your delivery dashboard</p>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex mx-6 mt-5 mb-4 bg-white/[0.03] border border-white/[0.08] rounded-lg p-1">
+                    <button onclick="showTab('signup')" id="signupTab" class="tab-btn active flex-1 py-2 text-sm font-medium rounded-md border border-transparent">
+                        Sign Up
+                    </button>
+                    <button onclick="showTab('login')" id="loginTab" class="tab-btn flex-1 py-2 text-sm font-medium rounded-md border border-transparent">
+                        Login
+                    </button>
+                </div>
+
+                <!-- Sign Up Form -->
+                <div id="signupForm" class="px-6 pb-6">
+                    <form onsubmit="handleSignup(event)" class="space-y-3">
+                        <div>
+                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">Business Name *</label>
+                            <input type="text" id="signupBusiness" class="modal-input w-full rounded-lg px-3.5 py-2.5 text-sm" placeholder="Your business name">
+                            <p class="error-msg" id="signupBusinessError">Required</p>
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">Full Name *</label>
+                            <input type="text" id="signupName" class="modal-input w-full rounded-lg px-3.5 py-2.5 text-sm" placeholder="Your full name">
+                            <p class="error-msg" id="signupNameError">Required</p>
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">Email *</label>
+                            <input type="email" id="signupEmail" class="modal-input w-full rounded-lg px-3.5 py-2.5 text-sm" placeholder="you@example.com">
+                            <p class="error-msg" id="signupEmailError">Enter valid email</p>
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">Phone *</label>
+                            <input type="tel" id="signupPhone" class="modal-input w-full rounded-lg px-3.5 py-2.5 text-sm" placeholder="+255 XXX XXX XXX">
+                            <p class="error-msg" id="signupPhoneError">Required</p>
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">Password *</label>
+                            <input type="password" id="signupPassword" class="modal-input w-full rounded-lg px-3.5 py-2.5 text-sm" placeholder="Min 6 characters">
+                            <p class="error-msg" id="signupPasswordError">Min 6 characters</p>
+                        </div>
+                        <button type="submit" class="w-full bg-cyan-500 text-white font-medium text-sm py-3 rounded-lg hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 mt-1">
+                            <span class="iconify" data-icon="mdi:account-plus"></span>
+                            Create Account
+                        </button>
+                    </form>
+                    <p class="text-center text-slate-500 text-xs mt-4">
+                        Already registered? <a href="#" onclick="showTab('login')" class="text-cyan-400 hover:text-cyan-300">Login here</a>
+                    </p>
+                </div>
+
+                <!-- Login Form -->
+                <div id="loginForm" class="px-6 pb-6 hidden">
+                    <form onsubmit="handleLogin(event)" class="space-y-3">
+                        <div>
+                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">Email *</label>
+                            <input type="email" id="loginEmail" class="modal-input w-full rounded-lg px-3.5 py-2.5 text-sm" placeholder="you@example.com">
+                            <p class="error-msg" id="loginEmailError">Enter valid email</p>
+                        </div>
+                        <div>
+                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">Password *</label>
+                            <input type="password" id="loginPassword" class="modal-input w-full rounded-lg px-3.5 py-2.5 text-sm" placeholder="Your password">
+                            <p class="error-msg" id="loginPasswordError">Required</p>
+                        </div>
+                        <p class="error-msg text-center text-sm" id="loginGeneralError">Invalid email or password</p>
+                        <button type="submit" class="w-full bg-cyan-500 text-white font-medium text-sm py-3 rounded-lg hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 mt-1">
+                            <span class="iconify" data-icon="mdi:login"></span>
+                            Login to Dashboard
+                        </button>
+                    </form>
+                    <p class="text-center text-slate-500 text-xs mt-4">
+                        New here? <a href="#" onclick="showTab('signup')" class="text-cyan-400 hover:text-cyan-300">Create an account</a>
+                    </p>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="border-t border-white/[0.05] px-6 py-4 flex items-center justify-center gap-4">
+                    <div class="flex items-center gap-1.5 text-slate-500 text-[10px]">
+                        <span class="iconify text-cyan-400 text-xs" data-icon="mdi:shield-check"></span> Secure
+                    </div>
+                    <div class="flex items-center gap-1.5 text-slate-500 text-[10px]">
+                        <span class="iconify text-cyan-400 text-xs" data-icon="mdi:clock-fast"></span> Quick Setup
+                    </div>
+                    <div class="flex items-center gap-1.5 text-slate-500 text-[10px]">
+                        <span class="iconify text-cyan-400 text-xs" data-icon="mdi:cash-multiple"></span> Free
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
     <section class="relative hero-glow min-h-screen flex items-center justify-center pt-16 overflow-hidden">
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl"></div>
         <div class="absolute bottom-1/4 right-1/4 w-72 h-72 bg-cyan-600/5 rounded-full blur-3xl"></div>
@@ -111,9 +239,9 @@
             <h1 class="text-4xl md:text-7xl font-medium tracking-tight leading-[1.1] gradient-text mb-6">Deliver Everywhere.<br>Cash On Delivery<br>Made Simple.</h1>
             <p class="text-lg md:text-xl font-light text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">Tanzania's most reliable COD & logistics partner. From warehousing to last-mile delivery, we handle your entire supply chain with precision.</p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-                <a href="merchants.html" class="bg-cyan-500 text-white font-medium text-sm px-8 py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center shadow-lg shadow-cyan-500/20">
+                <button onclick="openAuthModal()" class="bg-cyan-500 text-white font-medium text-sm px-8 py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center shadow-lg shadow-cyan-500/20">
                     <span class="iconify text-lg" data-icon="mdi:storefront"></span> Join as a Merchant
-                </a>
+                </button>
                 <a href="#services" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-8 py-3.5 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2 w-full sm:w-auto justify-center">
                     <span class="iconify text-cyan-400" data-icon="mdi:play-circle-outline"></span> Explore Services
                 </a>
@@ -255,7 +383,7 @@
                         <div class="flex items-start gap-3"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white">Regional Towns — 1-2 Days</p><p class="text-xs text-slate-500">Morogoro, Tanga, Iringa, Kagera, Lindi</p></div></div>
                         <div class="flex items-start gap-3"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white">Remote Areas — 2-5 Days</p><p class="text-xs text-slate-500">Kigoma, Rukwa, Katavi, Simiyu, Geita</p></div></div>
                     </div>
-                    <a href="merchants.html" class="inline-flex items-center gap-2 text-cyan-400 text-sm font-medium hover:text-cyan-300 transition-colors">Start delivering to your customers <span class="iconify" data-icon="mdi:arrow-right"></span></a>
+                    <button onclick="openAuthModal()" class="inline-flex items-center gap-2 text-cyan-400 text-sm font-medium hover:text-cyan-300 transition-colors">Start delivering to your customers <span class="iconify" data-icon="mdi:arrow-right"></span></button>
                 </div>
                 <div class="relative">
                     <div class="absolute -inset-4 bg-gradient-to-r from-cyan-500/5 to-transparent rounded-3xl blur-2xl"></div>
@@ -297,7 +425,7 @@
                     <div class="relative bg-[#0f172a] border border-white/[0.08] rounded-2xl overflow-hidden">
                         <img src="https://picsum.photos/seed/chapshop-team-warehouse/700/500.jpg" alt="ChapShop Warehouse Team" class="w-full h-[350px] md:h-[450px] object-cover opacity-75">
                         <div class="absolute inset-0 bg-gradient-to-r from-[#0f172a]/60 to-transparent"></div>
-                        <div class="absolute bottom-6 left-6"><div class="bg-[#0f172a]/90 border border-white/10 rounded-xl px-5 py-4"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-xl" data-icon="mdi:shield-check"></span></div><div><div class="text-sm font-medium text-white">Insured Deliveries</div><div class="text-xs text-slate-400">Every parcel covered up to TZS 500,000</div></div></div></div>
+                        <div class="absolute bottom-6 left-6"><div class="bg-[#0f172a]/90 border border-white/10 rounded-xl px-5 py-4"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-xl" data-icon="mdi:shield-check"></span></div><div><div class="text-sm font-medium text-white">Insured Deliveries</div><div class="text-xs text-slate-400">Every parcel covered up to TZS 500,000</div></div></div></div></div>
                     </div>
                 </div>
                 <div class="order-1 lg:order-2">
@@ -348,7 +476,7 @@
             <h2 class="text-3xl md:text-5xl font-medium tracking-tight gradient-text mb-6">Ready to Scale Your Delivery?</h2>
             <p class="text-lg text-slate-400 font-light max-w-xl mx-auto mb-10 leading-relaxed">Join 500+ merchants that trust ChapShop Delivery across Tanzania.</p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="merchants.html" class="bg-cyan-500 text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 shadow-lg shadow-cyan-500/20 w-full sm:w-auto justify-center"><span class="iconify text-lg" data-icon="mdi:rocket-launch"></span> Join as Merchant — Free</a>
+                <button onclick="openAuthModal()" class="bg-cyan-500 text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 shadow-lg shadow-cyan-500/20 w-full sm:w-auto justify-center"><span class="iconify text-lg" data-icon="mdi:rocket-launch"></span> Join as Merchant — Free</button>
                 <a href="tel:0769799110" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2 w-full sm:w-auto justify-center"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:phone"></span> Call 0769 799 110</a>
             </div>
         </div>
@@ -430,7 +558,7 @@
                     <ul class="space-y-2.5">
                         <li><a href="about.html" class="text-sm text-slate-400 hover:text-white transition-colors">About Us</a></li>
                         <li><a href="#coverage" class="text-sm text-slate-400 hover:text-white transition-colors">Coverage Areas</a></li>
-                        <li><a href="merchants.html" class="text-sm text-slate-400 hover:text-white transition-colors">Join as Merchant</a></li>
+                        <li><a href="#" onclick="openAuthModal()" class="text-sm text-slate-400 hover:text-white transition-colors">Join as Merchant</a></li>
                         <li><a href="#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a></li>
                     </ul>
                 </div>
@@ -462,25 +590,157 @@
     </button>
 
     <script>
+        // Mobile Menu
         const menuBtn = document.getElementById('menu-btn');
         const closeMenuBtn = document.getElementById('close-menu');
         const mobileMenu = document.getElementById('mobile-menu');
         const menuOverlay = document.getElementById('menu-overlay');
-        const mobileLinks = document.querySelectorAll('.mobile-link');
         function openMenu() { mobileMenu.classList.add('open'); menuOverlay.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
         function closeMenu() { mobileMenu.classList.remove('open'); menuOverlay.classList.add('hidden'); document.body.style.overflow = ''; }
         menuBtn.addEventListener('click', openMenu);
         closeMenuBtn.addEventListener('click', closeMenu);
         menuOverlay.addEventListener('click', closeMenu);
-        mobileLinks.forEach(link => link.addEventListener('click', closeMenu));
+        document.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', closeMenu));
+
+        // Toast
         function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000); }
+
+        // Contact Form
         document.getElementById('contact-form').addEventListener('submit', function(e) { e.preventDefault(); const b = this.querySelector('button[type="submit"]'); const o = b.innerHTML; b.innerHTML = '<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Sending...'; b.disabled = true; setTimeout(() => { b.innerHTML = o; b.disabled = false; this.reset(); showToast("Thank you! Your inquiry has been sent."); }, 1500); });
+
+        // Back to Top
         const btt = document.getElementById('back-to-top');
         window.addEventListener('scroll', () => { btt.style.opacity = window.scrollY > 500 ? '1' : '0'; btt.style.pointerEvents = window.scrollY > 500 ? 'auto' : 'none'; });
         btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Smooth Scroll
         document.querySelectorAll('a[href^="#"]').forEach(a => { a.addEventListener('click', function(e) { const t = document.querySelector(this.getAttribute('href')); if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }); });
+
+        // Nav Scroll
         const nav = document.querySelector('nav');
         window.addEventListener('scroll', () => { nav.style.borderBottomColor = window.scrollY > 50 ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.08)'; nav.style.backgroundColor = window.scrollY > 50 ? 'rgba(2,6,23,0.9)' : 'rgba(2,6,23,0.8)'; });
+
+        // ============ AUTH MODAL ============
+        function openAuthModal() {
+            document.getElementById('authModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Reset forms
+            document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+            document.querySelectorAll('.modal-input').forEach(e => e.classList.remove('input-error'));
+            showTab('signup');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal on overlay click
+        document.getElementById('authModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAuthModal();
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeAuthModal();
+        });
+
+        // Tabs
+        function showTab(tab) {
+            document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+            document.querySelectorAll('.modal-input').forEach(e => e.classList.remove('input-error'));
+            document.getElementById('loginGeneralError').classList.remove('show');
+
+            if (tab === 'signup') {
+                document.getElementById('signupForm').classList.remove('hidden');
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('signupTab').classList.add('active');
+                document.getElementById('loginTab').classList.remove('active');
+            } else {
+                document.getElementById('signupForm').classList.add('hidden');
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('signupTab').classList.remove('active');
+                document.getElementById('loginTab').classList.add('active');
+            }
+        }
+
+        function showError(id, errorId) {
+            document.getElementById(id).classList.add('input-error');
+            document.getElementById(errorId).classList.add('show');
+        }
+
+        function hideError(id, errorId) {
+            document.getElementById(id).classList.remove('input-error');
+            document.getElementById(errorId).classList.remove('show');
+        }
+
+        // Sign Up
+        function handleSignup(e) {
+            e.preventDefault();
+            let valid = true;
+            const business = document.getElementById('signupBusiness').value.trim();
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value;
+
+            if (!business) { showError('signupBusiness', 'signupBusinessError'); valid = false; } else { hideError('signupBusiness', 'signupBusinessError'); }
+            if (!name) { showError('signupName', 'signupNameError'); valid = false; } else { hideError('signupName', 'signupNameError'); }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('signupEmail', 'signupEmailError'); valid = false; } else { hideError('signupEmail', 'signupEmailError'); }
+            if (!phone) { showError('signupPhone', 'signupPhoneError'); valid = false; } else { hideError('signupPhone', 'signupPhoneError'); }
+            if (password.length < 6) { showError('signupPassword', 'signupPasswordError'); valid = false; } else { hideError('signupPassword', 'signupPasswordError'); }
+
+            if (!valid) return;
+
+            const merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
+            if (merchants.find(m => m.email === email)) {
+                document.getElementById('signupEmailError').textContent = 'Email already registered';
+                showError('signupEmail', 'signupEmailError');
+                return;
+            }
+
+            merchants.push({ business, name, email, phone, password, createdAt: new Date().toISOString() });
+            localStorage.setItem('chapshop_merchants', JSON.stringify(merchants));
+
+            showToast('Account created! Please login.');
+            showTab('login');
+            document.getElementById('loginEmail').value = email;
+        }
+
+        // Login
+        function handleLogin(e) {
+            e.preventDefault();
+            let valid = true;
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('loginEmail', 'loginEmailError'); valid = false; } else { hideError('loginEmail', 'loginEmailError'); }
+            if (!password) { showError('loginPassword', 'loginPasswordError'); valid = false; } else { hideError('loginPassword', 'loginPasswordError'); }
+
+            if (!valid) return;
+
+            const merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
+            const merchant = merchants.find(m => m.email === email && m.password === password);
+
+            if (!merchant) {
+                document.getElementById('loginGeneralError').classList.add('show');
+                return;
+            }
+
+            localStorage.setItem('chapshop_logged_in', JSON.stringify(merchant));
+            showToast('Login successful! Redirecting...');
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+        }
+
+        // Clear errors on input
+        document.querySelectorAll('.modal-input').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('input-error');
+                const errorEl = this.nextElementSibling;
+                if (errorEl && errorEl.classList.contains('error-msg')) errorEl.classList.remove('show');
+                document.getElementById('loginGeneralError').classList.remove('show');
+            });
+        });
     </script>
 </body>
 </html>
