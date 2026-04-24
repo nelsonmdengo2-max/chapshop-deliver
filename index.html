@@ -14,7 +14,6 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
         .gradient-text { background: linear-gradient(to bottom, #ffffff, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .glow-line { background: linear-gradient(to right, transparent, #164e63, transparent); height: 1px; }
         .service-card:hover .service-icon { background: rgba(6,182,212,0.15); border-color: rgba(6,182,212,0.3); }
@@ -29,24 +28,21 @@
         .mobile-menu.open { transform: translateX(0); }
         .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
         .toast.show { transform: translateY(0); opacity: 1; }
-        .whatsapp-float { position: fixed; bottom: 24px; right: 24px; z-index: 50; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.4); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .whatsapp-float:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(37,211,102,0.5); }
+        .whatsapp-float { position: fixed; bottom: 24px; right: 24px; z-index: 50; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.4); transition: transform 0.3s ease; }
+        .whatsapp-float:hover { transform: scale(1.1); }
     </style>
 </head>
 <body class="bg-[#020617] text-white">
 
-    <!-- Toast -->
     <div id="toast" class="toast fixed bottom-6 right-24 z-[100] bg-cyan-900/90 border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
         <span class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
         <span id="toast-msg" class="text-sm font-medium">Message sent!</span>
     </div>
 
-    <!-- WhatsApp -->
     <a href="https://wa.me/255769799110" target="_blank" class="whatsapp-float" title="Chat on WhatsApp">
         <span class="iconify text-white text-3xl" data-icon="mdi:whatsapp"></span>
     </a>
 
-    <!-- Navigation -->
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2.5">
@@ -62,7 +58,7 @@
                 <a href="#services" class="text-sm text-slate-400 hover:text-white transition-colors">Services</a>
                 <a href="#coverage" class="text-sm text-slate-400 hover:text-white transition-colors">Coverage</a>
                 <a href="#how-it-works" class="text-sm text-slate-400 hover:text-white transition-colors">How It Works</a>
-                <a href="#stats" class="text-sm text-slate-400 hover:text-white transition-colors">About</a>
+                <a href="about.html" class="text-sm text-slate-400 hover:text-white transition-colors">About Us</a>
                 <a href="#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
             </div>
             <div class="hidden md:flex items-center gap-3">
@@ -80,7 +76,6 @@
         </div>
     </nav>
 
-    <!-- Mobile Menu -->
     <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 bottom-0 w-72 z-[60] bg-[#0f172a] border-l border-white/10 p-6">
         <div class="flex justify-end mb-8">
             <button id="close-menu" class="text-white p-2"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
@@ -89,7 +84,7 @@
             <a href="#services" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Services</a>
             <a href="#coverage" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Coverage</a>
             <a href="#how-it-works" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">How It Works</a>
-            <a href="#stats" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">About</a>
+            <a href="about.html" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">About Us</a>
             <a href="#contact" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Contact</a>
             <div class="glow-line my-4"></div>
             <a href="tel:0769799110" class="text-cyan-400 text-sm flex items-center gap-2">
@@ -102,7 +97,6 @@
     </div>
     <div id="menu-overlay" class="fixed inset-0 z-[55] bg-black/60 hidden"></div>
 
-    <!-- Hero -->
     <section class="relative hero-glow min-h-screen flex items-center justify-center pt-16 overflow-hidden">
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl"></div>
         <div class="absolute bottom-1/4 right-1/4 w-72 h-72 bg-cyan-600/5 rounded-full blur-3xl"></div>
@@ -114,20 +108,14 @@
                 </span>
                 <span class="text-xs font-medium text-slate-300">Trusted by 500+ Businesses Across Tanzania</span>
             </div>
-            <h1 class="text-4xl md:text-7xl font-medium tracking-tight leading-[1.1] gradient-text mb-6">
-                Deliver Everywhere.<br>Cash On Delivery<br>Made Simple.
-            </h1>
-            <p class="text-lg md:text-xl font-light text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-                Tanzania's most reliable COD & logistics partner. From warehousing to last-mile delivery, we handle your entire supply chain with precision.
-            </p>
+            <h1 class="text-4xl md:text-7xl font-medium tracking-tight leading-[1.1] gradient-text mb-6">Deliver Everywhere.<br>Cash On Delivery<br>Made Simple.</h1>
+            <p class="text-lg md:text-xl font-light text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">Tanzania's most reliable COD & logistics partner. From warehousing to last-mile delivery, we handle your entire supply chain with precision.</p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
                 <a href="merchants.html" class="bg-cyan-500 text-white font-medium text-sm px-8 py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 w-full sm:w-auto justify-center shadow-lg shadow-cyan-500/20">
-                    <span class="iconify text-lg" data-icon="mdi:storefront"></span>
-                    Join as a Merchant
+                    <span class="iconify text-lg" data-icon="mdi:storefront"></span> Join as a Merchant
                 </a>
                 <a href="#services" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-8 py-3.5 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2 w-full sm:w-auto justify-center">
-                    <span class="iconify text-cyan-400" data-icon="mdi:play-circle-outline"></span>
-                    Explore Services
+                    <span class="iconify text-cyan-400" data-icon="mdi:play-circle-outline"></span> Explore Services
                 </a>
             </div>
             <div class="relative max-w-4xl mx-auto">
@@ -146,7 +134,6 @@
         </div>
     </section>
 
-    <!-- Trusted By -->
     <section class="border-y border-white/[0.05] py-10">
         <div class="max-w-7xl mx-auto px-6">
             <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 text-center mb-8">Trusted by leading brands in Tanzania</p>
@@ -161,7 +148,6 @@
         </div>
     </section>
 
-    <!-- Services -->
     <section id="services" class="py-24 relative">
         <div class="absolute top-0 left-0 right-0 glow-line"></div>
         <div class="max-w-7xl mx-auto px-6">
@@ -182,17 +168,17 @@
                 <div class="service-card group bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all duration-300 cursor-default">
                     <div class="service-icon w-12 h-12 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center mb-5 transition-all duration-300"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:truck-delivery"></span></div>
                     <h3 class="text-base font-medium text-white mb-2">Courier & Delivery</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">Same-day and next-day delivery across all 30+ regions. Express and standard options available.</p>
+                    <p class="text-sm text-slate-400 leading-relaxed">Same-day and next-day delivery across all 30+ regions.</p>
                 </div>
                 <div class="service-card group bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all duration-300 cursor-default">
                     <div class="service-icon w-12 h-12 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center mb-5 transition-all duration-300"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:warehouse"></span></div>
                     <h3 class="text-base font-medium text-white mb-2">Warehouse Solutions</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">Strategic warehousing with inventory management, pick & pack, and distribution services.</p>
+                    <p class="text-sm text-slate-400 leading-relaxed">Strategic warehousing with inventory management, pick & pack, and distribution.</p>
                 </div>
                 <div class="service-card group bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all duration-300 cursor-default">
                     <div class="service-icon w-12 h-12 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center mb-5 transition-all duration-300"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:headset"></span></div>
                     <h3 class="text-base font-medium text-white mb-2">Call Center</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">Dedicated customer support with order confirmation, follow-ups, and complaint resolution.</p>
+                    <p class="text-sm text-slate-400 leading-relaxed">Dedicated customer support with order confirmation and complaint resolution.</p>
                 </div>
                 <div class="service-card group bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all duration-300 cursor-default">
                     <div class="service-icon w-12 h-12 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center mb-5 transition-all duration-300"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:package-variant-closed-check"></span></div>
@@ -202,23 +188,22 @@
                 <div class="service-card group bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all duration-300 cursor-default">
                     <div class="service-icon w-12 h-12 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center mb-5 transition-all duration-300"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:medical-bag"></span></div>
                     <h3 class="text-base font-medium text-white mb-2">Medical Courier</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">Temperature-controlled, time-sensitive delivery for pharmaceuticals, lab samples, and supplies.</p>
+                    <p class="text-sm text-slate-400 leading-relaxed">Temperature-controlled, time-sensitive delivery for pharmaceuticals and supplies.</p>
                 </div>
                 <div class="service-card group bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all duration-300 cursor-default">
                     <div class="service-icon w-12 h-12 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center mb-5 transition-all duration-300"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:swap-horizontal"></span></div>
                     <h3 class="text-base font-medium text-white mb-2">Reverse Logistics</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">Hassle-free returns management with pickup, inspection, and restocking or disposal.</p>
+                    <p class="text-sm text-slate-400 leading-relaxed">Hassle-free returns management with pickup, inspection, and restocking.</p>
                 </div>
                 <div class="service-card group bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all duration-300 cursor-default">
                     <div class="service-icon w-12 h-12 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center mb-5 transition-all duration-300"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:box-cutter"></span></div>
                     <h3 class="text-base font-medium text-white mb-2">3PL Services</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">Third-party logistics — outsourced warehousing, transport, and fulfillment so you focus on growth.</p>
+                    <p class="text-sm text-slate-400 leading-relaxed">Third-party logistics — outsourced warehousing, transport, and fulfillment.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- How It Works -->
     <section id="how-it-works" class="py-24 bg-[#0f172a]/50 relative">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
@@ -234,28 +219,27 @@
                 <div class="text-center relative">
                     <div class="w-20 h-20 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5"><span class="text-2xl font-semibold text-cyan-400">01</span></div>
                     <h3 class="text-base font-medium text-white mb-2">Register</h3>
-                    <p class="text-sm text-slate-400">Sign up as a business partner. Quick onboarding in under 24 hours.</p>
+                    <p class="text-sm text-slate-400">Sign up as a business partner. Quick onboarding.</p>
                 </div>
                 <div class="text-center relative">
                     <div class="w-20 h-20 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5"><span class="text-2xl font-semibold text-cyan-400">02</span></div>
                     <h3 class="text-base font-medium text-white mb-2">Create Orders</h3>
-                    <p class="text-sm text-slate-400">Upload orders via dashboard, API, or CSV. We handle the rest.</p>
+                    <p class="text-sm text-slate-400">Upload orders via dashboard, API, or CSV.</p>
                 </div>
                 <div class="text-center relative">
                     <div class="w-20 h-20 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5"><span class="text-2xl font-semibold text-cyan-400">03</span></div>
                     <h3 class="text-base font-medium text-white mb-2">We Deliver</h3>
-                    <p class="text-sm text-slate-400">Our riders pick, pack, and deliver to your customer's doorstep nationwide.</p>
+                    <p class="text-sm text-slate-400">Our riders pick, pack, and deliver nationwide.</p>
                 </div>
                 <div class="text-center relative">
                     <div class="w-20 h-20 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-5"><span class="text-2xl font-semibold text-cyan-400">04</span></div>
                     <h3 class="text-base font-medium text-white mb-2">Get Paid</h3>
-                    <p class="text-sm text-slate-400">COD amounts collected and remitted to your account on schedule.</p>
+                    <p class="text-sm text-slate-400">COD amounts remitted to your account.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Coverage -->
     <section id="coverage" class="py-24 relative">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -265,37 +249,21 @@
                         <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Nationwide Coverage</span>
                     </div>
                     <h2 class="text-3xl md:text-4xl font-medium tracking-tight gradient-text mb-6">Delivering to Every Corner of Tanzania</h2>
-                    <p class="text-slate-400 font-light text-lg leading-relaxed mb-8">From Dar es Salaam to Kigoma, Mwanza to Mbeya — we reach where others don't. Our extensive network covers all 31 regions.</p>
+                    <p class="text-slate-400 font-light text-lg leading-relaxed mb-8">From Dar es Salaam to Kigoma — we reach where others don't. Our network covers all 31 regions.</p>
                     <div class="space-y-4 mb-8">
-                        <div class="flex items-start gap-3">
-                            <div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div>
-                            <div><p class="text-sm font-medium text-white">Major Cities — Same Day</p><p class="text-xs text-slate-500">Dar es Salaam, Dodoma, Mwanza, Arusha, Mbeya</p></div>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div>
-                            <div><p class="text-sm font-medium text-white">Regional Towns — 1-2 Days</p><p class="text-xs text-slate-500">Morogoro, Tanga, Iringa, Kagera, Lindi</p></div>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div>
-                            <div><p class="text-sm font-medium text-white">Remote Areas — 2-5 Days</p><p class="text-xs text-slate-500">Kigoma, Rukwa, Katavi, Simiyu, Geita</p></div>
-                        </div>
+                        <div class="flex items-start gap-3"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white">Major Cities — Same Day</p><p class="text-xs text-slate-500">Dar es Salaam, Dodoma, Mwanza, Arusha, Mbeya</p></div></div>
+                        <div class="flex items-start gap-3"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white">Regional Towns — 1-2 Days</p><p class="text-xs text-slate-500">Morogoro, Tanga, Iringa, Kagera, Lindi</p></div></div>
+                        <div class="flex items-start gap-3"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white">Remote Areas — 2-5 Days</p><p class="text-xs text-slate-500">Kigoma, Rukwa, Katavi, Simiyu, Geita</p></div></div>
                     </div>
-                    <a href="merchants.html" class="inline-flex items-center gap-2 text-cyan-400 text-sm font-medium hover:text-cyan-300 transition-colors">
-                        Start delivering to your customers <span class="iconify" data-icon="mdi:arrow-right"></span>
-                    </a>
+                    <a href="merchants.html" class="inline-flex items-center gap-2 text-cyan-400 text-sm font-medium hover:text-cyan-300 transition-colors">Start delivering to your customers <span class="iconify" data-icon="mdi:arrow-right"></span></a>
                 </div>
                 <div class="relative">
                     <div class="absolute -inset-4 bg-gradient-to-r from-cyan-500/5 to-transparent rounded-3xl blur-2xl"></div>
                     <div class="relative bg-[#0f172a] border border-white/[0.08] rounded-2xl p-8 overflow-hidden">
                         <div class="aspect-[4/3] relative bg-slate-900/50 rounded-xl overflow-hidden">
                             <img src="https://picsum.photos/seed/tanzania-map-aerial/800/600.jpg" alt="Tanzania Coverage Map" class="w-full h-full object-cover opacity-30">
-                            <div class="absolute inset-0">
-                                <div class="map-dot" style="top:60%;left:55%"></div><div class="map-dot" style="top:38%;left:45%"></div><div class="map-dot" style="top:25%;left:35%"></div><div class="map-dot" style="top:42%;left:25%"></div><div class="map-dot" style="top:70%;left:35%"></div><div class="map-dot" style="top:55%;left:65%"></div><div class="map-dot" style="top:30%;left:55%"></div><div class="map-dot" style="top:48%;left:40%"></div><div class="map-dot" style="top:65%;left:50%"></div><div class="map-dot" style="top:20%;left:48%"></div><div class="map-dot" style="top:35%;left:60%"></div><div class="map-dot" style="top:50%;left:30%"></div>
-                            </div>
-                            <div class="absolute bottom-4 left-4 bg-[#0f172a]/90 border border-white/10 rounded-lg px-4 py-3">
-                                <div class="flex items-center gap-2 mb-1.5"><div class="w-2 h-2 rounded-full bg-cyan-500"></div><span class="text-xs text-slate-300">Active Delivery Zone</span></div>
-                                <div class="text-[10px] text-slate-500">31 regions • 150+ delivery routes</div>
-                            </div>
+                            <div class="absolute inset-0"><div class="map-dot" style="top:60%;left:55%"></div><div class="map-dot" style="top:38%;left:45%"></div><div class="map-dot" style="top:25%;left:35%"></div><div class="map-dot" style="top:42%;left:25%"></div><div class="map-dot" style="top:70%;left:35%"></div><div class="map-dot" style="top:55%;left:65%"></div><div class="map-dot" style="top:30%;left:55%"></div><div class="map-dot" style="top:48%;left:40%"></div><div class="map-dot" style="top:65%;left:50%"></div><div class="map-dot" style="top:20%;left:48%"></div><div class="map-dot" style="top:35%;left:60%"></div><div class="map-dot" style="top:50%;left:30%"></div></div>
+                            <div class="absolute bottom-4 left-4 bg-[#0f172a]/90 border border-white/10 rounded-lg px-4 py-3"><div class="flex items-center gap-2 mb-1.5"><div class="w-2 h-2 rounded-full bg-cyan-500"></div><span class="text-xs text-slate-300">Active Delivery Zone</span></div><div class="text-[10px] text-slate-500">31 regions • 150+ delivery routes</div></div>
                         </div>
                     </div>
                 </div>
@@ -303,7 +271,6 @@
         </div>
     </section>
 
-    <!-- Stats -->
     <section id="stats" class="py-24 bg-[#0f172a]/50 relative">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
@@ -322,7 +289,6 @@
         </div>
     </section>
 
-    <!-- Why Choose Us -->
     <section class="py-24 relative">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -331,21 +297,11 @@
                     <div class="relative bg-[#0f172a] border border-white/[0.08] rounded-2xl overflow-hidden">
                         <img src="https://picsum.photos/seed/chapshop-team-warehouse/700/500.jpg" alt="ChapShop Warehouse Team" class="w-full h-[350px] md:h-[450px] object-cover opacity-75">
                         <div class="absolute inset-0 bg-gradient-to-r from-[#0f172a]/60 to-transparent"></div>
-                        <div class="absolute bottom-6 left-6">
-                            <div class="bg-[#0f172a]/90 border border-white/10 rounded-xl px-5 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-xl" data-icon="mdi:shield-check"></span></div>
-                                    <div><div class="text-sm font-medium text-white">Insured Deliveries</div><div class="text-xs text-slate-400">Every parcel covered up to TZS 500,000</div></div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="absolute bottom-6 left-6"><div class="bg-[#0f172a]/90 border border-white/10 rounded-xl px-5 py-4"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-xl" data-icon="mdi:shield-check"></span></div><div><div class="text-sm font-medium text-white">Insured Deliveries</div><div class="text-xs text-slate-400">Every parcel covered up to TZS 500,000</div></div></div></div>
                     </div>
                 </div>
                 <div class="order-1 lg:order-2">
-                    <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6">
-                        <span class="iconify text-cyan-400 text-sm" data-icon="mdi:star-four-points"></span>
-                        <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Why ChapShop</span>
-                    </div>
+                    <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:star-four-points"></span><span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Why ChapShop</span></div>
                     <h2 class="text-3xl md:text-4xl font-medium tracking-tight gradient-text mb-6">Built for Tanzania's Unique Market</h2>
                     <p class="text-slate-400 font-light text-lg leading-relaxed mb-8">We understand the challenges of logistics in East Africa.</p>
                     <div class="space-y-5">
@@ -359,14 +315,10 @@
         </div>
     </section>
 
-    <!-- Testimonials -->
     <section class="py-24 bg-[#0f172a]/50 relative">
         <div class="max-w-7xl mx-auto px-6">
             <div class="text-center mb-16">
-                <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6">
-                    <span class="iconify text-cyan-400 text-sm" data-icon="mdi:format-quote-close"></span>
-                    <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Testimonials</span>
-                </div>
+                <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:format-quote-close"></span><span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Testimonials</span></div>
                 <h2 class="text-3xl md:text-4xl font-medium tracking-tight gradient-text mb-4">What Our Merchants Say</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -389,7 +341,6 @@
         </div>
     </section>
 
-    <!-- CTA -->
     <section class="py-24 relative overflow-hidden">
         <div class="absolute inset-0 hero-glow"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl"></div>
@@ -397,32 +348,24 @@
             <h2 class="text-3xl md:text-5xl font-medium tracking-tight gradient-text mb-6">Ready to Scale Your Delivery?</h2>
             <p class="text-lg text-slate-400 font-light max-w-xl mx-auto mb-10 leading-relaxed">Join 500+ merchants that trust ChapShop Delivery across Tanzania.</p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="merchants.html" class="bg-cyan-500 text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 shadow-lg shadow-cyan-500/20 w-full sm:w-auto justify-center">
-                    <span class="iconify text-lg" data-icon="mdi:rocket-launch"></span> Join as Merchant — Free
-                </a>
-                <a href="tel:0769799110" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2 w-full sm:w-auto justify-center">
-                    <span class="iconify text-cyan-400 text-lg" data-icon="mdi:phone"></span> Call 0769 799 110
-                </a>
+                <a href="merchants.html" class="bg-cyan-500 text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 shadow-lg shadow-cyan-500/20 w-full sm:w-auto justify-center"><span class="iconify text-lg" data-icon="mdi:rocket-launch"></span> Join as Merchant — Free</a>
+                <a href="tel:0769799110" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2 w-full sm:w-auto justify-center"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:phone"></span> Call 0769 799 110</a>
             </div>
         </div>
     </section>
 
-    <!-- Contact -->
     <section id="contact" class="py-24 bg-[#0f172a]/50 relative">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
                 <div>
-                    <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6">
-                        <span class="iconify text-cyan-400 text-sm" data-icon="mdi:message-text"></span>
-                        <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Contact Us</span>
-                    </div>
+                    <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:message-text"></span><span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Contact Us</span></div>
                     <h2 class="text-3xl md:text-4xl font-medium tracking-tight gradient-text mb-6">Let's Talk Logistics</h2>
                     <p class="text-slate-400 font-light text-lg leading-relaxed mb-10">Fill out the form and our team will respond within 2 hours.</p>
                     <div class="space-y-6">
                         <div class="flex items-start gap-4"><div class="w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:map-marker"></span></div><div><h4 class="text-sm font-medium text-white mb-1">Head Office</h4><p class="text-sm text-slate-400">Dar es Salaam, Tanzania<br>Sam Nujoma Road, Mikocheni B</p></div></div>
                         <div class="flex items-start gap-4"><div class="w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:phone"></span></div><div><h4 class="text-sm font-medium text-white mb-1">Phone</h4><p class="text-sm text-slate-400"><a href="tel:0769799110" class="hover:text-cyan-400 transition-colors">0769 799 110</a></p></div></div>
                         <div class="flex items-start gap-4"><div class="w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:email"></span></div><div><h4 class="text-sm font-medium text-white mb-1">Email</h4><p class="text-sm text-slate-400"><a href="mailto:chapshopdelivery@gmail.com" class="hover:text-cyan-400 transition-colors">chapshopdelivery@gmail.com</a></p></div></div>
-                        <div class="flex items-start gap-4"><div class="w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:whatsapp"></span></div><div><h4 class="text-sm font-medium text-white mb-1">WhatsApp</h4><p class="text-sm text-slate-400"><a href="https://wa.me/255769799110" target="_blank" class="hover:text-cyan-400 transition-colors">0769 799 110 — Chat with us</a></p></div></div>
+                        <div class="flex items-start gap-4"><div class="w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:whatsapp"></span></div><div><h4 class="text-sm font-medium text-white mb-1">WhatsApp</h4><p class="text-slate-400"><a href="https://wa.me/255769799110" target="_blank" class="hover:text-cyan-400 transition-colors">0769 799 110 — Chat with us</a></p></div></div>
                         <div class="flex items-start gap-4"><div class="w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:clock-outline"></span></div><div><h4 class="text-sm font-medium text-white mb-1">Working Hours</h4><p class="text-sm text-slate-400">Mon - Fri: 8:00 AM - 6:00 PM<br>Sat: 9:00 AM - 2:00 PM</p></div></div>
                     </div>
                 </div>
@@ -442,7 +385,7 @@
                                 <option>Cash On Delivery</option><option>Courier & Delivery</option><option>Warehouse Solutions</option><option>Call Center</option><option>Order Fulfillment</option><option>Medical Courier</option><option>Reverse Logistics</option><option>3PL Services</option><option>Multiple Services</option>
                             </select>
                         </div>
-                        <div><label class="text-xs font-medium text-slate-400 mb-2 block">Message</label><textarea rows="4" placeholder="Tell us about your needs..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all resize-none"></textarea></div>
+                        <div><label class="text-xs font-medium text-slate-400 mb-2 block">Message</label><textarea rows="4" placeholder="Tell us more about your logistics needs..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all resize-none"></textarea></div>
                         <button type="submit" class="w-full bg-white text-[#0f172a] font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-50 transition-colors flex items-center justify-center gap-2"><span class="iconify text-lg" data-icon="mdi:send"></span> Send Inquiry</button>
                     </form>
                 </div>
@@ -450,7 +393,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="border-t border-white/[0.05] pt-16 pb-8">
         <div class="max-w-7xl mx-auto px-6">
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
@@ -459,7 +401,7 @@
                         <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
                         <div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div>
                     </a>
-                    <p class="text-sm text-slate-400 leading-relaxed max-w-xs mb-6">Tanzania's trusted COD and logistics partner. Delivering reliability, one parcel at a time.</p>
+                    <p class="text-sm text-slate-400 leading-relaxed max-w-xs mb-6">Tanzania's trusted COD and logistics partner.</p>
                     <div class="flex items-center gap-3 mb-4">
                         <a href="#" class="w-9 h-9 bg-white/[0.05] border border-white/[0.1] rounded-lg flex items-center justify-center hover:bg-white/[0.1] transition-colors"><span class="iconify text-slate-400 text-lg" data-icon="mdi:instagram"></span></a>
                         <a href="#" class="w-9 h-9 bg-white/[0.05] border border-white/[0.1] rounded-lg flex items-center justify-center hover:bg-white/[0.1] transition-colors"><span class="iconify text-slate-400 text-lg" data-icon="mdi:twitter"></span></a>
@@ -486,7 +428,7 @@
                 <div>
                     <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Company</h4>
                     <ul class="space-y-2.5">
-                        <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="about.html" class="text-sm text-slate-400 hover:text-white transition-colors">About Us</a></li>
                         <li><a href="#coverage" class="text-sm text-slate-400 hover:text-white transition-colors">Coverage Areas</a></li>
                         <li><a href="merchants.html" class="text-sm text-slate-400 hover:text-white transition-colors">Join as Merchant</a></li>
                         <li><a href="#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a></li>
@@ -499,7 +441,7 @@
                         <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Pricing</a></li>
                         <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">FAQ</a></li>
                         <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="dashboard.html" class="text-sm text-slate-400 hover:text-white transition-colors">Merchant Dashboard</a></li>
                     </ul>
                 </div>
             </div>
@@ -515,7 +457,9 @@
         </div>
     </footer>
 
-    <button id="back-to-top" class="fixed bottom-6 left-6 z-50 w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.1] transition-all opacity-0 pointer-events-none" style="transition: opacity 0.3s ease;"><span class="iconify text-lg" data-icon="mdi:chevron-up"></span></button>
+    <button id="back-to-top" class="fixed bottom-6 left-6 z-50 w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.1] transition-all opacity-0 pointer-events-none" style="transition: opacity 0.3s ease;">
+        <span class="iconify text-lg" data-icon="mdi:chevron-up"></span>
+    </button>
 
     <script>
         const menuBtn = document.getElementById('menu-btn');
