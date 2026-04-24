@@ -7,14 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        * { font-family: 'Inter', sans-serif; }
         .nav-blur { backdrop-filter: blur(12px); }
         .sidebar { transition: transform 0.3s ease; }
         .sidebar.closed { transform: translateX(-100%); }
         .sidebar-link { transition: all 0.2s ease; }
-        .sidebar-link:hover, .sidebar-link.active { background: rgba(6,182,212,0.1); color: #22d3ee; border-right: 2px solid #06b6d4; }
+        .sidebar-link:hover, .sidebar-link.active { background: rgba(6,182,212,0.1); color: #22d3ee; border-right: 2px solid #06b6d6d4; }
         .stat-card:hover { border-color: rgba(6,182,212,0.3); transform: translateY(-2px); }
         .badge { font-size: 10px; padding: 2px 8px; border-radius: 9999px; font-weight: 600; }
         .badge-pending { background: rgba(234,179,8,0.15); color: #facc15; }
@@ -22,8 +21,6 @@
         .badge-delivered { background: rgba(34,197,94,0.15); color: #4ade80; }
         .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
         .toast.show { transform: translateY(0); opacity: 1; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.4s ease forwards; }
     </style>
 </head>
 <body class="bg-[#020617] text-white">
@@ -33,54 +30,62 @@
         <span id="toast-msg" class="text-sm font-medium">Success!</span>
     </div>
 
+    <!-- Nav -->
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/90 border-b border-white/[0.08]">
         <div class="flex items-center justify-between h-16 px-4 md:px-6">
             <div class="flex items-center gap-3">
                 <button id="sidebar-toggle" class="lg:hidden text-white p-1.5"><span class="iconify text-xl" data-icon="mdi:menu"></span></button>
                 <a href="index.html" class="flex items-center gap-2">
                     <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-sm" data-icon="mdi:truck-fast"></span></div>
-                    <span class="hidden sm:block font-semibold text-white text-sm">ChapShop <span class="text-cyan-400">Delivery</span></span>
+                    <span class="hidden sm:block font-semibold text-sm text-white">ChapShop <span class="text-cyan-400">Delivery</span></span>
                 </a>
             </div>
             <div class="flex items-center gap-3">
                 <div class="hidden sm:flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-1.5">
                     <div class="w-7 h-7 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:account"></span></div>
-                    <span id="nav-username" class="text-xs text-slate-300 font-medium">Loading...</span>
+                    <span id="nav-username" class="text-xs text-slate-300 font-medium">Merchant</span>
                 </div>
-                <button onclick="handleLogout()" class="text-slate-400 hover:text-red-400 transition-colors p-2" title="Logout"><span class="iconify text-xl" data-icon="mdi:logout"></span></button>
+                <button onclick="handleLogout()" class="text-slate-400 hover:text-red-400 transition-colors p-2" title="Logout">
+                    <span class="iconify text-xl" data-icon="mdi:logout"></span>
+                </button>
             </div>
         </div>
     </nav>
 
+    <!-- Sidebar Overlay -->
     <div id="sidebar-overlay" class="fixed inset-0 z-[55] bg-black/60 hidden lg:hidden"></div>
 
+    <!-- Sidebar -->
     <aside id="sidebar" class="sidebar closed lg:!transform-none fixed top-16 left-0 bottom-0 w-64 z-[60] bg-[#0f172a] border-r border-white/[0.08] overflow-y-auto">
         <div class="p-4">
             <div class="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border border-cyan-500/20 rounded-xl p-4 mb-6">
                 <div class="flex items-center gap-3 mb-2">
                     <div class="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:storefront"></span></div>
-                    <div><p id="sidebar-business" class="text-sm font-medium text-white truncate max-w-[140px]">Loading...</p><p id="sidebar-email" class="text-[10px] text-slate-500 truncate max-w-[140px]">...</p></div>
+                    <div>
+                        <p id="sidebar-business" class="text-sm font-medium text-white truncate max-w-[140px]">Business</p>
+                        <p id="sidebar-email" class="text-[10px] text-slate-500 truncate max-w-[140px]">email</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 bg-green-400 rounded-full"></div><span class="text-[10px] text-green-400 font-medium">Connected to Database</span></div>
+                <div class="flex items-center gap-1.5">
+                    <div class="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                    <span class="text-[10px] text-green-400 font-medium">Active Account</span>
+                </div>
             </div>
             <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">Menu</p>
             <nav class="space-y-1">
-                <a href="#" onclick="showSection('overview')" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="overview"><span class="iconify text-lg" data-icon="mdi:view-dashboard"></span> Overview</a>
-                <a href="#" onclick="showSection('orders')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="orders"><span class="iconify text-lg" data-icon="mdi:package-variant"></span> Orders</a>
-                <a href="#" onclick="showSection('remittance')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="remittance"><span class="iconify text-lg" data-icon="mdi:cash-multiple"></span> COD Remittance</a>
-                <a href="#" onclick="showSection('notifications')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="notifications"><span class="iconify text-lg" data-icon="mdi:cellphone-message"></span> SMS Notifications</a>
-                <a href="#" onclick="showSection('account-manager')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="account-manager"><span class="iconify text-lg" data-icon="mdi:account-heart"></span> Account Manager</a>
+                <a href="javascript:void(0)" onclick="showSection('overview')" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="overview"><span class="iconify text-lg" data-icon="mdi:view-dashboard"></span> Overview</a>
+                <a href="javascript:void(0)" onclick="showSection('orders')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="orders"><span class="iconify text-lg" data-icon="mdi:package-variant"></span> Orders</a>
+                <a href="javascript:void(0)" onclick="showSection('remittance')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="remittance"><span class="iconify text-lg" data-icon="mdi:cash-multiple"></span> COD Remittance</a>
+                <a href="javascript:void(0)" onclick="showSection('notifications')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="notifications"><span class="iconify text-lg" data-icon="mdi:cellphone-message"></span> SMS Notifications</a>
+                <a href="javascript:void(0)" onclick="showSection('account-manager')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="account-manager"><span class="iconify text-lg" data-icon="mdi:account-heart"></span> Account Manager</a>
                 <a href="index.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400"><span class="iconify text-lg" data-icon="mdi:home-outline"></span> Back to Website</a>
             </nav>
-            <div class="mt-8 p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl">
-                <p class="text-[10px] text-slate-500 mb-1">🔒 Secure Database</p>
-                <p class="text-[10px] text-cyan-400">Powered by Supabase</p>
-            </div>
         </div>
     </aside>
 
+    <!-- Main Content -->
     <main class="lg:ml-64 pt-16 min-h-screen">
-        <section id="section-overview" class="p-4 md:p-6 fade-in">
+        <section id="section-overview" class="p-4 md:p-6">
             <div class="mb-6">
                 <h1 class="text-xl md:text-2xl font-semibold text-white">Welcome back, <span id="welcome-name">Merchant</span></h1>
                 <p class="text-sm text-slate-500 mt-1">Here's what's happening with your deliveries today.</p>
@@ -117,48 +122,216 @@
             </div>
         </section>
 
-        <section id="section-orders" class="p-4 md:p-6 hidden"><div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Orders</h1><p class="text-sm text-slate-500 mt-1">Manage and track all your deliveries</p></div><div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-8 text-center"><span class="iconify text-4xl text-slate-600 mb-3" data-icon="mdi:package-variant"></span><p class="text-slate-400">Order management coming soon!</p></div></section>
-        <section id="section-remittance" class="p-4 md:p-6 hidden"><div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Fast COD Remittance</h1><p class="text-sm text-slate-500 mt-1">Track your COD collections and M-Pesa/Bank transfers</p></div><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div class="bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/20 rounded-xl p-5"><div class="flex items-center gap-3 mb-2"><span class="iconify text-green-400 text-2xl" data-icon="mdi:cash-check"></span></div><p class="text-xl font-bold text-white">TZS 3.85M</p><p class="text-xs text-green-400">Total Remitted</p><p class="text-[10px] text-slate-500 mt-2">→ M-Pesa: TZS 2.1M | Bank: TZS 1.75M</p></div><div class="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border border-yellow-500/20 rounded-xl p-5"><div class="flex items-center gap-3 mb-2"><span class="iconify text-yellow-400 text-2xl" data-icon="mdi:clock-outline"></span></div><p class="text-xl font-bold text-white">TZS 350K</p><p class="text-xs text-yellow-400">Pending</p><p class="text-[10px] text-slate-500 mt-2">Next remittance: Jan 17, 2025</p></div><div class="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border border-cyan-500/20 rounded-xl p-5"><div class="flex items-center gap-3 mb-2"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:timer-sand"></span></div><p class="text-xl font-bold text-white">18 hours</p><p class="text-xs text-cyan-400">Avg. Remittance Time</p><p class="text-[10px] text-slate-500 mt-2">Target: 24 hours ✓</p></div></div></section>
-        <section id="section-notifications" class="p-4 md:p-6 hidden"><div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">SMS Notifications</h1><p class="text-sm text-slate-500 mt-1">Track all SMS alerts sent to you and your customers</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center gap-4"><div class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:message-text"></span></div><div><p class="text-lg font-bold text-white">1,247</p><p class="text-xs text-slate-500">SMS Sent This Month</p></div></div><div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center gap-4"><div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center"><span class="iconify text-green-400 text-2xl" data-icon="mdi:check-all"></span></div><div><p class="text-lg font-bold text-white">99.2%</p><p class="text-xs text-slate-500">Delivery Rate</p></div></div></div><div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5"><div class="space-y-3"><div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-sm" data-icon="mdi:check-circle"></span></div><div><p class="text-xs text-white">Order #CS-2450 delivered to Fatma Ali</p><p class="text-[10px] text-slate-500">Customer notified • Jan 14, 14:32</p></div></div><div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:truck"></span></div><div><p class="text-xs text-white">Order #CS-2451 in transit to Kigoma</p><p class="text-[10px] text-slate-500">You & customer notified • Jan 15, 09:15</p></div></div><div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:cash"></span></div><div><p class="text-xs text-white">TZS 450,000 remitted to your M-Pesa</p><p class="text-[10px] text-slate-500">You notified • Jan 14, 16:00</p></div></div></div></div></section>
-        <section id="section-account-manager" class="p-4 md:p-6 hidden"><div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Dedicated Account Manager</h1><p class="text-sm text-slate-500 mt-1">Your personal support contact</p></div><div class="max-w-lg mx-auto bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 text-center"><div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-full flex items-center justify-center mx-auto mb-4"><span class="iconify text-white text-4xl" data-icon="mdi:account-tie"></span></div><h3 class="text-lg font-semibold text-white mb-1">David Mwangi</h3><p class="text-sm text-cyan-400 mb-4">Senior Account Manager</p><div class="space-y-3 text-left"><div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-cyan-400" data-icon="mdi:phone"></span><div><p class="text-[10px] text-slate-500">Phone</p><p class="text-sm text-white">+255 769 800 220</p></div></div><div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-green-400" data-icon="mdi:whatsapp"></span><div><p class="text-[10px] text-slate-500">WhatsApp</p><p class="text-sm text-white">+255 769 800 220</p></div></div></div><a href="https://wa.me/255769800220" target="_blank" class="mt-5 w-full bg-green-500 text-white font-medium text-sm py-3 rounded-xl hover:bg-green-400 transition-colors flex items-center justify-center gap-2"><span class="iconify text-lg" data-icon="mdi:whatsapp"></span> Chat on WhatsApp</a></div></section>
+        <section id="section-orders" class="p-4 md:p-6" style="display:none;">
+            <div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Orders</h1><p class="text-sm text-slate-500 mt-1">Manage and track all your deliveries</p></div>
+            <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-8 text-center">
+                <span class="iconify text-4xl text-slate-600 mb-3" data-icon="mdi:package-variant"></span>
+                <p class="text-slate-400">Order management coming soon!</p>
+            </div>
+        </section>
+
+        <section id="section-remittance" class="p-4 md:p-6" style="display:none;">
+            <div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Fast COD Remittance</h1><p class="text-sm text-slate-500 mt-1">Track your COD collections and M-Pesa/Bank transfers</p></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/20 rounded-xl p-5">
+                    <span class="iconify text-green-400 text-2xl mb-2" data-icon="mdi:cash-check"></span>
+                    <p class="text-xl font-bold text-white">TZS 3.85M</p>
+                    <p class="text-xs text-green-400">Total Remitted</p>
+                    <p class="text-[10px] text-slate-500 mt-2">→ M-Pesa: TZS 2.1M | Bank: TZS 1.75M</p>
+                </div>
+                <div class="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border border-yellow-500/20 rounded-xl p-5">
+                    <span class="iconify text-yellow-400 text-2xl mb-2" data-icon="mdi:clock-outline"></span>
+                    <p class="text-xl font-bold text-white">TZS 350K</p>
+                    <p class="text-xs text-yellow-400">Pending</p>
+                    <p class="text-[10px] text-slate-500 mt-2">Next remittance: Jan 17, 2025</p>
+                </div>
+                <div class="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border border-cyan-500/20 rounded-xl p-5">
+                    <span class="iconify text-cyan-400 text-2xl mb-2" data-icon="mdi:timer-sand"></span>
+                    <p class="text-xl font-bold text-white">18 hours</p>
+                    <p class="text-xs text-cyan-400">Avg. Remittance Time</p>
+                    <p class="text-[10px] text-slate-500 mt-2">Target: 24 hours ✓</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-notifications" class="p-4 md:p-6" style="display:none;">
+            <div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">SMS Notifications</h1><p class="text-sm text-slate-500 mt-1">Track all SMS alerts</p></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:message-text"></span></div>
+                    <div><p class="text-lg font-bold text-white">1,247</p><p class="text-xs text-slate-500">SMS Sent This Month</p></div>
+                </div>
+                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center"><span class="iconify text-green-400 text-2xl" data-icon="mdi:check-all"></span></div>
+                    <div><p class="text-lg font-bold text-white">99.2%</p><p class="text-xs text-slate-500">Delivery Rate</p></div>
+                </div>
+            </div>
+            <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                <div class="space-y-3">
+                    <div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-sm" data-icon="mdi:check-circle"></span></div><div><p class="text-xs text-white">Order #CS-2450 delivered to Fatma Ali</p><p class="text-[10px] text-slate-500">Customer notified • Jan 14, 14:32</p></div></div>
+                    <div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:truck"></span></div><div><p class="text-xs text-white">Order #CS-2451 in transit to Kigoma</p><p class="text-[10px] text-slate-500">You & customer notified • Jan 15, 09:15</p></div></div>
+                    <div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:cash"></span></div><div><p class="text-xs text-white">TZS 450,000 remitted to your M-Pesa</p><p class="text-[10px] text-slate-500">You notified • Jan 14, 16:00</p></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-account-manager" class="p-4 md:p-6" style="display:none;">
+            <div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Dedicated Account Manager</h1><p class="text-sm text-slate-500 mt-1">Your personal support contact</p></div>
+            <div class="max-w-lg mx-auto bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 text-center">
+                <div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-full flex items-center justify-center mx-auto mb-4"><span class="iconify text-white text-4xl" data-icon="mdi:account-tie"></span></div>
+                <h3 class="text-lg font-semibold text-white mb-1">David Mwangi</h3>
+                <p class="text-sm text-cyan-400 mb-4">Senior Account Manager</p>
+                <div class="space-y-3 text-left">
+                    <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-cyan-400" data-icon="mdi:phone"></span><div><p class="text-[10px] text-slate-500">Phone</p><p class="text-sm text-white">+255 769 800 220</p></div></div>
+                    <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-green-400" data-icon="mdi:whatsapp"></span><div><p class="text-[10px] text-slate-500">WhatsApp</p><p class="text-sm text-white">+255 769 800 220</p></div></div>
+                </div>
+                <a href="https://wa.me/255769800220" target="_blank" class="mt-5 w-full bg-green-500 text-white font-medium text-sm py-3 rounded-xl hover:bg-green-400 transition-colors flex items-center justify-center gap-2"><span class="iconify text-lg" data-icon="mdi:whatsapp"></span> Chat on WhatsApp</a>
+            </div>
+        </section>
     </main>
 
     <script>
-        const supabase = window.supabase.createClient('https://lmbpnnfyelsqhwzatwbv.supabase.co', 'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm');
-
-        async function init() {
-            const { data: { user }, error } = await supabase.auth.getUser();
-            if (!user) { window.location.href = 'merchants.html'; return; }
-            const { data: merchant } = await supabase.from('merchants').select('*').eq('user_id', user.id).single();
-            if (merchant) {
-                document.getElementById('nav-username').textContent = merchant.name || 'Merchant';
-                document.getElementById('sidebar-business').textContent = merchant.business || 'Business';
-                document.getElementById('sidebar-email').textContent = merchant.email || '';
-                document.getElementById('welcome-name').textContent = merchant.name?.split(' ')[0] || 'Merchant';
-            }
-        }
-        init();
-
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
-        document.getElementById('sidebar-toggle').addEventListener('click', () => { sidebar.classList.toggle('closed'); sidebarOverlay.classList.toggle('hidden'); });
-        sidebarOverlay.addEventListener('click', () => { sidebar.classList.add('closed'); sidebarOverlay.classList.add('hidden'); });
+        var SUPABASE_URL = 'https://lmbpnnfyelsqhwzatwbv.supabase.co';
+        var SUPABASE_KEY = 'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm';
+        var db = null;
+        var merchantData = null;
 
         function showSection(section) {
-            document.querySelectorAll('[id^="section-"]').forEach(s => s.classList.add('hidden'));
-            const target = document.getElementById('section-' + section);
-            if (target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            const link = document.querySelector(`.sidebar-link[data-section="${section}"]`);
-            if (link) link.classList.add('active');
-            if (window.innerWidth < 1024) { sidebar.classList.add('closed'); sidebarOverlay.classList.add('hidden'); }
+            var sections = document.querySelectorAll('[id^="section-"]');
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].style.display = 'none';
+            }
+            var target = document.getElementById('section-' + section);
+            if (target) target.style.display = 'block';
+            var links = document.querySelectorAll('.sidebar-link');
+            for (var i = 0; i < links.length; i++) {
+                links[i].classList.remove('active');
+                if (links[i].getAttribute('data-section') === section) {
+                    links[i].classList.add('active');
+                }
+            }
         }
 
-        function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000); }
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 4000);
+        }
 
-        async function handleLogout() {
-            await supabase.auth.signOut();
-            window.location.href = 'merchants.html';
+        function handleLogout() {
+            if (db) {
+                db.auth.signOut().then(function() {
+                    localStorage.removeItem('chapshop_logged_in');
+                    showToast('Logged out!');
+                    setTimeout(function() {
+                        window.location.href = 'merchants.html';
+                    }, 800);
+                });
+            } else {
+                localStorage.removeItem('chunkshop_logged_in');
+                showToast('Logged out!');
+                setTimeout(function() {
+                    window.location.href = 'merchants.html';
+                }, 800);
+            }
+        }
+
+        // Sidebar toggle
+        var sidebar = document.getElementById('sidebar');
+        var sidebarOverlay = document.getElementById('sidebar-overlay');
+        document.getElementById('sidebar-toggle').addEventListener('click', function() {
+            sidebar.classList.toggle('closed');
+            sidebarOverlay.classList.toggle('hidden');
+        });
+        sidebarOverlay.addEventListener('click', function() {
+            sidebar.classList.add('closed');
+            sidebarOverlay.classList.add('hidden');
+        });
+
+        // ===== FAST INIT - max 3 second loading =====
+        function initDashboard() {
+            // Show dashboard immediately with "Merchant" as default
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+
+            // Then try to load real data
+            try {
+                if (typeof window.supabase !== 'undefined') {
+                    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    
+                    db.auth.getUser().then(function(result) {
+                        if (!result.data.user) {
+                            window.location.href = 'merchants.html';
+                            return;
+                        }
+                        
+                        // 3 second timeout - if data doesn't load, use localStorage
+                        var loaded = false;
+                        
+                        var timeout = setTimeout(function() {
+                            if (!loaded) {
+                                // Fallback to localStorage
+                                merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in'));
+                                if (merchantData) {
+                                    fillDashboard();
+                                } else {
+                                    window.location.href = 'merchants.html';
+                                }
+                            }
+                        }, 3000);
+                        
+                        db.from('merchants').select('*').eq('user_id', result.data.user.id).single().then(function(result) {
+                            loaded = true;
+                            clearTimeout(timeout);
+                            merchantData = result.data;
+                            fillDashboard();
+                        }).catch(function() {
+                                loaded = true;
+                                clearTimeout(timeout);
+                                merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in'));
+                                if (merchantData) fillDashboard();
+                        });
+                    });
+                } else {
+                    merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in'));
+                    if (merchantData) {
+                        fillDashboard();
+                    } else {
+                        window.location.href = 'javascript:void(0)';
+                    }
+                }
+            } catch(e) {
+                merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in'));
+                if (merchantData) {
+                    fillDashboard();
+                } else {
+                    window.location.href = 'javascript:void(0)';
+                }
+            }
+        }
+
+        function fillDashboard() {
+            if (!merchantData) {
+                window.location.href = 'merchants.html';
+                return;
+            }
+
+            var name = merchantData.name || 'Merchant';
+            var business = merchantData.business || 'Business';
+            var email = merchantData.email || '';
+
+            document.getElementById('nav-username').textContent = name;
+            document.getElementById('sidebar-business').textContent = business;
+            document.getElementById('sidebar-email').textContent = email;
+            document.getElementById('welcome-name').textContent = name.split(' ')[0];
+        }
+
+        // Init
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDashboard);
+        } else {
+            initDashboard();
         }
     </script>
 </body>
