@@ -1,1 +1,395 @@
-pbpaste > ~/Desktop/merchants.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join as Merchant — ChapShop Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        * { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .gradient-text { background: linear-gradient(to bottom, #ffffff, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .glow-line { background: linear-gradient(to right, transparent, #164e63, transparent); height: 1px; }
+        .hero-glow { background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(6,182,212,0.12) 0%, transparent 60%); }
+        .nav-blur { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
+        .mobile-menu.open { transform: translateX(0); }
+        .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .whatsapp-float { position: fixed; bottom: 24px; right: 24px; z-index: 50; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.4); transition: transform 0.3s ease; }
+        .whatsapp-float:hover { transform: scale(1.1); }
+        .platform-chip { transition: all 0.2s ease; cursor: pointer; }
+        .platform-chip.selected { background: rgba(6,182,212,0.2) !important; border-color: rgba(6,182,212,0.5) !important; color: #22d3ee !important; }
+        .platform-chip:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+        .join-glow { background: radial-gradient(ellipse 60% 40% at 30% 50%, rgba(6,182,212,0.08) 0%, transparent 70%); }
+    </style>
+</head>
+<body class="bg-[#020617] text-white">
+
+    <!-- Toast -->
+    <div id="toast" class="toast fixed bottom-6 right-24 z-[100] bg-cyan-900/90 border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+        <span class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
+        <span id="toast-msg" class="text-sm font-medium">Success!</span>
+    </div>
+
+    <!-- WhatsApp -->
+    <a href="https://wa.me/255769799110" target="_blank" class="whatsapp-float" title="Chat on WhatsApp">
+        <span class="iconify text-white text-3xl" data-icon="mdi:whatsapp"></span>
+    </a>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center">
+                    <span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span>
+                </div>
+                <div>
+                    <span class="font-semibold text-white text-[15px]">ChapShop</span>
+                    <span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span>
+                </div>
+            </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Services</a>
+                <a href="index.html#coverage" class="text-sm text-slate-400 hover:text-white transition-colors">Coverage</a>
+                <a href="index.html#how-it-works" class="text-sm text-slate-400 hover:text-white transition-colors">How It Works</a>
+                <a href="index.html#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
+            </div>
+            <div class="hidden md:flex items-center gap-3">
+                <a href="tel:0769799110" class="text-sm text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+                    <span class="iconify text-base" data-icon="mdi:phone"></span>
+                    0769 799 110
+                </a>
+                <a href="index.html#contact" class="bg-white text-[#0f172a] text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-50 transition-colors">
+                    Get a Quote
+                </a>
+            </div>
+            <button id="menu-btn" class="md:hidden text-white p-2">
+                <span class="iconify text-2xl" data-icon="mdi:menu"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 bottom-0 w-72 z-[60] bg-[#0f172a] border-l border-white/10 p-6">
+        <div class="flex justify-end mb-8">
+            <button id="close-menu" class="text-white p-2"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
+        </div>
+        <div class="flex flex-col gap-4">
+            <a href="index.html" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Home</a>
+            <a href="index.html#services" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Services</a>
+            <a href="index.html#coverage" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Coverage</a>
+            <a href="index.html#contact" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Contact</a>
+            <div class="glow-line my-4"></div>
+            <a href="tel:0769799110" class="text-cyan-400 text-sm flex items-center gap-2">
+                <span class="iconify" data-icon="mdi:phone"></span> 0769 799 110
+            </a>
+        </div>
+    </div>
+    <div id="menu-overlay" class="fixed inset-0 z-[55] bg-black/60 hidden"></div>
+
+    <!-- Page Header -->
+    <section class="relative hero-glow pt-28 pb-12 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <!-- Breadcrumb -->
+            <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+                <a href="index.html" class="hover:text-white transition-colors">Home</a>
+                <span class="iconify text-xs" data-icon="mdi:chevron-right"></span>
+                <span class="text-cyan-400">Join as Merchant</span>
+            </div>
+            <div class="max-w-3xl">
+                <h1 class="text-3xl md:text-5xl font-medium tracking-tight gradient-text mb-4">Join 500+ Merchants Growing With ChapShop</h1>
+                <p class="text-lg text-slate-400 font-light leading-relaxed">Whether you're selling on Instagram, WhatsApp, Shopify, or your own website — we handle your delivery so you can focus on selling.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Badges -->
+    <section class="border-y border-white/[0.05] py-6">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-wrap items-center justify-center gap-3 md:gap-5">
+                <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-4 py-2">
+                    <span class="iconify text-green-400 text-lg" data-icon="mdi:check-circle"></span>
+                    <span class="text-xs font-medium text-slate-300">No Setup Fee</span>
+                </div>
+                <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-4 py-2">
+                    <span class="iconify text-green-400 text-lg" data-icon="mdi:check-circle"></span>
+                    <span class="text-xs font-medium text-slate-300">Free Integration</span>
+                </div>
+                <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-4 py-2">
+                    <span class="iconify text-green-400 text-lg" data-icon="mdi:check-circle"></span>
+                    <span class="text-xs font-medium text-slate-300">24h Onboarding</span>
+                </div>
+                <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-4 py-2">
+                    <span class="iconify text-green-400 text-lg" data-icon="mdi:check-circle"></span>
+                    <span class="text-xs font-medium text-slate-300">No Monthly Minimum</span>
+                </div>
+                <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-4 py-2">
+                    <span class="iconify text-green-400 text-lg" data-icon="mdi:check-circle"></span>
+                    <span class="text-xs font-medium text-slate-300">Dedicated Support</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-16 relative">
+        <div class="absolute inset-0 join-glow"></div>
+        <div class="relative max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-10">
+
+                <!-- Left — Benefits (2 cols) -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Onboarding Steps -->
+                    <div>
+                        <h3 class="text-lg font-medium text-white mb-5">How Onboarding Works</h3>
+                        <div class="space-y-0">
+                            <div class="flex gap-4 relative">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/30 rounded-full flex items-center justify-center flex-shrink-0 z-10"><span class="text-sm font-semibold text-cyan-400">1</span></div>
+                                    <div class="w-px h-full bg-white/[0.06] my-1"></div>
+                                </div>
+                                <div class="pb-6"><h4 class="text-sm font-medium text-white mb-1">Submit Your Application</h4><p class="text-xs text-slate-400 leading-relaxed">Fill out the form with your business details. Takes less than 2 minutes.</p></div>
+                            </div>
+                            <div class="flex gap-4 relative">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/30 rounded-full flex items-center justify-center flex-shrink-0 z-10"><span class="text-sm font-semibold text-cyan-400">2</span></div>
+                                    <div class="w-px h-full bg-white/[0.06] my-1"></div>
+                                </div>
+                                <div class="pb-6"><h4 class="text-sm font-medium text-white mb-1">Verification & Setup</h4><p class="text-xs text-slate-400 leading-relaxed">Our team verifies your business and sets up your account — usually within 24 hours.</p></div>
+                            </div>
+                            <div class="flex gap-4 relative">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/30 rounded-full flex items-center justify-center flex-shrink-0 z-10"><span class="text-sm font-semibold text-cyan-400">3</span></div>
+                                    <div class="w-px h-full bg-white/[0.06] my-1"></div>
+                                </div>
+                                <div class="pb-6"><h4 class="text-sm font-medium text-white mb-1">Integrate & Connect</h4><p class="text-xs text-slate-400 leading-relaxed">Connect your store via API, dashboard, or CSV. Free integration support included.</p></div>
+                            </div>
+                            <div class="flex gap-4 relative">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0 z-10"><span class="iconify text-white text-lg" data-icon="mdi:rocket-launch"></span></div>
+                                </div>
+                                <div><h4 class="text-sm font-medium text-white mb-1">Start Shipping & Earning</h4><p class="text-xs text-slate-400 leading-relaxed">Create orders and we deliver. Receive COD remittances to M-Pesa or bank.</p></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- What You Get -->
+                    <div>
+                        <h3 class="text-lg font-medium text-white mb-4">What You Get as a Merchant</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3 bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3">
+                                <span class="iconify text-cyan-400 text-lg flex-shrink-0" data-icon="mdi:view-dashboard"></span>
+                                <span class="text-sm text-slate-300">Merchant Dashboard — manage orders, track, analyze</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3">
+                                <span class="iconify text-cyan-400 text-lg flex-shrink-0" data-icon="mdi:cellphone-message"></span>
+                                <span class="text-sm text-slate-300">SMS Notifications to you & your customers</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3">
+                                <span class="iconify text-cyan-400 text-lg flex-shrink-0" data-icon="mdi:cash-fast"></span>
+                                <span class="text-sm text-slate-300">Fast COD Remittance — M-Pesa / Bank transfer</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3">
+                                <span class="iconify text-cyan-400 text-lg flex-shrink-0" data-icon="mdi:chart-bar"></span>
+                                <span class="text-sm text-slate-300">Analytics & Reports — delivery performance, COD tracking</span>
+                            </div>
+                            <div class="flex items-center gap-3 bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3">
+                                <span class="iconify text-cyan-400 text-lg flex-shrink-0" data-icon="mdi:account-heart"></span>
+                                <span class="text-sm text-slate-300">Dedicated Account Manager for your business</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integrations -->
+                    <div>
+                        <h3 class="text-sm font-medium text-slate-400 mb-3">Seamless Integrations</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:shopify"></span><span class="text-xs text-slate-400">Shopify</span></div>
+                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:wordpress"></span><span class="text-xs text-slate-400">WooCommerce</span></div>
+                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:api"></span><span class="text-xs text-slate-400">REST API</span></div>
+                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:file-csv"></span><span class="text-xs text-slate-400">CSV Upload</span></div>
+                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:instagram"></span><span class="text-xs text-slate-400">Instagram</span></div>
+                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:whatsapp"></span><span class="text-xs text-slate-400">WhatsApp</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right — Form (3 cols) -->
+                <div class="lg:col-span-3">
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-1 bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent rounded-full"></div>
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/20 rounded-xl flex items-center justify-center"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:account-plus"></span></div>
+                            <div><h3 class="text-lg font-medium text-white">Merchant Application</h3><p class="text-xs text-slate-500">Fill in your details to join ChapShop Delivery</p></div>
+                        </div>
+
+                        <form id="merchant-form" class="space-y-5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Full Name <span class="text-red-400">*</span></label><input type="text" name="fullname" required placeholder="e.g. Amina Kimaro" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"></div>
+                                <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Business / Store Name <span class="text-red-400">*</span></label><input type="text" name="business" required placeholder="e.g. ZanzibarStyle" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Email Address <span class="text-red-400">*</span></label><input type="email" name="email" required placeholder="amina@store.co.tz" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"></div>
+                                <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Phone Number <span class="text-red-400">*</span></label><input type="tel" name="phone" required placeholder="0769 xxx xxx" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">City / Region <span class="text-red-400">*</span></label>
+                                    <select name="city" required class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>'); background-repeat: no-repeat; background-position: right 16px center;">
+                                        <option value="" disabled selected>Select your city</option>
+                                        <option>Dar es Salaam</option><option>Dodoma</option><option>Mwanza</option><option>Arusha</option><option>Mbeya</option><option>Morogoro</option><option>Tanga</option><option>Zanzibar</option><option>Iringa</option><option>Kagera</option><option>Kigoma</option><option>Lindi</option><option>Mara</option><option>Pwani</option><option>Ruvuma</option><option>Shinyanga</option><option>Singida</option><option>Tabora</option><option>Rukwa</option><option>Katavi</option><option>Simiyu</option><option>Geita</option><option>Njombe</option><option>Other</option>
+                                    </select>
+                                </div>
+                                <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Business Type <span class="text-red-400">*</span></label>
+                                    <select name="biztype" required class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>'); background-repeat: no-repeat; background-position: right 16px center;">
+                                        <option value="" disabled selected>Select type</option>
+                                        <option>E-Commerce Store</option><option>Social Media Seller (IG/WhatsApp/FB)</option><option>Pharmacy / Medical</option><option>Fashion & Apparel</option><option>Electronics</option><option>Food & Groceries</option><option>FMCG / Consumer Goods</option><option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-slate-400 mb-2.5 block">Where Do You Sell? <span class="text-slate-600 font-normal">(select all that apply)</span></label>
+                                <div class="flex flex-wrap gap-2" id="platform-chips">
+                                    <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="shopify"><span class="iconify text-sm" data-icon="mdi:shopify"></span> Shopify</button>
+                                    <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="woocommerce"><span class="iconify text-sm" data-icon="mdi:wordpress"></span> WooCommerce</button>
+                                    <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="instagram"><span class="iconify text-sm" data-icon="mdi:instagram"></span> Instagram</button>
+                                    <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="whatsapp"><span class="iconify text-sm" data-icon="mdi:whatsapp"></span> WhatsApp</button>
+                                    <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="facebook"><span class="iconify text-sm" data-icon="mdi:facebook"></span> Facebook</button>
+                                    <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="tiktok"><span class="iconify text-sm" data-icon="ic:baseline-tiktok"></span> TikTok</button>
+                                    <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="website"><span class="iconify text-sm" data-icon="mdi:web"></span> Own Website</button>
+                                    <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="physical"><span class="iconify text-sm" data-icon="mdi:store"></span> Physical Store</button>
+                                    <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="other"><span class="iconify text-sm" data-icon="mdi:dots-horizontal"></span> Other</button>
+                                </div>
+                                <input type="hidden" name="platforms" id="platforms-input">
+                            </div>
+                            <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Estimated Monthly Orders <span class="text-red-400">*</span></label>
+                                <select name="volume" required class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>'); background-repeat: no-repeat; background-position: right 16px center;">
+                                    <option value="" disabled selected>Select estimated volume</option>
+                                    <option>Less than 50 orders/month</option><option>50 - 200 orders/month</option><option>200 - 500 orders/month</option><option>500 - 1,000 orders/month</option><option>1,000 - 5,000 orders/month</option><option>5,000+ orders/month</option>
+                                </select>
+                            </div>
+                            <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Services You Need <span class="text-red-400">*</span></label>
+                                <select name="services" required class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>'); background-repeat: no-repeat; background-position: right 16px center;">
+                                    <option value="" disabled selected>What services do you need?</option>
+                                    <option>Cash On Delivery Only</option><option>COD + Courier & Delivery</option><option>COD + Warehouse + Fulfillment</option><option>Full 3PL (Warehouse + Fulfillment + Delivery)</option><option>Medical Courier</option><option>Call Center + COD</option><option>Reverse Logistics + COD</option><option>Custom Package</option>
+                                </select>
+                            </div>
+                            <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Website / Store Link <span class="text-slate-600 font-normal">(optional)</span></label><input type="url" name="website" placeholder="https://your-store.com or Instagram link" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"></div>
+                            <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">How Did You Hear About Us?</label>
+                                <select name="source" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>'); background-repeat: no-repeat; background-position: right 16px center;">
+                                    <option value="" disabled selected>Select an option</option>
+                                    <option>Google Search</option><option>Facebook / Instagram Ad</option><option>WhatsApp Referral</option><option>Friend / Colleague</option><option>Trade Fair / Event</option><option>Jumia / Marketplace</option><option>Other</option>
+                                </select>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <input type="checkbox" id="terms" required class="mt-1 w-4 h-4 rounded border-white/20 bg-white/[0.04] text-cyan-500 focus:ring-cyan-500/30 focus:ring-offset-0 cursor-pointer">
+                                <label for="terms" class="text-xs text-slate-400 leading-relaxed cursor-pointer">I agree to the <a href="#" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">Terms of Service</a> and <a href="#" class="text-cyan-400 hover:text-cyan-300 underline underline-offset-2">Privacy Policy</a>.</label>
+                            </div>
+                            <button type="submit" class="w-full bg-cyan-500 text-white font-medium text-sm py-4 rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 mt-2">
+                                <span class="iconify text-lg" data-icon="mdi:send"></span> Submit Merchant Application
+                            </button>
+                            <div class="flex items-center justify-center gap-4 pt-1">
+                                <span class="text-[11px] text-slate-500 flex items-center gap-1"><span class="iconify text-green-400 text-xs" data-icon="mdi:lock"></span> Secure & Encrypted</span>
+                                <span class="text-[11px] text-slate-500">•</span>
+                                <span class="text-[11px] text-slate-500">Response within 24 hours</span>
+                                <span class="text-[11px] text-slate-500">•</span>
+                                <span class="text-[11px] text-slate-500">No spam</span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Note -->
+            <div class="mt-10 text-center">
+                <p class="text-sm text-slate-500 mb-2">Already a ChapShop merchant?</p>
+                <a href="https://wa.me/255769799110?text=Hi%20ChapShop%2C%20I%27m%20already%20a%20merchant%20and%20need%20help" target="_blank" class="inline-flex items-center gap-2 text-cyan-400 text-sm font-medium hover:text-cyan-300 transition-colors">
+                    <span class="iconify" data-icon="mdi:whatsapp"></span> Chat with our support team on WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/[0.05] pt-12 pb-8">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+                <a href="index.html" class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
+                    <div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div>
+                </a>
+                <div class="flex items-center gap-6">
+                    <a href="index.html" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a>
+                    <a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Services</a>
+                    <a href="index.html#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="glow-line mb-6"></div>
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-xs text-slate-500">© 2025 ChapShop Delivery. All rights reserved. Registered in Tanzania.</p>
+                <div class="flex items-center gap-4">
+                    <span class="text-xs text-slate-500 flex items-center gap-1.5"><span class="iconify text-cyan-400" data-icon="mdi:shield-check"></span> SSL Secured</span>
+                    <span class="text-xs text-slate-500 flex items-center gap-1.5"><span class="iconify text-cyan-400" data-icon="mdi:certificate"></span> TCRA Licensed</span>
+                    <span class="text-xs text-slate-500 flex items-center gap-1.5"><span class="iconify text-cyan-400" data-icon="mdi:lock"></span> Insured</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+        function openMenu() { mobileMenu.classList.add('open'); menuOverlay.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+        function closeMenu() { mobileMenu.classList.remove('open'); menuOverlay.classList.add('hidden'); document.body.style.overflow = ''; }
+        menuBtn.addEventListener('click', openMenu);
+        closeMenuBtn.addEventListener('click', closeMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+        mobileLinks.forEach(link => link.addEventListener('click', closeMenu));
+
+        function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 5000); }
+
+        const selectedPlatforms = new Set();
+        document.querySelectorAll('.platform-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const val = chip.dataset.value;
+                if (selectedPlatforms.has(val)) { selectedPlatforms.delete(val); chip.classList.remove('selected'); }
+                else { selectedPlatforms.add(val); chip.classList.add('selected'); }
+                document.getElementById('platforms-input').value = Array.from(selectedPlatforms).join(',');
+            });
+        });
+
+        document.getElementById('merchant-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Submitting...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            setTimeout(() => {
+                btn.innerHTML = '<span class="iconify text-lg" data-icon="mdi:check-circle"></span> Application Submitted!';
+                btn.style.background = '#059669';
+                btn.style.opacity = '1';
+                showToast('🎉 Application received! Our team will contact you within 24 hours.');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.background = '';
+                    btn.disabled = false;
+                    this.reset();
+                    selectedPlatforms.clear();
+                    document.querySelectorAll('.platform-chip').forEach(c => c.classList.remove('selected'));
+                    document.getElementById('platforms-input').value = '';
+                }, 4000);
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
