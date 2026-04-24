@@ -11,20 +11,14 @@
         * { font-family: 'Inter', sans-serif; }
         .gradient-text { background: linear-gradient(to bottom, #fff, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero-glow { background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(6,182,212,0.12) 0%, transparent 60%); }
-        .glow-line { background: linear-gradient(to right, transparent, #164e63, transparent); height: 1px; }
-        .join-glow { background: radial-gradient(ellipse 60% 40% at 30% 50%, rgba(6,182,212,0.08) 0%, transparent 70%); }
-        .nav-blur { backdrop-filter: blur(12px); }
         .form-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; }
         .form-input:focus { border-color: #06b6d4; outline: none; }
         .form-input::placeholder { color: #475569; }
-        .error-msg { color: #f87171; font-size: 11px; margin-top: 4px; display: none; }
-        .error-msg.show { display: block; }
-        .input-error { border-color: #f87171 !important; }
+        .nav-blur { backdrop-filter: blur(12px); }
     </style>
 </head>
 <body class="bg-[#020617] text-white">
 
-    <!-- Nav -->
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2.5">
@@ -33,12 +27,11 @@
                 </div>
                 <span class="font-semibold text-white text-[15px]">ChapShop<span class="text-cyan-400 ml-0.5">Delivery</span></span>
             </a>
-            <a href="index.html" class="text-sm text-slate-400 hover:text-white">← Back to Home</a>
+            <a href="index.html" class="text-sm text-slate-400 hover:text-white">← Back</a>
         </div>
     </nav>
 
-    <!-- Header -->
-    <section class="relative hero-glow pt-28 pb-12">
+    <section class="hero-glow pt-28 pb-12">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
                 <a href="index.html" class="hover:text-white">Home</a>
@@ -50,7 +43,6 @@
         </div>
     </section>
 
-    <!-- Trust Badges -->
     <section class="border-y border-white/[0.05] py-6">
         <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-center gap-3">
             <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-4 py-2">
@@ -61,15 +53,14 @@
                 <span class="iconify text-green-400" data-icon="mdi:check-circle"></span>
                 <span class="text-xs text-slate-300">Free Integration</span>
             </div>
-            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-4 py-2">
-                <span class="iconify text-green-400" data-icon="mdi:check-circle"></span>
-                <span class="text-xs text-slate-300">Dedicated Support</span>
-            </div>
         </div>
     </section>
 
-    <!-- Main Form -->
-    <section class="join-glow py-16">
+    <div id="dbStatus" class="max-w-md mx-auto px-6 mb-4 text-center">
+        <span class="text-yellow-400 text-xs">⏳ Loading...</span>
+    </div>
+
+    <section class="pb-16">
         <div class="max-w-md mx-auto px-6">
 
             <!-- Tabs -->
@@ -85,9 +76,7 @@
                         <span class="iconify text-cyan-400 text-2xl" data-icon="mdi:account-plus"></span>
                     </div>
                     <h2 class="text-xl font-semibold text-white">Create Account</h2>
-                    <p class="text-xs text-slate-500 mt-1">Fill in your details to join ChapShop</p>
                 </div>
-
                 <form id="signupForm" class="space-y-4">
                     <div>
                         <label class="text-xs text-slate-400 mb-1 block">Full Name *</label>
@@ -121,7 +110,7 @@
                         <label class="text-xs text-slate-400 mb-1 block">Password * (min 6)</label>
                         <input type="password" id="sPassword" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Min 6 characters" required>
                     </div>
-                    <button type="submit" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400">Create Account</button>
+                    <button type="submit" id="signupBtn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400">Create Account</button>
                     <p class="text-center text-slate-500 text-xs">Already have an account? <a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">Login here</a></p>
                 </form>
             </div>
@@ -133,11 +122,10 @@
                         <span class="iconify text-cyan-400 text-2xl" data-icon="mdi:login"></span>
                     </div>
                     <h2 class="text-xl font-semibold text-white">Welcome Back</h2>
-                    <p class="text-xs text-slate-500 mt-1">Login to access your dashboard</p>
                 </div>
 
                 <div id="loginError" style="display:none; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:8px; padding:8px 12px; margin-bottom:16px;">
-                    <p class="text-sm text-red-400">Invalid email or password</p>
+                    <p class="text-sm text-red-400" id="loginErrorMsg">Invalid email or password</p>
                 </div>
 
                 <form id="loginForm" class="space-y-4">
@@ -149,32 +137,27 @@
                         <label class="text-xs text-slate-400 mb-1 block">Password *</label>
                         <input type="password" id="lPassword" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Your password" required>
                     </div>
-                    <button type="submit" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400">Login to Dashboard</button>
+                    <button type="submit" id="loginBtn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400">Login to Dashboard</button>
                     <p class="text-center text-slate-500 text-xs">New here? <a href="javascript:void(0)" onclick="showSignup()" class="text-cyan-400">Create an account</a></p>
                 </form>
-            </div>
-
-            <!-- Info -->
-            <div class="mt-6 text-center">
-                <p class="text-[11px] text-slate-500 flex items-center justify-center gap-1.5">
-                    <span class="iconify text-green-400" data-icon="mdi:lock"></span> Secure & Encrypted — Real Database
-                </p>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="border-t border-white/[0.05] py-8">
         <div class="max-w-7xl mx-auto px-6 text-center">
             <p class="text-xs text-slate-500">© 2025 ChapShop Delivery. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Supabase - load at bottom -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
 
     <script>
-        // ===== TAB SWITCHING =====
+        var SUPABASE_URL = 'https://lmbpnnfyelsqhwzatwbv.supabase.co';
+        var SUPABASE_KEY = 'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm';
+        var db = null;
+        var useLocal = false;
+
         function showSignup() {
             document.getElementById('signupBox').style.display = 'block';
             document.getElementById('loginBox').style.display = 'none';
@@ -190,20 +173,73 @@
             document.getElementById('tabSignup').className = 'flex-1 py-2.5 text-sm font-medium rounded-md text-slate-500 border border-transparent';
         }
 
-        // ===== SUPABASE =====
-        var db = null;
-        try {
-            if (typeof window.supabase !== 'undefined') {
-                db = window.supabase.createClient(
-                    'https://lmbpnnfyelsqhwzatwbv.supabase.co',
-                    'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm'
-                );
+        // Local storage fallback
+        function localSignUp(name, business, email, phone, city, password) {
+            var merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
+            for (var i = 0; i < merchants.length; i++) {
+                if (merchants[i].email === email) {
+                    return { error: { message: 'Email already registered' } };
+                }
             }
-        } catch(e) {
-            console.log('Supabase init error:', e);
+            merchants.push({ name: name, business: business, email: email, phone: phone, city: city, password: password });
+            localStorage.setItem('chapshop_merchants', JSON.stringify(merchants));
+            return { data: { user: { id: 'local-' + Date.now() } } };
         }
 
-        // ===== SIGN UP =====
+        function localLogin(email, password) {
+            var merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
+            for (var i = 0; i < merchants.length; i++) {
+                if (merchants[i].email === email && merchants[i].password === password) {
+                    localStorage.setItem('chapshop_logged_in', JSON.stringify(merchants[i]));
+                    return { data: { user: merchants[i] } };
+                }
+            }
+            return { error: { message: 'Invalid email or password' } };
+        }
+
+        function localGetUser() {
+            var user = localStorage.getItem('chapshop_logged_in');
+            return user ? { data: { user: JSON.parse(user) } } : { data: { user: null } };
+        }
+
+        // Unified functions
+        function doSignUp(name, business, email, phone, city, password) {
+            if (useLocal) {
+                return Promise.resolve(localSignUp(name, business, email, phone, city, password));
+            }
+            
+            return db.auth.signUp({
+                email: email,
+                password: password,
+                options: { data: { name: name, business: business, phone: phone, city: city } }
+            }).then(function(authResult) {
+                if (authResult.error) return authResult;
+                return db.from('merchants').insert([{
+                    user_id: authResult.data.user.id,
+                    name: name,
+                    business: business,
+                    email: email,
+                    phone: phone,
+                    city: city
+                }]).then(function() { return authResult; });
+            });
+        }
+
+        function doLogin(email, password) {
+            if (useLocal) {
+                return Promise.resolve(localLogin(email, password));
+            }
+            return db.auth.signInWithPassword({ email: email, password: password });
+        }
+
+        function doGetUser() {
+            if (useLocal) {
+                return Promise.resolve(localGetUser());
+            }
+            return db.auth.getUser();
+        }
+
+        // Sign up form
         document.getElementById('signupForm').onsubmit = function(e) {
             e.preventDefault();
 
@@ -213,18 +249,12 @@
             var phone = document.getElementById('sPhone').value;
             var city = document.getElementById('sCity').value;
             var password = document.getElementById('sPassword').value;
+            var btn = document.getElementById('signupBtn');
 
-            if (!db) {
-                alert('Database not loaded. Please refresh.');
-                return;
-            }
-
-            var btn = this.querySelector('button[type="submit"]');
             btn.textContent = 'Creating...';
             btn.disabled = true;
 
-            db.auth.signUp({ email: email, password: password })
-            .then(function(result) {
+            doSignUp(name, business, email, phone, city, password).then(function(result) {
                 btn.textContent = 'Create Account';
                 btn.disabled = false;
 
@@ -233,60 +263,82 @@
                     return;
                 }
 
-                db.from('merchants').insert([{
-                    user_id: result.data.user.id,
-                    name: name,
-                    business: business,
-                    email: email,
-                    phone: phone,
-                    city: city
-                }])
-                .then(function() {
-                    alert('Account created! Please login.');
-                    showLogin();
-                    document.getElementById('lEmail').value = email;
-                });
+                if (useLocal) {
+                    // Already saved in localLogin
+                }
+
+                alert('Account created! Please login now.');
+                showLogin();
+                document.getElementById('lEmail').value = email;
+                document.getElementById('lPassword').focus();
+            }).catch(function(err) {
+                btn.textContent = 'Create Account';
+                btn.disabled = false;
+                alert('Error: ' + err.message);
             });
         };
 
-        // ===== LOGIN =====
+        // Login form
         document.getElementById('loginForm').onsubmit = function(e) {
             e.preventDefault();
 
             var email = document.getElementById('lEmail').value;
             var password = document.getElementById('lPassword').value;
+            var btn = document.getElementById('loginBtn');
 
-            if (!db) {
-                alert('Database not loaded. Please refresh.');
-                return;
-            }
-
-            var btn = this.querySelector('button[type="submit"]');
             btn.textContent = 'Logging in...';
             btn.disabled = true;
+            document.getElementById('loginError').style.display = 'none';
 
-            db.auth.signInWithPassword({ email: email, password: password })
-            .then(function(result) {
+            doLogin(email, password).then(function(result) {
                 btn.textContent = 'Login to Dashboard';
                 btn.disabled = false;
 
                 if (result.error) {
+                    document.getElementById('loginErrorMsg').textContent = result.error.message;
                     document.getElementById('loginError').style.display = 'block';
                     return;
                 }
 
                 alert('Login successful!');
                 window.location.href = 'dashboard.html';
+            }).catch(function(err) {
+                btn.textContent = 'Login to Dashboard';
+                btn.disabled = false;
+                document.getElementById('loginErrorMsg').textContent = err.message;
+                document.getElementById('loginError').style.display = 'block';
             });
         };
 
-        // ===== CHECK IF LOGGED IN =====
-        if (db) {
-            db.auth.getUser().then(function(result) {
+        // Init
+        function init() {
+            if (typeof window.supabase !== 'undefined') {
+                try {
+                    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    useLocal = false;
+                    document.getElementById('dbStatus').innerHTML = '<span class="text-green-400 text-xs">✅ Connected to Supabase</span>';
+                    console.log('Using Supabase');
+                } catch(e) {
+                    useLocal = true;
+                    document.getElementById('dbStatus').innerHTML = '<span class="text-yellow-400 text-xs">⚠️ Using local storage (Supabase failed)</span>';
+                    console.log('Using localStorage:', e);
+                }
+            } else {
+                useLocal = true;
+                document.getElementById('dbStatus').innerHTML = '<span class="text-yellow-400 text-xs">⚠️ Using local storage</span>';
+            }
+
+            doGetUser().then(function(result) {
                 if (result.data && result.data.user) {
                     window.location.href = 'dashboard.html';
                 }
             });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
         }
     </script>
 </body>
