@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merchant Dashboard — ChapShop Delivery</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-    <style>
-        * { font-family: 'Inter', sans-serif; }
-        .nav-blur { backdrop-filter: blur(12px); }
-        .sidebar { transition: transform 0.3s ease; }
-        .sidebar.closed { transform: translateX(-100%); }
-        .sidebar-link { transition: all 0.2s ease; }
-        .sidebar-link:hover, .sidebar-link.active { background: rgba(6,182,212,0.1); color: #22d3ee; border-right: 2px solid #06b6d6d4; }
-        .stat-card:hover { border-color: rgba(6,182,212,0.3); transform: translateY(-2px); }
-        .badge { font-size: 10px; padding: 2px 8px; border-radius: 9999px; font-weight: 600; }
-        .badge-pending { background: rgba(234,179,8,0.15); color: #facc15; }
-        .badge-transit { background: rgba(59,130,246,0.15); color: #60a5fa; }
-        .badge-delivered { background: rgba(34,197,94,0.15); color: #4ade80; }
-        .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
-        .toast.show { transform: translateY(0); opacity: 1; }
-    </style>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Merchant Dashboard — ChapShop Delivery</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+        <style>
+            * { font-family: 'Inter', sans-serif; }
+            .nav-blur { backdrop-filter: blur(12px); }
+            .sidebar { transition: transform 0.3s ease; }
+            .sidebar.closed { transform: translateX(-100%); }
+            .sidebar-link { transition: all 0.2s ease; }
+            .sidebar-link:hover, .sidebar-link.active { background: rgba(6,182,212,0.1); color: #22d3ee; border-right: 2px solid #06b6d4d; }
+            .stat-card:hover { border-color: rgba(6,182,212,0.3); transform: translateY(-2px); }
+            .badge { font-size: 10px; padding: 2px 8px; border-radius: 9999px; font-weight: 600; }
+            .badge-pending { background: rgba(234,179,8,0.15); color: #facc15; }
+            .badge-transit { background: rgba(59,130,246,0.15); color: #60a5fa; }
+            .badge-delivered { background: rgba(34,197,94,0.15); color: #4ade80; }
+            .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
+            .toast.show { transform: translateY(0); opacity: 1; }
+        </style>
+    </head>
 <body class="bg-[#020617] text-white">
 
     <div id="toast" class="toast fixed bottom-6 right-6 z-[100] bg-cyan-900/90 border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
@@ -183,12 +183,14 @@
                 <p class="text-sm text-cyan-400 mb-4">Senior Account Manager</p>
                 <div class="space-y-3 text-left">
                     <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-cyan-400" data-icon="mdi:phone"></span><div><p class="text-[10px] text-slate-500">Phone</p><p class="text-sm text-white">+255 769 800 220</p></div></div>
-                    <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-green-400" data-icon="mdi:whatsapp"></span><div><p class="text-[10px] text-slate-500">WhatsApp</p><p class="text-sm text-white">+255 769 800 220</p></div></div>
+                    <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-green-400" data-icon="mdi:whatsapp"></span><div><p class="text-[10px] text-sulate-500">WhatsApp</p><p class="text-sm text-white">+255 769 800 220</p></div></div>
                 </div>
                 <a href="https://wa.me/255769800220" target="_blank" class="mt-5 w-full bg-green-500 text-white font-medium text-sm py-3 rounded-xl hover:bg-green-400 transition-colors flex items-center justify-center gap-2"><span class="iconify text-lg" data-icon="mdi:whatsapp"></span> Chat on WhatsApp</a>
             </div>
         </section>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.local-storage.min.js"></script>
 
     <script>
         var SUPABASE_URL = 'https://lmbpnnfyelsqhwzatwbv.supabase.co';
@@ -197,7 +199,7 @@
         var merchantData = null;
 
         function showSection(section) {
-            var sections = document.querySelectorAll('[id^="section-"]');
+            var sections = document.querySelectorAll('[id^="section-]');
             for (var i = 0; i < sections.length; i++) {
                 sections[i].style.display = 'none';
             }
@@ -220,119 +222,101 @@
         }
 
         function handleLogout() {
-            if (db) {
-                db.auth.signOut().then(function() {
-                    localStorage.removeItem('chapshop_logged_in');
-                    showToast('Logged out!');
-                    setTimeout(function() {
-                        window.location.href = 'merchants.html';
-                    }, 800);
-                });
-            } else {
-                localStorage.removeItem('chunkshop_logged_in');
-                showToast('Logged out!');
-                setTimeout(function() {
-                    window.location.href = 'merchants.html';
-                }, 800);
+            showToast('Logging out...');
+            
+            // Save current user data to localStorage for instant re-login
+            if (merchantData) {
+                localStorage.setItem('chapshop_logged_in', JSON.stringify(merchantData));
             }
-        }
 
-        // Sidebar toggle
-        var sidebar = document.getElementById('sidebar');
-        var sidebarOverlay = document.getElementById('sidebar-overlay');
-        document.getElementById('sidebar-toggle').addEventListener('click', function() {
-            sidebar.classList.toggle('closed');
-            sidebarOverlay.classList.toggle('hidden');
-        });
-        sidebarOverlay.addEventListener('click', function() {
-            sidebar.classList.add('closed');
-            sidebarOverlay.classList.add('hidden');
-        });
-
-        // ===== FAST INIT - max 3 second loading =====
-        function initDashboard() {
-            // Show dashboard immediately with "Merchant" as default
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-
-            // Then try to load real data
-            try {
-                if (typeof window.supabase !== 'undefined') {
-                    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    
-                    db.auth.getUser().then(function(result) {
-                        if (!result.data.user) {
-                            window.location.href = 'merchants.html';
-                            return;
-                        }
-                        
-                        // 3 second timeout - if data doesn't load, use localStorage
-                        var loaded = false;
-                        
-                        var timeout = setTimeout(function() {
-                            if (!loaded) {
-                                // Fallback to localStorage
-                                merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in'));
-                                if (merchantData) {
-                                    fillDashboard();
-                                } else {
-                                    window.location.href = 'merchants.html';
-                                }
-                            }
-                        }, 3000);
-                        
-                        db.from('merchants').select('*').eq('user_id', result.data.user.id).single().then(function(result) {
-                            loaded = true;
-                            clearTimeout(timeout);
-                            merchantData = result.data;
-                            fillDashboard();
-                        }).catch(function() {
-                                loaded = true;
-                                clearTimeout(timeout);
-                                merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in'));
-                                if (merchantData) fillDashboard();
-                        });
-                    });
-                } else {
-                    merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in'));
-                    if (merchantData) {
-                        fillDashboard();
-                    } else {
-                        window.location.href = 'javascript:void(0)';
-                    }
-                }
-            } catch(e) {
-                merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in'));
-                if (merchantData) {
-                    fillDashboard();
-                } else {
-                    window.location.href = 'javascript:void(0)';
-                }
+            // If Supabase, sign out first
+            if (window.supabase) {
+                window.supabase.auth.signOut().catch(function() {});
             }
+
+            // Re-login after 1 second
+            setTimeout(function() {
+                window.location.href = 'dashboard.html';
+            }, 1000);
         }
 
         function fillDashboard() {
-            if (!merchantData) {
-                window.location.href = 'merchants.html';
-                return;
-            }
-
-            var name = merchantData.name || 'Merchant';
-            var business = merchantData.business || 'Business';
-            var email = merchantData.email || '';
-
-            document.getElementById('nav-username').textContent = name;
-            document.getElementById('sidebar-business').textContent = business;
-            document.getElementById('sidebar-email').textContent = email;
-            document.getElementById('welcome-name').textContent = name.split(' ')[0];
+            if (!merchantData) return;
+            document.getElementById('nav-username').textContent = merchantData.name || 'Merchant';
+            document.getElementById('sidebar-business').textContent = merchantData.business || 'Business';
+            document.getElementById('sidebar-email').textContent = merchantData.email || '';
+            document.getElementById('welcome-name').textContent = merchantData.name.split(' ')[0];
         }
 
-        // Init
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initDashboard);
-        } else {
-            initDashboard();
+        function initDashboard() {
+            // Show dashboard immediately with defaults
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            fillDashboard();
+
+            // Then try to load real data (max 3 seconds)
+            try {
+                if (typeof window.supabase !== 'undefined') {
+                    db = window.supabase.createClient(SUBABASE_URL, SUPABASE_KEY);
+
+                    // 3 second timeout - if data doesn't load, use localStorage
+                    var loaded = false;
+                    var timeout = setTimeout(function() {
+                        if (!loaded) {
+                            merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in') || null;
+                            if (merchantData) fillDashboard();
+                        }
+                    }, 3000);
+
+                    db.auth.getUser().then(function(result) {
+                        if (!result.data.user) {
+                            merchantData = JSON.parse(localStorage.getItem('chapshop_in merchants') || null;
+                            if (merchantData) {
+                                fillDashboard();
+                            }
+                            loaded = true;
+                            clearTimeout(timeout);
+                        } else {
+                            loaded = true;
+                            clearTimeout(timeout);
+                            
+                            db.from('merchants').select('*').eq('user_id', result.data.user.id).single().then(function(result) {
+                                loaded = true;
+                                clearTimeout(timeout);
+                                if (result.data) {
+                                    merchantData = result.data;
+                                } else {
+                                    merchantData = JSON.parse(localStorage.getItem('chapshop_merchants') || null;
+                                }
+                                fillDashboard();
+                            }).catch(function() {
+                                loaded = true;
+                                clearTimeout(timeout);
+                                merchantData = JSON.parse(localStorage.getItem('chapshop_merchants') || null;
+                                if (merchantData) fillDashboard();
+                            });
+                        }
+                    });
+                } else {
+                    merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in') || null;
+                    if (merchantData) fillDashboard();
+                }
+            } else {
+                merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in') || null;
+                if (merchantData) fillDashboard();
+            }
+        }
+
+        function init() {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initDashboard);
+            } else {
+                initDashboard();
+            }
         }
     </script>
 </body>
 </html>
+---
+
+## How logout works now:
