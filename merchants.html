@@ -56,14 +56,9 @@
         </div>
     </section>
 
-    <div id="dbStatus" class="max-w-md mx-auto px-6 mb-4 text-center">
-        <span class="text-yellow-400 text-xs">⏳ Loading...</span>
-    </div>
-
     <section class="pb-16">
         <div class="max-w-md mx-auto px-6">
 
-            <!-- Tabs -->
             <div class="flex mb-6 bg-white/[0.03] border border-white/[0.08] rounded-lg p-1">
                 <button type="button" onclick="showSignup()" id="tabSignup" class="flex-1 py-2.5 text-sm font-medium rounded-md text-cyan-400 bg-cyan-500/10 border border-cyan-500/30">Sign Up</button>
                 <button type="button" onclick="showLogin()" id="tabLogin" class="flex-1 py-2.5 text-sm font-medium rounded-md text-slate-500 border border-transparent">Login</button>
@@ -137,10 +132,14 @@
                         <label class="text-xs text-slate-400 mb-1 block">Password *</label>
                         <input type="password" id="lPassword" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Your password" required>
                     </div>
-                    <button type="submit" id="loginBtn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400">Login to Dashboard</button>
+                    <button type="submit" id="loginBtn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400 flex items-center justify-center gap-2">
+                        <span id="loginBtnText">Login to Dashboard</span>
+                        <span id="loginBtnLoading" style="display:none" class="iconify animate-spin text-lg" data-icon="mdi:loading"></span>
+                    </button>
                     <p class="text-center text-slate-500 text-xs">New here? <a href="javascript:void(0)" onclick="showSignup()" class="text-cyan-400">Create an account</a></p>
                 </form>
             </div>
+
         </div>
     </section>
 
@@ -173,13 +172,10 @@
             document.getElementById('tabSignup').className = 'flex-1 py-2.5 text-sm font-medium rounded-md text-slate-500 border border-transparent';
         }
 
-        // Local storage fallback
         function localSignUp(name, business, email, phone, city, password) {
             var merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
             for (var i = 0; i < merchants.length; i++) {
-                if (merchants[i].email === email) {
-                    return { error: { message: 'Email already registered' } };
-                }
+                if (merchants[i].email === email) return { error: { message: 'Email already registered' } };
             }
             merchants.push({ name: name, business: business, email: email, phone: phone, city: city, password: password });
             localStorage.setItem('chapshop_merchants', JSON.stringify(merchants));
@@ -202,74 +198,46 @@
             return user ? { data: { user: JSON.parse(user) } } : { data: { user: null } };
         }
 
-        // Unified functions
         function doSignUp(name, business, email, phone, city, password) {
-            if (useLocal) {
-                return Promise.resolve(localSignUp(name, business, email, phone, city, password));
-            }
-            
-            return db.auth.signUp({
-                email: email,
-                password: password,
-                options: { data: { name: name, business: business, phone: phone, city: city } }
-            }).then(function(authResult) {
+            if (useLocal) return Promise.resolve(localSignUp(name, business, email, phone, city, password));
+            return db.auth.signUp({ email: email, password: password, options: { data: { name: name, business: business, phone: phone, city: city } } })
+            .then(function(authResult) {
                 if (authResult.error) return authResult;
-                return db.from('merchants').insert([{
-                    user_id: authResult.data.user.id,
-                    name: name,
-                    business: business,
-                    email: email,
-                    phone: phone,
-                    city: city
-                }]).then(function() { return authResult; });
+                return db.from('merchants').insert([{ user_id: authResult.data.user.id, name: name, business: business, email: email, phone: phone, city: city }])
+                .then(function() { return authResult; });
             });
         }
 
         function doLogin(email, password) {
-            if (useLocal) {
-                return Promise.resolve(localLogin(email, password));
-            }
+            if (useLocal) return Promise.resolve(localLogin(email, password));
             return db.auth.signInWithPassword({ email: email, password: password });
         }
 
         function doGetUser() {
-            if (useLocal) {
-                return Promise.resolve(localGetUser());
-            }
+            if (useLocal) return Promise.resolve(localGetUser());
             return db.auth.getUser();
         }
 
-        // Sign up form
         document.getElementById('signupForm').onsubmit = function(e) {
             e.preventDefault();
-
-            var name = document.getElementById('sName').value;
-            var business = document.getElementById('sBusiness').value;
-            var email = document.getElementById('sEmail').value;
-            var phone = document.getElementById('sPhone').value;
-            var city = document.getElementById('sCity').value;
-            var password = document.getElementById('sPassword').value;
             var btn = document.getElementById('signupBtn');
-
             btn.textContent = 'Creating...';
             btn.disabled = true;
 
-            doSignUp(name, business, email, phone, city, password).then(function(result) {
+            doSignUp(
+                document.getElementById('sName').value,
+                document.getElementById('sBusiness').value,
+                document.getElementById('sEmail').value,
+                document.getElementById('sPhone').value,
+                document.getElementById('sCity').value,
+                document.getElementById('sPassword').value
+            ).then(function(result) {
                 btn.textContent = 'Create Account';
                 btn.disabled = false;
-
-                if (result.error) {
-                    alert('Error: ' + result.error.message);
-                    return;
-                }
-
-                if (useLocal) {
-                    // Already saved in localLogin
-                }
-
-                alert('Account created! Please login now.');
+                if (result.error) { alert('Error: ' + result.error.message); return; }
+                alert('Account created! Please login.');
                 showLogin();
-                document.getElementById('lEmail').value = email;
+                document.getElementById('lEmail').value = document.getElementById('sEmail').value;
                 document.getElementById('lPassword').focus();
             }).catch(function(err) {
                 btn.textContent = 'Create Account';
@@ -278,60 +246,48 @@
             });
         };
 
-        // Login form
         document.getElementById('loginForm').onsubmit = function(e) {
             e.preventDefault();
-
             var email = document.getElementById('lEmail').value;
             var password = document.getElementById('lPassword').value;
-            var btn = document.getElementById('loginBtn');
 
-            btn.textContent = 'Logging in...';
-            btn.disabled = true;
             document.getElementById('loginError').style.display = 'none';
+            document.getElementById('loginBtnText').style.display = 'none';
+            document.getElementById('loginBtnLoading').style.display = 'inline-block';
+            document.getElementById('loginBtn').disabled = true;
 
             doLogin(email, password).then(function(result) {
-                btn.textContent = 'Login to Dashboard';
-                btn.disabled = false;
-
                 if (result.error) {
+                    document.getElementById('loginBtnText').style.display = 'inline';
+                    document.getElementById('loginBtnLoading').style.display = 'none';
+                    document.getElementById('loginBtn').disabled = false;
                     document.getElementById('loginErrorMsg').textContent = result.error.message;
                     document.getElementById('loginError').style.display = 'block';
                     return;
                 }
-
-                alert('Login successful!');
                 window.location.href = 'dashboard.html';
             }).catch(function(err) {
-                btn.textContent = 'Login to Dashboard';
-                btn.disabled = false;
+                document.getElementById('loginBtnText').style.display = 'inline';
+                document.getElementById('loginBtnLoading').style.display = 'none';
+                document.getElementById('loginBtn').disabled = false;
                 document.getElementById('loginErrorMsg').textContent = err.message;
                 document.getElementById('loginError').style.display = 'block';
             });
         };
 
-        // Init
         function init() {
             if (typeof window.supabase !== 'undefined') {
                 try {
                     db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                     useLocal = false;
-                    document.getElementById('dbStatus').innerHTML = '<span class="text-green-400 text-xs">✅ Connected to Supabase</span>';
-                    console.log('Using Supabase');
                 } catch(e) {
                     useLocal = true;
-                    document.getElementById('dbStatus').innerHTML = '<span class="text-yellow-400 text-xs">⚠️ Using local storage (Supabase failed)</span>';
-                    console.log('Using localStorage:', e);
                 }
             } else {
                 useLocal = true;
-                document.getElementById('dbStatus').innerHTML = '<span class="text-yellow-400 text-xs">⚠️ Using local storage</span>';
             }
-
             doGetUser().then(function(result) {
-                if (result.data && result.data.user) {
-                    window.location.href = 'dashboard.html';
-                }
+                if (result.data && result.data.user) window.location.href = 'dashboard.html';
             });
         }
 
