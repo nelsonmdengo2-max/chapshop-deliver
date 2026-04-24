@@ -5,663 +5,161 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Merchant Dashboard — ChapShop Delivery</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-        .gradient-text { background: linear-gradient(to bottom, #ffffff, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .glow-line { background: linear-gradient(to right, transparent, #164e63, transparent); height: 1px; }
-        .nav-blur { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        * { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .nav-blur { backdrop-filter: blur(12px); }
         .sidebar { transition: transform 0.3s ease; }
         .sidebar.closed { transform: translateX(-100%); }
         .sidebar-link { transition: all 0.2s ease; }
         .sidebar-link:hover, .sidebar-link.active { background: rgba(6,182,212,0.1); color: #22d3ee; border-right: 2px solid #06b6d4; }
-        .stat-card { transition: all 0.3s ease; }
         .stat-card:hover { border-color: rgba(6,182,212,0.3); transform: translateY(-2px); }
-        .order-row { transition: all 0.2s ease; }
-        .order-row:hover { background: rgba(255,255,255,0.03); }
-        .badge { font-size: 10px; padding: 2px 8px; border-radius: 9999px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+        .badge { font-size: 10px; padding: 2px 8px; border-radius: 9999px; font-weight: 600; }
         .badge-pending { background: rgba(234,179,8,0.15); color: #facc15; }
-        .badge-picked { background: rgba(6,182,212,0.15); color: #22d3ee; }
         .badge-transit { background: rgba(59,130,246,0.15); color: #60a5fa; }
         .badge-delivered { background: rgba(34,197,94,0.15); color: #4ade80; }
-        .badge-returned { background: rgba(239,68,68,0.15); color: #f87171; }
-        .badge-paid { background: rgba(34,197,94,0.15); color: #4ade80; }
-        .badge-unpaid { background: rgba(239,68,68,0.15); color: #f87171; }
         .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
         .toast.show { transform: translateY(0); opacity: 1; }
-        .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
-        .mobile-menu.open { transform: translateX(0); }
-        .tab-btn { transition: all 0.2s ease; }
-        .tab-btn.active { color: #06b6d4; border-color: #06b6d4; }
-        .tab-btn:not(.active) { color: #64748b; }
-        .tab-btn:not(.active):hover { color: #94a3b8; }
-        .chart-bar { transition: height 0.5s ease; }
-        .notification-item { transition: all 0.2s ease; }
-        .notification-item:hover { background: rgba(255,255,255,0.03); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.4s ease forwards; }
-        .remittance-card { transition: all 0.2s ease; }
-        .remittance-card:hover { border-color: rgba(6,182,212,0.3); }
     </style>
 </head>
 <body class="bg-[#020617] text-white">
 
-    <!-- Toast -->
     <div id="toast" class="toast fixed bottom-6 right-6 z-[100] bg-cyan-900/90 border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
         <span class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
         <span id="toast-msg" class="text-sm font-medium">Success!</span>
     </div>
 
-    <!-- Top Nav -->
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/90 border-b border-white/[0.08]">
         <div class="flex items-center justify-between h-16 px-4 md:px-6">
             <div class="flex items-center gap-3">
-                <button id="sidebar-toggle" class="lg:hidden text-white p-1.5">
-                    <span class="iconify text-xl" data-icon="mdi:menu"></span>
-                </button>
+                <button id="sidebar-toggle" class="lg:hidden text-white p-1.5"><span class="iconify text-xl" data-icon="mdi:menu"></span></button>
                 <a href="index.html" class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center">
-                        <span class="iconify text-white text-sm" data-icon="mdi:truck-fast"></span>
-                    </div>
-                    <div class="hidden sm:block">
-                        <span class="font-semibold text-white text-sm">ChapShop</span>
-                        <span class="text-cyan-400 font-semibold text-sm ml-0.5">Delivery</span>
-                    </div>
+                    <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-sm" data-icon="mdi:truck-fast"></span></div>
+                    <span class="hidden sm:block font-semibold text-white text-sm">ChapShop <span class="text-cyan-400">Delivery</span></span>
                 </a>
-                <span class="hidden md:flex items-center gap-1.5 text-slate-500 text-xs ml-3">
-                    <span class="iconify text-sm" data-icon="mdi:chevron-right"></span>
-                    <span class="text-cyan-400">Dashboard</span>
-                </span>
             </div>
             <div class="flex items-center gap-3">
-                <button id="notif-btn" class="relative p-2 text-slate-400 hover:text-white transition-colors">
-                    <span class="iconify text-xl" data-icon="mdi:bell-outline"></span>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-cyan-500 rounded-full"></span>
-                </button>
                 <div class="hidden sm:flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-1.5">
-                    <div class="w-7 h-7 bg-cyan-500/20 rounded-full flex items-center justify-center">
-                        <span class="iconify text-cyan-400 text-sm" data-icon="mdi:account"></span>
-                    </div>
-                    <span id="nav-username" class="text-xs text-slate-300 font-medium">Merchant</span>
+                    <div class="w-7 h-7 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:account"></span></div>
+                    <span id="nav-username" class="text-xs text-slate-300 font-medium">Loading...</span>
                 </div>
-                <button onclick="handleLogout()" class="text-slate-400 hover:text-red-400 transition-colors p-2" title="Logout">
-                    <span class="iconify text-xl" data-icon="mdi:logout"></span>
-                </button>
+                <button onclick="handleLogout()" class="text-slate-400 hover:text-red-400 transition-colors p-2" title="Logout"><span class="iconify text-xl" data-icon="mdi:logout"></span></button>
             </div>
         </div>
     </nav>
 
-    <!-- Sidebar Overlay -->
     <div id="sidebar-overlay" class="fixed inset-0 z-[55] bg-black/60 hidden lg:hidden"></div>
 
-    <!-- Sidebar -->
     <aside id="sidebar" class="sidebar closed lg:!transform-none fixed top-16 left-0 bottom-0 w-64 z-[60] bg-[#0f172a] border-r border-white/[0.08] overflow-y-auto">
         <div class="p-4">
             <div class="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border border-cyan-500/20 rounded-xl p-4 mb-6">
                 <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
-                        <span class="iconify text-cyan-400 text-lg" data-icon="mdi:storefront"></span>
-                    </div>
-                    <div>
-                        <p id="sidebar-business" class="text-sm font-medium text-white truncate max-w-[140px]">Business</p>
-                        <p id="sidebar-email" class="text-[10px] text-slate-500 truncate max-w-[140px]">email</p>
-                    </div>
+                    <div class="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:storefront"></span></div>
+                    <div><p id="sidebar-business" class="text-sm font-medium text-white truncate max-w-[140px]">Loading...</p><p id="sidebar-email" class="text-[10px] text-slate-500 truncate max-w-[140px]">...</p></div>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <div class="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                    <span class="text-[10px] text-green-400 font-medium">Active Account</span>
-                </div>
+                <div class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 bg-green-400 rounded-full"></div><span class="text-[10px] text-green-400 font-medium">Connected to Database</span></div>
             </div>
-
-            <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">Main Menu</p>
+            <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">Menu</p>
             <nav class="space-y-1">
-                <a href="#" onclick="showSection('overview')" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="overview">
-                    <span class="iconify text-lg" data-icon="mdi:view-dashboard"></span> Overview
-                </a>
-                <a href="#" onclick="showSection('orders')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="orders">
-                    <span class="iconify text-lg" data-icon="mdi:package-variant"></span> Orders
-                    <span class="ml-auto bg-cyan-500/20 text-cyan-400 text-[10px] font-semibold px-2 py-0.5 rounded-full">24</span>
-                </a>
-                <a href="#" onclick="showSection('analytics')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="analytics">
-                    <span class="iconify text-lg" data-icon="mdi:chart-bar"></span> Analytics
-                </a>
-                <a href="#" onclick="showSection('remittance')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="remittance">
-                    <span class="iconify text-lg" data-icon="mdi:cash-multiple"></span> COD Remittance
-                </a>
-                <a href="#" onclick="showSection('notifications')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="notifications">
-                    <span class="iconify text-lg" data-icon="mdi:cellphone-message"></span> SMS Notifications
-                </a>
+                <a href="#" onclick="showSection('overview')" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="overview"><span class="iconify text-lg" data-icon="mdi:view-dashboard"></span> Overview</a>
+                <a href="#" onclick="showSection('orders')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="orders"><span class="iconify text-lg" data-icon="mdi:package-variant"></span> Orders</a>
+                <a href="#" onclick="showSection('remittance')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="remittance"><span class="iconify text-lg" data-icon="mdi:cash-multiple"></span> COD Remittance</a>
+                <a href="#" onclick="showSection('notifications')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="notifications"><span class="iconify text-lg" data-icon="mdi:cellphone-message"></span> SMS Notifications</a>
+                <a href="#" onclick="showSection('account-manager')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="account-manager"><span class="iconify text-lg" data-icon="mdi:account-heart"></span> Account Manager</a>
+                <a href="index.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400"><span class="iconify text-lg" data-icon="mdi:home-outline"></span> Back to Website</a>
             </nav>
-
-            <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6 px-3">Support</p>
-            <nav class="space-y-1">
-                <a href="#" onclick="showSection('account-manager')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="account-manager">
-                    <span class="iconify text-lg" data-icon="mdi:account-heart"></span> Account Manager
-                </a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400">
-                    <span class="iconify text-lg" data-icon="mdi:help-circle-outline"></span> Help & FAQ
-                </a>
-                <a href="index.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400">
-                    <span class="iconify text-lg" data-icon="mdi:home-outline"></span> Back to Website
-                </a>
-            </nav>
-
             <div class="mt-8 p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl">
-                <p class="text-[10px] text-slate-500 mb-2">Need help?</p>
-                <a href="https://wa.me/255769799110" target="_blank" class="flex items-center gap-2 text-xs text-green-400 hover:text-green-300 transition-colors">
-                    <span class="iconify" data-icon="mdi:whatsapp"></span> Chat with Support
-                </a>
+                <p class="text-[10px] text-slate-500 mb-1">🔒 Secure Database</p>
+                <p class="text-[10px] text-cyan-400">Powered by Supabase</p>
             </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="lg:ml-64 pt-16 min-h-screen">
-
-        <!-- OVERVIEW SECTION -->
         <section id="section-overview" class="p-4 md:p-6 fade-in">
             <div class="mb-6">
                 <h1 class="text-xl md:text-2xl font-semibold text-white">Welcome back, <span id="welcome-name">Merchant</span></h1>
                 <p class="text-sm text-slate-500 mt-1">Here's what's happening with your deliveries today.</p>
             </div>
-
-            <!-- Stats Grid -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center">
-                            <span class="iconify text-cyan-400 text-xl" data-icon="mdi:package-variant"></span>
-                        </div>
-                        <span class="text-[10px] text-green-400 font-medium flex items-center gap-0.5"><span class="iconify text-xs" data-icon="mdi:trending-up"></span> +12%</span>
-                    </div>
+                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 transition-all duration-300">
+                    <div class="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-3"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:package-variant"></span></div>
                     <div class="text-2xl font-bold text-white">248</div>
-                    <div class="text-xs text-slate-500 mt-0.5">Total Orders</div>
+                    <div class="text-xs text-slate-500">Total Orders</div>
                 </div>
-                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
-                            <span class="iconify text-green-400 text-xl" data-icon="mdi:check-circle"></span>
-                        </div>
-                        <span class="text-[10px] text-green-400 font-medium flex items-center gap-0.5"><span class="iconify text-xs" data-icon="mdi:trending-up"></span> +5%</span>
-                    </div>
+                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 transition-all duration-300">
+                    <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center mb-3"><span class="iconify text-green-400 text-xl" data-icon="mdi:check-circle"></span></div>
                     <div class="text-2xl font-bold text-white">189</div>
-                    <div class="text-xs text-slate-500 mt-0.5">Delivered</div>
+                    <div class="text-xs text-slate-500">Delivered</div>
                 </div>
-                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                            <span class="iconify text-blue-400 text-xl" data-icon="mdi:truck-delivery"></span>
-                        </div>
-                        <span class="text-[10px] text-cyan-400 font-medium">Live</span>
-                    </div>
+                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 transition-all duration-300">
+                    <div class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center mb-3"><span class="iconify text-blue-400 text-xl" data-icon="mdi:truck-delivery"></span></div>
                     <div class="text-2xl font-bold text-white">32</div>
-                    <div class="text-xs text-slate-500 mt-0.5">In Transit</div>
+                    <div class="text-xs text-slate-500">In Transit</div>
                 </div>
-                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center">
-                            <span class="iconify text-yellow-400 text-xl" data-icon="mdi:cash-multiple"></span>
-                        </div>
-                        <span class="badge badge-paid">Paid</span>
-                    </div>
+                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 transition-all duration-300">
+                    <div class="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center mb-3"><span class="iconify text-yellow-400 text-xl" data-icon="mdi:cash-multiple"></span></div>
                     <div class="text-2xl font-bold text-white">TZS 4.2M</div>
-                    <div class="text-xs text-slate-500 mt-0.5">COD Collected</div>
+                    <div class="text-xs text-slate-500">COD Collected</div>
                 </div>
             </div>
-
-            <!-- Chart + Recent Orders -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Chart -->
-                <div class="lg:col-span-2 bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
-                    <div class="flex items-center justify-between mb-5">
-                        <h3 class="text-sm font-medium text-white">Delivery Performance</h3>
-                        <div class="flex gap-1 bg-white/[0.03] rounded-lg p-0.5">
-                            <button class="tab-btn active text-[10px] font-medium px-3 py-1 rounded-md border border-transparent">7 Days</button>
-                            <button class="tab-btn text-[10px] font-medium px-3 py-1 rounded-md border border-transparent">30 Days</button>
-                            <button class="tab-btn text-[10px] font-medium px-3 py-1 rounded-md border border-transparent">90 Days</button>
-                        </div>
-                    </div>
-                    <div class="flex items-end justify-between gap-2 h-48">
-                        <div class="flex-1 flex flex-col items-center gap-1">
-                            <div class="w-full bg-cyan-500/20 rounded-t-md chart-bar" style="height: 60%"></div>
-                            <span class="text-[10px] text-slate-500">Mon</span>
-                        </div>
-                        <div class="flex-1 flex flex-col items-center gap-1">
-                            <div class="w-full bg-cyan-500/30 rounded-t-md chart-bar" style="height: 80%"></div>
-                            <span class="text-[10px] text-slate-500">Tue</span>
-                        </div>
-                        <div class="flex-1 flex flex-col items-center gap-1">
-                            <div class="w-full bg-cyan-500/40 rounded-t-md chart-bar" style="height: 45%"></div>
-                            <span class="text-[10px] text-slate-500">Wed</span>
-                        </div>
-                        <div class="flex-1 flex flex-col items-center gap-1">
-                            <div class="w-full bg-cyan-500/50 rounded-t-md chart-bar" style="height: 90%"></div>
-                            <span class="text-[10px] text-slate-500">Thu</span>
-                        </div>
-                        <div class="flex-1 flex flex-col items-center gap-1">
-                            <div class="w-full bg-cyan-500/40 rounded-t-md chart-bar" style="height: 70%"></div>
-                            <span class="text-[10px] text-slate-500">Fri</span>
-                        </div>
-                        <div class="flex-1 flex flex-col items-center gap-1">
-                            <div class="w-full bg-cyan-500/25 rounded-t-md chart-bar" style="height: 35%"></div>
-                            <span class="text-[10px] text-slate-500">Sat</span>
-                        </div>
-                        <div class="flex-1 flex flex-col items-center gap-1">
-                            <div class="w-full bg-cyan-500/15 rounded-t-md chart-bar" style="height: 20%"></div>
-                            <span class="text-[10px] text-slate-500">Sun</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 mt-4 pt-4 border-t border-white/[0.05]">
-                        <div class="flex items-center gap-2"><div class="w-3 h-3 bg-cyan-500/40 rounded"></div><span class="text-[10px] text-slate-500">Deliveries</span></div>
-                        <div class="ml-auto text-xs text-slate-400">Avg: <span class="text-white font-medium">34/day</span></div>
-                    </div>
-                </div>
-
-                <!-- Recent Orders -->
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm font-medium text-white">Recent Orders</h3>
-                        <a href="#" onclick="showSection('orders')" class="text-[10px] text-cyan-400 hover:text-cyan-300">View All →</a>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors">
-                            <div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:package"></span></div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs text-white font-medium truncate">#CS-2451</p>
-                                <p class="text-[10px] text-slate-500">Dar → Kigoma</p>
-                            </div>
-                            <span class="badge badge-transit">Transit</span>
-                        </div>
-                        <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors">
-                            <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-green-400 text-sm" data-icon="mdi:check"></span></div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs text-white font-medium truncate">#CS-2450</p>
-                                <p class="text-[10px] text-slate-500">Dar → Mwanza</p>
-                            </div>
-                            <span class="badge badge-delivered">Done</span>
-                        </div>
-                        <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors">
-                            <div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:clock-outline"></span></div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs text-white font-medium truncate">#CS-2449</p>
-                                <p class="text-[10px] text-slate-500">Dar → Arusha</p>
-                            </div>
-                            <span class="badge badge-pending">Pending</span>
-                        </div>
-                        <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors">
-                            <div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:motorbike"></span></div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs text-white font-medium truncate">#CS-2448</p>
-                                <p class="text-[10px] text-slate-500">Dar → Mbeya</p>
-                            </div>
-                            <span class="badge badge-picked">Picked</span>
-                        </div>
-                        <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02] transition-colors">
-                            <div class="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-red-400 text-sm" data-icon="mdi:refresh"></span></div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs text-white font-medium truncate">#CS-2447</p>
-                                <p class="text-[10px] text-slate-500">Dar → Dodoma</p>
-                            </div>
-                            <span class="badge badge-returned">Returned</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ORDERS SECTION -->
-        <section id="section-orders" class="p-4 md:p-6 hidden">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
-                <div>
-                    <h1 class="text-xl md:text-2xl font-semibold text-white">Orders</h1>
-                    <p class="text-sm text-slate-500 mt-1">Manage and track all your deliveries</p>
-                </div>
-                <button onclick="showToast('New order form coming soon!')" class="bg-cyan-500 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors flex items-center gap-2">
-                    <span class="iconify" data-icon="mdi:plus"></span> New Order
-                </button>
-            </div>
-
-            <!-- Filters -->
-            <div class="flex flex-wrap gap-2 mb-4">
-                <button class="bg-cyan-500/20 text-cyan-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-cyan-500/30">All (248)</button>
-                <button class="bg-white/[0.03] text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] transition-colors">Pending (12)</button>
-                <button class="bg-white/[0.03] text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] transition-colors">Picked (8)</button>
-                <button class="bg-white/[0.03] text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] transition-colors">In Transit (32)</button>
-                <button class="bg-white/[0.03] text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] transition-colors">Delivered (189)</button>
-                <button class="bg-white/[0.03] text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg border border-white/[0.08] hover:border-white/[0.15] transition-colors">Returned (7)</button>
-            </div>
-
-            <!-- Orders Table -->
-            <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="border-b border-white/[0.08]">
-                                <th class="text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">Order ID</th>
-                                <th class="text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">Customer</th>
-                                <th class="text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">Route</th>
-                                <th class="text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">COD Amount</th>
-                                <th class="text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">Status</th>
-                                <th class="text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">Payment</th>
-                                <th class="text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-4 py-3">Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="order-row border-b border-white/[0.04]">
-                                <td class="px-4 py-3 text-sm text-cyan-400 font-medium">#CS-2451</td>
-                                <td class="px-4 py-3"><div class="text-sm text-white">Juma Hassan</div><div class="text-[10px] text-slate-500">0765 432 100</div></td>
-                                <td class="px-4 py-3 text-xs text-slate-400">Dar es Salaam → Kigoma</td>
-                                <td class="px-4 py-3 text-sm text-white font-medium">TZS 85,000</td>
-                                <td class="px-4 py-3"><span class="badge badge-transit">In Transit</span></td>
-                                <td class="px-4 py-3"><span class="badge badge-unpaid">Unpaid</span></td>
-                                <td class="px-4 py-3 text-xs text-slate-500">Jan 15, 2025</td>
-                            </tr>
-                            <tr class="order-row border-b border-white/[0.04]">
-                                <td class="px-4 py-3 text-sm text-cyan-400 font-medium">#CS-2450</td>
-                                <td class="px-4 py-3"><div class="text-sm text-white">Fatma Ali</div><div class="text-[10px] text-slate-500">0789 123 456</div></td>
-                                <td class="px-4 py-3 text-xs text-slate-400">Dar es Salaam → Mwanza</td>
-                                <td class="px-4 py-3 text-sm text-white font-medium">TZS 120,000</td>
-                                <td class="px-4 py-3"><span class="badge badge-delivered">Delivered</span></td>
-                                <td class="px-4 py-3"><span class="badge badge-paid">Paid</span></td>
-                                <td class="px-4 py-3 text-xs text-slate-500">Jan 14, 2025</td>
-                            </tr>
-                            <tr class="order-row border-b border-white/[0.04]">
-                                <td class="px-4 py-3 text-sm text-cyan-400 font-medium">#CS-2449</td>
-                                <td class="px-4 py-3"><div class="text-sm text-white">Omar Mohamed</div><div class="text-[10px] text-slate-500">0712 345 678</div></td>
-                                <td class="px-4 py-3 text-xs text-slate-400">Dar es Salaam → Arusha</td>
-                                <td class="px-4 py-3 text-sm text-white font-medium">TZS 45,000</td>
-                                <td class="px-4 py-3"><span class="badge badge-pending">Pending</span></td>
-                                <td class="px-4 py-3"><span class="badge badge-unpaid">Unpaid</span></td>
-                                <td class="px-4 py-3 text-xs text-slate-500">Jan 15, 2025</td>
-                            </tr>
-                            <tr class="order-row border-b border-white/[0.04]">
-                                <td class="px-4 py-3 text-sm text-cyan-400 font-medium">#CS-2448</td>
-                                <td class="px-4 py-3"><div class="text-sm text-white">Asha Peter</div><div class="text-[10px] text-slate-500">0756 789 012</div></td>
-                                <td class="px-4 py-3 text-xs text-slate-400">Dar es Salaam → Mbeya</td>
-                                <td class="px-4 py-3 text-sm text-white font-medium">TZS 200,000</td>
-                                <td class="px-4 py-3"><span class="badge badge-picked">Picked Up</span></td>
-                                <td class="px-4 py-3"><span class="badge badge-unpaid">Unpaid</span></td>
-                                <td class="px-4 py-3 text-xs text-slate-500">Jan 15, 2025</td>
-                            </tr>
-                            <tr class="order-row">
-                                <td class="px-4 py-3 text-sm text-cyan-400 font-medium">#CS-2447</td>
-                                <td class="px-4 py-3"><div class="text-sm text-white">Moses John</div><div class="text-[10px] text-slate-500">0734 567 890</div></td>
-                                <td class="px-4 py-3 text-xs text-slate-400">Dar es Salaam → Dodoma</td>
-                                <td class="px-4 py-3 text-sm text-white font-medium">TZS 75,000</td>
-                                <td class="px-4 py-3"><span class="badge badge-returned">Returned</span></td>
-                                <td class="px-4 py-3"><span class="badge badge-unpaid">Unpaid</span></td>
-                                <td class="px-4 py-3 text-xs text-slate-500">Jan 13, 2025</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ANALYTICS SECTION -->
-        <section id="section-analytics" class="p-4 md:p-6 hidden">
-            <div class="mb-6">
-                <h1 class="text-xl md:text-2xl font-semibold text-white">Analytics & Reports</h1>
-                <p class="text-sm text-slate-500 mt-1">Track your delivery performance and COD metrics</p>
-            </div>
-
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 text-center">
-                    <div class="text-2xl font-bold text-cyan-400">98%</div>
-                    <div class="text-xs text-slate-500 mt-1">Delivery Success Rate</div>
-                </div>
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 text-center">
-                    <div class="text-2xl font-bold text-green-400">96%</div>
-                    <div class="text-xs text-slate-500 mt-1">COD Success Rate</div>
-                </div>
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 text-center">
-                    <div class="text-2xl font-bold text-white">1.8 days</div>
-                    <div class="text-xs text-slate-500 mt-1">Avg. Delivery Time</div>
-                </div>
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 text-center">
-                    <div class="text-2xl font-bold text-red-400">2.8%</div>
-                    <div class="text-xs text-slate-500 mt-1">Return Rate</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Delivery by Region -->
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
-                    <h3 class="text-sm font-medium text-white mb-4">Deliveries by Region</h3>
-                    <div class="space-y-3">
-                        <div><div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Dar es Salaam</span><span class="text-white font-medium">89</span></div><div class="w-full bg-white/[0.05] rounded-full h-2"><div class="bg-cyan-500 h-2 rounded-full" style="width: 85%"></div></div></div>
-                        <div><div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Mwanza</span><span class="text-white font-medium">42</span></div><div class="w-full bg-white/[0.05] rounded-full h-2"><div class="bg-cyan-500/80 h-2 rounded-full" style="width: 50%"></div></div></div>
-                        <div><div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Arusha</span><span class="text-white font-medium">35</span></div><div class="w-full bg-white/[0.05] rounded-full h-2"><div class="bg-cyan-500/60 h-2 rounded-full" style="width: 40%"></div></div></div>
-                        <div><div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Mbeya</span><span class="text-white font-medium">28</span></div><div class="w-full bg-white/[0.05] rounded-full h-2"><div class="bg-cyan-500/50 h-2 rounded-full" style="width: 32%"></div></div></div>
-                        <div><div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Dodoma</span><span class="text-white font-medium">22</span></div><div class="w-full bg-white/[0.05] rounded-full h-2"><div class="bg-cyan-500/40 h-2 rounded-full" style="width: 25%"></div></div></div>
-                        <div><div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Kigoma</span><span class="text-white font-medium">15</span></div><div class="w-full bg-white/[0.05] rounded-full h-2"><div class="bg-cyan-500/30 h-2 rounded-full" style="width: 18%"></div></div></div>
-                    </div>
-                </div>
-
-                <!-- COD Performance -->
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
-                    <h3 class="text-sm font-medium text-white mb-4">COD Performance</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-4 bg-green-500/5 border border-green-500/10 rounded-lg p-3">
-                            <div class="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-xl" data-icon="mdi:cash-check"></span></div>
-                            <div><p class="text-sm text-white font-medium">TZS 4,200,000</p><p class="text-[10px] text-slate-500">Total COD Collected</p></div>
-                        </div>
-                        <div class="flex items-center gap-4 bg-cyan-500/5 border border-cyan-500/10 rounded-lg p-3">
-                            <div class="w-10 h-10 bg-cyan-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:bank-transfer"></span></div>
-                            <div><p class="text-sm text-white font-medium">TZS 3,850,000</p><p class="text-[10px] text-slate-500">Remitted to Your Account</p></div>
-                        </div>
-                        <div class="flex items-center gap-4 bg-yellow-500/5 border border-yellow-500/10 rounded-lg p-3">
-                            <div class="w-10 h-10 bg-yellow-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-yellow-400 text-xl" data-icon="mdi:clock-outline"></span></div>
-                            <div><p class="text-sm text-white font-medium">TZS 350,000</p><p class="text-[10px] text-slate-500">Pending Remittance</p></div>
-                        </div>
-                        <div class="flex items-center gap-4 bg-red-500/5 border border-red-500/10 rounded-lg p-3">
-                            <div class="w-10 h-10 bg-red-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-red-400 text-xl" data-icon="mdi:cash-remove"></span></div>
-                            <div><p class="text-sm text-white font-medium">TZS 120,000</p><p class="text-[10px] text-slate-500">Failed COD (Returns)</p></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- REMITTANCE SECTION -->
-        <section id="section-remittance" class="p-4 md:p-6 hidden">
-            <div class="mb-6">
-                <h1 class="text-xl md:text-2xl font-semibold text-white">Fast COD Remittance</h1>
-                <p class="text-sm text-slate-500 mt-1">Track your COD collections and bank/M-Pesa transfers</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="remittance-card bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/20 rounded-xl p-5">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-xl" data-icon="mdi:cash-check"></span></div>
-                        <div><p class="text-xs text-slate-400">Total Remitted</p><p class="text-xl font-bold text-white">TZS 3.85M</p></div>
-                    </div>
-                    <p class="text-[10px] text-green-400">→ M-Pesa: TZS 2.1M | Bank: TZS 1.75M</p>
-                </div>
-                <div class="remittance-card bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border border-yellow-500/20 rounded-xl p-5">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center"><span class="iconify text-yellow-400 text-xl" data-icon="mdi:clock-outline"></span></div>
-                        <div><p class="text-xs text-slate-400">Pending</p><p class="text-xl font-bold text-white">TZS 350K</p></div>
-                    </div>
-                    <p class="text-[10px] text-yellow-400">Next remittance: Jan 17, 2025</p>
-                </div>
-                <div class="remittance-card bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border border-cyan-500/20 rounded-xl p-5">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:timer-sand"></span></div>
-                        <div><p class="text-xs text-slate-400">Avg. Remittance Time</p><p class="text-xl font-bold text-white">18 hours</p></div>
-                    </div>
-                    <p class="text-[10px] text-cyan-400">Target: 24 hours ✓</p>
-                </div>
-            </div>
-
-            <!-- Remittance History -->
             <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
-                <h3 class="text-sm font-medium text-white mb-4">Recent Remittances</h3>
+                <h3 class="text-sm font-medium text-white mb-4">Recent Orders</h3>
                 <div class="space-y-3">
-                    <div class="flex items-center gap-4 p-3 bg-white/[0.02] rounded-lg">
-                        <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-green-400" data-icon="mdi:cellphone"></span></div>
-                        <div class="flex-1"><p class="text-sm text-white font-medium">TZS 450,000</p><p class="text-[10px] text-slate-500">M-Pesa → 0769 799 110 • Ref: MP45892</p></div>
-                        <div class="text-right"><p class="text-[10px] text-green-400 font-medium">Completed</p><p class="text-[10px] text-slate-500">Jan 14, 2025</p></div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 bg-white/[0.02] rounded-lg">
-                        <div class="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400" data-icon="mdi:bank"></span></div>
-                        <div class="flex-1"><p class="text-sm text-white font-medium">TZS 800,000</p><p class="text-[10px] text-slate-500">CRDB Bank • Acc: ****4521 • Ref: BK78234</p></div>
-                        <div class="text-right"><p class="text-[10px] text-green-400 font-medium">Completed</p><p class="text-[10px] text-slate-500">Jan 13, 2025</p></div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 bg-white/[0.02] rounded-lg">
-                        <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-green-400" data-icon="mdi:cellphone"></span></div>
-                        <div class="flex-1"><p class="text-sm text-white font-medium">TZS 320,000</p><p class="text-[10px] text-slate-500">M-Pesa → 0769 799 110 • Ref: MP45102</p></div>
-                        <div class="text-right"><p class="text-[10px] text-green-400 font-medium">Completed</p><p class="text-[10px] text-slate-500">Jan 12, 2025</p></div>
-                    </div>
+                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02]"><div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:package"></span></div><div class="flex-1"><p class="text-xs text-white font-medium">#CS-2451 — Dar → Kigoma</p></div><span class="badge badge-transit">Transit</span></div>
+                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02]"><div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-sm" data-icon="mdi:check"></span></div><div class="flex-1"><p class="text-xs text-white font-medium">#CS-2450 — Dar → Mwanza</p></div><span class="badge badge-delivered">Done</span></div>
+                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02]"><div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:clock-outline"></span></div><div class="flex-1"><p class="text-xs text-white font-medium">#CS-2449 — Dar → Arusha</p></div><span class="badge badge-pending">Pending</span></div>
                 </div>
             </div>
         </section>
 
-        <!-- NOTIFICATIONS SECTION -->
-        <section id="section-notifications" class="p-4 md:p-6 hidden">
-            <div class="mb-6">
-                <h1 class="text-xl md:text-2xl font-semibold text-white">SMS Notifications</h1>
-                <p class="text-sm text-slate-500 mt-1">Track all SMS alerts sent to you and your customers</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:message-text"></span></div>
-                    <div><p class="text-lg font-bold text-white">1,247</p><p class="text-xs text-slate-500">SMS Sent This Month</p></div>
-                </div>
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center"><span class="iconify text-green-400 text-2xl" data-icon="mdi:check-all"></span></div>
-                    <div><p class="text-lg font-bold text-white">99.2%</p><p class="text-xs text-slate-500">Delivery Rate</p></div>
-                </div>
-            </div>
-
-            <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
-                <h3 class="text-sm font-medium text-white mb-4">Recent Notifications</h3>
-                <div class="space-y-3">
-                    <div class="notification-item flex gap-3 p-3 rounded-lg">
-                        <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-green-400 text-sm" data-icon="mdi:check-circle"></span></div>
-                        <div><p class="text-xs text-white">Order #CS-2450 delivered to Fatma Ali</p><p class="text-[10px] text-slate-500">Customer notified • Jan 14, 14:32</p></div>
-                    </div>
-                    <div class="notification-item flex gap-3 p-3 rounded-lg">
-                        <div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:truck"></span></div>
-                        <div><p class="text-xs text-white">Order #CS-2451 picked up — in transit to Kigoma</p><p class="text-[10px] text-slate-500">You & customer notified • Jan 15, 09:15</p></div>
-                    </div>
-                    <div class="notification-item flex gap-3 p-3 rounded-lg">
-                        <div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:cash"></span></div>
-                        <div><p class="text-xs text-white">TZS 450,000 remitted to your M-Pesa</p><p class="text-[10px] text-slate-500">You notified • Jan 14, 16:00</p></div>
-                    </div>
-                    <div class="notification-item flex gap-3 p-3 rounded-lg">
-                        <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-blue-400 text-sm" data-icon="mdi:motorbike"></span></div>
-                        <div><p class="text-xs text-white">Rider assigned to Order #CS-2448</p><p class="text-[10px] text-slate-500">You notified • Jan 15, 08:45</p></div>
-                    </div>
-                    <div class="notification-item flex gap-3 p-3 rounded-lg">
-                        <div class="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-red-400 text-sm" data-icon="mdi:alert-circle"></span></div>
-                        <div><p class="text-xs text-white">Order #CS-2447 returned — customer unreachable</p><p class="text-[10px] text-slate-500">You notified • Jan 13, 11:20</p></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ACCOUNT MANAGER SECTION -->
-        <section id="section-account-manager" class="p-4 md:p-6 hidden">
-            <div class="mb-6">
-                <h1 class="text-xl md:text-2xl font-semibold text-white">Dedicated Account Manager</h1>
-                <p class="text-sm text-slate-500 mt-1">Your personal support contact for all business needs</p>
-            </div>
-
-            <div class="max-w-lg mx-auto">
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 text-center">
-                    <div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span class="iconify text-white text-4xl" data-icon="mdi:account-tie"></span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-white mb-1">David Mwangi</h3>
-                    <p class="text-sm text-cyan-400 mb-4">Senior Account Manager</p>
-                    <div class="glow-line mb-4"></div>
-                    <div class="space-y-3 text-left">
-                        <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3">
-                            <span class="iconify text-cyan-400" data-icon="mdi:phone"></span>
-                            <div><p class="text-[10px] text-slate-500">Phone</p><p class="text-sm text-white">+255 769 800 220</p></div>
-                        </div>
-                        <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3">
-                            <span class="iconify text-cyan-400" data-icon="mdi:email"></span>
-                            <div><p class="text-[10px] text-slate-500">Email</p><p class="text-sm text-white">david@chapshop.co.tz</p></div>
-                        </div>
-                        <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3">
-                            <span class="iconify text-green-400" data-icon="mdi:whatsapp"></span>
-                            <div><p class="text-[10px] text-slate-500">WhatsApp</p><p class="text-sm text-white">+255 769 800 220</p></div>
-                        </div>
-                        <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3">
-                            <span class="iconify text-cyan-400" data-icon="mdi:clock-outline"></span>
-                            <div><p class="text-[10px] text-slate-500">Available</p><p class="text-sm text-white">Mon - Fri, 8AM - 6PM</p></div>
-                        </div>
-                    </div>
-                    <a href="https://wa.me/255769800220" target="_blank" class="mt-5 w-full bg-green-500 text-white font-medium text-sm py-3 rounded-xl hover:bg-green-400 transition-colors flex items-center justify-center gap-2">
-                        <span class="iconify text-lg" data-icon="mdi:whatsapp"></span> Chat on WhatsApp
-                    </a>
-                </div>
-            </div>
-        </section>
-
+        <section id="section-orders" class="p-4 md:p-6 hidden"><div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Orders</h1><p class="text-sm text-slate-500 mt-1">Manage and track all your deliveries</p></div><div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-8 text-center"><span class="iconify text-4xl text-slate-600 mb-3" data-icon="mdi:package-variant"></span><p class="text-slate-400">Order management coming soon!</p></div></section>
+        <section id="section-remittance" class="p-4 md:p-6 hidden"><div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Fast COD Remittance</h1><p class="text-sm text-slate-500 mt-1">Track your COD collections and M-Pesa/Bank transfers</p></div><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div class="bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/20 rounded-xl p-5"><div class="flex items-center gap-3 mb-2"><span class="iconify text-green-400 text-2xl" data-icon="mdi:cash-check"></span></div><p class="text-xl font-bold text-white">TZS 3.85M</p><p class="text-xs text-green-400">Total Remitted</p><p class="text-[10px] text-slate-500 mt-2">→ M-Pesa: TZS 2.1M | Bank: TZS 1.75M</p></div><div class="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border border-yellow-500/20 rounded-xl p-5"><div class="flex items-center gap-3 mb-2"><span class="iconify text-yellow-400 text-2xl" data-icon="mdi:clock-outline"></span></div><p class="text-xl font-bold text-white">TZS 350K</p><p class="text-xs text-yellow-400">Pending</p><p class="text-[10px] text-slate-500 mt-2">Next remittance: Jan 17, 2025</p></div><div class="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border border-cyan-500/20 rounded-xl p-5"><div class="flex items-center gap-3 mb-2"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:timer-sand"></span></div><p class="text-xl font-bold text-white">18 hours</p><p class="text-xs text-cyan-400">Avg. Remittance Time</p><p class="text-[10px] text-slate-500 mt-2">Target: 24 hours ✓</p></div></div></section>
+        <section id="section-notifications" class="p-4 md:p-6 hidden"><div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">SMS Notifications</h1><p class="text-sm text-slate-500 mt-1">Track all SMS alerts sent to you and your customers</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center gap-4"><div class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:message-text"></span></div><div><p class="text-lg font-bold text-white">1,247</p><p class="text-xs text-slate-500">SMS Sent This Month</p></div></div><div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center gap-4"><div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center"><span class="iconify text-green-400 text-2xl" data-icon="mdi:check-all"></span></div><div><p class="text-lg font-bold text-white">99.2%</p><p class="text-xs text-slate-500">Delivery Rate</p></div></div></div><div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5"><div class="space-y-3"><div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-sm" data-icon="mdi:check-circle"></span></div><div><p class="text-xs text-white">Order #CS-2450 delivered to Fatma Ali</p><p class="text-[10px] text-slate-500">Customer notified • Jan 14, 14:32</p></div></div><div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:truck"></span></div><div><p class="text-xs text-white">Order #CS-2451 in transit to Kigoma</p><p class="text-[10px] text-slate-500">You & customer notified • Jan 15, 09:15</p></div></div><div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:cash"></span></div><div><p class="text-xs text-white">TZS 450,000 remitted to your M-Pesa</p><p class="text-[10px] text-slate-500">You notified • Jan 14, 16:00</p></div></div></div></div></section>
+        <section id="section-account-manager" class="p-4 md:p-6 hidden"><div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Dedicated Account Manager</h1><p class="text-sm text-slate-500 mt-1">Your personal support contact</p></div><div class="max-w-lg mx-auto bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 text-center"><div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-full flex items-center justify-center mx-auto mb-4"><span class="iconify text-white text-4xl" data-icon="mdi:account-tie"></span></div><h3 class="text-lg font-semibold text-white mb-1">David Mwangi</h3><p class="text-sm text-cyan-400 mb-4">Senior Account Manager</p><div class="space-y-3 text-left"><div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-cyan-400" data-icon="mdi:phone"></span><div><p class="text-[10px] text-slate-500">Phone</p><p class="text-sm text-white">+255 769 800 220</p></div></div><div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-green-400" data-icon="mdi:whatsapp"></span><div><p class="text-[10px] text-slate-500">WhatsApp</p><p class="text-sm text-white">+255 769 800 220</p></div></div></div><a href="https://wa.me/255769800220" target="_blank" class="mt-5 w-full bg-green-500 text-white font-medium text-sm py-3 rounded-xl hover:bg-green-400 transition-colors flex items-center justify-center gap-2"><span class="iconify text-lg" data-icon="mdi:whatsapp"></span> Chat on WhatsApp</a></div></section>
     </main>
 
     <script>
-        // Auth Check
-        const merchant = JSON.parse(localStorage.getItem('chapshop_logged_in'));
-        if (!merchant) { window.location.href = 'merchants.html'; }
+        const supabase = window.supabase.createClient('https://lmbpnnfyelsqhwzatwbv.supabase.co', 'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm');
 
-        // Set User Info
-        if (merchant) {
-            document.getElementById('nav-username').textContent = merchant.name || 'Merchant';
-            document.getElementById('sidebar-business').textContent = merchant.business || 'Business';
-            document.getElementById('sidebar-email').textContent = merchant.email || '';
-            document.getElementById('welcome-name').textContent = merchant.name?.split(' ')[0] || 'Merchant';
+        async function init() {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (!user) { window.location.href = 'merchants.html'; return; }
+            const { data: merchant } = await supabase.from('merchants').select('*').eq('user_id', user.id).single();
+            if (merchant) {
+                document.getElementById('nav-username').textContent = merchant.name || 'Merchant';
+                document.getElementById('sidebar-business').textContent = merchant.business || 'Business';
+                document.getElementById('sidebar-email').textContent = merchant.email || '';
+                document.getElementById('welcome-name').textContent = merchant.name?.split(' ')[0] || 'Merchant';
+            }
         }
+        init();
 
-        // Sidebar Toggle
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebar-overlay');
         document.getElementById('sidebar-toggle').addEventListener('click', () => { sidebar.classList.toggle('closed'); sidebarOverlay.classList.toggle('hidden'); });
         sidebarOverlay.addEventListener('click', () => { sidebar.classList.add('closed'); sidebarOverlay.classList.add('hidden'); });
 
-        // Show Section
         function showSection(section) {
             document.querySelectorAll('[id^="section-"]').forEach(s => s.classList.add('hidden'));
             const target = document.getElementById('section-' + section);
             if (target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
-            
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
             const link = document.querySelector(`.sidebar-link[data-section="${section}"]`);
             if (link) link.classList.add('active');
-            
-            // Close mobile sidebar
             if (window.innerWidth < 1024) { sidebar.classList.add('closed'); sidebarOverlay.classList.add('hidden'); }
         }
 
-        // Toast
         function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000); }
 
-        // Logout
-        function handleLogout() {
-            localStorage.removeItem('chapshop_logged_in');
+        async function handleLogout() {
+            await supabase.auth.signOut();
             window.location.href = 'merchants.html';
         }
-
-        // Notification button
-        document.getElementById('notif-btn').addEventListener('click', () => showSection('notifications'));
-
-        // Chart tabs
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
     </script>
 </body>
 </html>
