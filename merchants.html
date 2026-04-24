@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Join as Merchant — ChapShop Delivery</title>
-    <script src="https://codinafrica.com/en#join" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https:// Fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     <style>
         * { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: ating-3px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         .gradient-text { background: linear-gradient(to bottom, #ffffff, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .glow-line { background: linear-gradient(to right, transparent, #164e63, transparent); height: 1px; }
         .hero-glow { background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(6,182,212,0.12) 0%, transparent 60%); }
@@ -22,28 +22,37 @@
         .mobile-menu.open { transform: translateX(0); }
         .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
         .toast.show { transform: translateY(0); opacity: 1; }
-        .whatsapp-float { position: fixed; bottom: 24px; right: 24px; z-index: 50; width: 56px; height: 4px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 4px 20px rgba(37,211,102,0.4); transition: transform 0.3s ease; }
+        .whatsapp-float { position: fixed; bottom: 24px; right: 24px; z-index: 50; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.4); transition: transform 0.3s ease; }
         .whatsapp-float:hover { transform: scale(1.1); }
         .platform-chip { transition: all 0.2s ease; cursor: pointer; }
         .platform-chip.selected { background: rgba(6,182,212,0.2) !important; border-color: rgba(6,182,212,0.5) !important; color: #22d3ee !important; }
         .join-glow { background: radial-gradient(ellipse 60% 40% at 30% 50%, rgba(6,182,212,0.08) 0%, transparent 70%); }
-        .success-screen { display: none; }
-        .success-screen.show { display: flex; }
-        .success-anim { animation: fadeInUp 0.6s ease forwards; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .tab-btn { transition: all 0.3s ease; }
+        .tab-btn.active { color: #06b6d4; border-color: #06b6d4; background: rgba(6,182,212,0.08); }
+        .tab-btn:not(.active) { color: #64748b; border-color: transparent; }
+        .tab-btn:not(.active):hover { color: #94a3b8; background: rgba(255,255,255,0.02); }
+        .form-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; transition: all 0.3s; }
+        .form-input:focus { border-color: rgba(6,182,212,0.5); outline: none; box-shadow: 0 0 0 3px rgba(6,182,212,0.08); background: rgba(255,255,255,0.06); }
+        .form-input::placeholder { color: #475569; }
+        .error-msg { color: #f87171; font-size: 11px; margin-top: 4px; display: none; }
+        .error-msg.show { display: block; }
+        .input-error { border-color: #f87171 !important; }
     </style>
 </head>
 <body class="bg-[#020617] text-white">
 
+    <!-- Toast -->
     <div id="toast" class="toast fixed bottom-6 right-24 z-[100] bg-cyan-900/90 border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
         <span class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
         <span id="toast-msg" class="text-sm font-medium">Success!</span>
     </div>
 
+    <!-- WhatsApp -->
     <a href="https://wa.me/255769799110" target="_blank" class="whatsapp-float" title="Chat on WhatsApp">
         <span class="iconify text-white text-3xl" data-icon="mdi:whatsapp"></span>
     </a>
 
+    <!-- Nav -->
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2.5">
@@ -66,9 +75,9 @@
                     <span class="iconify text-base" data-icon="mdi:phone"></span>
                     0769 799 110
                 </a>
-                <a href="#join" class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors">
+                <span class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg">
                     Join as Merchant
-                </a>
+                </span>
             </div>
             <button id="menu-btn" class="md:hidden text-white p-2">
                 <span class="iconify text-2xl" data-icon="mdi:menu"></span>
@@ -76,6 +85,7 @@
         </div>
     </nav>
 
+    <!-- Mobile Menu -->
     <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 bottom-0 w-72 z-[60] bg-[#0f172a] border-l border-white/10 p-6">
         <div class="flex justify-end mb-8">
             <button id="close-menu" class="text-white p-2"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
@@ -83,22 +93,22 @@
         <div class="flex flex-col gap-4">
             <a href="index.html" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Home</a>
             <a href="index.html#services" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Services</a>
-            <a href="index.html#coverage" class="mobile-link text-slate-3 hover:text-white py-2 text-base transition-colors">Coverage</a>
+            <a href="index.html#coverage" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Coverage</a>
             <a href="about.html" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">About Us</a>
             <a href="index.html#contact" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Contact</a>
             <div class="glow-line my-4"></div>
             <a href="tel:0769799110" class="text-cyan-400 text-sm flex items-center gap-2">
                 <span class="iconify" data-icon="mdi:phone"></span> 0769 799 110
             </a>
-            <a href="#join" class="mobile-link bg-cyan-500 text-white text-sm font-medium px-5 py-3 rounded-lg text-center hover:bg-cyan-400 transition-colors mt-2">
+            <span class="bg-cyan-500 text-white text-sm font-medium px-5 py-3 rounded-lg text-center">
                 Join as Merchant
-            </a>
+            </span>
         </div>
     </div>
     <div id="menu-overlay" class="fixed inset-0 z-[55] bg-black/60 hidden"></div>
 
-    <!-- JOIN SECTION -->
-    <section id="join" class="relative hero-glow pt-28 pb-12 overflow-hidden">
+    <!-- Header Section -->
+    <section class="relative hero-glow pt-28 pb-12 overflow-hidden">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
                 <a href="index.html" class="hover:text-white transition-colors">Home</a>
@@ -124,7 +134,7 @@
                     <span class="iconify text-green-400 text-lg" data-icon="mdi:check-circle"></span>
                     <span class="text-xs font-medium text-slate-300">Free Integration</span>
                 </div>
-                <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.8] rounded-full px-4 py-2">
+                <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-4 py-2">
                     <span class="iconify text-green-400 text-lg" data-icon="mdi:check-circle"></span>
                     <span class="text-xs font-medium text-slate-300">24h Onboarding</span>
                 </div>
@@ -140,9 +150,9 @@
         </div>
     </section>
 
-    <!-- MAIN CONTENT -->
-    <section class="relative join-glow py-16 relative">
-        <div class="relative max-w-7xl mx-auto px-6">
+    <!-- Main Content -->
+    <section class="relative join-glow py-16">
+        <div class="max-w-7xl mx-auto px-6">
             <div class="grid grid-cols-1 lg:grid-cols-5 gap-10">
 
                 <!-- Left Side — Benefits -->
@@ -152,30 +162,30 @@
                     <div>
                         <h3 class="text-lg font-medium text-white mb-5">How Onboarding Works</h3>
                         <div class="space-y-0">
-                            <div class="flex gap-4 relative">
+                            <div class="flex gap-4">
                                 <div class="flex flex-col items-center">
-                                    <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/30 rounded-full flex items-center justify-center flex-shrink-0 z-10"><span class="text-sm font-semibold text-cyan-400">1</span></div>
+                                    <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/30 rounded-full flex items-center justify-center flex-shrink-0"><span class="text-sm font-semibold text-cyan-400">1</span></div>
                                     <div class="w-px h-full bg-white/[0.06] my-1"></div>
                                 </div>
                                 <div class="pb-6"><h4 class="text-sm font-medium text-white mb-1">Submit Your Application</h4><p class="text-xs text-slate-400 leading-relaxed">Fill out the form with your business details. Takes less than 2 minutes.</p></div>
                             </div>
-                            <div class="flex gap-4 relative">
+                            <div class="flex gap-4">
                                 <div class="flex flex-col items-center">
-                                    <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/30 rounded-full flex items-center justify-center flex-shrink-0 z-10"><span class="text-sm font-semibold text-cyan-400">2</span></div>
+                                    <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/30 rounded-full flex items-center justify-center flex-shrink-0"><span class="text-sm font-semibold text-cyan-400">2</span></div>
                                     <div class="w-px h-full bg-white/[0.06] my-1"></div>
                                 </div>
                                 <div class="pb-6"><h4 class="text-sm font-medium text-white mb-1">Verification & Setup</h4><p class="text-xs text-slate-400 leading-relaxed">Our team verifies your business and sets up your account — usually within 24 hours.</p></div>
                             </div>
-                            <div class="flex gap-4 relative">
+                            <div class="flex gap-4">
                                 <div class="flex flex-col items-center">
-                                    <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/30 rounded-full flex items-center justify-center flex-shrink-0 z-10"><span class="text-sm font-semibold text-cyan-400">3</span></div>
+                                    <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/30 rounded-full flex items-center justify-center flex-shrink-0"><span class="text-sm font-semibold text-cyan-400">3</span></div>
                                     <div class="w-px h-full bg-white/[0.06] my-1"></div>
                                 </div>
                                 <div class="pb-6"><h4 class="text-sm font-medium text-white mb-1">Integrate & Connect</h4><p class="text-xs text-slate-400 leading-relaxed">Connect your store via API, dashboard, or CSV. Free integration support included.</p></div>
                             </div>
-                            <div class="flex gap-4 relative">
+                            <div class="flex gap-4">
                                 <div class="flex flex-col items-center">
-                                    <div class="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0 z-10"><span class="iconify text-white text-lg" data-icon="mdi:rocket-launch"></span></div>
+                                    <div class="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center flex-shrink-0"><span class="iconify text-white text-lg" data-icon="mdi:rocket-launch"></span></div>
                                 </div>
                                 <div><h4 class="text-sm font-medium text-white mb-1">Start Shipping & Earning</h4><p class="text-xs text-slate-400 leading-relaxed">Create orders and we deliver. Receive COD remittances to M-Pesa or bank.</p></div>
                             </div>
@@ -194,7 +204,7 @@
                                 <span class="iconify text-cyan-400 text-lg flex-shrink-0" data-icon="mdi:cellphone-message"></span>
                                 <span class="text-sm text-slate-300">SMS Notifications to you & your customers</span>
                             </div>
-                            <div class="flex items-center gap-3 bg-white/[0.02] border border-white/[0.6] rounded-xl px-4 py-3">
+                            <div class="flex items-center gap-3 bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3">
                                 <span class="iconify text-cyan-400 text-lg flex-shrink-0" data-icon="mdi:cash-fast"></span>
                                 <span class="text-sm text-slate-300">Fast COD Remittance — M-Pesa / Bank transfer</span>
                             </div>
@@ -212,144 +222,155 @@
                     <!-- Integrations -->
                     <div>
                         <h3 class="text-sm font-medium text-slate-400 mb-3">Seamless Integrations</h3>
-                        <div class="flex flex-wrap gap-3">
-                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:shopify"></span><span class="text-xs text-slate-400">Shopify</span></div>
-                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:wordpress"></span><span class="text-xs text-slate-400">WooCommerce</span></div>
-                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:api"></span><span class="text-xs text-slate-400">REST API</span></div>
-                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:file-csv"></span><span class="text-xs text-slate-400">CSV Upload</span></div>
-                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:instagram"></span><span class="text-xs text-slate-400">Instagram</span></div>
-                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:whatsapp"></span><span class="text-xs text-slate-400">WhatsApp</span></div>
-                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:web"></span><span class="text-xs text-slate-400">Own Website</span></div>
-                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:store"></span><span class="text-xs text-slate-400">Physical Store</span></div>
-                            <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400 text-lg" data-icon="mdi:dots-horizontal"></span><span class="text-xs text-slate-400">Other</span></div>
+                        <div class="flex flex-wrap gap-2">
+                            <div class="flex items-center gap-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400" data-icon="mdi:shopify"></span><span class="text-xs text-slate-400">Shopify</span></div>
+                            <div class="flex items-center gap-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400" data-icon="mdi:wordpress"></span><span class="text-xs text-slate-400">WooCommerce</span></div>
+                            <div class="flex items-center gap-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400" data-icon="mdi:api"></span><span class="text-xs text-slate-400">REST API</span></div>
+                            <div class="flex items-center gap-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400" data-icon="mdi:file-csv"></span><span class="text-xs text-slate-400">CSV Upload</span></div>
+                            <div class="flex items-center gap-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400" data-icon="mdi:instagram"></span><span class="text-xs text-slate-400">Instagram</span></div>
+                            <div class="flex items-center gap-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400" data-icon="mdi:whatsapp"></span><span class="text-xs text-slate-400">WhatsApp</span></div>
+                            <div class="flex items-center gap-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400" data-icon="mdi:web"></span><span class="text-xs text-slate-400">Own Website</span></div>
+                            <div class="flex items-center gap-1.5 bg-white/[0.03] border border-white/[0.06] rounded-lg px-3 py-2"><span class="iconify text-slate-400" data-icon="mdi:store"></span><span class="text-xs text-slate-400">Physical Store</span></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Side — Form -->
-                <div class="div[&--tw-px-6 md:px-8] bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 md:p-8 relative overflow-hidden">
-                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-1 bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent rounded-full"></div>
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/20 rounded-xl flex items-center justify-center"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:account-plus"></span></div>
-                        <div><h3 class="text-lg font-medium text-white">Merchant Application</h3><p class="text-xs text-slate-500">Fill in your details to join ChapShop Delivery</p></div>
-                    </div>
+                <!-- Right Side — Sign Up / Login Form -->
+                <div class="lg:col-span-3">
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-1 bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent rounded-full"></div>
 
-                    <form id="merchant-form" class="space-y-5">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs font-medium text-slate-400 mb-1.5 block">Full Name <span class="text-red-400">*</span></label>
-                                <input type="text" name="fullname" required placeholder="e.g. Amina Kimaro" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all">
-                            </div>
-                            <div>
-                                <label class="text-xs font-medium text-slate-400 mb-1.5 block">Business / Store Name <span class="text-red-400">*</span></label>
-                                <input type="text" name="business" required placeholder="e.g. ZanzibarStyle" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all">
-                            </div>
+                        <!-- Tabs -->
+                        <div class="flex mb-6 bg-white/[0.03] border border-white/[0.08] rounded-lg p-1">
+                            <button onclick="showTab('signup')" id="signupTab" class="tab-btn active flex-1 py-2.5 text-sm font-medium rounded-md border border-transparent">
+                                Sign Up
+                            </button>
+                            <button onclick="showTab('login')" id="loginTab" class="tab-btn flex-1 py-2.5 text-sm font-medium rounded-md border border-transparent">
+                                Login
+                            </button>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs font-medium text-slate-400 mb-1.5 block">Email Address <span class="text-red-400">*</span></label>
-                                <input type="email" name="email" required placeholder="amina@store.co.tz" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all">
+
+                        <!-- Sign Up Form -->
+                        <div id="signupForm">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/20 rounded-xl flex items-center justify-center">
+                                    <span class="iconify text-cyan-400 text-xl" data-icon="mdi:account-plus"></span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium text-white">Merchant Application</h3>
+                                    <p class="text-xs text-slate-500">Fill in your details to join ChapShop Delivery</p>
+                                </div>
                             </div>
-                            <div>
-                                <label class="text-xs font-medium text-slate-400 mb-1.5 block">Phone Number <span class="text-red-400">*</span></label>
-                                <input type="tel" name="required placeholder="0769 xxx xxx xxx" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all">
+
+                            <form id="signup-form" class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs font-medium text-slate-400 mb-1.5 block">Full Name <span class="text-red-400">*</span></label>
+                                        <input type="text" id="signupName" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="e.g. Amina Kimaro">
+                                        <p class="error-msg" id="signupNameError">Required</p>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-medium text-slate-400 mb-1.5 block">Business Name <span class="text-red-400">*</span></label>
+                                        <input type="text" id="signupBusiness" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="e.g. ZanzibarStyle">
+                                        <p class="error-msg" id="signupBusinessError">Required</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs font-medium text-slate-400 mb-1.5 block">Email <span class="text-red-400">*</span></label>
+                                        <input type="email" id="signupEmail" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="amina@store.co.tz">
+                                        <p class="error-msg" id="signupEmailError">Enter valid email</p>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-medium text-slate-400 mb-1.5 block">Phone <span class="text-red-400">*</span></label>
+                                        <input type="tel" id="signupPhone" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="0769 xxx xxx">
+                                        <p class="error-msg" id="signupPhoneError">Required</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs font-medium text-slate-400 mb-1.5 block">City / Region <span class="text-red-400">*</span></label>
+                                        <select id="signupCity" class="form-input w-full rounded-xl px-4 py-3 text-sm text-slate-400 appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>'); background-repeat: no-repeat; background-position: right 16px center;">
+                                            <option value="" disabled selected>Select your city</option>
+                                            <option>Dar es Salaam</option><option>Dodoma</option><option>Mwanza</option><option>Arusha</option><option>Mbeya</option><option>Morogoro</option><option>Tanga</option><option>Zanzibar</option><option>Iringa</option><option>Kagera</option><option>Kigoma</option><option>Lindi</option><option>Mara</option><option>Pwani</option><option>Ruvuma</option><option>Shinyanga</option><option>Singida</option><option>Tabora</option><option>Other</option>
+                                        </select>
+                                        <p class="error-msg" id="signupCityError">Required</p>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-medium text-slate-400 mb-1.5 block">Password <span class="text-red-400">*</span></label>
+                                        <input type="password" id="signupPassword" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Min 6 characters">
+                                        <p class="error-msg" id="signupPasswordError">Min 6 characters</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-medium text-slate-400 mb-2 block">Where Do You Sell?</label>
+                                    <div class="flex flex-wrap gap-2" id="platform-chips">
+                                        <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-400" data-value="shopify"><span class="iconify text-sm mr-1" data-icon="mdi:shopify"></span>Shopify</button>
+                                        <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-400" data-value="woocommerce"><span class="iconify text-sm mr-1" data-icon="mdi:wordpress"></span>WooCommerce</button>
+                                        <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-400" data-value="instagram"><span class="iconify text-sm mr-1" data-icon="mdi:instagram"></span>Instagram</button>
+                                        <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-400" data-value="whatsapp"><span class="iconify text-sm mr-1" data-icon="mdi:whatsapp"></span>WhatsApp</button>
+                                        <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-400" data-value="facebook"><span class="iconify text-sm mr-1" data-icon="mdi:facebook"></span>Facebook</button>
+                                        <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-400" data-value="website"><span class="iconify text-sm mr-1" data-icon="mdi:web"></span>Own Website</button>
+                                        <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-400" data-value="physical"><span class="iconify text-sm mr-1" data-icon="mdi:store"></span>Physical Store</button>
+                                        <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-400" data-value="other"><span class="iconify text-sm mr-1" data-icon="mdi:dots-horizontal"></span>Other</button>
+                                    </div>
+                                    <input type="hidden" id="platforms-input" value="">
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <input type="checkbox" id="terms" class="mt-1 w-4 h-4 rounded border-white/20 bg-white/[0.04] accent-cyan-500 cursor-pointer">
+                                    <label for="terms" class="text-xs text-slate-400 leading-relaxed cursor-pointer">
+                                        I agree to the <a href="#" class="text-cyan-400 underline underline-offset-2">Terms of Service</a> and <a href="#" class="text-cyan-400 underline underline-offset-2">Privacy Policy</a>.
+                                    </label>
+                                </div>
+                                <p class="error-msg" id="termsError">Please agree to the terms</p>
+                                <button type="submit" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20">
+                                    <span class="iconify text-lg" data-icon="mdi:send"></span> Create Account
+                                </button>
+                                <p class="text-center text-slate-500 text-xs mt-4">
+                                    Already registered? <a href="#" onclick="showTab('login')" class="text-cyan-400 hover:text-cyan-300">Login here</a>
+                                </p>
+                            </form>
+                        </div>
+
+                        <!-- Login Form -->
+                        <div id="loginForm" class="hidden">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/20 rounded-xl flex items-center justify-center">
+                                    <span class="iconify text-cyan-400 text-xl" data-icon="mdi:login"></span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium text-white">Welcome Back</h3>
+                                    <p class="text-xs text-slate-500">Login to access your merchant dashboard</p>
+                                </div>
                             </div>
+
+                            <form id="login-form" class="space-y-4">
+                                <div>
+                                    <label class="text-xs font-medium text-slate-400 mb-1.5 block">Email <span class="text-red-400">*</span></label>
+                                    <input type="email" id="loginEmail" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="you@example.com">
+                                    <p class="error-msg" id="loginEmailError">Enter valid email</p>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-medium text-slate-400 mb-1.5 block">Password <span class="text-red-400">*</span></label>
+                                    <input type="password" id="loginPassword" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Your password">
+                                    <p class="error-msg" id="loginPasswordError">Required</p>
+                                </div>
+                                <p class="error-msg text-center text-sm" id="loginGeneralError">Invalid email or password</p>
+                                <button type="submit" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20">
+                                    <span class="iconify text-lg" data-icon="mdi:login"></span> Login to Dashboard
+                                </button>
+                                <p class="text-center text-slate-500 text-xs mt-4">
+                                    New here? <a href="#" onclick="showTab('signup')" class="text-cyan-400 hover:text-cyan-300">Create an account</a>
+                                </p>
+                            </form>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs font-medium text-slate-400 mb-1.5 block">City / Region <span class="text-red-400">*</span></label>
-                                <select name="city" required class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>'); background-repeat: no-repeat; background-position: right 16px center;">
-                                    <option value="" disabled selected>Select your city</option>
-                                    <option>Dar es Salaam</option><option>Dodoma</option><option>Mwanza</option><option>Arusha</option><option>Mbeya</option>Morogoro</option>Tanga</option>Zanzibar</option>Iringa</option>Kagera</option>Kigoma</option>Lindi</option>Mara</option>Pwani</option>Ruvuma</option>Shinyanga</option>Singida</option>Tabora</option>Rukwa</option>Katavi</option>Simiyu</option>Geita</option>Njombe</option> <option>Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-xs font-medium text-slate-400 mb-1.5 block">Business Type <span class="text-red-400">*</span></label>
-                                <select name="biztype" required class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 focus:ring-https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-                                    <option value="" disabled selected>Select type</option>
-                                    <option>E-Commerce Store</option><option>Social Media Seller (IG/WhatsApp/FB)</option><option>Pharmacy / Medical</option>Fashion & Apparel</option>Electronics</option>Food & Groceries</option>FMCG / Consumer Goods</option>Other</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium text-slate-400 mb-2.5 block">Where Do You Sell? <span class="text-slate-600 font-normal">(select all that apply)</span></label>
-                            <div class="flex flex-wrap gap-2" id="platform-chips">
-                                <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="shopify"><span class="iconify text-sm" data-icon="mdi:shopify"></span> Shopify</button>
-                                <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="woocommerce"><span class="iconify text-sm" data-icon="mdi:wordpress"></span> WooCommerce</button>
-                                <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="instagram"><span class="iconify text-sm" data-icon="mdi:instagram"></span> Instagram</button>
-                                <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="whatsapp"><span class="iconify text-sm" data-icon="mdi:whatsapp"></span> WhatsApp</button>
-                                <button type="button" class="platform-chip bg-white/[0.4] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="facebook"><span class="iconify text-sm" data-icon="mdi:facebook"></span> Facebook</button>
-                                <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="tiktok"><span class="iconify text-sm" data-icon="ic:baseline-tiktok"></span> TikTok</button>
-                                <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="website"><span class="iconify text-sm" data-icon="mdi:web"></span> Own Website</button>
-                                <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="physical"><span class="iconify text-sm" data-icon="mdi:store"></span> Physical Store</button>
-                                <button type="button" class="platform-chip bg-white/[0.04] border border-white/[0.1] rounded-lg px-3.5 py-2 text-xs text-slate-400 flex items-center gap-1.5" data-value="other"><span class="iconify text-sm" data-icon="mdi:dots-horizontal"></span> Other</button>
-                            </div>
-                            <input type="hidden" name="platforms" id="platforms-input">
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">Estimated Monthly Orders <span class="text-red-400">*</span></label>
-                            <select name="volume" required class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>'); background-repeat: no-repeat; background-position: right 16px center;">
-                                <option value="" disabled selected>Select estimated volume</option>
-                                <option value="small">Less than 50 orders/month</option><option value="medium">50 - 200 orders/month</option><option value="200 - 500 orders/month</option><option value="500 - 1,000 orders/month</option><option value="1,000 - 500 orders/month</option><option value="5,000+ orders/month</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">Services You Need <span class="text-red-400">*</span></label>
-                            <select name="services" required class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 focus:outline:none focus:ring-500/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>'); background-repeat: no-repeat; background-position: right 16px center;">
-                                <option value="" disabled selected>What services do you need?</option>
-                                <option value="cod">Cash On Delivery Only</option><option value="cod+courier">COD + Courier & Delivery</option><option value="cod+warehouse">COD + Warehouse + Fulfillment</option><option value="full-3pl">Full 3PL (Warehouse + Fulfillment + Delivery)</option><option value="medical">Medical Courier</option><option value="callcenter">Call Center + COD</option><option value="reverse">Reverse Logistics + COD</option><option value="custom">Custom Package</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">Website / Store Link <span class="text-slate-600 font-normal">(optional)</label>
-                            <input type="url" name="website" placeholder="https://your-store.com or Instagram link" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/50 focus:outline:none focus:ring-500/20 transition-all">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-xs font-medium text-slate-400 mb-1.5 block">How Did You Hear About Us?</label>
-                            <select name="source" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate- specificity-400 focus:outline:none focus:border-cyan-500/50 focus:outline:none focus:ring-500/20 transition-all appearance-none cursor-pointer" style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>'); background-repeat: no-repeat; background-position: right 16px center;">
-                                <option value="" disabled>Select an option</option>
-                                <option>Google Search</option><option>Facebook / Instagram Ad</option>WhatsApp Referral</option>Friend / Colleague</option>Trade Fair / Event</option>Jumia / Marketplace</option>Other</option>
-                            </select>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <input type="checkbox" id="terms" required class="mt-1 w-4 h-4 rounded border-white/20 bg-white/[0.04] text-cyan-500 text-base focus:ring-cyan-500/30 focus:ring-cyan-500/30 focus:ring-offset-0 cursor-pointer">
-                            </div>
-                            <label for="terms" class="text-xs text-slate-400 leading-relaxed cursor-pointer">
-                                I agree to the <a href="#" class="text-cyan-400 hover:text-cyan-400 underline underline-offset-2">Terms of Service</a> and <a href="#" class="text-cyan-400 hover:text-cyan-400 underline underline-offset-2">Privacy Policy</a>.
-                            </label>
-                        </div>
-                        <button type="submit" id="submit" class="w-full bg-cyan-500 text-white font-medium text-sm py-4 rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-lg shadow-cyan-500/20 mt-2">
-                            <span class="iconify text-lg" data-icon="mdi:send"></span> Submit Merchant Application
-                        </button>
-                        <div class="flex items-center justify-center gap-4 pt-1">
+
+                        <!-- Footer Info -->
+                        <div class="flex items-center justify-center gap-4 pt-5 mt-5 border-t border-white/[0.05]">
                             <span class="text-[11px] text-slate-500 flex items-center gap-1.5"><span class="iconify text-green-400 text-xs" data-icon="mdi:lock"></span> Secure & Encrypted</span>
-                            <span class="text-[11px] text-slate-500 flex items-center gap-1.5"><span class="text-[11px] text-slate-500">Response within 24 hours. No spam.</span></div>
+                            <span class="text-[11px] text-slate-500">Response within 24 hours</span>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SUCCESS SCREEN -->
-    <section id="success-screen" class="success-screen">
-        <div class="success-anim">
-            <div class="max-w-xl mx-auto px-6 text-center">
-                <div class="w-24 h-24 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-8">
-                    <span class="iconify text-white text-4xl" data-icon="mdi:check-circle"></span>
-                </div>
-                <h2 class="application/x-l md:text-3xl font-medium text-white mb-4">Application Received!</h2>
-                <p class="text-slate-400 text-base leading-relaxed mb-8 max-w-lg mx-auto">Thank you for signing up! Our team will contact you within 24 hours to activate your merchant account.</p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <a href="dashboard.html" class="bg-cyan-500 text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 shadow-lg shadow-lg shadow-cyan-500/20 w-full sm:w-auto justify-center">
-                        <span class="iconify text-lg" data-icon="mdi:view-dashboard"></span>
-                        Go to Dashboard
-                    </a>
-                    <a href="index.html" class="bg-white/[0.05] border border-white/[0.1] text-[#0f172a] font-medium text-sm px-8 py-4 rounded-xl hover:bg-white/[0.1] flex items-center gap-2 w-full sm:w-auto justify-center">
-                        <span class="iconify text-lg text-[#0f172a]" data-icon="mdi:home"></span>
-                        Back to Home
-                    </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -358,82 +379,54 @@
     <!-- CTA Section -->
     <section class="py-20 relative overflow-hidden">
         <div class="absolute inset-0 hero-glow"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-3xl"></div>
         <div class="relative max-w-3xl mx-auto px-6 text-center">
-            <h2 class="text-2xl md:text-5xl font-medium tracking-tight gradient-text mb-4>Ready to Scale Your Delivery?</h2>
+            <h2 class="text-2xl md:text-4xl font-medium tracking-tight gradient-text mb-4">Ready to Scale Your Delivery?</h2>
             <p class="text-base text-slate-400 font-light max-w-xl mx-auto mb-10 leading-relaxed">Join 500+ merchants that trust ChapShop Delivery across Tanzania. No setup fees. No restrictions — just results.</p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="#join" class="bg-cyan-500 text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 shadow-lg shadow-lg shadow-cyan-500/20 w-full sm:w-auto justify-center">
-                    <span class="iconify text-lg" data-icon="mdi:rocket-launch"></span> Join as Merchant — Free
-                </a>
-                <a href="https://wa.me/255769799110" target="_blank" class="bg-white/[0.05] border border-white/[0.1] text-[#0f172a] font-medium text-sm px-8 py-4 rounded-xl hover:bg-white/[0.05] transition-all flex items-center gap-2 w-full sm:w-auto justify-center">
+                <a href="https://wa.me/255769799110" target="_blank" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2 w-full sm:w-auto justify-center">
                     <span class="iconify text-green-400 text-lg" data-icon="mdi:whatsapp"></span> Chat on WhatsApp
+                </a>
+                <a href="tel:0769799110" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2 w-full sm:w-auto justify-center">
+                    <span class="iconify text-cyan-400 text-lg" data-icon="mdi:phone"></span> Call 0769 799 110
                 </a>
             </div>
         </div>
-        </section>
+    </section>
 
     <!-- Footer -->
     <footer class="border-t border-white/[0.05] pt-12 pb-8">
         <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
-                <div class="col-span-2 md:col-span-4 lg:col-span-2">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                <div class="col-span-2">
                     <a href="index.html" class="flex items-center gap-2.5 mb-4">
                         <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
-                        <div>
-                            <span class="font-semibold text-white text-[15px]">ChapShop</span>
-                            <span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span>
-                        </div>
+                        <div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div>
                     </a>
                     <p class="text-sm text-slate-400 leading-relaxed max-w-xs mb-6">Tanzania's trusted COD and logistics partner.</p>
-                    <div class="flex items-center gap-3 mb-4">
-                        <a href="https://wa.me/255769799110" target="_blank" class="w-9 h-9 bg-white/[0.05] border border-white/[0.1] rounded-lg flex items-center justify-center hover:bg-white/[0.1] transition-colors"><span class="iconify text-slate-400 text-lg" data-icon="mdi:whatsapp"></span></a>
-                        <a href="#" class="w-9 h-9 bg-white/[0.05] border border-white/[0.1] rounded-lg flex items-center justify-center hover:bg-white/[0.095] transition-colors"><span class="iconify text-slate-400 text-lg" data-icon="mdi:facebook"></span></a>
-                        <a href="#" class="w-9 h-9 bg-white/[0.05] border border-white/[0.1] rounded-lg flex items-center justify-center hover:bg-white/[0.095 transition-colors"><span class="iconify text-slate-400 text-lg" data-icon="mdi:linkedin"></span></a>
-                        <a href="https://wa.me/255769799110" target="_blank" class="w-9 h-9 bg-white/[0.05] border border-white/[0.05] rounded-lg flex items-center justify-center hover:bg-green-500/10 hover:bg-green-500/20 transition-colors"><span class="iconify text-green-400 text-lg" data-icon="mdi:whatsapp"></span></a>
-                        <a href="#" class="w-9 h-9 bg-white/[0.05] border border-white/[0.05] rounded-lg flex items-center justify-center hover:bg-white/[0.05] transition-colors"><span class="iconify text-slate-400 text-lg" data-icon="mdi:linkedin"></span></a>
-                        <a href="#" class="w-9 h-9 bg-white/[0.05] border border-white/[0.05] rounded-lg flex items-center justify-center hover:bg-white/[0.05] transition-colors"><span class="iconify text-slate-400 text-lg" data-icon="mdi:lock"></span></a>
-                        </div>
-                    </div>
                     <div class="space-y-1.5">
                         <a href="tel:0769799110" class="text-sm text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-2"><span class="iconify text-sm" data-icon="mdi:phone"></span> 0769 799 110</a>
                         <a href="mailto:chapshopdelivery@gmail.com" class="text-sm text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-2"><span class="iconify text-sm" data-icon="mdi:email"></span> chapshopdelivery@gmail.com</a>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
-                    <div>
-                        <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Services</h4>
-                        <ul class="space-y-2.5">
-                            <li><a href="#services" class="text-sm text-slate-400 hover:text-white transition-colors">Cash On Delivery</a></li>
-                            <li><a href="#services" class="text-sm text-slate-400 hover:text-white transition-colors">Courier & Delivery</a></li>
-                            <li><a href="#services" class="text-sm text-slate-400 hover:text-white transition-colors">Warehouse</a></li>
-                            <li><a href="#services" class="text-sm text-slate-400 hover:text-white transition-colors">Call Center</a></li>
-                            <li><a href="#services" class="text-sm text-slate-400 hover:text-white transition-colors">Order Fulfillment</a></li>
-                            <li><a href="#services" class="text-sm text-slate-400 hover:text-white transition-colors">Medical Courier</a></li>
-                            <li><a href="#services" class="text-sm text-slate-400 hover:text-white transition-colors">Reverse Logistics</a></li>
-                            <li><a href="#services" class="text-sm text-slate-400 hover:text-white transition-colors">3PL Services</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Company</h4>
-                        <ul class="space-y-2.5">
-                            <li><a href="about.html" class="text-sm text-slate-400 hover:text-white transition-colors">About Us</a></li>
-                            <a href="#coverage" class="text-sm text-slate-400 hover:text-white transition-colors">Coverage Areas</a></li>
-                            <a href="merchants.html" class="text-sm text-slate-400 hover:text-white transition-colors">Join as Merchant</a></li>
-                            <a href="#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Resources</h4>
-                        <ul class="space-y-2.5">
-                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">API Docs</a></li>
-                            <a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Pricing</a></li>
-                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">FAQ</a></li>
-                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Privacy Policy</a></li>
-                            <li><a href="#" class="text-sm text-slate-400 hover:text-white transition-colors">Terms of Service</a></li>
-                            <a href="dashboard.html" class="text-sm text-slate-400 hover:text-white transition-colors">Merchant Dashboard</a></li>
-                        </ul>
-                    </div>
+                <div>
+                    <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Services</h4>
+                    <ul class="space-y-2.5">
+                        <li><a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Cash On Delivery</a></li>
+                        <li><a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Courier & Delivery</a></li>
+                        <li><a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Warehouse</a></li>
+                        <li><a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Order Fulfillment</a></li>
+                        <li><a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Medical Courier</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-4">Company</h4>
+                    <ul class="space-y-2.5">
+                        <li><a href="about.html" class="text-sm text-slate-400 hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="index.html#coverage" class="text-sm text-slate-400 hover:text-white transition-colors">Coverage Areas</a></li>
+                        <li><a href="index.html#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="dashboard.html" class="text-sm text-slate-400 hover:text-white transition-colors">Merchant Dashboard</a></li>
+                    </ul>
                 </div>
             </div>
             <div class="glow-line mb-8"></div>
@@ -448,44 +441,140 @@
         </div>
     </footer>
 
-    <button id="back-to-top" class="fixed bottom-6 left-6 z-50 w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.05] transition-all opacity-0 pointer-events-none" style="transition: opacity 0.3s ease;">
+    <button id="back-to-top" class="fixed bottom-6 left-6 z-50 w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/[0.1] transition-all opacity-0 pointer-events-none">
         <span class="iconify text-lg" data-icon="mdi:chevron-up"></span>
     </button>
 
     <script>
+        // Mobile Menu
         const menuBtn = document.getElementById('menu-btn');
         const closeMenuBtn = document.getElementById('close-menu');
         const mobileMenu = document.getElementById('mobile-menu');
         const menuOverlay = document.getElementById('menu-overlay');
-        const mobileLinks = document.querySelectorAll('.mobile-link');
         function openMenu() { mobileMenu.classList.add('open'); menuOverlay.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
         function closeMenu() { mobileMenu.classList.remove('open'); menuOverlay.classList.add('hidden'); document.body.style.overflow = ''; }
         menuBtn.addEventListener('click', openMenu);
         closeMenuBtn.addEventListener('click', closeMenu);
         menuOverlay.addEventListener('click', closeMenu);
-        mobileLinks.forEach(link => link.addEventListener('click', closeMenu));
+        document.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', closeMenu));
+
+        // Toast
         function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 5000); }
-        document.getElementById('merchant-form').addEventListener('submit', function(e) {
+
+        // Back to Top
+        const btt = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => { btt.style.opacity = window.scrollY > 500 ? '1' : '0'; btt.style.pointerEvents = window.scrollY > 500 ? 'auto' : 'none'; });
+        btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Nav Scroll
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => { nav.style.backgroundColor = window.scrollY > 50 ? 'rgba(2,6,23,0.9)' : 'rgba(2,6,23,0.8)'; });
+
+        // Platform Chips
+        document.querySelectorAll('.platform-chip').forEach(chip => {
+            chip.addEventListener('click', function() { this.classList.toggle('selected'); updatePlatforms(); });
+        });
+        function updatePlatforms() {
+            const selected = [...document.querySelectorAll('.platform-chip.selected')].map(c => c.dataset.value);
+            document.getElementById('platforms-input').value = selected.join(',');
+        }
+
+        // Tabs
+        function showTab(tab) {
+            document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+            document.querySelectorAll('.form-input').forEach(e => e.classList.remove('input-error'));
+            if (tab === 'signup') {
+                document.getElementById('signupForm').classList.remove('hidden');
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('signupTab').classList.add('active');
+                document.getElementById('loginTab').classList.remove('active');
+            } else {
+                document.getElementById('signupForm').classList.add('hidden');
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('signupTab').classList.remove('active');
+                document.getElementById('loginTab').classList.add('active');
+            }
+        }
+
+        function showError(id, errorId) { document.getElementById(id).classList.add('input-error'); document.getElementById(errorId).classList.add('show'); }
+        function hideError(id, errorId) { document.getElementById(id).classList.remove('input-error'); document.getElementById(errorId).classList.remove('show'); }
+
+        // Sign Up
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            const btn = this.querySelector('button[type="submit"');
-            const o = btn.innerHTML;
-            btn.innerHTML = '<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Submitting...';
-            btn.disabled = true;
-            setTimeout(() => {
-                btn.innerHTML = '<span class="iconify text-green-400 text-2xl" data-icon="mdi:check-circle"></span> Application Submitted!';
-                btn.style.background = '#059669';
-                btn.style.opacity = '1';
-                showToast('🎉 Application received! Our team will contact you within 500+24 hours. Click "Go to Dashboard" to start using your dashboard.';
-                setTimeout(() => { btn.innerHTML = o; btn.style.background = ''; btn.disabled = false; }, 4000);
+            let valid = true;
+            const name = document.getElementById('signupName').value.trim();
+            const business = document.getElementById('signupBusiness').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const city = document.getElementById('signupCity').value;
+            const password = document.getElementById('signupPassword').value;
+            const platforms = document.getElementById('platforms-input').value;
+
+            if (!name) { showError('signupName', 'signupNameError'); valid = false; } else { hideError('signupName', 'signupNameError'); }
+            if (!business) { showError('signupBusiness', 'signupBusinessError'); valid = false; } else { hideError('signupBusiness', 'signupBusinessError'); }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('signupEmail', 'signupEmailError'); valid = false; } else { hideError('signupEmail', 'signupEmailError'); }
+            if (!phone) { showError('signupPhone', 'signupPhoneError'); valid = false; } else { hideError('signupPhone', 'signupPhoneError'); }
+            if (!city) { showError('signupCity', 'signupCityError'); valid = false; } else { hideError('signupCity', 'signupCityError'); }
+            if (password.length < 6) { showError('signupPassword', 'signupPasswordError'); valid = false; } else { hideError('signupPassword', 'signupPasswordError'); }
+            if (!document.getElementById('terms').checked) { document.getElementById('termsError').classList.add('show'); valid = false; } else { document.getElementById('termsError').classList.remove('show'); }
+
+            if (!valid) return;
+
+            const merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
+            if (merchants.find(m => m.email === email)) {
+                document.getElementById('signupEmailError').textContent = 'Email already registered';
+                showError('signupEmail', 'signupEmailError');
+                return;
+            }
+
+            merchants.push({ name, business, email, phone, city, password, platforms, createdAt: new Date().toISOString() });
+            localStorage.setItem('chapshop_merchants', JSON.stringify(merchants));
+
+            showToast('Account created successfully! Please login.');
+            showTab('login');
+            document.getElementById('loginEmail').value = email;
+        });
+
+        // Login
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let valid = true;
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('loginEmail', 'loginEmailError'); valid = false; } else { hideError('loginEmail', 'loginEmailError'); }
+            if (!password) { showError('loginPassword', 'loginPasswordError'); valid = false; } else { hideError('loginPassword', 'loginPasswordError'); }
+
+            if (!valid) return;
+
+            const merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
+            const merchant = merchants.find(m => m.email === email && m.password === password);
+
+            if (!merchant) {
+                document.getElementById('loginGeneralError').classList.add('show');
+                return;
+            }
+
+            localStorage.setItem('chapshop_logged_in', JSON.stringify(merchant));
+            showToast('Login successful! Redirecting to dashboard...');
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+        });
+
+        // Clear errors on input
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('input-error');
+                const errorEl = this.nextElementSibling;
+                if (errorEl && errorEl.classList.contains('error-msg')) errorEl.classList.remove('show');
+                document.getElementById('loginGeneralError').classList.remove('show');
             });
         });
-        document.getElementById('contact-form').addEventListener('submit', function(e) { e.preventDefault(); const b = this.querySelector('button[type="submit"'); const o = b.innerHTML; b.innerHTML = '<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Sending...'; b.disabled = true; setTimeout(() => { b.innerHTML = o; b.disabled = false; this.reset(); showToast("Thank you! Your inquiry has been sent."); }, 1500); });
-        const btt = document.getElementById('back-to-top');
-        window.addEventListener('scroll', () => { btt.style.opacity = window.scrollY > 500 ? '1' : '0'; btt.style.pointer-events = window.scrollY > 500 ? 'auto' : 'none'; });
-        btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-        document.querySelectorAll('a[href^="#"]').forEach(a => { a.addEventListener('click', function(e) { const t = document.querySelector(this.getAttribute('href')); if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }); });
-        const nav = document.querySelector('nav');
-        window.addEventListener('scroll', () => { nav.style.borderBottomColor = window.scrollY > 500 ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.08)'; nav.style.backgroundColor = window.scrollY > 50 ? 'rgba(2,6,23,0.9)' : 'rgba(2,6,23,0.8)'; });
+
+        // Check if already logged in
+        if (localStorage.getItem('chapshop_logged_in')) {
+            window.location.href = 'dashboard.html';
+        }
     </script>
 </body>
 </html>
