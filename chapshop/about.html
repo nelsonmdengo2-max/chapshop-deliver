@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us — ChapShop Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        * { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .gradient-text { background: linear-gradient(to bottom, #ffffff, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .glow-line { background: linear-gradient(to right, transparent, #164e63, transparent); height: 1px; }
+        .hero-glow { background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(6,182,212,0.12) 0%, transparent 60%); }
+        .nav-blur { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
+        .mobile-menu.open { transform: translateX(0); }
+        .whatsapp-float { position: fixed; bottom: 24px; right: 24px; z-index: 50; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.4); transition: transform 0.3s ease; }
+        .whatsapp-float:hover { transform: scale(1.1); }
+        .feature-card { transition: all 0.3s ease; }
+        .feature-card:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .ecosystem-step { position: relative; }
+        .ecosystem-step::after { content: ''; position: absolute; top: 24px; left: 48px; right: -24px; height: 2px; background: linear-gradient(to right, rgba(6,182,212,0.3), transparent); }
+        .ecosystem-step:last-child::after { display: none; }
+        @media (max-width: 768px) { .ecosystem-step::after { display: none; } }
+    </style>
+</head>
+<body class="bg-[#020617] text-white">
+
+    <a href="https://wa.me/255769799110" target="_blank" class="whatsapp-float" title="Chat on WhatsApp">
+        <span class="iconify text-white text-3xl" data-icon="mdi:whatsapp"></span>
+    </a>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center">
+                    <span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span>
+                </div>
+                <div>
+                    <span class="font-semibold text-white text-[15px]">ChapShop</span>
+                    <span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span>
+                </div>
+            </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Services</a>
+                <a href="index.html#coverage" class="text-sm text-slate-400 hover:text-white transition-colors">Coverage</a>
+                <a href="about.html" class="text-sm text-white transition-colors">About Us</a>
+                <a href="index.html#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
+            </div>
+            <div class="hidden md:flex items-center gap-3">
+                <a href="tel:0769799110" class="text-sm text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+                    <span class="iconify text-base" data-icon="mdi:phone"></span>
+                    0769 799 110
+                </a>
+                <a href="merchants.html" class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors">
+                    Join as Merchant
+                </a>
+            </div>
+            <button id="menu-btn" class="md:hidden text-white p-2">
+                <span class="iconify text-2xl" data-icon="mdi:menu"></span>
+            </button>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 bottom-0 w-72 z-[60] bg-[#0f172a] border-l border-white/10 p-6">
+        <div class="flex justify-end mb-8">
+            <button id="close-menu" class="text-white p-2"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
+        </div>
+        <div class="flex flex-col gap-4">
+            <a href="index.html" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Home</a>
+            <a href="index.html#services" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Services</a>
+            <a href="index.html#coverage" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Coverage</a>
+            <a href="about.html" class="mobile-link text-white py-2 text-base transition-colors font-medium">About Us</a>
+            <a href="index.html#contact" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors">Contact</a>
+            <div class="glow-line my-4"></div>
+            <a href="tel:0769799110" class="text-cyan-400 text-sm flex items-center gap-2">
+                <span class="iconify" data-icon="mdi:phone"></span> 0769 799 110
+            </a>
+            <a href="merchants.html" class="mobile-link bg-cyan-500 text-white text-sm font-medium px-5 py-3 rounded-lg text-center hover:bg-cyan-400 transition-colors mt-2">
+                Join as Merchant
+            </a>
+        </div>
+    </div>
+    <div id="menu-overlay" class="fixed inset-0 z-[55] bg-black/60 hidden"></div>
+
+    <section class="relative hero-glow pt-28 pb-16 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
+                <a href="index.html" class="hover:text-white transition-colors">Home</a>
+                <span class="iconify text-xs" data-icon="mdi:chevron-right"></span>
+                <span class="text-cyan-400">About Us</span>
+            </div>
+            <div class="max-w-3xl">
+                <h1 class="text-3xl md:text-5xl font-medium tracking-tight gradient-text mb-4">About ChapShop Delivery</h1>
+                <p class="text-lg text-slate-400 font-light leading-relaxed">We provide you with a complete system to start and scale your e-commerce business in the Tanzanian market easily — without customs or legal restrictions.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-medium tracking-tight gradient-text mb-6">Your E-Commerce Partner From A to Z</h2>
+                    <p class="text-slate-400 font-light text-base leading-relaxed mb-6">
+                        All you have to do is focus on selecting products and launching advertising campaigns — and we take care of the rest: <span class="text-white font-medium">importing, order confirmation, warehousing, packing, and shipping</span> across Tanzania.
+                    </p>
+                    <p class="text-slate-400 font-light text-base leading-relaxed mb-6">
+                        Whether you're a social media seller on Instagram or WhatsApp, or running a full e-commerce store on Shopify, ChapShop Delivery gives you the logistics backbone to deliver nationwide with cash on delivery.
+                    </p>
+                    <p class="text-slate-400 font-light text-base leading-relaxed mb-8">
+                        If you have a clear product and market study or vision, we can also <span class="text-cyan-400 font-medium">finance your project</span> and help you launch faster.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="merchants.html" class="bg-cyan-500 text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2">
+                            <span class="iconify" data-icon="mdi:rocket-launch"></span> Start Selling
+                        </a>
+                        <a href="index.html#contact" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2">
+                            <span class="iconify text-cyan-400" data-icon="mdi:phone"></span> Talk to Us
+                        </a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="absolute -inset-4 bg-gradient-to-l from-cyan-500/5 to-transparent rounded-3xl blur-2xl"></div>
+                    <div class="relative bg-[#0f172a] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <img src="https://picsum.photos/seed/chapshop-about-warehouse-team/700/500.jpg" alt="ChapShop Team" class="w-full h-[400px] object-cover opacity-70">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent"></div>
+                        <div class="absolute bottom-6 left-6 right-6">
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="bg-[#0f172a]/90 border border-white/10 rounded-xl p-3 text-center">
+                                    <div class="text-xl font-semibold text-cyan-400">31</div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">Regions</div>
+                                </div>
+                                <div class="bg-[#0f172a]/90 border border-white/10 rounded-xl p-3 text-center">
+                                    <div class="text-xl font-semibold text-cyan-400">500+</div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">Merchants</div>
+                                </div>
+                                <div class="bg-[#0f172a]/90 border border-white/10 rounded-xl p-3 text-center">
+                                    <div class="text-xl font-semibold text-cyan-400">24/7</div>
+                                    <div class="text-[10px] text-slate-400 mt-0.5">Support</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-[#0f172a]/50 relative">
+        <div class="absolute top-0 left-0 right-0 glow-line"></div>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-14">
+                <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6">
+                    <span class="iconify text-cyan-400 text-sm" data-icon="mdi:handshake"></span>
+                    <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">What We Handle</span>
+                </div>
+                <h2 class="text-2xl md:text-4xl font-medium tracking-tight gradient-text mb-4">You Focus on Selling. We Handle The Rest.</h2>
+                <p class="text-slate-400 font-light text-base max-w-2xl mx-auto">From the moment a customer places an order to the moment they receive it — we manage every step.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:package-variant-closed"></span></div>
+                    <h3 class="text-base font-medium text-white mb-2">Importing & Sourcing</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">We help you source and import products without the hassle of customs clearance or legal restrictions in Tanzania.</p>
+                </div>
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:cellphone-check"></span></div>
+                    <h3 class="text-base font-medium text-white mb-2">Order Confirmation</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Our call center confirms every order with your customers via phone calls and SMS to reduce returns and boost delivery rates.</p>
+                </div>
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:warehouse"></span></div>
+                    <h3 class="text-base font-medium text-white mb-2">Warehousing & Storage</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Strategic warehouses in Dar es Salaam with real-time inventory management, so your products are always ready to ship.</p>
+                </div>
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:package-variant"></span></div>
+                    <h3 class="text-base font-medium text-white mb-2">Packing & Labeling</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Professional pick & pack services with branded labeling. Each order is carefully packed and ready for last-mile delivery.</p>
+                </div>
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:truck-delivery"></span></div>
+                    <h3 class="text-base font-medium text-white mb-2">Last-Mile Delivery</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Nationwide COD delivery covering all 31 regions — same-day in major cities, 1-5 days to remote areas.</p>
+                </div>
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                    <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:cash-fast"></span></div>
+                    <h3 class="text-base font-medium text-white mb-2">COD Collection & Remittance</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">We collect cash on delivery and remit directly to your M-Pesa or bank account within 24 hours — no delays.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-14">
+                <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6">
+                    <span class="iconify text-cyan-400 text-sm" data-icon="mdi:infinity"></span>
+                    <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Complete Ecosystem</span>
+                </div>
+                <h2 class="text-2xl md:text-4xl font-medium tracking-tight gradient-text mb-4">Complete E-Commerce Ecosystem From A to Z</h2>
+                <p class="text-slate-400 font-light text-base max-w-2xl mx-auto">Everything you need to sell online in Tanzania, integrated into one seamless platform.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
+                <div class="ecosystem-step text-center">
+                    <div class="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4"><span class="iconify text-white text-xl" data-icon="mdi:lightbulb-on"></span></div>
+                    <h4 class="text-sm font-medium text-white mb-1">Product Selection</h4>
+                    <p class="text-xs text-slate-400">Choose what to sell. We guide you on trending products in Tanzania.</p>
+                </div>
+                <div class="ecosystem-step text-center">
+                    <div class="w-12 h-12 bg-cyan-500/80 rounded-full flex items-center justify-center mx-auto mb-4"><span class="iconify text-white text-xl" data-icon="mdi:bullhorn"></span></div>
+                    <h4 class="text-sm font-medium text-white mb-1">Launch Campaigns</h4>
+                    <p class="text-xs text-slate-400">Run ads on social media. We help with marketing strategy and content.</p>
+                </div>
+                <div class="ecosystem-step text-center">
+                    <div class="w-12 h-12 bg-cyan-500/60 rounded-full flex items-center justify-center mx-auto mb-4"><span class="iconify text-white text-xl" data-icon="mdi:cog-transfer"></span></div>
+                    <h4 class="text-sm font-medium text-white mb-1">We Handle Operations</h4>
+                    <p class="text-xs text-slate-400">Import, confirm, store, pack, ship — all managed by our team.</p>
+                </div>
+                <div class="ecosystem-step text-center">
+                    <div class="w-12 h-12 bg-cyan-500/40 rounded-full flex items-center justify-center mx-auto mb-4"><span class="iconify text-white text-xl" data-icon="mdi:cash-multiple"></span></div>
+                    <h4 class="text-sm font-medium text-white mb-1">You Get Paid</h4>
+                    <p class="text-xs text-slate-400">COD collected and remitted to you. Track everything from your dashboard.</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/20 rounded-2xl p-6 text-center">
+                    <div class="w-14 h-14 bg-cyan-500/15 border border-cyan-500/25 rounded-2xl flex items-center justify-center mx-auto mb-4"><span class="iconify text-cyan-400 text-3xl" data-icon="mdi:earth"></span></div>
+                    <h3 class="text-lg font-medium text-white mb-2">Multi-Region Logistics & Warehousing</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Strategic warehouse locations across Tanzania with delivery routes covering all 31 regions — urban and rural.</p>
+                </div>
+                <div class="bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/20 rounded-2xl p-6 text-center">
+                    <div class="w-14 h-14 bg-cyan-500/15 border border-cyan-500/25 rounded-2xl flex items-center justify-center mx-auto mb-4"><span class="iconify text-cyan-400 text-3xl" data-icon="mdi:headset"></span></div>
+                    <h3 class="text-lg font-medium text-white mb-2">Dedicated Support Team Available 24/7</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Our support team is always available — via WhatsApp, phone, or email. Your dedicated account manager knows your business.</p>
+                </div>
+                <div class="bg-gradient-to-br from-cyan-500/10 to-transparent border border-cyan-500/20 rounded-2xl p-6 text-center">
+                    <div class="w-14 h-14 bg-cyan-500/15 border border-cyan-500/25 rounded-2xl flex items-center justify-center mx-auto mb-4"><span class="iconify text-cyan-400 text-3xl" data-icon="mdi:finance"></span></div>
+                    <h3 class="text-lg font-medium text-white mb-2">Project Financing Available</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Have a clear vision? We can finance your e-commerce project — from product import to first sales. Talk to us to learn more.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-[#0f172a]/50 relative">
+        <div class="absolute top-0 left-0 right-0 glow-line"></div>
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="relative order-2 lg:order-1">
+                    <div class="absolute -inset-4 bg-gradient-to-r from-cyan-500/5 to-transparent rounded-3xl blur-2xl"></div>
+                    <div class="relative bg-[#0f172a] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <img src="https://picsum.photos/seed/tanzania-economy-market/700/500.jpg" alt="Tanzania Market" class="w-full h-[400px] object-cover opacity-70">
+                        <div class="absolute inset-0 bg-gradient-to-r from-[#0f172a]/50 to-transparent"></div>
+                    </div>
+                </div>
+                <div class="order-1 lg:order-2">
+                    <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6">
+                        <span class="iconify text-cyan-400 text-sm" data-icon="mdi:flag"></span>
+                        <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Why Tanzania</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-medium tracking-tight gradient-text mb-6">A Massive Market Waiting to Be Served</h2>
+                    <p class="text-slate-400 font-light text-base leading-relaxed mb-6">Tanzania is one of Africa's fastest-growing economies with over 65 million people. E-commerce is booming, driven by mobile penetration and a young population hungry for online shopping.</p>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div>
+                            <div><p class="text-sm font-medium text-white">65M+ Population</p><p class="text-xs text-slate-500">Growing middle class with increasing purchasing power</p></div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div>
+                            <div><p class="text-sm font-medium text-white">Cash-First Economy</p><p class="text-xs text-slate-500">Over 80% of transactions are cash-based — COD is king</p></div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div>
+                            <div><p class="text-sm font-medium text-white">Mobile Penetration 90%+</p><p class="text-xs text-slate-500">M-Pesa, Tigo Pesa, Airtel Money — everyone's connected</p></div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div>
+                            <div><p class="text-sm font-medium text-white">Low E-Commerce Competition</p><p class="text-xs text-slate-500">The market is still early — first movers have huge advantage</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 relative">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6">
+                <span class="iconify text-cyan-400 text-sm" data-icon="mdi:target"></span>
+                <span class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Our Mission</span>
+            </div>
+            <blockquote class="text-2xl md:text-3xl font-light text-white leading-relaxed mb-8">
+                "To empower every entrepreneur in Tanzania to sell online <span class="text-cyan-400 font-medium">without barriers</span> — by providing the logistics, warehousing, and support infrastructure they need to succeed."
+            </blockquote>
+            <div class="flex items-center justify-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-full flex items-center justify-center text-sm font-semibold">CS</div>
+                <div class="text-left">
+                    <div class="text-sm font-medium text-white">ChapShop Delivery Team</div>
+                    <div class="text-xs text-slate-500">Dar es Salaam, Tanzania</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 relative overflow-hidden">
+        <div class="absolute inset-0 hero-glow"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-3xl"></div>
+        <div class="relative max-w-3xl mx-auto px-6 text-center">
+            <h2 class="text-2xl md:text-4xl font-medium tracking-tight gradient-text mb-4">Ready to Start Your E-Commerce Journey?</h2>
+            <p class="text-base text-slate-400 font-light max-w-xl mx-auto mb-8 leading-relaxed">Join 500+ merchants who are already growing their online business with ChapShop Delivery. No setup fees, no restrictions — just results.</p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="merchants.html" class="bg-cyan-500 text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 shadow-lg shadow-cyan-500/20 w-full sm:w-auto justify-center">
+                    <span class="iconify text-lg" data-icon="mdi:storefront"></span> Join as Merchant — Free
+                </a>
+                <a href="https://wa.me/255769799110?text=Hi%20ChapShop%2C%20I%20want%20to%20learn%20more%20about%20your%20services" target="_blank" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2 w-full sm:w-auto justify-center">
+                    <span class="iconify text-green-400 text-lg" data-icon="mdi:whatsapp"></span> Chat on WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/[0.05] pt-12 pb-8">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+                <a href="index.html" class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
+                    <div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div>
+                </a>
+                <div class="flex items-center gap-6">
+                    <a href="index.html" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a>
+                    <a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Services</a>
+                    <a href="about.html" class="text-sm text-white transition-colors">About Us</a>
+                    <a href="merchants.html" class="text-sm text-slate-400 hover:text-white transition-colors">Merchants</a>
+                    <a href="index.html#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
+                </div>
+            </div>
+            <div class="glow-line mb-6"></div>
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-xs text-slate-500">© 2025 ChapShop Delivery. All rights reserved. Registered in Tanzania.</p>
+                <div class="flex items-center gap-4">
+                    <span class="text-xs text-slate-500 flex items-center gap-1.5"><span class="iconify text-cyan-400" data-icon="mdi:shield-check"></span> SSL Secured</span>
+                    <span class="text-xs text-slate-500 flex items-center gap-1.5"><span class="iconify text-cyan-400" data-icon="mdi:certificate"></span> TCRA Licensed</span>
+                    <span class="text-xs text-slate-500 flex items-center gap-1.5"><span class="iconify text-cyan-400" data-icon="mdi:lock"></span> Insured</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+        function openMenu() { mobileMenu.classList.add('open'); menuOverlay.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+        function closeMenu() { mobileMenu.classList.remove('open'); menuOverlay.classList.add('hidden'); document.body.style.overflow = ''; }
+        menuBtn.addEventListener('click', openMenu);
+        closeMenuBtn.addEventListener('click', closeMenu);
+        menuOverlay.addEventListener('click', closeMenu);
+        mobileLinks.forEach(link => link.addEventListener('click', closeMenu));
+        document.querySelectorAll('a[href^="#"]').forEach(a => { a.addEventListener('click', function(e) { const t = document.querySelector(this.getAttribute('href')); if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }); });
+        const nav = document.querySelector('nav');
+        window.addEventListener('scroll', () => { nav.style.borderBottomColor = window.scrollY > 50 ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.08)'; nav.style.backgroundColor = window.scrollY > 50 ? 'rgba(2,6,23,0.9)' : 'rgba(2,6,23,0.8)'; });
+    </script>
+</body>
+</html>

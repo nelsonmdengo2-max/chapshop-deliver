@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merchant Dashboard — ChapShop Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        * { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .gradient-text { background: linear-gradient(to bottom, #ffffff, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .sidebar { transition: transform 0.3s ease; }
+        .sidebar.closed { transform: translateX(-100%); }
+        .sidebar-overlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+        .dash-card { transition: all 0.2s ease; }
+        .dash-card:hover { border-color: rgba(255,255,255,0.15); }
+        .tab-btn { transition: all 0.2s ease; }
+        .tab-btn.active { background: rgba(6,182,212,0.15); color: #22d3ee; border-color: rgba(6,182,212,0.3); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .status-pending { background: rgba(234,179,8,0.15); color: #facc15; }
+        .status-delivered { background: rgba(34,197,94,0.15); color: #4ade80; }
+        .status-returned { background: rgba(239,68,68,0.15); color: #f87171; }
+        .status-shipped { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .status-confirmed { background: rgba(6,182,212,0.15); color: #22d3ee; }
+        .bar { transition: height 0.6s ease; }
+        .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: fadeInUp 0.4s ease forwards; }
+    </style>
+</head>
+<body class="bg-[#020617] text-white">
+
+    <!-- Toast -->
+    <div id="toast" class="toast fixed bottom-6 right-6 z-[100] bg-cyan-900/90 border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+        <span class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
+        <span id="toast-msg" class="text-sm font-medium">Action completed!</span>
+    </div>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div id="sidebar-overlay" class="sidebar-overlay fixed inset-0 z-[55] bg-black/60" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 bottom-0 w-64 z-[60] bg-[#0f172a] border-r border-white/[0.08] flex flex-col">
+        <!-- Logo -->
+        <div class="h-16 flex items-center gap-2.5 px-5 border-b border-white/[0.06] flex-shrink-0">
+            <a href="index.html" class="flex items-center gap-2.5">
+                <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center">
+                    <span class="iconify text-white text-base" data-icon="mdi:truck-fast"></span>
+                </div>
+                <div>
+                    <span class="font-semibold text-white text-sm">ChapShop</span>
+                    <span class="text-cyan-400 font-semibold text-sm ml-0.5">Delivery</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- Nav Links -->
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+            <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 hover:text-white hover:bg-white/[0.05] transition-all">
+                <span class="iconify text-lg" data-icon="mdi:home-outline"></span> Back to Website
+            </a>
+
+            <div class="pt-3 pb-2 px-3">
+                <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Dashboard</span>
+            </div>
+            <button onclick="switchTab('overview')" class="tab-btn active w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm border border-transparent" data-tab="overview">
+                <span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Overview
+            </button>
+            <button onclick="switchTab('orders')" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 border border-transparent hover:bg-white/[0.05]" data-tab="orders">
+                <span class="iconify text-lg" data-icon="mdi:package-variant-closed"></span> Orders
+                <span class="ml-auto bg-cyan-500/20 text-cyan-400 text-[10px] font-semibold px-2 py-0.5 rounded-full">24</span>
+            </button>
+            <button onclick="switchTab('cod')" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 border border-transparent hover:bg-white/[0.05]" data-tab="cod">
+                <span class="iconify text-lg" data-icon="mdi:cash-multiple"></span> COD Remittance
+            </button>
+            <button onclick="switchTab('analytics')" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 border border-transparent hover:bg-white/[0.05]" data-tab="analytics">
+                <span class="iconify text-lg" data-icon="mdi:chart-bar"></span> Analytics
+            </button>
+            <button onclick="switchTab('sms')" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 border border-transparent hover:bg-white/[0.05]" data-tab="sms">
+                <span class="iconify text-lg" data-icon="mdi:cellphone-message"></span> SMS Logs
+            </button>
+
+            <div class="pt-3 pb-2 px-3">
+                <span class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Account</span>
+            </div>
+            <button onclick="switchTab('manager')" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 border border-transparent hover:bg-white/[0.05]" data-tab="manager">
+                <span class="iconify text-lg" data-icon="mdi:account-heart-outline"></span> My Manager
+            </button>
+            <button onclick="switchTab('settings')" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400 border border-transparent hover:bg-white/[0.05]" data-tab="settings">
+                <span class="iconify text-lg" data-icon="mdi:cog-outline"></span> Settings
+            </button>
+        </nav>
+
+        <!-- User -->
+        <div class="border-t border-white/[0.06] p-4 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-xs font-semibold">AK</div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-sm font-medium text-white truncate">Amina Kimaro</div>
+                    <div class="text-[11px] text-slate-500 truncate">ZanzibarStyle Online</div>
+                </div>
+                <button class="text-slate-500 hover:text-white transition-colors">
+                    <span class="iconify text-lg" data-icon="mdi:logout-variant"></span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="md:ml-64 min-h-screen">
+        <!-- Top Bar -->
+        <header class="sticky top-0 z-40 bg-[#020617]/90 backdrop-blur-md border-b border-white/[0.06] h-16 flex items-center justify-between px-6">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="md:hidden text-white p-1">
+                    <span class="iconify text-2xl" data-icon="mdi:menu"></span>
+                </button>
+                <div>
+                    <h1 id="page-title" class="text-base font-medium text-white">Overview</h1>
+                    <p class="text-[11px] text-slate-500">Welcome back, Amina. Here's your store performance.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative hidden sm:block">
+                    <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg" data-icon="mdi:magnify"></span>
+                    <input type="text" placeholder="Search orders..." class="bg-white/[0.05] border border-white/[0.08] rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-cyan-500/40 w-56">
+                </div>
+                <button class="relative w-9 h-9 bg-white/[0.05] border border-white/[0.08] rounded-lg flex items-center justify-center hover:bg-white/[0.1] transition-colors">
+                    <span class="iconify text-slate-400 text-lg" data-icon="mdi:bell-outline"></span>
+                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] font-bold flex items-center justify-center">3</span>
+                </button>
+                <a href="https://wa.me/255769799110" target="_blank" class="w-9 h-9 bg-white/[0.05] border border-white/[0.08] rounded-lg flex items-center justify-center hover:bg-white/[0.1] transition-colors" title="Chat Support">
+                    <span class="iconify text-green-400 text-lg" data-icon="mdi:whatsapp"></span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <main class="p-6">
+
+            <!-- ========== OVERVIEW TAB ========== -->
+            <div id="tab-overview" class="tab-content active">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:package-variant-closed"></span></div>
+                            <span class="text-[11px] text-green-400 font-medium flex items-center gap-0.5"><span class="iconify text-xs" data-icon="mdi:trending-up"></span> +12%</span>
+                        </div>
+                        <div class="text-2xl font-semibold text-white">1,247</div>
+                        <div class="text-xs text-slate-500 mt-0.5">Total Orders</div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-xl" data-icon="mdi:cash-check"></span></div>
+                            <span class="text-[11px] text-green-400 font-medium flex items-center gap-0.5"><span class="iconify text-xs" data-icon="mdi:trending-up"></span> +8%</span>
+                        </div>
+                        <div class="text-2xl font-semibold text-white">TZS 14.2M</div>
+                        <div class="text-xs text-slate-500 mt-0.5">COD Collected (MTD)</div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-blue-400 text-xl" data-icon="mdi:check-decagram"></span></div>
+                            <span class="text-[11px] text-green-400 font-medium flex items-center gap-0.5"><span class="iconify text-xs" data-icon="mdi:trending-up"></span> +2%</span>
+                        </div>
+                        <div class="text-2xl font-semibold text-white">96.8%</div>
+                        <div class="text-xs text-slate-500 mt-0.5">Delivery Success Rate</div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-purple-400 text-xl" data-icon="mdi:bank-transfer"></span></div>
+                            <span class="text-[11px] text-cyan-400 font-medium">Pending</span>
+                        </div>
+                        <div class="text-2xl font-semibold text-white">TZS 3.8M</div>
+                        <div class="text-xs text-slate-500 mt-0.5">Pending Remittance</div>
+                    </div>
+                </div>
+
+                <!-- Chart + Recent Orders -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Mini Chart -->
+                    <div class="lg:col-span-1 dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <h3 class="text-sm font-medium text-white mb-4">Orders This Week</h3>
+                        <div class="flex items-end justify-between gap-2 h-40">
+                            <div class="flex flex-col items-center gap-1 flex-1">
+                                <div class="w-full bg-cyan-500/30 rounded-t bar" style="height: 55%"></div>
+                                <span class="text-[10px] text-slate-500">Mon</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 flex-1">
+                                <div class="w-full bg-cyan-500/40 rounded-t bar" style="height: 70%"></div>
+                                <span class="text-[10px] text-slate-500">Tue</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 flex-1">
+                                <div class="w-full bg-cyan-500/30 rounded-t bar" style="height: 45%"></div>
+                                <span class="text-[10px] text-slate-500">Wed</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 flex-1">
+                                <div class="w-full bg-cyan-500/60 rounded-t bar" style="height: 85%"></div>
+                                <span class="text-[10px] text-slate-500">Thu</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 flex-1">
+                                <div class="w-full bg-cyan-500 rounded-t bar" style="height: 100%"></div>
+                                <span class="text-[10px] text-slate-500">Fri</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 flex-1">
+                                <div class="w-full bg-cyan-500/50 rounded-t bar" style="height: 65%"></div>
+                                <span class="text-[10px] text-slate-500">Sat</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 flex-1">
+                                <div class="w-full bg-cyan-500/20 rounded-t bar" style="height: 30%"></div>
+                                <span class="text-[10px] text-slate-500">Sun</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/[0.06]">
+                            <span class="text-xs text-slate-500">Total: 248 orders</span>
+                            <span class="text-xs text-green-400 font-medium">+18% vs last week</span>
+                        </div>
+                    </div>
+
+                    <!-- Recent Orders Table -->
+                    <div class="lg:col-span-2 dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-medium text-white">Recent Orders</h3>
+                            <button onclick="switchTab('orders')" class="text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-medium">View All →</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="border-b border-white/[0.06]">
+                                        <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider pb-3 pr-4">Order ID</th>
+                                        <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider pb-3 pr-4">Customer</th>
+                                        <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider pb-3 pr-4">Amount</th>
+                                        <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider pb-3 pr-4">Status</th>
+                                        <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider pb-3">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/[0.04]">
+                                    <tr class="hover:bg-white/[0.02] transition-colors">
+                                        <td class="py-3 pr-4 text-slate-300 font-medium">#CS-4821</td>
+                                        <td class="py-3 pr-4 text-slate-400">Juma Mwangi</td>
+                                        <td class="py-3 pr-4 text-white font-medium">TZS 45,000</td>
+                                        <td class="py-3 pr-4"><span class="status-delivered text-[11px] font-medium px-2.5 py-1 rounded-full">Delivered</span></td>
+                                        <td class="py-3 text-slate-500 text-xs">Today, 2:30 PM</td>
+                                    </tr>
+                                    <tr class="hover:bg-white/[0.02] transition-colors">
+                                        <td class="py-3 pr-4 text-slate-300 font-medium">#CS-4820</td>
+                                        <td class="py-3 pr-4 text-slate-400">Fatma Hassan</td>
+                                        <td class="py-3 pr-4 text-white font-medium">TZS 78,000</td>
+                                        <td class="py-3 pr-4"><span class="status-shipped text-[11px] font-medium px-2.5 py-1 rounded-full">Shipped</span></td>
+                                        <td class="py-3 text-slate-500 text-xs">Today, 11:00 AM</td>
+                                    </tr>
+                                    <tr class="hover:bg-white/[0.02] transition-colors">
+                                        <td class="py-3 pr-4 text-slate-300 font-medium">#CS-4819</td>
+                                        <td class="py-3 pr-4 text-slate-400">Peter John</td>
+                                        <td class="py-3 pr-4 text-white font-medium">TZS 32,000</td>
+                                        <td class="py-3 pr-4"><span class="status-confirmed text-[11px] font-medium px-2.5 py-1 rounded-full">Confirmed</span></td>
+                                        <td class="py-3 text-slate-500 text-xs">Today, 9:15 AM</td>
+                                    </tr>
+                                    <tr class="hover:bg-white/[0.02] transition-colors">
+                                        <td class="py-3 pr-4 text-slate-300 font-medium">#CS-4818</td>
+                                        <td class="py-3 pr-4 text-slate-400">Aisha Ramadhani</td>
+                                        <td class="py-3 pr-4 text-white font-medium">TZS 120,000</td>
+                                        <td class="py-3 pr-4"><span class="status-pending text-[11px] font-medium px-2.5 py-1 rounded-full">Pending</span></td>
+                                        <td class="py-3 text-slate-500 text-xs">Yesterday, 4:45 PM</td>
+                                    </tr>
+                                    <tr class="hover:bg-white/[0.02] transition-colors">
+                                        <td class="py-3 pr-4 text-slate-300 font-medium">#CS-4817</td>
+                                        <td class="py-3 pr-4 text-slate-400">Hassan Ali</td>
+                                        <td class="py-3 pr-4 text-white font-medium">TZS 55,000</td>
+                                        <td class="py-3 pr-4"><span class="status-returned text-[11px] font-medium px-2.5 py-1 rounded-full">Returned</span></td>
+                                        <td class="py-3 text-slate-500 text-xs">Yesterday, 2:00 PM</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <button onclick="showToast('New order form opening...')" class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 flex items-center gap-4 hover:border-cyan-500/30 text-left group">
+                        <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                            <span class="iconify text-cyan-400 text-2xl" data-icon="mdi:plus-circle"></span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-white">New Order</div>
+                            <div class="text-xs text-slate-500">Create a delivery order</div>
+                        </div>
+                    </button>
+                    <button onclick="showToast('CSV upload dialog opening...')" class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 flex items-center gap-4 hover:border-cyan-500/30 text-left group">
+                        <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                            <span class="iconify text-cyan-400 text-2xl" data-icon="mdi:file-upload"></span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-white">Bulk Upload</div>
+                            <div class="text-xs text-slate-500">Upload CSV with orders</div>
+                        </div>
+                    </button>
+                    <a href="https://wa.me/255769799110" target="_blank" class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 flex items-center gap-4 hover:border-green-500/30 text-left group">
+                        <div class="w-12 h-12 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                            <span class="iconify text-green-400 text-2xl" data-icon="mdi:whatsapp"></span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-medium text-white">Chat Support</div>
+                            <div class="text-xs text-slate-500">Get help via WhatsApp</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ========== ORDERS TAB ========== -->
+            <div id="tab-orders" class="tab-content">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button class="bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 text-xs font-medium px-3 py-1.5 rounded-lg">All (248)</button>
+                        <button class="bg-white/[0.03] border border-white/[0.08] text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-white/[0.06]">Pending (18)</button>
+                        <button class="bg-white/[0.03] border border-white/[0.08] text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-white/[0.06]">Shipped (32)</button>
+                        <button class="bg-white/[0.03] border border-white/[0.08] text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-white/[0.06]">Delivered (186)</button>
+                        <button class="bg-white/[0.03] border border-white/[0.08] text-slate-400 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-white/[0.06]">Returned (12)</button>
+                    </div>
+                    <button onclick="showToast('CSV download started!')" class="text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-medium flex items-center gap-1">
+                        <span class="iconify" data-icon="mdi:download"></span> Export CSV
+                    </button>
+                </div>
+                <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-white/[0.06] bg-white/[0.02]">
+                                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider p-4">Order ID</th>
+                                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider p-4">Customer</th>
+                                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider p-4">Phone</th>
+                                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider p-4">Region</th>
+                                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider p-4">Amount</th>
+                                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider p-4">Status</th>
+                                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider p-4">Date</th>
+                                    <th class="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider p-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/[0.04]">
+                                <tr class="hover:bg-white/[0.02] transition-colors">
+                                    <td class="p-4 text-slate-300 font-medium">#CS-4821</td>
+                                    <td class="p-4 text-slate-400">Juma Mwangi</td>
+                                    <td class="p-4 text-slate-400 text-xs">0765 432 110</td>
+                                    <td class="p-4 text-slate-400 text-xs">Dar es Salaam</td>
+                                    <td class="p-4 text-white font-medium">TZS 45,000</td>
+                                    <td class="p-4"><span class="status-delivered text-[11px] font-medium px-2.5 py-1 rounded-full">Delivered</span></td>
+                                    <td class="p-4 text-slate-500 text-xs">Jun 15, 2:30 PM</td>
+                                    <td class="p-4"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-medium">Track</button></td>
+                                </tr>
+                                <tr class="hover:bg-white/[0.02] transition-colors">
+                                    <td class="p-4 text-slate-300 font-medium">#CS-4820</td>
+                                    <td class="p-4 text-slate-400">Fatma Hassan</td>
+                                    <td class="p-4 text-slate-400 text-xs">0654 876 543</td>
+                                    <td class="p-4 text-slate-400 text-xs">Dodoma</td>
+                                    <td class="p-4 text-white font-medium">TZS 78,000</td>
+                                    <td class="p-4"><span class="status-shipped text-[11px] font-medium px-2.5 py-1 rounded-full">Shipped</span></td>
+                                    <td class="p-4 text-slate-500 text-xs">Jun 15, 11:00 AM</td>
+                                    <td class="p-4"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-medium">Track</button></td>
+                                </tr>
+                                <tr class="hover:bg-white/[0.02] transition-colors">
+                                    <td class="p-4 text-slate-300 font-medium">#CS-4819</td>
+                                    <td class="p-4 text-slate-400">Peter John</td>
+                                    <td class="p-4 text-slate-400 text-xs">0789 123 456</td>
+                                    <td class="p-4 text-slate-400 text-xs">Mwanza</td>
+                                    <td class="p-4 text-white font-medium">TZS 32,000</td>
+                                    <td class="p-4"><span class="status-confirmed text-[11px] font-medium px-2.5 py-1 rounded-full">Confirmed</span></td>
+                                    <td class="p-4 text-slate-500 text-xs">Jun 15, 9:15 AM</td>
+                                    <td class="p-4"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-medium">Track</button></td>
+                                </tr>
+                                <tr class="hover:bg-white/[0.02] transition-colors">
+                                    <td class="p-4 text-slate-300 font-medium">#CS-4818</td>
+                                    <td class="p-4 text-slate-400">Aisha Ramadhani</td>
+                                    <td class="p-4 text-slate-400 text-xs">0712 345 678</td>
+                                    <td class="p-4 text-slate-400 text-xs">Arusha</td>
+                                    <td class="p-4 text-white font-medium">TZS 120,000</td>
+                                    <td class="p-4"><span class="status-pending text-[11px] font-medium px-2.5 py-1 rounded-full">Pending</span></td>
+                                    <td class="p-4 text-slate-500 text-xs">Jun 14, 4:45 PM</td>
+                                    <td class="p-4"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-medium">Track</button></td>
+                                </tr>
+                                <tr class="hover:bg-white/[0.02] transition-colors">
+                                    <td class="p-4 text-slate-300 font-medium">#CS-4817</td>
+                                    <td class="p-4 text-slate-400">Hassan Ali</td>
+                                    <td class="p-4 text-slate-400 text-xs">0768 987 654</td>
+                                    <td class="p-4 text-slate-400 text-xs">Mbeya</td>
+                                    <td class="p-4 text-white font-medium">TZS 55,000</td>
+                                    <td class="p-4"><span class="status-returned text-[11px] font-medium px-2.5 py-1 rounded-full">Returned</span></td>
+                                    <td class="p-4 text-slate-500 text-xs">Jun 14, 2:00 PM</td>
+                                    <td class="p-4"><button class="text-slate-500 hover:text-slate-300 text-xs font-medium">Details</button></td>
+                                </tr>
+                                <tr class="hover:bg-white/[0.02] transition-colors">
+                                    <td class="p-4 text-slate-300 font-medium">#CS-4816</td>
+                                    <td class="p-4 text-slate-400">Rehema Juma</td>
+                                    <td class="p-4 text-slate-400 text-xs">0653 210 987</td>
+                                    <td class="p-4 text-slate-400 text-xs">Kigoma</td>
+                                    <td class="p-4 text-white font-medium">TZS 67,000</td>
+                                    <td class="p-4"><span class="status-delivered text-[11px] font-medium px-2.5 py-1 rounded-full">Delivered</span></td>
+                                    <td class="p-4 text-slate-500 text-xs">Jun 14, 10:30 AM</td>
+                                    <td class="p-4"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-medium">Track</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== COD REMITTANCE TAB ========== -->
+            <div id="tab-cod" class="tab-content">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="text-xs text-slate-500 mb-1">Collected This Month</div>
+                        <div class="text-2xl font-semibold text-white">TZS 14,200,000</div>
+                        <div class="text-xs text-slate-500 mt-1">From 186 delivered orders</div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="text-xs text-slate-500 mb-1">Remitted to You</div>
+                        <div class="text-2xl font-semibold text-green-400">TZS 10,400,000</div>
+                        <div class="text-xs text-slate-500 mt-1">3 transfers completed</div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="text-xs text-slate-500 mb-1">Pending Remittance</div>
+                        <div class="text-2xl font-semibold text-yellow-400">TZS 3,800,000</div>
+                        <div class="text-xs text-slate-500 mt-1">Next transfer: Jun 17</div>
+                    </div>
+                </div>
+
+                <!-- Remittance History -->
+                <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 mb-6">
+                    <h3 class="text-sm font-medium text-white mb-4">Remittance History</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-lg" data-icon="mdi:check-circle"></span></div>
+                                <div>
+                                    <div class="text-sm font-medium text-white">TZS 4,200,000</div>
+                                    <div class="text-xs text-slate-500">62 orders • Jun 12, 2025</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-green-400 font-medium">Completed</div>
+                                <div class="text-[11px] text-slate-500">→ M-Pesa 0769***110</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-lg" data-icon="mdi:check-circle"></span></div>
+                                <div>
+                                    <div class="text-sm font-medium text-white">TZS 3,800,000</div>
+                                    <div class="text-xs text-slate-500">55 orders • Jun 8, 2025</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-green-400 font-medium">Completed</div>
+                                <div class="text-[11px] text-slate-500">→ Bank CRDB ****4521</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-lg" data-icon="mdi:check-circle"></span></div>
+                                <div>
+                                    <div class="text-sm font-medium text-white">TZS 2,400,000</div>
+                                    <div class="text-xs text-slate-500">38 orders • Jun 4, 2025</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-green-400 font-medium">Completed</div>
+                                <div class="text-[11px] text-slate-500">→ M-Pesa 0769***110</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-yellow-500/[0.03] border border-yellow-500/10 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-yellow-400 text-lg animate-pulse" data-icon="mdi:clock-outline"></span></div>
+                                <div>
+                                    <div class="text-sm font-medium text-white">TZS 3,800,000</div>
+                                    <div class="text-xs text-slate-500">48 orders • Processing...</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-yellow-400 font-medium">Pending</div>
+                                <div class="text-[11px] text-slate-500">Est. Jun 17</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Settings -->
+                <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                    <h3 class="text-sm font-medium text-white mb-4">Payment Methods</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-red-400 text-lg" data-icon="mdi:cellphone"></span></div>
+                                <div>
+                                    <div class="text-sm font-medium text-white">M-Pesa</div>
+                                    <div class="text-xs text-slate-500">0769 799 110</div>
+                                </div>
+                            </div>
+                            <span class="text-[11px] font-medium text-green-400 bg-green-500/10 px-2.5 py-1 rounded-full">Primary</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-blue-400 text-lg" data-icon="mdi:bank"></span></div>
+                                <div>
+                                    <div class="text-sm font-medium text-white">CRDB Bank</div>
+                                    <div class="text-xs text-slate-500">Acc: ****4521</div>
+                                </div>
+                            </div>
+                            <span class="text-[11px] font-medium text-slate-400 bg-white/[0.05] px-2.5 py-1 rounded-full">Secondary</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== ANALYTICS TAB ========== -->
+            <div id="tab-analytics" class="tab-content">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="text-xs text-slate-500 mb-1">Avg. Delivery Time</div>
+                        <div class="text-2xl font-semibold text-white">1.8 days</div>
+                        <div class="text-xs text-green-400 mt-1">↓ Improved by 0.3 days</div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="text-xs text-slate-500 mb-1">Return Rate</div>
+                        <div class="text-2xl font-semibold text-yellow-400">3.2%</div>
+                        <div class="text-xs text-green-400 mt-1">↓ Down from 4.1%</div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="text-xs text-slate-500 mb-1">Confirmation Rate</div>
+                        <div class="text-2xl font-semibold text-white">89%</div>
+                        <div class="text-xs text-green-400 mt-1">↑ Up from 84%</div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="text-xs text-slate-500 mb-1">Top Region</div>
+                        <div class="text-2xl font-semibold text-white">Dar</div>
+                        <div class="text-xs text-slate-500 mt-1">42% of all orders</div>
+                    </div>
+                </div>
+
+                <!-- Regional Breakdown -->
+                <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 mb-6">
+                    <h3 class="text-sm font-medium text-white mb-4">Orders by Region</h3>
+                    <div class="space-y-3">
+                        <div><div class="flex items-center justify-between text-xs mb-1"><span class="text-slate-300">Dar es Salaam</span><span class="text-slate-400">104 orders (42%)</span></div><div class="w-full bg-white/[0.06] rounded-full h-2"><div class="bg-cyan-500 h-2 rounded-full" style="width: 42%"></div></div></div>
+                        <div><div class="flex items-center justify-between text-xs mb-1"><span class="text-slate-300">Dodoma</span><span class="text-slate-400">38 orders (15%)</span></div><div class="w-full bg-white/[0.06] rounded-full h-2"><div class="bg-cyan-500/70 h-2 rounded-full" style="width: 15%"></div></div></div>
+                        <div><div class="flex items-center justify-between text-xs mb-1"><span class="text-slate-300">Mwanza</span><span class="text-slate-400">30 orders (12%)</span></div><div class="w-full bg-white/[0.06] rounded-full h-2"><div class="bg-cyan-500/60 h-2 rounded-full" style="width: 12%"></div></div></div>
+                        <div><div class="flex items-center justify-between text-xs mb-1"><span class="text-slate-300">Arusha</span><span class="text-slate-400">25 orders (10%)</span></div><div class="w-full bg-white/[0.06] rounded-full h-2"><div class="bg-cyan-500/50 h-2 rounded-full" style="width: 10%"></div></div></div>
+                        <div><div class="flex items-center justify-between text-xs mb-1"><span class="text-slate-300">Mbeya</span><span class="text-slate-400">20 orders (8%)</span></div><div class="w-full bg-white/[0.06] rounded-full h-2"><div class="bg-cyan-500/40 h-2 rounded-full" style="width: 8%"></div></div></div>
+                        <div><div class="flex items-center justify-between text-xs mb-1"><span class="text-slate-300">Others</span><span class="text-slate-400">31 orders (13%)</span></div><div class="w-full bg-white/[0.06] rounded-full h-2"><div class="bg-cyan-500/30 h-2 rounded-full" style="width: 13%"></div></div></div>
+                    </div>
+                </div>
+
+                <!-- Status Breakdown -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <h3 class="text-sm font-medium text-white mb-4">Order Status Breakdown</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-green-400"></div><span class="text-sm text-slate-300">Delivered</span></div>
+                                <span class="text-sm font-medium text-white">186 (75%)</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-400"></div><span class="text-sm text-slate-300">Shipped</span></div>
+                                <span class="text-sm font-medium text-white">32 (13%)</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-cyan-400"></div><span class="text-sm text-slate-300">Confirmed</span></div>
+                                <span class="text-sm font-medium text-white">12 (5%)</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-yellow-400"></div><span class="text-sm text-slate-300">Pending</span></div>
+                                <span class="text-sm font-medium text-white">6 (2%)</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-red-400"></div><span class="text-sm text-slate-300">Returned</span></div>
+                                <span class="text-sm font-medium text-white">12 (5%)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <h3 class="text-sm font-medium text-white mb-4">COD Performance</h3>
+                        <div class="space-y-4">
+                            <div class="text-center p-4 bg-green-500/[0.05] border border-green-500/10 rounded-lg">
+                                <div class="text-3xl font-semibold text-green-400">TZS 14.2M</div>
+                                <div class="text-xs text-slate-400 mt-1">Total COD Collected</div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="text-center p-3 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                                    <div class="text-lg font-semibold text-white">96.8%</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5">Collection Rate</div>
+                                </div>
+                                <div class="text-center p-3 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                                    <div class="text-lg font-semibold text-white">24h</div>
+                                    <div class="text-[10px] text-slate-500 mt-0.5">Avg. Remittance</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== SMS LOGS TAB ========== -->
+            <div id="tab-sms" class="tab-content">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="text-xs text-slate-500 mb-1">SMS Sent (This Month)</div>
+                        <div class="text-2xl font-semibold text-white">2,496</div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="text-xs text-slate-500 mb-1">Delivery Rate</div>
+                        <div class="text-2xl font-semibold text-green-400">99.2%</div>
+                    </div>
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                        <div class="text-xs text-slate-500 mb-1">To Customers</div>
+                        <div class="text-2xl font-semibold text-white">1,872</div>
+                    </div>
+                </div>
+
+                <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                    <h3 class="text-sm font-medium text-white mb-4">Recent SMS Activity</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3 p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                            <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-green-400 text-sm" data-icon="mdi:check-circle"></span></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-white">Order Confirmed</span>
+                                    <span class="text-[11px] text-slate-500">Today, 2:35 PM</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">To: 0765***110 (Juma Mwangi) — "Your order #CS-4821 has been confirmed and will be shipped shortly."</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                            <div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:truck-delivery"></span></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-white">Out for Delivery</span>
+                                    <span class="text-[11px] text-slate-500">Today, 11:20 AM</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">To: 0654***543 (Fatma Hassan) — "Your order #CS-4820 is out for delivery. Track: chapshop.co.tz/track/CS4820"</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                            <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-green-400 text-sm" data-icon="mdi:check-all"></span></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-white">Delivery Completed</span>
+                                    <span class="text-[11px] text-slate-500">Today, 2:30 PM</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">To: 0765***110 (Juma Mwangi) — "Your order #CS-4821 has been delivered. Thank you for shopping with ZanzibarStyle!"</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                            <div class="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-purple-400 text-sm" data-icon="mdi:cash-check"></span></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-white">COD Remittance</span>
+                                    <span class="text-[11px] text-slate-500">Jun 12, 6:00 PM</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">To: 0769***110 (You) — "TZS 4,200,000 has been sent to your M-Pesa. Ref: QKR4L8M2XP"</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3 p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                            <div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:alert-circle"></span></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-white">Delivery Failed</span>
+                                    <span class="text-[11px] text-slate-500">Jun 14, 3:00 PM</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">To: 0768***654 (Hassan Ali) — "We couldn't deliver order #CS-4817. Customer unreachable. Retry scheduled."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== MANAGER TAB ========== -->
+            <div id="tab-manager" class="tab-content">
+                <div class="max-w-2xl">
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 md:p-8">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center text-xl font-semibold">DM</div>
+                            <div>
+                                <h3 class="text-lg font-medium text-white">David Mwenda</h3>
+                                <p class="text-sm text-cyan-400">Your Dedicated Account Manager</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Assigned since Jan 2025</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 mb-6">
+                            <div class="flex items-center gap-3 p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                                <span class="iconify text-cyan-400 text-lg" data-icon="mdi:phone"></span>
+                                <div>
+                                    <div class="text-xs text-slate-500">Direct Phone</div>
+                                    <a href="tel:0769799110" class="text-sm text-white font-medium hover:text-cyan-400 transition-colors">0769 799 110</a>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                                <span class="iconify text-green-400 text-lg" data-icon="mdi:whatsapp"></span>
+                                <div>
+                                    <div class="text-xs text-slate-500">WhatsApp</div>
+                                    <a href="https://wa.me/255769799110" target="_blank" class="text-sm text-white font-medium hover:text-green-400 transition-colors">Chat on WhatsApp</a>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                                <span class="iconify text-cyan-400 text-lg" data-icon="mdi:email"></span>
+                                <div>
+                                    <div class="text-xs text-slate-500">Email</div>
+                                    <a href="mailto:david@chapshopdelivery.co.tz" class="text-sm text-white font-medium hover:text-cyan-400 transition-colors">david@chapshopdelivery.co.tz</a>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 p-4 bg-white/[0.02] border border-white/[0.06] rounded-lg">
+                                <span class="iconify text-slate-400 text-lg" data-icon="mdi:clock-outline"></span>
+                                <div>
+                                    <div class="text-xs text-slate-500">Working Hours</div>
+                                    <div class="text-sm text-white font-medium">Mon–Sat, 8:00 AM – 7:00 PM</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-white/[0.06] pt-6">
+                            <h4 class="text-sm font-medium text-white mb-3">How I Can Help</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div class="flex items-center gap-2 text-xs text-slate-400">
+                                    <span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span> Optimize delivery routes
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-slate-400">
+                                    <span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span> Reduce return rates
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-slate-400">
+                                    <span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span> Product sourcing advice
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-slate-400">
+                                    <span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span> Marketing strategy
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-slate-400">
+                                    <span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span> API integration support
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-slate-400">
+                                    <span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span> Pricing optimization
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+                            <a href="https://wa.me/255769799110?text=Hi%20David%2C%20I%20need%20help%20with%20my%20account" target="_blank" class="flex-1 bg-green-500 text-white font-medium text-sm py-3 rounded-xl hover:bg-green-400 transition-colors flex items-center justify-center gap-2">
+                                <span class="iconify text-lg" data-icon="mdi:whatsapp"></span> Message David
+                            </a>
+                            <a href="tel:0769799110" class="flex-1 bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm py-3 rounded-xl hover:bg-white/[0.1] transition-colors flex items-center justify-center gap-2">
+                                <span class="iconify text-lg" data-icon="mdi:phone"></span> Call Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== SETTINGS TAB ========== -->
+            <div id="tab-settings" class="tab-content">
+                <div class="max-w-2xl space-y-6">
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-6">
+                        <h3 class="text-sm font-medium text-white mb-4">Business Information</h3>
+                        <div class="space-y-4">
+                            <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Store Name</label><input type="text" value="ZanzibarStyle Online" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                            <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Contact Email</label><input type="email" value="amina@zanzibarstyle.co.tz" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                            <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Phone Number</label><input type="tel" value="0769 799 110" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                            <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Pickup Address</label><textarea rows="2" class="w-full bg-white/[0.04] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all resize-none">Mikocheni B, Dar es Salaam</textarea></div>
+                        </div>
+                        <button onclick="showToast('Settings saved successfully!')" class="mt-5 bg-cyan-500 text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-cyan-400 transition-colors">Save Changes</button>
+                    </div>
+
+                    <div class="dash-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-6">
+                        <h3 class="text-sm font-medium text-white mb-4">Notification Preferences</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.06] rounded-lg cursor-pointer">
+                                <div><div class="text-sm text-white">Order Notifications</div><div class="text-xs text-slate-500">Get notified for every new order</div></div>
+                                <div class="relative"><input type="checkbox" checked class="sr-only peer"><div class="w-10 h-5 bg-slate-600 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div></div>
+                            </label>
+                            <label class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.06] rounded-lg cursor-pointer">
+                                <div><div class="text-sm text-white">Delivery Updates</div><div class="text-xs text-slate-500">SMS when order is shipped/delivered</div></div>
+                                <div class="relative"><input type="checkbox" checked class="sr-only peer"><div class="w-10 h-5 bg-slate-600 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div></div>
+                            </label>
+                            <label class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.06] rounded-lg cursor-pointer">
+                                <div><div class="text-sm text-white">COD Remittance Alerts</div><div class="text-xs text-slate-500">SMS when money is sent to you</div></div>
+                                <div class="relative"><input type="checkbox" checked class="sr-only peer"><div class="w-10 h-5 bg-slate-600 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div></div>
+                            </label>
+                            <label class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.06] rounded-lg cursor-pointer">
+                                <div><div class="text-sm text-white">Weekly Reports</div><div class="text-xs text-slate-500">Email summary every Monday</div></div>
+                                <div class="relative"><input type="checkbox" class="sr-only peer"><div class="w-10 h-5 bg-slate-600 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5"></div></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('closed');
+            overlay.classList.toggle('open');
+        }
+
+        // Tab switching
+        const titles = {
+            overview: 'Overview',
+            orders: 'Orders Management',
+            cod: 'COD Remittance',
+            analytics: 'Analytics & Reports',
+            sms: 'SMS Notifications',
+            manager: 'Your Account Manager',
+            settings: 'Settings'
+        };
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active');
+                b.classList.add('text-slate-400');
+            });
+            // Show selected tab
+            const tabEl = document.getElementById('tab-' + tabName);
+            if (tabEl) {
+                tabEl.classList.add('active');
+                tabEl.classList.add('animate-in');
+                setTimeout(() => tabEl.classList.remove('animate-in'), 400);
+            }
+            // Activate button
+            const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+            if (btn) {
+                btn.classList.add('active');
+                btn.classList.remove('text-slate-400');
+            }
+            // Update title
+            document.getElementById('page-title').textContent = titles[tabName] || 'Dashboard';
+            // Close sidebar on mobile
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('closed');
+                document.getElementById('sidebar-overlay').classList.remove('open');
+            }
+        }
+
+        // Toast
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // Auto-close sidebar on desktop
+        if (window.innerWidth >= 768) {
+            document.getElementById('sidebar').classList.remove('closed');
+        } else {
+            document.getElementById('sidebar').classList.add('closed');
+        }
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                document.getElementById('sidebar').classList.remove('closed');
+                document.getElementById('sidebar-overlay').classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
