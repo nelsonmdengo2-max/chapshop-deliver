@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
         ::-webkit-scrollbar { width: 6px; }
@@ -26,7 +25,7 @@
         .whatsapp-float { position: fixed; bottom: 24px; right: 24px; z-index: 50; width: 56px; height: 56px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37,211,102,0.4); transition: transform 0.3s ease; }
         .whatsapp-float:hover { transform: scale(1.1); }
         .join-glow { background: radial-gradient(ellipse 60% 40% at 30% 50%, rgba(6,182,212,0.08) 0%, transparent 70%); }
-        .tab-btn { transition: all 0.3s ease; }
+        .tab-btn { transition: all 0.3s ease; cursor: pointer; }
         .tab-btn.active { color: #06b6d4; border-color: #06b6d4; background: rgba(6,182,212,0.08); }
         .tab-btn:not(.active) { color: #64748b; border-color: transparent; }
         .form-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; transition: all 0.3s; }
@@ -173,10 +172,14 @@
                 <div class="lg:col-span-3">
                     <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 md:p-8 relative overflow-hidden">
                         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-1 bg-gradient-to-r from-transparent via-cyan-500/60 to-transparent rounded-full"></div>
+                        
+                        <!-- Tabs -->
                         <div class="flex mb-6 bg-white/[0.03] border border-white/[0.08] rounded-lg p-1">
-                            <button onclick="showTab('signup')" id="signupTab" class="tab-btn active flex-1 py-2.5 text-sm font-medium rounded-md border border-transparent">Sign Up</button>
-                            <button onclick="showTab('login')" id="loginTab" class="tab-btn flex-1 py-2.5 text-sm font-medium rounded-md border border-transparent">Login</button>
+                            <button type="button" onclick="showTab('signup')" id="signupTab" class="tab-btn active flex-1 py-2.5 text-sm font-medium rounded-md border border-transparent">Sign Up</button>
+                            <button type="button" onclick="showTab('login')" id="loginTab" class="tab-btn flex-1 py-2.5 text-sm font-medium rounded-md border border-transparent">Login</button>
                         </div>
+
+                        <!-- Sign Up Form -->
                         <div id="signupForm">
                             <div class="flex items-center gap-3 mb-6">
                                 <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/20 rounded-xl flex items-center justify-center"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:account-plus"></span></div>
@@ -198,10 +201,12 @@
                                 <div class="flex items-start gap-3"><input type="checkbox" id="terms" class="mt-1 w-4 h-4 rounded accent-cyan-500 cursor-pointer"><label for="terms" class="text-xs text-slate-400 cursor-pointer">I agree to the <a href="#" class="text-cyan-400 underline">Terms of Service</a> and <a href="#" class="text-cyan-400 underline">Privacy Policy</a>.</label></div>
                                 <p class="error-msg" id="termsError">Please agree to the terms</p>
                                 <button type="submit" id="signupBtn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20"><span class="iconify text-lg" data-icon="mdi:send"></span> Create Account</button>
-                                <p class="text-center text-slate-500 text-xs mt-4">Already registered? <a href="#" onclick="showTab('login')" class="text-cyan-400 hover:text-cyan-300">Login here</a></p>
+                                <p class="text-center text-slate-500 text-xs mt-4">Already registered? <a href="javascript:void(0)" onclick="showTab('login')" class="text-cyan-400 hover:text-cyan-300">Login here</a></p>
                             </form>
                         </div>
-                        <div id="loginForm" class="hidden">
+
+                        <!-- Login Form -->
+                        <div id="loginForm" style="display:none;">
                             <div class="flex items-center gap-3 mb-6">
                                 <div class="w-10 h-10 bg-cyan-500/15 border border-cyan-500/20 rounded-xl flex items-center justify-center"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:login"></span></div>
                                 <div><h3 class="text-lg font-medium text-white">Welcome Back</h3><p class="text-xs text-slate-500">Login to access your dashboard</p></div>
@@ -211,9 +216,10 @@
                                 <div><label class="text-xs font-medium text-slate-400 mb-1.5 block">Password <span class="text-red-400">*</span></label><input type="password" id="loginPassword" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Your password"><p class="error-msg" id="loginPasswordError">Required</p></div>
                                 <p class="error-msg text-center text-sm" id="loginGeneralError">Invalid email or password</p>
                                 <button type="submit" id="loginBtn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20"><span class="iconify text-lg" data-icon="mdi:login"></span> Login to Dashboard</button>
-                                <p class="text-center text-slate-500 text-xs mt-4">New here? <a href="#" onclick="showTab('signup')" class="text-cyan-400 hover:text-cyan-300">Create an account</a></p>
+                                <p class="text-center text-slate-500 text-xs mt-4">New here? <a href="javascript:void(0)" onclick="showTab('signup')" class="text-cyan-400 hover:text-cyan-300">Create an account</a></p>
                             </form>
                         </div>
+
                         <div class="flex items-center justify-center gap-4 pt-5 mt-5 border-t border-white/[0.05]">
                             <span class="text-[11px] text-slate-500 flex items-center gap-1.5"><span class="iconify text-green-400 text-xs" data-icon="mdi:lock"></span> Secure & Encrypted</span>
                             <span class="text-[11px] text-slate-500">Real Database — Supabase</span>
@@ -278,59 +284,110 @@
         </div>
     </footer>
 
+    <!-- Load Supabase BEFORE our script -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
-        const supabase = window.supabase.createClient('https://lmbpnnfyelsqhwzatwbv.supabase.co', 'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm');
-
-        const menuBtn = document.getElementById('menu-btn');
-        const closeMenuBtn = document.getElementById('close-menu');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const menuOverlay = document.getElementById('menu-overlay');
-        function openMenu() { mobileMenu.classList.add('open'); menuOverlay.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
-        function closeMenu() { mobileMenu.classList.remove('open'); menuOverlay.classList.add('hidden'); document.body.style.overflow = ''; }
-        menuBtn.addEventListener('click', openMenu);
-        closeMenuBtn.addEventListener('click', closeMenu);
-        menuOverlay.addEventListener('click', closeMenu);
-        document.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', closeMenu));
-
-        function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toast-msg').textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 5000); }
-
+        // ============ SIMPLE TAB SWITCHING (works immediately) ============
         function showTab(tab) {
-            document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
-            document.querySelectorAll('.form-input').forEach(e => e.classList.remove('input-error'));
-            document.getElementById('loginGeneralError').classList.remove('show');
+            var signupForm = document.getElementById('signupForm');
+            var loginForm = document.getElementById('loginForm');
+            var signupTab = document.getElementById('signupTab');
+            var loginTab = document.getElementById('loginTab');
+            
             if (tab === 'signup') {
-                document.getElementById('signupForm').classList.remove('hidden');
-                document.getElementById('loginForm').classList.add('hidden');
-                document.getElementById('signupTab').classList.add('active');
-                document.getElementById('loginTab').classList.remove('active');
+                signupForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                signupTab.classList.add('active');
+                loginTab.classList.remove('active');
             } else {
-                document.getElementById('signupForm').classList.add('hidden');
-                document.getElementById('loginForm').classList.remove('hidden');
-                document.getElementById('signupTab').classList.remove('active');
-                document.getElementById('loginTab').classList.add('active');
+                signupForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                signupTab.classList.remove('active');
+                loginTab.classList.add('active');
+            }
+            
+            // Clear errors
+            var errors = document.querySelectorAll('.error-msg');
+            for (var i = 0; i < errors.length; i++) {
+                errors[i].classList.remove('show');
+            }
+            var inputs = document.querySelectorAll('.form-input');
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].classList.remove('input-error');
             }
         }
 
-        function showError(id, errorId) { document.getElementById(id).classList.add('input-error'); document.getElementById(errorId).classList.add('show'); }
-        function hideError(id, errorId) { document.getElementById(id).classList.remove('input-error'); document.getElementById(errorId).classList.remove('show'); }
-
-        // Check if logged in
-        async function checkAuth() {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) window.location.href = 'dashboard.html';
+        // ============ TOAST ============
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            t.classList.add('show');
+            setTimeout(function() { t.classList.remove('show'); }, 5000);
         }
-        checkAuth();
 
-        // Sign Up
-        document.getElementById('signup-form').addEventListener('submit', async function(e) {
+        // ============ MOBILE MENU ============
+        var menuBtn = document.getElementById('menu-btn');
+        var closeMenuBtn = document.getElementById('close-menu');
+        var mobileMenu = document.getElementById('mobile-menu');
+        var menuOverlay = document.getElementById('menu-overlay');
+        
+        menuBtn.addEventListener('click', function() {
+            mobileMenu.classList.add('open');
+            menuOverlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        closeMenuBtn.addEventListener('click', function() {
+            mobileMenu.classList.remove('open');
+            menuOverlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        });
+        
+        menuOverlay.addEventListener('click', function() {
+            mobileMenu.classList.remove('open');
+            menuOverlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        });
+
+        // ============ SUPABASE SETUP ============
+        var supabase = null;
+        var SUPABASE_URL = 'https://lmbpnnfyelsqhwzatwbv.supabase.co';
+        var SUPABASE_KEY = 'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm';
+        
+        try {
+            if (window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('Supabase connected!');
+            } else {
+                console.log('Supabase library not loaded');
+            }
+        } catch (e) {
+            console.log('Supabase error: ' + e.message);
+        }
+
+        // ============ HELPER FUNCTIONS ============
+        function showError(id, errorId) {
+            document.getElementById(id).classList.add('input-error');
+            document.getElementById(errorId).classList.add('show');
+        }
+
+        function hideError(id, errorId) {
+            document.getElementById(id).classList.remove('input-error');
+            document.getElementById(errorId).classList.remove('show');
+        }
+
+        // ============ SIGN UP ============
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            let valid = true;
-            const name = document.getElementById('signupName').value.trim();
-            const business = document.getElementById('signupBusiness').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const phone = document.getElementById('signupPhone').value.trim();
-            const city = document.getElementById('signupCity').value;
-            const password = document.getElementById('signupPassword').value;
+            
+            var valid = true;
+            var name = document.getElementById('signupName').value.trim();
+            var business = document.getElementById('signupBusiness').value.trim();
+            var email = document.getElementById('signupEmail').value.trim();
+            var phone = document.getElementById('signupPhone').value.trim();
+            var city = document.getElementById('signupCity').value;
+            var password = document.getElementById('signupPassword').value;
 
             if (!name) { showError('signupName', 'signupNameError'); valid = false; } else { hideError('signupName', 'signupNameError'); }
             if (!business) { showError('signupBusiness', 'signupBusinessError'); valid = false; } else { hideError('signupBusiness', 'signupBusinessError'); }
@@ -339,73 +396,97 @@
             if (!city) { showError('signupCity', 'signupCityError'); valid = false; } else { hideError('signupCity', 'signupCityError'); }
             if (password.length < 6) { showError('signupPassword', 'signupPasswordError'); valid = false; } else { hideError('signupPassword', 'signupPasswordError'); }
             if (!document.getElementById('terms').checked) { document.getElementById('termsError').classList.add('show'); valid = false; } else { document.getElementById('termsError').classList.remove('show'); }
+            
             if (!valid) return;
+            if (!supabase) { showToast('Database not connected. Check console.'); return; }
 
-            const btn = document.getElementById('signupBtn');
+            var btn = document.getElementById('signupBtn');
             btn.innerHTML = '<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Creating...';
             btn.classList.add('btn-loading');
 
-            const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+            supabase.auth.signUp({ email: email, password: password }).then(function(result) {
+                var authData = result.data;
+                var authError = result.error;
 
-            if (authError) {
                 btn.innerHTML = '<span class="iconify text-lg" data-icon="mdi:send"></span> Create Account';
                 btn.classList.remove('btn-loading');
-                if (authError.message.includes('already registered')) {
-                    document.getElementById('signupEmailError').textContent = 'Email already registered';
-                    showError('signupEmail', 'signupEmailError');
-                } else {
-                    showToast('Error: ' + authError.message);
+
+                if (authError) {
+                    if (authError.message.indexOf('already') > -1) {
+                        document.getElementById('signupEmailError').textContent = 'Email already registered';
+                        showError('signupEmail', 'signupEmailError');
+                    } else {
+                        showToast('Error: ' + authError.message);
+                    }
+                    return;
                 }
-                return;
-            }
 
-            if (authData.user) {
-                await supabase.from('merchants').insert([{ user_id: authData.user.id, name, business, email, phone, city }]);
-                showToast('Account created! Please login.');
-                showTab('login');
-                document.getElementById('loginEmail').value = email;
-            }
-
-            btn.innerHTML = '<span class="iconify text-lg" data-icon="mdi:send"></span> Create Account';
-            btn.classList.remove('btn-loading');
+                if (authData.user) {
+                    supabase.from('merchants').insert([{ user_id: authData.user.id, name: name, business: business, email: email, phone: phone, city: city }]).then(function() {
+                        showToast('Account created! Please login.');
+                        showTab('login');
+                        document.getElementById('loginEmail').value = email;
+                    });
+                }
+            });
         });
 
-        // Login
-        document.getElementById('login-form').addEventListener('submit', async function(e) {
+        // ============ LOGIN ============
+        document.getElementById('login-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            let valid = true;
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
+            
+            var valid = true;
+            var email = document.getElementById('loginEmail').value.trim();
+            var password = document.getElementById('loginPassword').value;
 
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('loginEmail', 'loginEmailError'); valid = false; } else { hideError('loginEmail', 'loginEmailError'); }
             if (!password) { showError('loginPassword', 'loginPasswordError'); valid = false; } else { hideError('loginPassword', 'loginPasswordError'); }
+            
             if (!valid) return;
+            if (!supabase) { showToast('Database not connected. Check console.'); return; }
 
-            const btn = document.getElementById('loginBtn');
+            var btn = document.getElementById('loginBtn');
             btn.innerHTML = '<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Logging in...';
             btn.classList.add('btn-loading');
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            supabase.auth.signInWithPassword({ email: email, password: password }).then(function(result) {
+                var data = result.data;
+                var error = result.error;
 
-            if (error) {
                 btn.innerHTML = '<span class="iconify text-lg" data-icon="mdi:login"></span> Login to Dashboard';
                 btn.classList.remove('btn-loading');
-                document.getElementById('loginGeneralError').classList.add('show');
-                return;
-            }
 
-            showToast('Login successful!');
-            setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
-        });
+                if (error) {
+                    document.getElementById('loginGeneralError').classList.add('show');
+                    return;
+                }
 
-        document.querySelectorAll('.form-input').forEach(input => {
-            input.addEventListener('input', function() {
-                this.classList.remove('input-error');
-                const errorEl = this.nextElementSibling;
-                if (errorEl && errorEl.classList.contains('error-msg')) errorEl.classList.remove('show');
-                document.getElementById('loginGeneralError').classList.remove('show');
+                showToast('Login successful!');
+                setTimeout(function() { window.location.href = 'dashboard.html'; }, 500);
             });
         });
+
+        // ============ CLEAR ERRORS ON INPUT ============
+        var allInputs = document.querySelectorAll('.form-input');
+        for (var i = 0; i < allInputs.length; i++) {
+            allInputs[i].addEventListener('input', function() {
+                this.classList.remove('input-error');
+                var nextEl = this.nextElementSibling;
+                if (nextEl && nextEl.classList.contains('error-msg')) {
+                    nextEl.classList.remove('show');
+                }
+                document.getElementById('loginGeneralError').classList.remove('show');
+            });
+        }
+
+        // ============ CHECK IF ALREADY LOGGED IN ============
+        if (supabase) {
+            supabase.auth.getUser().then(function(result) {
+                if (result.data.user) {
+                    window.location.href = 'dashboard.html';
+                }
+            });
+        }
     </script>
 </body>
 </html>
