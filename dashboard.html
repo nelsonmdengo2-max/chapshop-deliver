@@ -1,322 +1,675 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Merchant Dashboard — ChapShop Delivery</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-        <style>
-            * { font-family: 'Inter', sans-serif; }
-            .nav-blur { backdrop-filter: blur(12px); }
-            .sidebar { transition: transform 0.3s ease; }
-            .sidebar.closed { transform: translateX(-100%); }
-            .sidebar-link { transition: all 0.2s ease; }
-            .sidebar-link:hover, .sidebar-link.active { background: rgba(6,182,212,0.1); color: #22d3ee; border-right: 2px solid #06b6d4d; }
-            .stat-card:hover { border-color: rgba(6,182,212,0.3); transform: translateY(-2px); }
-            .badge { font-size: 10px; padding: 2px 8px; border-radius: 9999px; font-weight: 600; }
-            .badge-pending { background: rgba(234,179,8,0.15); color: #facc15; }
-            .badge-transit { background: rgba(59,130,246,0.15); color: #60a5fa; }
-            .badge-delivered { background: rgba(34,197,94,0.15); color: #4ade80; }
-            .toast { transform: translateY(100px); opacity: 0; transition: all 0.4s ease; }
-            .toast.show { transform: translateY(0); opacity: 1; }
-        </style>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — ChapShop Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <style>
+        *{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+        ::-webkit-scrollbar{width:5px}
+        ::-webkit-scrollbar-track{background:#0f172a}
+        ::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+        .sidebar-link{transition:all .2s}
+        .sidebar-link:hover,.sidebar-link.active{background:rgba(6,182,212,0.1);color:#06b6d4;border-right:3px solid #06b6d4d4}
+        .stat-card{transition:all .3s}
+        .stat-card:hover{transform:translateY(-2px);border-color:rgba(6,182,212,0.3)}
+        .order-row{transition:background .2s}
+        .order-row:hover{background:rgba(255,255,255,0.03)}
+        .status-pending{background:rgba(234,179,8,0.15);color:#fbbf24}
+        .status-picked{background:rgba(59,130,246,0.15);color:#60a5fa}
+        .status-delivered{background:rgba(34,197,94,0.15);color:#4ade80}
+        .status-returned{background:rgba(239,68,68,0.15);color:#f87171}
+        .tab-btn{transition:all .2s}
+        .tab-btn.active{background:#06b6d4;color:white}
+        .tab-btn:not(.active):hover{background:rgba(255,255,255,0.05)}
+        .modal-overlay{opacity:0;visibility:hidden;transition:all .3s}
+        .modal-overlay.show{opacity:1;visibility:visible}
+        .modal-box{transform:scale(0.95) translateY(10px);transition:all .3s cubic-bezier(0.16,1,0.3,1)}
+        .modal-overlay.show .modal-box{transform:scale(1) translateY(0)}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loader-spin{animation:spin .8s linear infinite}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .fade-in{animation:fadeIn .4s ease forwards}
+        .toast{transform:translateY(100px);opacity:0;transition:all .4s}
+        .toast.show{transform:translateY(0);opacity:1}
+        .mobile-sidebar{transform:translateX(-100%);transition:transform .3s}
+        .mobile-sidebar.open{transform:translateX(0)}
+    </style>
+</head>
 <body class="bg-[#020617] text-white">
 
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 z-[200] bg-[#020617] flex flex-col items-center justify-center">
+        <div class="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full loader-spin"></div>
+        <p class="text-slate-400 text-sm mt-6">Loading your dashboard...</p>
+    </div>
+
+    <!-- Toast -->
     <div id="toast" class="toast fixed bottom-6 right-6 z-[100] bg-cyan-900/90 border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
         <span class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
         <span id="toast-msg" class="text-sm font-medium">Success!</span>
     </div>
 
-    <!-- Nav -->
-    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/90 border-b border-white/[0.08]">
-        <div class="flex items-center justify-between h-16 px-4 md:px-6">
-            <div class="flex items-center gap-3">
-                <button id="sidebar-toggle" class="lg:hidden text-white p-1.5"><span class="iconify text-xl" data-icon="mdi:menu"></span></button>
-                <a href="index.html" class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-sm" data-icon="mdi:truck-fast"></span></div>
-                    <span class="hidden sm:block font-semibold text-sm text-white">ChapShop <span class="text-cyan-400">Delivery</span></span>
+    <!-- Main Layout -->
+    <div id="app" class="hidden min-h-screen flex">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed left-0 top-0 bottom-0 w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 flex flex-col lg:relative lg:translate-x-0 mobile-sidebar">
+            <div class="p-5 border-b border-white/[0.08]">
+                <a href="index.html" class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl flex items-center justify-center">
+                        <span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span>
+                    </div>
+                    <div>
+                        <span class="font-semibold text-white text-[15px]">ChapShop</span>
+                        <span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span>
+                    </div>
                 </a>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="hidden sm:flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-lg px-3 py-1.5">
-                    <div class="w-7 h-7 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:account"></span></div>
-                    <span id="nav-username" class="text-xs text-slate-300 font-medium">Merchant</span>
-                </div>
-                <button onclick="handleLogout()" class="text-slate-400 hover:text-red-400 transition-colors p-2" title="Logout">
-                    <span class="iconify text-xl" data-icon="mdi:logout"></span>
-                </button>
+            <div class="flex-1 py-4 overflow-y-auto">
+                <p class="px-5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3">Main Menu</p>
+                <nav class="space-y-1 px-3">
+                    <a href="#" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm" data-page="overview">
+                        <span class="iconify text-lg" data-icon="mdi:view-dashboard"></span> Overview
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-page="orders">
+                        <span class="iconify text-lg" data-icon="mdi:package-variant-closed"></span> Orders
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-page="create-order">
+                        <span class="iconify text-lg" data-icon="mdi:plus-circle"></span> Create Order
+                    </a>
+                </nav>
+                <p class="px-5 text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3 mt-6">Account</p>
+                <nav class="space-y-1 px-3">
+                    <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-page="profile">
+                        <span class="iconify text-lg" data-icon="mdi:account-circle"></span> Profile
+                    </a>
+                    <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-page="settings">
+                        <span class="iconify text-lg" data-icon="mdi:cog"></span> Settings
+                    </a>
+                </nav>
             </div>
-        </div>
-    </nav>
-
-    <!-- Sidebar Overlay -->
-    <div id="sidebar-overlay" class="fixed inset-0 z-[55] bg-black/60 hidden lg:hidden"></div>
-
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar closed lg:!transform-none fixed top-16 left-0 bottom-0 w-64 z-[60] bg-[#0f172a] border-r border-white/[0.08] overflow-y-auto">
-        <div class="p-4">
-            <div class="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border border-cyan-500/20 rounded-xl p-4 mb-6">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:storefront"></span></div>
-                    <div>
-                        <p id="sidebar-business" class="text-sm font-medium text-white truncate max-w-[140px]">Business</p>
-                        <p id="sidebar-email" class="text-[10px] text-slate-500 truncate max-w-[140px]">email</p>
+            <div class="p-4 border-t border-white/[0.08]">
+                <div id="sidebar-user" class="flex items-center gap-3 mb-3">
+                    <div class="w-9 h-9 bg-cyan-500/20 rounded-full flex items-center justify-center text-sm font-semibold text-cyan-400">?</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-white truncate" id="sidebar-name">Loading...</p>
+                        <p class="text-xs text-slate-500 truncate" id="sidebar-email">Loading...</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <div class="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                    <span class="text-[10px] text-green-400 font-medium">Active Account</span>
-                </div>
+                <button id="logout-btn" class="w-full flex items-center justify-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-red-500/20 transition-colors cursor-pointer">
+                    <span class="iconify" data-icon="mdi:logout"></span> Log Out
+                </button>
             </div>
-            <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">Menu</p>
-            <nav class="space-y-1">
-                <a href="javascript:void(0)" onclick="showSection('overview')" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="overview"><span class="iconify text-lg" data-icon="mdi:view-dashboard"></span> Overview</a>
-                <a href="javascript:void(0)" onclick="showSection('orders')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="orders"><span class="iconify text-lg" data-icon="mdi:package-variant"></span> Orders</a>
-                <a href="javascript:void(0)" onclick="showSection('remittance')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="remittance"><span class="iconify text-lg" data-icon="mdi:cash-multiple"></span> COD Remittance</a>
-                <a href="javascript:void(0)" onclick="showSection('notifications')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="notifications"><span class="iconify text-lg" data-icon="mdi:cellphone-message"></span> SMS Notifications</a>
-                <a href="javascript:void(0)" onclick="showSection('account-manager')" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400" data-section="account-manager"><span class="iconify text-lg" data-icon="mdi:account-heart"></span> Account Manager</a>
-                <a href="index.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-400"><span class="iconify text-lg" data-icon="mdi:home-outline"></span> Back to Website</a>
-            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 lg:ml-64 min-h-screen">
+            <header class="sticky top-0 z-30 bg-[#020617]/80 backdrop-blur-xl border-b border-white/[0.08] px-6 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button id="mobile-menu-btn" class="lg:hidden text-white p-2"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
+                    <h2 id="page-title" class="text-lg font-semibold text-white">Overview</h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="index.html" class="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1.5">
+                        <span class="iconify" data-icon="mdi:open-in-new"></span> View Website
+                    </a>
+                </div>
+            </header>
+
+            <div class="p-6">
+
+                <!-- OVERVIEW PAGE -->
+                <div id="page-overview" class="page-content fade-in">
+                    <div class="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-2xl p-6 mb-6">
+                        <h2 class="text-xl font-semibold text-white mb-1" id="welcome-name">Welcome back! 👋</h2>
+                        <p class="text-sm text-slate-400">Here's your delivery dashboard summary.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="iconify text-2xl text-cyan-400" data-icon="mdi:package-variant-closed"></span>
+                                <span class="text-xs text-green-400 font-medium flex items-center gap-1"><span class="iconify" data-icon="mdi:trending-up"></span>Live</span>
+                            </div>
+                            <div class="text-2xl font-bold text-white" id="stat-total-orders">0</div>
+                            <div class="text-xs text-slate-500 mt-1">Total Orders</div>
+                        </div>
+                        <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="iconify text-2xl text-green-400" data-icon="mdi:check-circle"></span>
+                            </div>
+                            <div class="text-2xl font-bold text-green-400" id="stat-delivered">0</div>
+                            <div class="text-xs text-slate-500 mt-1">Delivered</div>
+                        </div>
+                        <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="iconify text-2xl text-yellow-400" data-icon="mdi:clock-outline"></span>
+                            </div>
+                            <div class="text-2xl font-bold text-yellow-400" id="stat-pending">0</div>
+                            <div class="text-xs text-slate-500 mt-1">In Progress</div>
+                        </div>
+                        <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="iconify text-2xl text-cyan-400" data-icon="mdi:cash-multiple"></span>
+                            </div>
+                            <div class="text-2xl font-bold text-white" id="stat-cod-total">TZS 0</div>
+                            <div class="text-xs text-slate-500 mt-1">Total COD Value</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                        <button onclick="switchPage('create-order')" class="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-5 text-left hover:bg-cyan-500/15 transition-colors cursor-pointer">
+                            <span class="iconify text-2xl text-cyan-400 mb-2" data-icon="mdi:plus-circle"></span>
+                            <p class="text-sm font-medium text-white">Create New Order</p>
+                            <p class="text-xs text-slate-500">Add a delivery request</p>
+                        </button>
+                        <button onclick="switchPage('orders')" class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 text-left hover:bg-white/[0.04] transition-colors cursor-pointer">
+                            <span class="iconify text-2xl text-blue-400 mb-2" data-icon="mdi:format-list-bulleted"></span>
+                            <p class="text-sm font-medium text-white">View All Orders</p>
+                            <p class="text-xs text-slate-500">Track your deliveries</p>
+                        </button>
+                        <button onclick="switchPage('profile')" class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 text-left hover:bg-white/[0.04] transition-colors cursor-pointer">
+                            <span class="iconify text-2xl text-purple-400 mb-2" data-icon="mdi:account-edit"></span>
+                            <p class="text-sm font-medium text-white">Edit Profile</p>
+                            <p class="text-xs text-slate-500">Update your info</p>
+                        </button>
+                    </div>
+
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="px-6 py-4 border-b border-white/[0.08] flex items-center justify-between">
+                            <h3 class="text-base font-medium text-white">Recent Orders</h3>
+                            <button onclick="switchPage('orders')" class="text-xs text-cyan-400 hover:text-cyan-300 font-medium">View All →</button>
+                        </div>
+                        <div id="recent-orders-list" class="divide-y divide-white/[0.05]">
+                            <div class="p-6 text-center text-slate-500 text-sm">Loading orders...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ORDERS PAGE -->
+                <div id="page-orders" class="page-content hidden">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">All Orders</h3>
+                            <p class="text-sm text-slate-500">Manage and track your deliveries</p>
+                        </div>
+                        <button onclick="switchPage('create-order')" class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors flex items-center gap-2 cursor-pointer">
+                            <span class="iconify" data-icon="mdi:plus"></span> New Order
+                        </button>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr class="border-b border-white/[0.08] text-left">
+                                        <th class="px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Order ID</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Recipient</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Destination</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">COD Amount</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="all-orders-tbody">
+                                    <tr><td colspan="6" class="px-6 py-10 text-center text-slate-500 text-sm">Loading orders...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="no-orders-msg" class="hidden p-10 text-center">
+                            <span class="iconify text-4xl text-slate-600 mb-3" data-icon="mdi:package-variant-remove"></span>
+                            <p class="text-sm text-slate-400 mb-3">No orders yet</p>
+                            <button onclick="switchPage('create-order')" class="bg-cyan-500 text-white text-sm font-medium px-6 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors cursor-pointer">Create Your First Order</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CREATE ORDER PAGE -->
+                <div id="page-create-order" class="page-content hidden">
+                    <div class="max-w-3xl mx-auto">
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold text-white mb-1">Create New Order</h3>
+                            <p class="text-sm text-slate-500">Fill in the delivery details below.</p>
+                        </div>
+                        <form id="create-order-form" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 md:p-8 space-y-5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div><label class="text-xs font-medium text-slate-400 mb-2 block">Recipient Name *</label><input type="text" id="order-name" required placeholder="John Doe" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                                <div><label class="text-xs font-medium text-slate-400 mb-2 block">Recipient Phone *</label><input type="tel" id="order-phone" required placeholder="0769 xxx xxx" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                            </div>
+                            <div><label class="text-xs font-medium text-slate-400 mb-2 block">Delivery Address *</label><textarea id="order-address" required rows="2" placeholder="Full delivery address (street, area, city)" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-all resize-none"></textarea></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div><label class="text-xs font-medium text-slate-400 mb-2 block">City *</label>
+                                    <select id="order-city" required class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 transition-all appearance-none cursor-pointer" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>');background-repeat:no-repeat;background-position:right 16px center">
+                                        <option value="">Select city</option>
+                                        <option>Dar es Salaam</option><option>Dodoma</option><option>Mwanza</option><option>Arusha</option><option>Mbeya</option><option>Morogoro</option><option>Tanga</option><option>Iringa</option><option>Kagera</option><option>Lindi</option><option>Kigoma</option><option>Rukwa</option><option>Katavi</option><option>Simiyu</option><option>Geita</option><option>Singida</option><option>Tabora</option><option>Pwani</option><option>Mtwara</option><option>Ruvuma</option><option>Njombe</option><option>Other</option>
+                                    </select>
+                                </div>
+                                <div><label class="text-xs font-medium text-slate-400 mb-2 block">COD Amount (TZS)</label><input type="number" id="order-cod" placeholder="e.g. 50000" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div><label class="text-xs font-medium text-slate-400 mb-2 block">Package Description</label><input type="text" id="order-desc" placeholder="e.g. Phone case, 0.5kg" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                                <div><label class="text-xs font-medium text-slate-400 mb-2 block">Delivery Type</label>
+                                    <select id="order-type" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-slate-400 focus:outline-none focus:border-cyan-500/50 transition-all appearance-none cursor-pointer" style="background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2394a3b8%22 d=%22M6 8L1 3h10z%22/></svg>');background-repeat:no-repeat;background-position:right 16px center">
+                                        <option value="standard">Standard (1-3 days)</option>
+                                        <option value="express">Express (same day)</option>
+                                        <option value="scheduled">Scheduled</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div><label class="text-xs font-medium text-slate-400 mb-2 block">Notes (Optional)</label><textarea id="order-notes" rows="2" placeholder="Any special instructions..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-all resize-none"></textarea></div>
+                            <button type="submit" id="submit-order-btn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="iconify text-lg" data-icon="mdi:check-circle"></span> Submit Order
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- PROFILE PAGE -->
+                <div id="page-profile" class="page-content hidden">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="mb-6"><h3 class="text-lg font-semibold text-white mb-1">Merchant Profile</h3><p class="text-sm text-slate-500">View and update your business information.</p></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 md:p-8">
+                            <div class="flex items-center gap-4 mb-8 pb-8 border-b border-white/[0.08]">
+                                <div class="w-16 h-16 bg-cyan-500/20 rounded-2xl flex items-center justify-center text-xl font-bold text-cyan-400" id="profile-avatar">?</div>
+                                <div><p class="text-lg font-medium text-white" id="profile-name">Loading...</p><p class="text-sm text-slate-400" id="profile-email">Loading...</p><p class="text-xs text-green-400 mt-1 flex items-center gap-1"><span class="iconify" data-icon="mdi:check-circle"></span> Verified Account</p></div>
+                            </div>
+                            <form id="profile-form" class="space-y-5">
+                                <div><label class="text-xs font-medium text-slate-400 mb-2 block">Business Name *</label><input type="text" id="profile-business" required class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                                <div><label class="text-xs font-medium text-slate-400 mb-2 block">Phone Number</label><input type="tel" id="profile-phone" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                                <div><label class="text-xs font-medium text-slate-400 mb-2 block">City</label><input type="text" id="profile-city" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                                <div><label class="text-xs font-medium text-slate-400 mb-2 block">Selling Platforms</label><input type="text" id="profile-platforms" placeholder="e.g. Shopify, Instagram, Jumia" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-all"></div>
+                                <button type="submit" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 cursor-pointer"><span class="iconify" data-icon="mdi:content-save"></span> Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SETTINGS PAGE -->
+                <div id="page-settings" class="page-content hidden">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="mb-6"><h3 class="text-lg font-semibold text-white mb-1">Settings</h3><p class="text-sm text-slate-500">Manage your account preferences.</p></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 md:p-8 space-y-6">
+                            <div class="flex items-center justify-between py-3 border-b border-white/[0.05]">
+                                <div><p class="text-sm font-medium text-white">Email Notifications</p><p class="text-xs text-slate-500">Get order updates via email</p></div>
+                                <div class="w-11 h-6 bg-cyan-500 rounded-full cursor-pointer relative"><div class="absolute inset-0.5 bg-white rounded-full"></div></div>
+                            </div>
+                            <div class="flex items-center justify-between py-3 border-b border-white/[0.05]">
+                                <div><p class="text-sm font-medium text-white">SMS Notifications</p><p class="text-xs text-slate-500">Get SMS for delivery updates</p></div>
+                                <div class="w-11 h-6 bg-cyan-500 rounded-full cursor-pointer relative"><div class="absolute inset-0.5 bg-white rounded-full"></div></div>
+                            </div>
+                            <div class="flex items-center justify-between py-3">
+                                <div><p class="text-sm font-medium text-white">Delete Account</p><p class="text-xs text-red-400/70">Permanently delete your account</p></div>
+                                <button id="delete-account-btn" class="text-xs text-red-400 border border-red-500/20 px-4 py-2 rounded-lg hover:bg-red-500/10 transition-colors cursor-pointer font-medium">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal-overlay fixed inset-0 z-[60] bg-black/60 flex items-center justify-center p-6">
+        <div class="modal-box bg-[#0f172a] border border-white/[0.1] rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <div class="text-center mb-4">
+                <span class="iconify text-4xl text-red-400 mb-3" data-icon="mdi:alert-circle"></span>
+                <h3 class="text-lg font-semibold text-white mb-2">Delete Account?</h3>
+                <p class="text-sm text-slate-400">This will permanently delete your account, all orders, and merchant data. This cannot be undone.</p>
+            </div>
+            <div class="flex gap-3">
+                <button id="cancel-delete" class="flex-1 bg-white/[0.05] border border-white/[0.1] text-white text-sm font-medium py-2.5 rounded-lg hover:bg-white/[0.1] transition-colors cursor-pointer">Cancel</button>
+                <button id="confirm-delete" class="flex-1 bg-red-500 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-red-400 transition-colors cursor-pointer">Delete Forever</button>
+            </div>
         </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="lg:ml-64 pt-16 min-h-screen">
-        <section id="section-overview" class="p-4 md:p-6">
-            <div class="mb-6">
-                <h1 class="text-xl md:text-2xl font-semibold text-white">Welcome back, <span id="welcome-name">Merchant</span></h1>
-                <p class="text-sm text-slate-500 mt-1">Here's what's happening with your deliveries today.</p>
-            </div>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 transition-all duration-300">
-                    <div class="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center mb-3"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:package-variant"></span></div>
-                    <div class="text-2xl font-bold text-white">248</div>
-                    <div class="text-xs text-slate-500">Total Orders</div>
-                </div>
-                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 transition-all duration-300">
-                    <div class="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center mb-3"><span class="iconify text-green-400 text-xl" data-icon="mdi:check-circle"></span></div>
-                    <div class="text-2xl font-bold text-white">189</div>
-                    <div class="text-xs text-slate-500">Delivered</div>
-                </div>
-                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 transition-all duration-300">
-                    <div class="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center mb-3"><span class="iconify text-blue-400 text-xl" data-icon="mdi:truck-delivery"></span></div>
-                    <div class="text-2xl font-bold text-white">32</div>
-                    <div class="text-xs text-slate-500">In Transit</div>
-                </div>
-                <div class="stat-card bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 transition-all duration-300">
-                    <div class="w-10 h-10 bg-yellow-500/10 rounded-lg flex items-center justify-center mb-3"><span class="iconify text-yellow-400 text-xl" data-icon="mdi:cash-multiple"></span></div>
-                    <div class="text-2xl font-bold text-white">TZS 4.2M</div>
-                    <div class="text-xs text-slate-500">COD Collected</div>
-                </div>
-            </div>
-            <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
-                <h3 class="text-sm font-medium text-white mb-4">Recent Orders</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02]"><div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:package"></span></div><div class="flex-1"><p class="text-xs text-white font-medium">#CS-2451 — Dar → Kigoma</p></div><span class="badge badge-transit">Transit</span></div>
-                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02]"><div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-sm" data-icon="mdi:check"></span></div><div class="flex-1"><p class="text-xs text-white font-medium">#CS-2450 — Dar → Mwanza</p></div><span class="badge badge-delivered">Done</span></div>
-                    <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/[0.02]"><div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:clock-outline"></span></div><div class="flex-1"><p class="text-xs text-white font-medium">#CS-2449 — Dar → Arusha</p></div><span class="badge badge-pending">Pending</span></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="section-orders" class="p-4 md:p-6" style="display:none;">
-            <div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Orders</h1><p class="text-sm text-slate-500 mt-1">Manage and track all your deliveries</p></div>
-            <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-8 text-center">
-                <span class="iconify text-4xl text-slate-600 mb-3" data-icon="mdi:package-variant"></span>
-                <p class="text-slate-400">Order management coming soon!</p>
-            </div>
-        </section>
-
-        <section id="section-remittance" class="p-4 md:p-6" style="display:none;">
-            <div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Fast COD Remittance</h1><p class="text-sm text-slate-500 mt-1">Track your COD collections and M-Pesa/Bank transfers</p></div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/20 rounded-xl p-5">
-                    <span class="iconify text-green-400 text-2xl mb-2" data-icon="mdi:cash-check"></span>
-                    <p class="text-xl font-bold text-white">TZS 3.85M</p>
-                    <p class="text-xs text-green-400">Total Remitted</p>
-                    <p class="text-[10px] text-slate-500 mt-2">→ M-Pesa: TZS 2.1M | Bank: TZS 1.75M</p>
-                </div>
-                <div class="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border border-yellow-500/20 rounded-xl p-5">
-                    <span class="iconify text-yellow-400 text-2xl mb-2" data-icon="mdi:clock-outline"></span>
-                    <p class="text-xl font-bold text-white">TZS 350K</p>
-                    <p class="text-xs text-yellow-400">Pending</p>
-                    <p class="text-[10px] text-slate-500 mt-2">Next remittance: Jan 17, 2025</p>
-                </div>
-                <div class="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border border-cyan-500/20 rounded-xl p-5">
-                    <span class="iconify text-cyan-400 text-2xl mb-2" data-icon="mdi:timer-sand"></span>
-                    <p class="text-xl font-bold text-white">18 hours</p>
-                    <p class="text-xs text-cyan-400">Avg. Remittance Time</p>
-                    <p class="text-[10px] text-slate-500 mt-2">Target: 24 hours ✓</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="section-notifications" class="p-4 md:p-6" style="display:none;">
-            <div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">SMS Notifications</h1><p class="text-sm text-slate-500 mt-1">Track all SMS alerts</p></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-cyan-500/10 rounded-xl flex items-center justify-center"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:message-text"></span></div>
-                    <div><p class="text-lg font-bold text-white">1,247</p><p class="text-xs text-slate-500">SMS Sent This Month</p></div>
-                </div>
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center"><span class="iconify text-green-400 text-2xl" data-icon="mdi:check-all"></span></div>
-                    <div><p class="text-lg font-bold text-white">99.2%</p><p class="text-xs text-slate-500">Delivery Rate</p></div>
-                </div>
-            </div>
-            <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5">
-                <div class="space-y-3">
-                    <div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-sm" data-icon="mdi:check-circle"></span></div><div><p class="text-xs text-white">Order #CS-2450 delivered to Fatma Ali</p><p class="text-[10px] text-slate-500">Customer notified • Jan 14, 14:32</p></div></div>
-                    <div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:truck"></span></div><div><p class="text-xs text-white">Order #CS-2451 in transit to Kigoma</p><p class="text-[10px] text-slate-500">You & customer notified • Jan 15, 09:15</p></div></div>
-                    <div class="flex gap-3 p-3 rounded-lg hover:bg-white/[0.03]"><div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:cash"></span></div><div><p class="text-xs text-white">TZS 450,000 remitted to your M-Pesa</p><p class="text-[10px] text-slate-500">You notified • Jan 14, 16:00</p></div></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="section-account-manager" class="p-4 md:p-6" style="display:none;">
-            <div class="mb-6"><h1 class="text-xl md:text-2xl font-semibold text-white">Dedicated Account Manager</h1><p class="text-sm text-slate-500 mt-1">Your personal support contact</p></div>
-            <div class="max-w-lg mx-auto bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 text-center">
-                <div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-full flex items-center justify-center mx-auto mb-4"><span class="iconify text-white text-4xl" data-icon="mdi:account-tie"></span></div>
-                <h3 class="text-lg font-semibold text-white mb-1">David Mwangi</h3>
-                <p class="text-sm text-cyan-400 mb-4">Senior Account Manager</p>
-                <div class="space-y-3 text-left">
-                    <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-cyan-400" data-icon="mdi:phone"></span><div><p class="text-[10px] text-slate-500">Phone</p><p class="text-sm text-white">+255 769 800 220</p></div></div>
-                    <div class="flex items-center gap-3 bg-white/[0.03] rounded-lg p-3"><span class="iconify text-green-400" data-icon="mdi:whatsapp"></span><div><p class="text-[10px] text-sulate-500">WhatsApp</p><p class="text-sm text-white">+255 769 800 220</p></div></div>
-                </div>
-                <a href="https://wa.me/255769800220" target="_blank" class="mt-5 w-full bg-green-500 text-white font-medium text-sm py-3 rounded-xl hover:bg-green-400 transition-colors flex items-center justify-center gap-2"><span class="iconify text-lg" data-icon="mdi:whatsapp"></span> Chat on WhatsApp</a>
-            </div>
-        </section>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.local-storage.min.js"></script>
+    </div>
 
     <script>
-        var SUPABASE_URL = 'https://lmbpnnfyelsqhwzatwbv.supabase.co';
-        var SUPABASE_KEY = 'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm';
-        var db = null;
-        var merchantData = null;
+    // ===== SUPABASE INIT (YOUR REAL KEYS) =====
+    var SUPABASE_URL = 'https://lmbpnnfyelsqhwzatwbv.supabase.co';
+    var SUPABASE_ANON_KEY = 'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm';
+    var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        function showSection(section) {
-            var sections = document.querySelectorAll('[id^="section-]');
-            for (var i = 0; i < sections.length; i++) {
-                sections[i].style.display = 'none';
-            }
-            var target = document.getElementById('section-' + section);
-            if (target) target.style.display = 'block';
-            var links = document.querySelectorAll('.sidebar-link');
-            for (var i = 0; i < links.length; i++) {
-                links[i].classList.remove('active');
-                if (links[i].getAttribute('data-section') === section) {
-                    links[i].classList.add('active');
-                }
-            }
-        }
+    var currentUser = null;
+    var merchantProfile = null;
 
-        function showToast(msg) {
-            var t = document.getElementById('toast');
-            document.getElementById('toast-msg').textContent = msg;
-            t.classList.add('show');
-            setTimeout(function() { t.classList.remove('show'); }, 4000);
-        }
+    // ===== AUTH CHECK =====
+    async function checkAuth() {
+        try {
+            var { data: { session }, error } = await supabase.auth.getSession();
+            if (error) throw error;
 
-        function handleLogout() {
-            showToast('Logging out...');
-            
-            // Save current user data to localStorage for instant re-login
-            if (merchantData) {
-                localStorage.setItem('chapshop_logged_in', JSON.stringify(merchantData));
-            }
-
-            // If Supabase, sign out first
-            if (window.supabase) {
-                window.supabase.auth.signOut().catch(function() {});
-            }
-
-            // Re-login after 1 second
-            setTimeout(function() {
-                window.location.href = 'dashboard.html';
-            }, 1000);
-        }
-
-        function fillDashboard() {
-            if (!merchantData) return;
-            document.getElementById('nav-username').textContent = merchantData.name || 'Merchant';
-            document.getElementById('sidebar-business').textContent = merchantData.business || 'Business';
-            document.getElementById('sidebar-email').textContent = merchantData.email || '';
-            document.getElementById('welcome-name').textContent = merchantData.name.split(' ')[0];
-        }
-
-        function initDashboard() {
-            // Show dashboard immediately with defaults
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            fillDashboard();
-
-            // Then try to load real data (max 3 seconds)
-            try {
-                if (typeof window.supabase !== 'undefined') {
-                    db = window.supabase.createClient(SUBABASE_URL, SUPABASE_KEY);
-
-                    // 3 second timeout - if data doesn't load, use localStorage
-                    var loaded = false;
-                    var timeout = setTimeout(function() {
-                        if (!loaded) {
-                            merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in') || null;
-                            if (merchantData) fillDashboard();
-                        }
-                    }, 3000);
-
-                    db.auth.getUser().then(function(result) {
-                        if (!result.data.user) {
-                            merchantData = JSON.parse(localStorage.getItem('chapshop_in merchants') || null;
-                            if (merchantData) {
-                                fillDashboard();
-                            }
-                            loaded = true;
-                            clearTimeout(timeout);
-                        } else {
-                            loaded = true;
-                            clearTimeout(timeout);
-                            
-                            db.from('merchants').select('*').eq('user_id', result.data.user.id).single().then(function(result) {
-                                loaded = true;
-                                clearTimeout(timeout);
-                                if (result.data) {
-                                    merchantData = result.data;
-                                } else {
-                                    merchantData = JSON.parse(localStorage.getItem('chapshop_merchants') || null;
-                                }
-                                fillDashboard();
-                            }).catch(function() {
-                                loaded = true;
-                                clearTimeout(timeout);
-                                merchantData = JSON.parse(localStorage.getItem('chapshop_merchants') || null;
-                                if (merchantData) fillDashboard();
-                            });
-                        }
-                    });
-                } else {
-                    merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in') || null;
-                    if (merchantData) fillDashboard();
-                }
+            if (session && session.user) {
+                currentUser = session.user;
+                await loadMerchantProfile();
+                showApp();
             } else {
-                merchantData = JSON.parse(localStorage.getItem('chapshop_logged_in') || null;
-                if (merchantData) fillDashboard();
+                window.location.href = 'merchants.html';
             }
+        } catch (err) {
+            console.error('Auth check error:', err);
+            window.location.href = 'merchants.html';
         }
+    }
 
-        function init() {
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initDashboard);
+    // ===== LOAD MERCHANT PROFILE =====
+    async function loadMerchantProfile() {
+        try {
+            var { data, error } = await supabase
+                .from('merchants')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .maybeSingle();
+
+            if (error) throw error;
+
+            if (data) {
+                merchantProfile = data;
             } else {
-                initDashboard();
+                var emailName = currentUser.email ? currentUser.email.split('@')[0] : 'Merchant';
+                var newProfile = {
+                    user_id: currentUser.id,
+                    name: emailName,
+                    business: 'My Business',
+                    email: currentUser.email || '',
+                    phone: '',
+                    city: '',
+                    platforms: ''
+                };
+                var { data: insertedData, error: insertError } = await supabase
+                    .from('merchants')
+                    .insert(newProfile)
+                    .select()
+                    .single();
+                if (insertError) throw insertError;
+                merchantProfile = insertedData;
             }
+            updateUI();
+        } catch (err) {
+            console.error('Load profile error:', err);
+            showApp();
         }
+    }
+
+    // ===== UPDATE UI =====
+    function updateUI() {
+        if (!merchantProfile) return;
+        var name = merchantProfile.name || 'Merchant';
+        var email = merchantProfile.email || currentUser.email || '';
+        var initials = name.charAt(0).toUpperCase();
+
+        document.getElementById('sidebar-name').textContent = name;
+        document.getElementById('sidebar-email').textContent = email;
+        
+        var avatarDiv = document.querySelector('#sidebar-user > div:first-child');
+        if(avatarDiv) avatarDiv.textContent = initials;
+
+        document.getElementById('profile-avatar').textContent = initials;
+        document.getElementById('profile-name').textContent = name;
+        document.getElementById('profile-email').textContent = email;
+        document.getElementById('welcome-name').textContent = 'Welcome back, ' + name + '! 👋';
+        
+        document.getElementById('profile-business').value = merchantProfile.business || '';
+        document.getElementById('profile-phone').value = merchantProfile.phone || '';
+        document.getElementById('profile-city').value = merchantProfile.city || '';
+        document.getElementById('profile-platforms').value = merchantProfile.platforms || '';
+
+        loadOrders();
+    }
+
+    // ===== LOAD ORDERS =====
+    async function loadOrders() {
+        try {
+            var { data, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('merchant_id', currentUser.id)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                renderOrders(data, 'all-orders-tbody');
+                renderRecentOrders(data.slice(0, 5), 'recent-orders-list');
+                updateStats(data);
+            } else {
+                document.getElementById('all-orders-tbody').innerHTML = '';
+                document.getElementById('no-orders-msg').classList.remove('hidden');
+                document.getElementById('recent-orders-list').innerHTML = '<div class="p-6 text-center text-slate-500 text-sm">No orders yet. Create your first order!</div>';
+                updateStats([]);
+            }
+        } catch (err) {
+            console.error('Load orders error:', err);
+            document.getElementById('all-orders-tbody').innerHTML = '<tr><td colspan="6" class="px-6 py-10 text-center text-slate-500 text-sm">Could not load orders</td></tr>';
+            document.getElementById('recent-orders-list').innerHTML = '<div class="p-6 text-center text-slate-500 text-sm">Could not load orders</div>';
+            updateStats([]);
+        }
+    }
+
+    // ===== RENDER ORDERS TABLE =====
+    function renderOrders(orders, containerId) {
+        var tbody = document.getElementById(containerId);
+        if (!tbody) return;
+        if (orders.length === 0) {
+            tbody.innerHTML = '';
+            if (containerId === 'all-orders-tbody') document.getElementById('no-orders-msg').classList.remove('hidden');
+            return;
+        }
+        document.getElementById('no-orders-msg').classList.add('hidden');
+        var html = '';
+        for (var i = 0; i < orders.length; i++) {
+            var o = orders[i];
+            var orderId = o.id ? o.id.substring(0, 8).toUpperCase() : 'N/A';
+            var status = o.status || 'pending';
+            var statusClass = 'status-' + status;
+            var date = o.created_at ? new Date(o.created_at).toLocaleDateString() : 'N/A';
+            var cod = o.cod_amount ? 'TZS ' + Number(o.cod_amount).toLocaleString() : 'N/A';
+            html += '<tr class="order-row">';
+            html += '<td class="px-6 py-4 text-xs font-mono text-cyan-400">' + orderId + '</td>';
+            html += '<td class="px-4 py-4 text-sm text-white">' + (o.recipient_name || 'N/A') + '</td>';
+            html += '<td class="px-4 py-4 text-sm text-slate-300">' + (o.city || 'N/A') + '</td>';
+            html += '<td class="px-4 py-4 text-sm font-medium text-white">' + cod + '</td>';
+            html += '<td class="px-4 py-4"><span class="' + statusClass + ' text-xs font-medium px-2.5 py-1 rounded-full">' + status.charAt(0).toUpperCase() + status.slice(1) + '</span></td>';
+            html += '<td class="px-4 py-4 text-xs text-slate-500">' + date + '</td>';
+            html += '</tr>';
+        }
+        tbody.innerHTML = html;
+    }
+
+    // ===== RENDER RECENT ORDERS =====
+    function renderRecentOrders(orders, containerId) {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+        if (orders.length === 0) {
+            container.innerHTML = '<div class="p-6 text-center text-slate-500 text-sm">No orders yet. Create your first order!</div>';
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < orders.length; i++) {
+            var o = orders[i];
+            var status = o.status || 'pending';
+            var statusClass = 'status-' + status;
+            var date = o.created_at ? new Date(o.created_at).toLocaleDateString() : 'N/A';
+            var cod = o.cod_amount ? 'TZS ' + Number(o.cod_amount).toLocaleString() : 'N/A';
+            html += '<div class="flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors">';
+            html += '<div class="flex items-center gap-3"><div class="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center"><span class="iconify text-cyan-400" data-icon="mdi:package-variant"></span></div>';
+            html += '<div><p class="text-sm font-medium text-white">' + (o.recipient_name || 'N/A') + '</p>';
+            html += '<p class="text-xs text-slate-500">' + (o.city || 'N/A') + ' &bull; ' + date + '</p></div></div>';
+            html += '<div class="text-right"><p class="text-sm font-medium text-white">' + cod + '</p>';
+            html += '<span class="' + statusClass + ' text-[10px] font-medium px-2 py-0.5 rounded-full">' + status.toUpperCase() + '</span></div>';
+            html += '</div>';
+        }
+        container.innerHTML = html;
+    }
+
+    // ===== UPDATE STATS =====
+    function updateStats(orders) {
+        var total = orders.length;
+        var delivered = 0, pending = 0, codTotal = 0;
+        for (var i = 0; i < orders.length; i++) {
+            if (orders[i].status === 'delivered') delivered++;
+            else pending++;
+            if (orders[i].cod_amount) codTotal += Number(orders[i].cod_amount);
+        }
+        document.getElementById('stat-total-orders').textContent = total;
+        document.getElementById('stat-delivered').textContent = delivered;
+        document.getElementById('stat-pending').textContent = pending;
+        document.getElementById('stat-cod-total').textContent = 'TZS ' + codTotal.toLocaleString();
+    }
+
+    // ===== CREATE ORDER =====
+    document.getElementById('create-order-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var btn = document.getElementById('submit-order-btn');
+        btn.innerHTML = '<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Creating...';
+        btn.disabled = true;
+
+        var orderData = {
+            merchant_id: currentUser.id,
+            recipient_name: document.getElementById('order-name').value.trim(),
+            recipient_phone: document.getElementById('order-phone').value.trim(),
+            address: document.getElementById('order-address').value.trim(),
+            city: document.getElementById('order-city').value,
+            cod_amount: document.getElementById('order-cod').value ? parseInt(document.getElementById('order-cod').value) : 0,
+            description: document.getElementById('order-desc').value.trim(),
+            delivery_type: document.getElementById('order-type').value,
+            notes: document.getElementById('order-notes').value.trim(),
+            status: 'pending'
+        };
+
+        try {
+            var { data, error } = await supabase.from('orders').insert(orderData).select().single();
+            if (error) throw error;
+            document.getElementById('create-order-form').reset();
+            btn.innerHTML = '<span class="iconify text-lg" data-icon="mdi:check-circle"></span> Submit Order';
+            btn.disabled = false;
+            showToast('Order created successfully!');
+            setTimeout(function() { switchPage('orders'); }, 1000);
+        } catch (err) {
+            console.error('Create order error:', err);
+            btn.innerHTML = '<span class="iconify text-lg" data-icon="mdi:check-circle"></span> Submit Order';
+            btn.disabled = false;
+            showToast('Error: ' + (err.message || 'Could not create order'));
+        }
+    });
+
+    // ===== UPDATE PROFILE =====
+    document.getElementById('profile-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var btn = this.querySelector('button[type="submit"]');
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Saving...';
+        btn.disabled = true;
+        try {
+            var updates = {
+                business: document.getElementById('profile-business').value.trim(),
+                phone: document.getElementById('profile-phone').value.trim(),
+                city: document.getElementById('profile-city').value.trim(),
+                platforms: document.getElementById('profile-platforms').value.trim(),
+                updated_at: new Date().toISOString()
+            };
+            var { error } = await supabase.from('merchants').update(updates).eq('user_id', currentUser.id);
+            if (error) throw error;
+            merchantProfile = Object.assign({}, merchantProfile, updates);
+            updateUI();
+            showToast('Profile updated successfully!');
+        } catch (err) {
+            console.error('Update profile error:', err);
+            showToast('Error saving profile.');
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
+
+    // ===== LOGOUT =====
+    document.getElementById('logout-btn').addEventListener('click', async function() {
+        var btn = this;
+        btn.innerHTML = '<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Logging out...';
+        btn.disabled = true;
+        try {
+            await supabase.auth.signOut();
+        } catch (err) {
+            console.error('Logout error:', err);
+        }
+        setTimeout(function() { window.location.href = 'merchants.html'; }, 800);
+    });
+
+    // ===== DELETE ACCOUNT =====
+    document.getElementById('delete-account-btn').addEventListener('click', function() {
+        document.getElementById('delete-modal').classList.add('show');
+    });
+    document.getElementById('cancel-delete').addEventListener('click', function() {
+        document.getElementById('delete-modal').classList.remove('show');
+    });
+    document.getElementById('confirm-delete').addEventListener('click', async function() {
+        var btn = this;
+        btn.innerHTML = 'Deleting...';
+        btn.disabled = true;
+        document.getElementById('cancel-delete').disabled = true;
+        try {
+            await supabase.from('merchants').delete().eq('user_id', currentUser.id);
+            await supabase.auth.signOut();
+            showToast('Account deleted.');
+            setTimeout(function() { window.location.href = 'merchants.html'; }, 1000);
+        } catch (err) {
+            console.error('Delete error:', err);
+            showToast('Error deleting account.');
+            btn.innerHTML = 'Delete Forever';
+            btn.disabled = false;
+            document.getElementById('cancel-delete').disabled = false;
+        }
+    });
+
+    // ===== PAGE SWITCHING =====
+    function switchPage(page) {
+        document.querySelectorAll('.page-content').forEach(function(p) { p.classList.add('hidden'); });
+        var target = document.getElementById('page-' + page);
+        if (target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
+        document.querySelectorAll('.sidebar-link').forEach(function(l) { l.classList.remove('active'); l.classList.add('text-slate-400'); });
+        var activeLink = document.querySelector('[data-page="' + page + '"]');
+        if (activeLink) { activeLink.classList.add('active'); activeLink.classList.remove('text-slate-400'); }
+        var titles = { 'overview': 'Overview', 'orders': 'All Orders', 'create-order': 'Create New Order', 'profile': 'Merchant Profile', 'settings': 'Settings' };
+        document.getElementById('page-title').textContent = titles[page] || 'Dashboard';
+        document.getElementById('sidebar').classList.remove('open');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.sidebar-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var page = this.getAttribute('data-page');
+            if (page) switchPage(page);
+        });
+    });
+
+    document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+        document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // ===== SHOW APP =====
+    function showApp() {
+        document.getElementById('loading-screen').style.opacity = '0';
+        setTimeout(function() {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('app').classList.remove('hidden');
+        }, 400);
+    }
+
+    // ===== TOAST =====
+    function showToast(msg) {
+        var t = document.getElementById('toast');
+        document.getElementById('toast-msg').textContent = msg;
+        t.classList.add('show');
+        setTimeout(function() { t.classList.remove('show'); }, 3000);
+    }
+
+    // ===== INIT =====
+    checkAuth();
     </script>
 </body>
 </html>
----
-
-## How logout works now:
