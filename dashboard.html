@@ -3,40 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChapShop Delivery — Merchant Dashboard</title>
+    <title>ChapShop Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         *{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
-        ::-webkit-scrollbar{width:5px;height:5px}
-        ::-webkit-scrollbar-track{background:transparent}
-        ::-webkit-scrollbar-thumb{background:#1e293b;border-radius:10px}
+        ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#1e293b;border-radius:10px}
         body{background:#080c18;overflow-x:hidden}
         .sidebar{background:linear-gradient(180deg,#0c1120,#080c18);border-right:1px solid rgba(255,255,255,0.05)}
         .sidebar-link{position:relative;transition:all .2s;border-radius:10px}
-        .sidebar-link::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(6,182,212,0.1),rgba(6,182,212,0.03));opacity:0;transition:opacity .2s;border-radius:10px}
+        .sidebar-link::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(6,182,212,0.1),transparent);opacity:0;transition:opacity .2s;border-radius:10px}
         .sidebar-link:hover::before,.sidebar-link.active::before{opacity:1}
         .sidebar-link.active{color:#22d3ee!important;font-weight:600}
-        .sidebar-link.active::after{content:'';position:absolute;right:0;top:20%;height:60%;width:3px;background:linear-gradient(180deg,#06b6d4,#22d3ee);border-radius:3px 0 0 3px}
+        .sidebar-link.active::after{content:'';position:absolute;right:0;top:20%;height:60%;width:3px;background:#06b6d4;border-radius:3px 0 0 3px}
         .glass{background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.05);border-radius:16px;backdrop-filter:blur(20px);transition:all .3s}
         .glass:hover{border-color:rgba(6,182,212,0.1)}
         .glass-s{background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.05);border-radius:16px;backdrop-filter:blur(20px)}
         .inp{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:11px 16px;font-size:13px;color:#fff;transition:all .2s}
-        .inp::placeholder{color:#374151}
-        .inp:focus{outline:none;border-color:rgba(6,182,212,0.4);box-shadow:0 0 0 3px rgba(6,182,212,0.08);background:rgba(255,255,255,0.05)}
-        .sel{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:11px 16px;font-size:13px;color:#94a3b8;transition:all .2s;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
-        .sel:focus{outline:none;border-color:rgba(6,182,212,0.4);box-shadow:0 0 0 3px rgba(6,182,212,0.08)}
+        .inp::placeholder{color:#374151}.inp:focus{outline:none;border-color:rgba(6,182,212,0.4);box-shadow:0 0 0 3px rgba(6,182,212,0.08)}
+        .sel{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:11px 16px;font-size:13px;color:#94a3b8;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%236b7280' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+        .sel:focus{outline:none;border-color:rgba(6,182,212,0.4)}
         .btn-p{background:linear-gradient(135deg,#06b6d4,#0891b2);color:#fff;font-weight:600;border:none;border-radius:12px;padding:11px 22px;font-size:13px;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px}
-        .btn-p:hover{transform:translateY(-1px);box-shadow:0 8px 20px -4px rgba(6,182,212,0.35)}
-        .btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+        .btn-p:hover{transform:translateY(-1px);box-shadow:0 8px 20px -4px rgba(6,182,212,0.35)}.btn-p:disabled{opacity:.5;cursor:not-allowed;transform:none}
         .btn-s{background:rgba(255,255,255,0.04);color:#cbd5e1;font-weight:500;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:9px 16px;font-size:12px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
         .btn-s:hover{background:rgba(255,255,255,0.07)}
         .btn-d{background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
         .btn-d:hover{background:rgba(239,68,68,0.15)}
-        .badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.3px;text-transform:uppercase}
+        .badge{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase}
         .b-pending{background:rgba(245,158,11,0.1);color:#fbbf24;border:1px solid rgba(245,158,11,0.18)}
         .b-picked{background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.18)}
         .b-delivered{background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.18)}
@@ -57,31 +53,19 @@
         .toast-ok{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);color:#34d399}
         .toast-err{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);color:#f87171}
         .toast-inf{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2);color:#60a5fa}
-        .faq-item{border:1px solid rgba(255,255,255,0.05);border-radius:12px;overflow:hidden;transition:all .2s}
-        .faq-item:hover{border-color:rgba(255,255,255,0.1)}
-        .faq-q{padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background .2s}
-        .faq-q:hover{background:rgba(255,255,255,0.02)}
-        .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}
-        .faq-a.open{max-height:300px;padding:0 20px 16px}
+        .faq-item{border:1px solid rgba(255,255,255,0.05);border-radius:12px;overflow:hidden}.faq-q{padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background .2s}.faq-q:hover{background:rgba(255,255,255,0.02)}
+        .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}.faq-a.open{max-height:300px;padding:0 20px 16px}
         .faq-icon{transition:transform .3s}.faq-icon.rotated{transform:rotate(180deg)}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes pulse-g{0%,100%{box-shadow:0 0 0 0 rgba(6,182,212,0.25)}50%{box-shadow:0 0 0 6px rgba(6,182,212,0)}}
-        .anim-spin{animation:spin .7s linear infinite}
-        .anim-up{animation:fadeUp .45s ease forwards}
-        .anim-pulse{animation:pulse-g 2s infinite}
-        .mob-sb{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
-        .mob-sb.open{transform:translateX(0)}
-        .sb-back{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:39;opacity:0;visibility:hidden;transition:all .3s}
-        .sb-back.show{opacity:1;visibility:visible}
+        @keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}@keyframes pulse-g{0%,100%{box-shadow:0 0 0 0 rgba(6,182,212,0.25)}50%{box-shadow:0 0 0 6px rgba(6,182,212,0)}}
+        .anim-spin{animation:spin .7s linear infinite}.anim-up{animation:fadeUp .45s ease forwards}.anim-pulse{animation:pulse-g 2s infinite}
+        .mob-sb{transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}.mob-sb.open{transform:translateX(0)}
+        .sb-back{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:39;opacity:0;visibility:hidden;transition:all .3s}.sb-back.show{opacity:1;visibility:visible}
         .tbl{width:100%;border-collapse:collapse;min-width:700px}
         .tbl th{padding:11px 14px;font-size:10px;font-weight:700;color:#4b5563;text-transform:uppercase;letter-spacing:.5px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05);white-space:nowrap}
         .tbl td{padding:12px 14px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.03);white-space:nowrap}
         .stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center}
-        .stat-c{transition:all .3s cubic-bezier(.4,0,.2,1)}.stat-c:hover{transform:translateY(-3px);box-shadow:0 16px 32px -8px rgba(0,0,0,0.4)}
-        .notif-item{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .2s;cursor:pointer}
-        .notif-item:hover{background:rgba(255,255,255,0.02)}
-        .notif-item.unread{background:rgba(6,182,212,0.03);border-left:3px solid #06b6d4}
+        .stat-c{transition:all .3s}.stat-c:hover{transform:translateY(-3px)}
+        .notif-item{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .2s;cursor:pointer}.notif-item:hover{background:rgba(255,255,255,0.02)}.notif-item.unread{background:rgba(6,182,212,0.03);border-left:3px solid #06b6d4}
         @media(max-width:1023px){.main-c{margin-left:0!important}}
     </style>
 </head>
@@ -89,7 +73,7 @@
 
 <div id="loader" class="fixed inset-0 z-[300] bg-[#080c18] flex flex-col items-center justify-center gap-4">
     <div class="relative"><div class="w-14 h-14 border-[3px] border-cyan-500/20 border-t-cyan-500 rounded-full anim-spin"></div><div class="absolute inset-0 flex items-center justify-center"><span class="iconify text-cyan-400" data-icon="mdi:truck-fast"></span></div></div>
-    <p class="text-slate-600 text-xs font-medium">Loading dashboard...</p>
+    <p class="text-slate-600 text-xs font-medium" id="loader-text">Loading dashboard...</p>
 </div>
 
 <div class="toast-c" id="toasts"></div>
@@ -131,7 +115,7 @@
     </div>
     <div class="p-4 border-t border-white/[0.05]">
         <div class="flex items-center gap-3 mb-3">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400/15 to-cyan-600/15 flex items-center justify-center text-[12px] font-bold text-cyan-400" id="sb-avatar">?</div>
+            <div class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-[12px] font-bold text-cyan-400" id="sb-avatar">?</div>
             <div class="flex-1 min-w-0"><p class="text-[12px] font-semibold text-white truncate" id="sb-name">...</p><p class="text-[10px] text-slate-600 truncate" id="sb-email">...</p></div>
         </div>
         <button id="logout-btn" class="w-full flex items-center justify-center gap-2 text-[11px] font-semibold text-red-400/80 bg-red-500/5 border border-red-500/10 rounded-lg py-2 hover:bg-red-500/10 transition cursor-pointer"><span class="iconify text-[13px]" data-icon="mdi:logout"></span>Sign Out</button>
@@ -147,15 +131,13 @@
         <div class="flex items-center gap-2">
             <button onclick="switchPage('notifications')" class="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center hover:bg-white/[0.06] transition cursor-pointer relative"><span class="iconify text-lg text-slate-400" data-icon="mdi:bell-outline"></span><span id="notif-dot2" class="notif-dot hidden" style="border-color:#080c18"></span></button>
             <button onclick="location.reload()" class="w-8 h-8 rounded-lg bg-white/[0.03] flex items-center justify-center hover:bg-white/[0.06] transition cursor-pointer"><span class="iconify text-lg text-slate-400" data-icon="mdi:refresh"></span></button>
-            <a href="index.html" class="btn-s text-[11px] py-1.5 px-2.5 hidden sm:flex"><span class="iconify text-[13px]" data-icon="mdi:open-in-new"></span>Website</a>
         </div>
     </header>
 
     <div class="flex-1 p-5 lg:p-6">
 
-        <!-- OVERVIEW -->
         <div id="page-overview" class="page-content anim-up">
-            <div class="glass-s p-6 mb-6 relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.06] via-blue-500/[0.03] to-transparent pointer-events-none"></div><div class="relative"><h2 class="text-lg lg:text-xl font-bold text-white mb-0.5" id="welcome-name">Welcome back! 👋</h2><p class="text-[13px] text-slate-500">Here's your delivery summary.</p></div></div>
+            <div class="glass-s p-6 mb-6 relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.06] to-transparent pointer-events-none"></div><div class="relative"><h2 class="text-lg font-bold text-white mb-0.5" id="welcome-name">Welcome! 👋</h2><p class="text-[13px] text-slate-500">Here's your delivery summary.</p></div></div>
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div class="glass stat-c p-4"><div class="flex items-start justify-between mb-3"><div class="stat-icon bg-cyan-500/10"><span class="iconify text-xl text-cyan-400" data-icon="mdi:package-variant-closed"></span></div><span class="text-[9px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full anim-pulse"></span>Live</span></div><p class="text-2xl font-extrabold text-white" id="s-total">0</p><p class="text-[11px] text-slate-600 mt-0.5">Total Orders</p></div>
                 <div class="glass stat-c p-4"><div class="mb-3"><div class="stat-icon bg-emerald-500/10"><span class="iconify text-xl text-emerald-400" data-icon="mdi:check-decagram"></span></div></div><p class="text-2xl font-extrabold text-emerald-400" id="s-delivered">0</p><p class="text-[11px] text-slate-600 mt-0.5">Delivered</p></div>
@@ -167,156 +149,172 @@
                     <h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Quick Actions</h3>
                     <button onclick="switchPage('create-order')" class="glass w-full p-3.5 text-left cursor-pointer flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-cyan-500/10 flex items-center justify-center"><span class="iconify text-lg text-cyan-400" data-icon="mdi:plus-circle"></span></div><div><p class="text-[12px] font-semibold text-white">New Order</p><p class="text-[10px] text-slate-600">Create delivery</p></div></button>
                     <button onclick="switchPage('orders')" class="glass w-full p-3.5 text-left cursor-pointer flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center"><span class="iconify text-lg text-blue-400" data-icon="mdi:format-list-bulleted"></span></div><div><p class="text-[12px] font-semibold text-white">Manage Orders</p><p class="text-[10px] text-slate-600">View & track</p></div></button>
-                    <button onclick="switchPage('sales-report')" class="glass w-full p-3.5 text-left cursor-pointer flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center"><span class="iconify text-lg text-emerald-400" data-icon="mdi:receipt-text"></span></div><div><p class="text-[12px] font-semibold text-white">Sales Report</p><p class="text-[10px] text-slate-600">Revenue & stats</p></div></button>
-                    <button onclick="switchPage('notifications')" class="glass w-full p-3.5 text-left cursor-pointer flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center"><span class="iconify text-lg text-amber-400" data-icon="mdi:bell"></span></div><div><p class="text-[12px] font-semibold text-white">Notifications</p><p class="text-[10px] text-slate-600">Updates & alerts</p></div></button>
+                    <button onclick="switchPage('sales-report')" class="glass w-full p-3.5 text-left cursor-pointer flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center"><span class="iconify text-lg text-emerald-400" data-icon="mdi:receipt-text"></span></div><div><p class="text-[12px] font-semibold text-white">Sales Report</p><p class="text-[10px] text-slate-600">Revenue</p></div></button>
+                    <button onclick="switchPage('notifications')" class="glass w-full p-3.5 text-left cursor-pointer flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center"><span class="iconify text-lg text-amber-400" data-icon="mdi:bell"></span></div><div><p class="text-[12px] font-semibold text-white">Notifications</p><p class="text-[10px] text-slate-600">Updates</p></div></button>
                 </div>
                 <div class="lg:col-span-2"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-3">Orders This Week</h3><div class="glass-s p-4"><div style="height:200px"><canvas id="chart-overview"></canvas></div></div></div>
             </div>
-            <div><div class="flex items-center justify-between mb-3"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Recent Orders</h3><button onclick="switchPage('orders')" class="text-[11px] text-cyan-400 font-semibold hover:text-cyan-300 cursor-pointer">View All →</button></div><div class="glass-s overflow-hidden" id="recent-list"><div class="p-8 text-center text-slate-600 text-xs">Loading...</div></div></div>
+            <div><div class="flex items-center justify-between mb-3"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Recent Orders</h3><button onclick="switchPage('orders')" class="text-[11px] text-cyan-400 font-semibold cursor-pointer">View All →</button></div><div class="glass-s overflow-hidden" id="recent-list"><div class="p-8 text-center text-slate-600 text-xs">Loading...</div></div></div>
         </div>
 
-        <!-- ORDERS -->
         <div id="page-orders" class="page-content hidden">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5"><div><h2 class="text-lg font-bold text-white">All Orders</h2><p class="text-[12px] text-slate-600 mt-0.5">Manage and track deliveries</p></div><button onclick="switchPage('create-order')" class="btn-p text-[12px]"><span class="iconify text-base" data-icon="mdi:plus"></span>New Order</button></div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5"><div><h2 class="text-lg font-bold text-white">All Orders</h2><p class="text-[12px] text-slate-600 mt-0.5">Manage deliveries</p></div><button onclick="switchPage('create-order')" class="btn-p text-[12px]"><span class="iconify text-base" data-icon="mdi:plus"></span>New Order</button></div>
             <div class="glass-s p-3 mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <div class="relative flex-1 w-full"><span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 text-sm" data-icon="mdi:magnify"></span><input type="text" id="o-search" placeholder="Search..." class="inp pl-9 py-2 text-[12px]"></div>
                 <div class="flex items-center gap-1.5 flex-wrap"><button class="filter-btn active" data-f="all">All</button><button class="filter-btn" data-f="pending">Pending</button><button class="filter-btn" data-f="picked">Picked</button><button class="filter-btn" data-f="delivered">Delivered</button><button class="filter-btn" data-f="returned">Returned</button></div>
             </div>
-            <div class="glass-s overflow-hidden"><div class="overflow-x-auto" id="o-tbl-wrap"><table class="tbl"><thead><tr><th>ID</th><th>Recipient</th><th>Phone</th><th>City</th><th>COD</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="o-tbody"><tr><td colspan="8" class="text-center py-10 text-slate-600 text-xs">Loading...</td></tr></tbody></table></div><div id="no-orders" class="hidden p-10 text-center"><span class="iconify text-4xl text-slate-800 mb-3" data-icon="mdi:package-variant-remove"></span><p class="text-slate-500 text-xs mb-4">No orders found</p><button onclick="switchPage('create-order')" class="btn-p text-[12px]">Create Order</button></div></div>
+            <div class="glass-s overflow-hidden"><div class="overflow-x-auto" id="o-tbl-wrap"><table class="tbl"><thead><tr><th>ID</th><th>Recipient</th><th>Phone</th><th>City</th><th>COD</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="o-tbody"><tr><td colspan="8" class="text-center py-10 text-slate-600 text-xs">Loading...</td></tr></tbody></table></div><div id="no-orders" class="hidden p-10 text-center"><span class="iconify text-4xl text-slate-800 mb-3" data-icon="mdi:package-variant-remove"></span><p class="text-slate-500 text-xs mb-4">No orders</p><button onclick="switchPage('create-order')" class="btn-p text-[12px]">Create Order</button></div></div>
         </div>
 
-        <!-- CREATE ORDER -->
         <div id="page-create-order" class="page-content hidden">
-            <div class="max-w-2xl mx-auto"><div class="mb-6"><h2 class="text-lg font-bold text-white">Create New Order</h2><p class="text-[12px] text-slate-600 mt-0.5">Fill in the delivery details.</p></div>
+            <div class="max-w-2xl mx-auto"><div class="mb-6"><h2 class="text-lg font-bold text-white">Create New Order</h2></div>
             <form id="co-form" class="glass-s p-6 space-y-5">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Recipient Name *</label><input type="text" id="f-name" required placeholder="John Doe" class="inp"></div><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Phone *</label><input type="tel" id="f-phone" required placeholder="0769 123 456" class="inp"></div></div>
-                <div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Address *</label><textarea id="f-addr" required rows="2" placeholder="Street, area, landmark..." class="inp resize-none"></textarea></div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">City *</label><select id="f-city" required class="sel"><option value="">Select</option><option>Dar es Salaam</option><option>Dodoma</option><option>Mwanza</option><option>Arusha</option><option>Mbeya</option><option>Morogoro</option><option>Tanga</option><option>Iringa</option><option>Kagera</option><option>Lindi</option><option>Kigoma</option><option>Rukwa</option><option>Katavi</option><option>Simiyu</option><option>Geita</option><option>Singida</option><option>Tabora</option><option>Pwani</option><option>Mtwara</option><option>Ruvuma</option><option>Njombe</option><option>Other</option></select></div><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">COD (TZS)</label><input type="number" id="f-cod" placeholder="50000" class="inp"></div></div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Description</label><input type="text" id="f-desc" placeholder="Phone case, 0.5kg" class="inp"></div><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Type</label><select id="f-type" class="sel"><option value="standard">Standard (1-3 days)</option><option value="express">Express (same day)</option><option value="scheduled">Scheduled</option></select></div></div>
-                <div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Notes</label><textarea id="f-notes" rows="2" placeholder="Special instructions..." class="inp resize-none"></textarea></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">Name *</label><input type="text" id="f-name" required placeholder="John Doe" class="inp"></div><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">Phone *</label><input type="tel" id="f-phone" required placeholder="0769 123 456" class="inp"></div></div>
+                <div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">Address *</label><textarea id="f-addr" required rows="2" placeholder="Street, area..." class="inp resize-none"></textarea></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">City *</label><select id="f-city" required class="sel"><option value="">Select</option><option>Dar es Salaam</option><option>Dodoma</option><option>Mwanza</option><option>Arusha</option><option>Mbeya</option><option>Morogoro</option><option>Tanga</option><option>Iringa</option><option>Kagera</option><option>Lindi</option><option>Kigoma</option><option>Rukwa</option><option>Katavi</option><option>Simiyu</option><option>Geita</option><option>Singida</option><option>Tabora</option><option>Pwani</option><option>Mtwara</option><option>Ruvuma</option><option>Njombe</option><option>Other</option></select></div><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">COD (TZS)</label><input type="number" id="f-cod" placeholder="50000" class="inp"></div></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">Description</label><input type="text" id="f-desc" placeholder="Phone case" class="inp"></div><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">Type</label><select id="f-type" class="sel"><option value="standard">Standard</option><option value="express">Express</option><option value="scheduled">Scheduled</option></select></div></div>
+                <div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">Notes</label><textarea id="f-notes" rows="2" placeholder="Instructions..." class="inp resize-none"></textarea></div>
                 <button type="submit" id="co-btn" class="btn-p w-full justify-center py-3"><span class="iconify text-base" data-icon="mdi:check-circle-outline"></span>Submit Order</button>
             </form></div>
         </div>
 
-        <!-- ANALYTICS -->
         <div id="page-analytics" class="page-content hidden">
-            <div class="mb-6"><h2 class="text-lg font-bold text-white">Analytics</h2><p class="text-[12px] text-slate-600 mt-0.5">Delivery performance overview.</p></div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5"><div class="glass-s p-5"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-3">Orders by Status</h3><div style="height:220px"><canvas id="ch-status"></canvas></div></div><div class="glass-s p-5"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-3">COD Overview</h3><div style="height:220px"><canvas id="ch-cod"></canvas></div></div></div>
-            <div class="glass-s p-5"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-3">Orders Over Time</h3><div style="height:260px"><canvas id="ch-time"></canvas></div></div>
+            <div class="mb-6"><h2 class="text-lg font-bold text-white">Analytics</h2></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5"><div class="glass-s p-5"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-3">By Status</h3><div style="height:220px"><canvas id="ch-status"></canvas></div></div><div class="glass-s p-5"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-3">COD Overview</h3><div style="height:220px"><canvas id="ch-cod"></canvas></div></div></div>
+            <div class="glass-s p-5"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-3">Over Time</h3><div style="height:260px"><canvas id="ch-time"></canvas></div></div>
         </div>
 
-        <!-- SALES REPORT -->
         <div id="page-sales-report" class="page-content hidden">
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6"><div><h2 class="text-lg font-bold text-white">Sales Report</h2><p class="text-[12px] text-slate-600 mt-0.5">Revenue and delivery performance.</p></div><button onclick="exportReport()" class="btn-s text-[11px]"><span class="iconify text-sm" data-icon="mdi:download"></span>Export CSV</button></div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6"><div><h2 class="text-lg font-bold text-white">Sales Report</h2></div><button onclick="exportReport()" class="btn-s text-[11px]"><span class="iconify text-sm" data-icon="mdi:download"></span>Export CSV</button></div>
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="glass-s p-4"><div class="stat-icon bg-emerald-500/10 mb-3"><span class="iconify text-xl text-emerald-400" data-icon="mdi:cash-check"></span></div><p class="text-xl font-extrabold text-emerald-400" id="r-collected">TZS 0</p><p class="text-[11px] text-slate-600">Collected COD</p></div>
-                <div class="glass-s p-4"><div class="stat-icon bg-amber-500/10 mb-3"><span class="iconify text-xl text-amber-400" data-icon="mdi:cash-clock"></span></div><p class="text-xl font-extrabold text-amber-400" id="r-pending-cod">TZS 0</p><p class="text-[11px] text-slate-600">Pending COD</p></div>
-                <div class="glass-s p-4"><div class="stat-icon bg-blue-500/10 mb-3"><span class="iconify text-xl text-blue-400" data-icon="mdi:percent"></span></div><p class="text-xl font-extrabold text-blue-400" id="r-rate">0%</p><p class="text-[11px] text-slate-600">Delivery Rate</p></div>
-                <div class="glass-s p-4"><div class="stat-icon bg-red-500/10 mb-3"><span class="iconify text-xl text-red-400" data-icon="mdi:cash-remove"></span></div><p class="text-xl font-extrabold text-red-400" id="r-lost">TZS 0</p><p class="text-[11px] text-slate-600">Returned COD</p></div>
+                <div class="glass-s p-4"><div class="stat-icon bg-emerald-500/10 mb-3"><span class="iconify text-xl text-emerald-400" data-icon="mdi:cash-check"></span></div><p class="text-xl font-extrabold text-emerald-400" id="r-collected">TZS 0</p><p class="text-[11px] text-slate-600">Collected</p></div>
+                <div class="glass-s p-4"><div class="stat-icon bg-amber-500/10 mb-3"><span class="iconify text-xl text-amber-400" data-icon="mdi:cash-clock"></span></div><p class="text-xl font-extrabold text-amber-400" id="r-pending-cod">TZS 0</p><p class="text-[11px] text-slate-600">Pending</p></div>
+                <div class="glass-s p-4"><div class="stat-icon bg-blue-500/10 mb-3"><span class="iconify text-xl text-blue-400" data-icon="mdi:percent"></span></div><p class="text-xl font-extrabold text-blue-400" id="r-rate">0%</p><p class="text-[11px] text-slate-600">Rate</p></div>
+                <div class="glass-s p-4"><div class="stat-icon bg-red-500/10 mb-3"><span class="iconify text-xl text-red-400" data-icon="mdi:cash-remove"></span></div><p class="text-xl font-extrabold text-red-400" id="r-lost">TZS 0</p><p class="text-[11px] text-slate-600">Returned</p></div>
             </div>
             <div class="glass-s p-5 mb-5"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-3">Revenue by City</h3><div style="height:260px"><canvas id="ch-city"></canvas></div></div>
-            <div class="glass-s overflow-hidden"><div class="p-4 border-b border-white/[0.04]"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Order Summary Table</h3></div><div class="overflow-x-auto"><table class="tbl"><thead><tr><th>City</th><th>Total</th><th>Delivered</th><th>Returned</th><th>Rate</th><th>COD Collected</th></tr></thead><tbody id="r-tbody"><tr><td colspan="6" class="text-center py-8 text-slate-600 text-xs">Loading...</td></tr></tbody></table></div></div>
+            <div class="glass-s overflow-hidden"><div class="p-4 border-b border-white/[0.04]"><h3 class="text-[11px] font-bold text-slate-600 uppercase tracking-wider">Summary</h3></div><div class="overflow-x-auto"><table class="tbl"><thead><tr><th>City</th><th>Total</th><th>Delivered</th><th>Returned</th><th>Rate</th><th>COD</th></tr></thead><tbody id="r-tbody"><tr><td colspan="6" class="text-center py-8 text-slate-600 text-xs">Loading...</td></tr></tbody></table></div></div>
         </div>
 
-        <!-- NOTIFICATIONS -->
         <div id="page-notifications" class="page-content hidden">
-            <div class="flex items-center justify-between mb-6"><div><h2 class="text-lg font-bold text-white">Notifications</h2><p class="text-[12px] text-slate-600 mt-0.5">Stay updated on your orders.</p></div><button onclick="markAllRead()" class="btn-s text-[11px]"><span class="iconify text-sm" data-icon="mdi:check-all"></span>Mark All Read</button></div>
-            <div class="glass-s overflow-hidden" id="notif-list"><div class="p-10 text-center"><span class="iconify text-4xl text-slate-800 mb-3" data-icon="mdi:bell-off-outline"></span><p class="text-slate-600 text-xs">Loading...</p></div></div>
+            <div class="flex items-center justify-between mb-6"><div><h2 class="text-lg font-bold text-white">Notifications</h2></div><button onclick="markAllRead()" class="btn-s text-[11px]"><span class="iconify text-sm" data-icon="mdi:check-all"></span>Mark All Read</button></div>
+            <div class="glass-s overflow-hidden" id="notif-list"><div class="p-10 text-center text-slate-600 text-xs">Loading...</div></div>
         </div>
 
-        <!-- FAQ -->
         <div id="page-faq" class="page-content hidden">
-            <div class="max-w-2xl mx-auto"><div class="mb-6"><h2 class="text-lg font-bold text-white">Frequently Asked Questions</h2><p class="text-[12px] text-slate-600 mt-0.5">Find quick answers to common questions.</p></div><div class="space-y-3" id="faq-list"></div></div>
+            <div class="max-w-2xl mx-auto"><div class="mb-6"><h2 class="text-lg font-bold text-white">FAQ</h2></div><div class="space-y-3" id="faq-list"></div></div>
         </div>
 
-        <!-- PROFILE -->
         <div id="page-profile" class="page-content hidden">
-            <div class="max-w-2xl mx-auto"><div class="mb-6"><h2 class="text-lg font-bold text-white">Merchant Profile</h2><p class="text-[12px] text-slate-600 mt-0.5">Your business information.</p></div>
+            <div class="max-w-2xl mx-auto"><div class="mb-6"><h2 class="text-lg font-bold text-white">Profile</h2></div>
             <div class="glass-s p-6">
-                <div class="flex items-center gap-4 mb-7 pb-7 border-b border-white/[0.05]"><div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400/15 to-cyan-600/15 flex items-center justify-center text-xl font-extrabold text-cyan-400" id="p-avatar">?</div><div><p class="text-base font-bold text-white" id="p-name">...</p><p class="text-[12px] text-slate-500" id="p-email">...</p><div class="flex items-center gap-1.5 mt-1.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span><span class="text-[11px] text-emerald-400 font-semibold">Verified</span></div></div></div>
+                <div class="flex items-center gap-4 mb-7 pb-7 border-b border-white/[0.05]"><div class="w-16 h-16 rounded-2xl bg-cyan-500/20 flex items-center justify-center text-xl font-extrabold text-cyan-400" id="p-avatar">?</div><div><p class="text-base font-bold text-white" id="p-name">...</p><p class="text-[12px] text-slate-500" id="p-email">...</p><div class="flex items-center gap-1.5 mt-1.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span><span class="text-[11px] text-emerald-400 font-semibold">Verified</span></div></div></div>
                 <form id="p-form" class="space-y-4">
-                    <div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Business Name *</label><input type="text" id="pf-biz" required class="inp"></div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Phone</label><input type="tel" id="pf-phone" class="inp"></div><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">City</label><input type="text" id="pf-city" class="inp"></div></div>
-                    <div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Platforms</label><input type="text" id="pf-plat" placeholder="Instagram, Shopify..." class="inp"></div>
-                    <button type="submit" class="btn-p w-full justify-center py-3"><span class="iconify text-base" data-icon="mdi:content-save-outline"></span>Save Changes</button>
+                    <div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">Business Name *</label><input type="text" id="pf-biz" required class="inp"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">Phone</label><input type="tel" id="pf-phone" class="inp"></div><div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">City</label><input type="text" id="pf-city" class="inp"></div></div>
+                    <div><label class="text-[11px] font-semibold text-slate-500 mb-1.5 block uppercase">Platforms</label><input type="text" id="pf-plat" placeholder="Instagram, Shopify..." class="inp"></div>
+                    <button type="submit" class="btn-p w-full justify-center py-3"><span class="iconify text-base" data-icon="mdi:content-save-outline"></span>Save</button>
                 </form>
             </div></div>
         </div>
 
-        <!-- SETTINGS -->
         <div id="page-settings" class="page-content hidden">
-            <div class="max-w-2xl mx-auto"><div class="mb-6"><h2 class="text-lg font-bold text-white">Settings</h2><p class="text-[12px] text-slate-600 mt-0.5">Account preferences.</p></div>
+            <div class="max-w-2xl mx-auto"><div class="mb-6"><h2 class="text-lg font-bold text-white">Settings</h2></div>
             <div class="glass-s p-6 space-y-0">
-                <div class="flex items-center justify-between py-4 border-b border-white/[0.04]"><div><p class="text-[13px] font-semibold text-white">Email Notifications</p><p class="text-[11px] text-slate-600 mt-0.5">Order updates via email</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"><div class="w-10 h-5 bg-slate-700 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label></div>
-                <div class="flex items-center justify-between py-4 border-b border-white/[0.04]"><div><p class="text-[13px] font-semibold text-white">SMS Alerts</p><p class="text-[11px] text-slate-600 mt-0.5">Delivery updates via SMS</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer"><div class="w-10 h-5 bg-slate-700 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label></div>
-                <div class="flex items-center justify-between py-4"><div><p class="text-[13px] font-semibold text-white">Delete Account</p><p class="text-[11px] text-red-400/50 mt-0.5">Permanently remove account</p></div><button id="del-acc-btn" class="btn-d text-[11px]">Delete</button></div>
+                <div class="flex items-center justify-between py-4 border-b border-white/[0.04]"><div><p class="text-[13px] font-semibold text-white">Email Notifications</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"><div class="w-10 h-5 bg-slate-700 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label></div>
+                <div class="flex items-center justify-between py-4 border-b border-white/[0.04]"><div><p class="text-[13px] font-semibold text-white">SMS Alerts</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer"><div class="w-10 h-5 bg-slate-700 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div></label></div>
+                <div class="flex items-center justify-between py-4"><div><p class="text-[13px] font-semibold text-white">Delete Account</p><p class="text-[11px] text-red-400/50">Cannot be undone</p></div><button id="del-acc-btn" class="btn-d text-[11px]">Delete</button></div>
             </div></div>
         </div>
 
-        <!-- HELP -->
         <div id="page-help" class="page-content hidden">
-            <div class="max-w-2xl mx-auto"><div class="mb-6"><h2 class="text-lg font-bold text-white">Help & Support</h2><p class="text-[12px] text-slate-600 mt-0.5">Get in touch with us.</p></div>
-            <div class="glass-s p-8 text-center"><div class="w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center mx-auto mb-4"><span class="iconify text-3xl text-cyan-400" data-icon="mdi:headset"></span></div><h3 class="text-base font-bold text-white mb-1">Need Help?</h3><p class="text-[12px] text-slate-500 mb-6">Our support team is ready to assist you.</p><div class="flex flex-col sm:flex-row gap-3 justify-center"><a href="mailto:support@chapshop.co.tz" class="btn-p text-[12px] justify-center"><span class="iconify text-base" data-icon="mdi:email-outline"></span>Email Support</a><a href="https://wa.me/255769000000" class="btn-s text-[12px] justify-center" target="_blank"><span class="iconify text-base" data-icon="mdi:whatsapp"></span>WhatsApp</a></div></div></div>
+            <div class="max-w-2xl mx-auto"><div class="mb-6"><h2 class="text-lg font-bold text-white">Help & Support</h2></div>
+            <div class="glass-s p-8 text-center"><div class="w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center mx-auto mb-4"><span class="iconify text-3xl text-cyan-400" data-icon="mdi:headset"></span></div><h3 class="text-base font-bold text-white mb-1">Need Help?</h3><p class="text-[12px] text-slate-500 mb-6">Our team is ready to help.</p><a href="mailto:support@chapshop.co.tz" class="btn-p text-[12px] justify-center"><span class="iconify text-base" data-icon="mdi:email-outline"></span>Email Support</a></div></div>
         </div>
 
     </div>
 </div>
 </div>
 
-<!-- ORDER MODAL -->
-<div id="o-modal" class="modal-o"><div class="modal-c"><div class="p-5 border-b border-white/[0.05] flex items-center justify-between"><h3 class="text-sm font-bold text-white">Order Details</h3><button onclick="closeOM()" class="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition cursor-pointer"><span class="iconify text-slate-500" data-icon="mdi:close"></span></button></div><div id="o-modal-body" class="p-5"></div></div></div>
-<!-- STATUS MODAL -->
-<div id="s-modal" class="modal-o"><div class="modal-c" style="max-width:380px"><div class="p-5 border-b border-white/[0.05] flex items-center justify-between"><h3 class="text-sm font-bold text-white">Change Status</h3><button onclick="closeSM()" class="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition cursor-pointer"><span class="iconify text-slate-500" data-icon="mdi:close"></span></button></div><div class="p-5 space-y-2" id="s-opts"></div></div></div>
-<!-- DELETE MODAL -->
-<div id="d-modal" class="modal-o"><div class="modal-c" style="max-width:380px"><div class="p-6 text-center"><div class="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4"><span class="iconify text-2xl text-red-400" data-icon="mdi:alert-circle"></span></div><h3 class="text-base font-bold text-white mb-1">Delete Account?</h3><p class="text-[12px] text-slate-500 mb-5">This action cannot be undone.</p><div class="flex gap-3"><button onclick="document.getElementById('d-modal').classList.remove('show')" class="btn-s flex-1 justify-center py-2.5">Cancel</button><button id="del-confirm" class="btn-d flex-1 justify-center py-2.5">Delete Forever</button></div></div></div></div>
+<div id="o-modal" class="modal-o"><div class="modal-c"><div class="p-5 border-b border-white/[0.05] flex items-center justify-between"><h3 class="text-sm font-bold text-white">Order Details</h3><button onclick="closeOM()" class="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center cursor-pointer"><span class="iconify text-slate-500" data-icon="mdi:close"></span></button></div><div id="o-modal-body" class="p-5"></div></div></div>
+<div id="s-modal" class="modal-o"><div class="modal-c" style="max-width:380px"><div class="p-5 border-b border-white/[0.05] flex items-center justify-between"><h3 class="text-sm font-bold text-white">Change Status</h3><button onclick="closeSM()" class="w-7 h-7 rounded-lg bg-white/[0.04] flex items-center justify-center cursor-pointer"><span class="iconify text-slate-500" data-icon="mdi:close"></span></button></div><div class="p-5 space-y-2" id="s-opts"></div></div></div>
+<div id="d-modal" class="modal-o"><div class="modal-c" style="max-width:380px"><div class="p-6 text-center"><div class="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4"><span class="iconify text-2xl text-red-400" data-icon="mdi:alert-circle"></span></div><h3 class="text-base font-bold text-white mb-1">Delete Account?</h3><p class="text-[12px] text-slate-500 mb-5">Cannot be undone.</p><div class="flex gap-3"><button onclick="document.getElementById('d-modal').classList.remove('show')" class="btn-s flex-1 justify-center py-2.5">Cancel</button><button id="del-confirm" class="btn-d flex-1 justify-center py-2.5">Delete</button></div></div></div></div>
 
 <script>
 var SUPABASE_URL='https://lmbpnnfyelsqhwzatwbv.supabase.co';
 var SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxtYnBubmZ5ZWxzcWh3emF0d2J2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcwNTM3MzQsImV4cCI6MjA5MjYyOTczNH0.bXHRJozyXHTb-z-eIQCBWsgIaIQ9HG_HmQvcs9BbTFw';
-var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-var cu=null,mp=null,orders=[],curFilter='all',charts={},notifs=[];
+
+var sb=null,cu=null,mp=null,orders=[],curFilter='all',charts={},notifs=[];
 
 var faqs=[
-    {q:"How do I create an order?",a:"Go to 'Create Order' from the sidebar. Fill in recipient name, phone, address, city, and optional COD amount. Click Submit to create."},
-    {q:"What is COD (Cash On Delivery)?",a:"COD is the amount the customer pays the delivery rider when they receive their package. You set this amount when creating an order."},
-    {q:"How do I track my orders?",a:"Go to 'All Orders' to see every order with its current status: Pending, Picked, Delivered, or Returned."},
-    {q:"Can I change an order's status?",a:"Yes! In 'All Orders', click the status badge on any order to change it. You can also change it from the Order Details modal."},
-    {q:"How do I delete an order?",a:"Open the order details by clicking 'View', then click 'Delete Order' at the bottom. This action cannot be undone."},
-    {q:"What does the Sales Report show?",a:"The Sales Report shows total collected COD, pending COD, delivery rate percentage, returned COD, and revenue broken down by city."},
-    {q:"How do I export my report?",a:"On the Sales Report page, click the 'Export CSV' button to download a CSV file of your order summary."},
-    {q:"How do notifications work?",a:"The system automatically generates notifications when orders are created, picked up, delivered, or returned. Unread notifications are highlighted."},
-    {q:"What cities are supported?",a:"We support all major Tanzanian cities including Dar es Salaam, Dodoma, Mwanza, Arusha, Mbeya, Morogoro, Tanga, and more."},
-    {q:"What delivery types are available?",a:"Standard (1-3 days), Express (same day), and Scheduled delivery. Choose when creating an order."},
-    {q:"How do I update my business profile?",a:"Go to 'Profile' in the sidebar. Update your business name, phone, city, and selling platforms, then click Save."},
-    {q:"Is my data secure?",a:"Yes. All data is stored securely in Supabase with Row Level Security, meaning only you can access your own orders and profile."}
+    {q:"How do I create an order?",a:"Go to Create Order from the sidebar. Fill in recipient name, phone, address, city, and optional COD amount. Click Submit."},
+    {q:"What is COD?",a:"COD means Cash On Delivery. It is the amount the customer pays the rider when receiving the package."},
+    {q:"How do I track orders?",a:"Go to All Orders to see every order with its status: Pending, Picked, Delivered, or Returned."},
+    {q:"Can I change order status?",a:"Yes! Click the status badge on any order to change it."},
+    {q:"How do I delete an order?",a:"Open order details and click Delete Order."},
+    {q:"What does Sales Report show?",a:"Collected COD, pending COD, delivery rate, returned COD, and revenue by city."},
+    {q:"How do I export a report?",a:"Click Export CSV on the Sales Report page."},
+    {q:"How do notifications work?",a:"Notifications are auto-generated when orders change status."},
+    {q:"What cities are supported?",a:"All major Tanzanian cities including Dar es Salaam, Dodoma, Mwanza, Arusha, and more."},
+    {q:"Is my data secure?",a:"Yes. Data is stored securely with Row Level Security."}
 ];
 
-async function init(){
+// SAFETY: Show dashboard after 8 seconds no matter what
+setTimeout(function(){
+    var loader=document.getElementById('loader');
+    if(loader.style.display!=='none'){
+        loader.style.display='none';
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('loader-text').textContent='';
+    }
+},8000);
+
+// START
+(async function(){
     try{
-        var{data:{session},error}=await sb.auth.getSession();
-        if(error)throw error;
-        if(!session||!session.user){location.href='merchants.html';return}
+        document.getElementById('loader-text').textContent='Connecting to database...';
+        sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+        document.getElementById('loader-text').textContent='Checking login...';
+        var result=await sb.auth.getSession();
+        var session=result.data.session;
+        var error=result.error;
+
+        if(error){showError('Database error: '+error.message);return}
+        if(!session||!session.user){window.location.href='merchants.html';return}
+
         cu=session.user;
+
+        // SHOW DASHBOARD NOW
+        document.getElementById('loader').style.display='none';
+        document.getElementById('app').classList.remove('hidden');
+
+        // Load data in background
         await loadProfile();
-        showApp();
+
     }catch(e){
         console.error(e);
-        document.getElementById('loader').innerHTML='<div style="text-align:center;padding:40px"><span class="iconify" data-icon="mdi:alert-circle" style="font-size:48px;color:#f87171"></span><p style="color:#f87171;font-size:16px;margin-top:20px;font-weight:700">Connection Error</p><p style="color:#94a3b8;font-size:13px;margin-top:10px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6">Could not connect to database.<br><br><b style="color:#e2e8f0">Make sure you are logged in first</b> on your merchants.html page before opening this dashboard.</p></div>';
+        document.getElementById('loader').style.display='none';
+        document.getElementById('app').classList.remove('hidden');
+        toast('Error: '+e.message,'err');
     }
+})();
+
+function showError(msg){
+    document.getElementById('loader').innerHTML='<div style="text-align:center;padding:40px"><span class="iconify" data-icon="mdi:alert-circle" style="font-size:48px;color:#f87171"></span><p style="color:#f87171;font-size:16px;margin-top:20px;font-weight:700">Error</p><p style="color:#94a3b8;font-size:13px;margin-top:10px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.6">'+msg+'</p><p style="color:#6b7280;font-size:12px;margin-top:20px">Go to <b style="color:#e2e8f0">merchants.html</b> and log in first.</p></div>';
 }
 
 async function loadProfile(){
     try{
         var{data,error}=await sb.from('merchants').select('*').eq('user_id',cu.id).maybeSingle();
-        if(error)throw error;
+        if(error){console.error(error);return}
         if(data){mp=data}else{
             var n=cu.email?cu.email.split('@')[0]:'Merchant';
-            var ins={user_id:cu.id,name:n,business:'My Business',email:cu.email||'',phone:'',city:'',platforms:''};
-            var{data:d,error:e2}=await sb.from('merchants').insert(ins).select().single();
-            if(e2)throw e2;mp=d;
+            var{data:d,error:e2}=await sb.from('merchants').insert({user_id:cu.id,name:n,business:'My Business',email:cu.email||'',phone:'',city:'',platforms:''}).select().single();
+            if(e2){console.error(e2);return}mp=d;
         }
         renderProfile();await loadOrders();renderFAQ();generateNotifs();
-    }catch(e){console.error(e);showApp()}
+    }catch(e){console.error(e)}
 }
 
 function renderProfile(){
@@ -331,7 +329,8 @@ function renderProfile(){
 async function loadOrders(){
     try{
         var{data,error}=await sb.from('orders').select('*').eq('merchant_id',cu.id).order('created_at',{ascending:false});
-        if(error)throw error;orders=data||[];updateStats();renderOTable();renderRecent();renderCharts();renderReport();
+        if(error){console.error(error);return}
+        orders=data||[];updateStats();renderOTable();renderRecent();renderCharts();renderReport();
         var b=document.getElementById('o-badge');if(orders.length){b.textContent=orders.length;b.classList.remove('hidden')}
     }catch(e){console.error(e)}
 }
@@ -351,7 +350,7 @@ function renderOTable(){
 
 function renderRecent(){
     var el=document.getElementById('recent-list'),r=orders.slice(0,5);
-    if(!r.length){el.innerHTML='<div class="p-8 text-center"><span class="iconify text-3xl text-slate-800 mb-2" data-icon="mdi:package-variant"></span><p class="text-slate-600 text-xs">No orders yet</p></div>';return}var h='';
+    if(!r.length){el.innerHTML='<div class="p-8 text-center text-slate-600 text-xs">No orders yet</div>';return}var h='';
     r.forEach(function(o){var s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}):'',cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—';
     h+='<div class="flex items-center justify-between p-3.5 hover:bg-white/[0.01] transition cursor-pointer" onclick="openOM(\''+o.id+'\')"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-cyan-500/[0.06] flex items-center justify-center"><span class="iconify text-base text-cyan-400/60" data-icon="mdi:package-variant"></span></div><div><p class="text-[12px] font-semibold text-white">'+(o.recipient_name||'')+'</p><p class="text-[10px] text-slate-600">'+(o.city||'')+(dt?' · '+dt:'')+'</p></div></div><div class="text-right"><p class="text-[12px] font-semibold text-white">'+cod+'</p><span class="badge b-'+s+' text-[8px] mt-0.5 inline-block">'+s.toUpperCase()+'</span></div></div>'});
     el.innerHTML=h;
@@ -372,41 +371,36 @@ function renderCharts(){
 function renderReport(){
     var colCod=0,penCod=0,retCod=0,del=0,ret=0,cityMap={};
     orders.forEach(function(o){var c=o.cod_amount?Number(o.cod_amount):0,city=o.city||'Other';if(!cityMap[city])cityMap[city]={total:0,delivered:0,returned:0,cod:0,collected:0};cityMap[city].total++;cityMap[city].cod+=c;if(o.status==='delivered'){del++;colCod+=c;cityMap[city].delivered++;cityMap[city].collected+=c}else if(o.status==='returned'){ret++;retCod+=c;cityMap[city].returned++}else penCod+=c});
-    var rate=orders.length?Math.round((del/orders.length)*100):0;
-    document.getElementById('r-collected').textContent='TZS '+colCod.toLocaleString();document.getElementById('r-pending-cod').textContent='TZS '+penCod.toLocaleString();document.getElementById('r-rate').textContent=rate+'%';document.getElementById('r-lost').textContent='TZS '+retCod.toLocaleString();
-    if(charts.ct)charts.ct.destroy();var cL=Object.keys(cityMap),cD=cL.map(function(c){return cityMap[c].collected}),cols=['rgba(6,182,212,0.6)','rgba(34,197,94,0.6)','rgba(245,158,11,0.6)','rgba(139,92,246,0.6)','rgba(236,72,153,0.6)','rgba(59,130,246,0.6)','rgba(239,68,68,0.6)','rgba(20,184,166,0.6)','rgba(168,85,247,0.6)','rgba(249,115,22,0.6)'];
-    charts.ct=new Chart(document.getElementById('ch-city'),{type:'bar',data:{labels:cL,datasets:[{label:'COD Collected',data:cD,backgroundColor:cL.map(function(_,i){return cols[i%cols.length]}),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:9},maxRotation:45}},y:{grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#374151',font:{size:10},callback:function(v){return'TZS '+(v/1000)+'k'}},beginAtZero:true}}}});
+    document.getElementById('r-collected').textContent='TZS '+colCod.toLocaleString();document.getElementById('r-pending-cod').textContent='TZS '+penCod.toLocaleString();document.getElementById('r-rate').textContent=(orders.length?Math.round((del/orders.length)*100):0)+'%';document.getElementById('r-lost').textContent='TZS '+retCod.toLocaleString();
+    if(charts.ct)charts.ct.destroy();var cL=Object.keys(cityMap),cD=cL.map(function(c){return cityMap[c].collected}),cols=['rgba(6,182,212,0.6)','rgba(34,197,94,0.6)','rgba(245,158,11,0.6)','rgba(139,92,246,0.6)','rgba(236,72,153,0.6)','rgba(59,130,246,0.6)','rgba(239,68,68,0.6)'];
+    charts.ct=new Chart(document.getElementById('ch-city'),{type:'bar',data:{labels:cL,datasets:[{data:cD,backgroundColor:cL.map(function(_,i){return cols[i%cols.length]}),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:9},maxRotation:45}},y:{grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#374151',font:{size:10},callback:function(v){return'TZS '+(v/1000)+'k'}},beginAtZero:true}}}});
     var tb=document.getElementById('r-tbody'),h='';cL.forEach(function(c){var d=cityMap[c],r=d.total?Math.round((d.delivered/d.total)*100):0;h+='<tr class="order-row"><td class="text-white font-medium">'+c+'</td><td class="text-slate-400">'+d.total+'</td><td class="text-emerald-400">'+d.delivered+'</td><td class="text-red-400">'+d.returned+'</td><td class="text-blue-400 font-semibold">'+r+'%</td><td class="text-white font-semibold">TZS '+d.collected.toLocaleString()+'</td></tr>'});tb.innerHTML=h||'<tr><td colspan="6" class="text-center py-8 text-slate-600 text-xs">No data</td></tr>';
 }
 
-function exportReport(){var csv='City,Total,Delivered,Returned,Rate,COD Collected\n',cityMap={};orders.forEach(function(o){var c=o.city||'Other',cod=o.cod_amount?Number(o.cod_amount):0;if(!cityMap[c])cityMap[c]={total:0,delivered:0,returned:0,collected:0};cityMap[c].total++;if(o.status==='delivered'){cityMap[c].delivered++;cityMap[c].collected+=cod}else if(o.status==='returned')cityMap[c].returned++});Object.keys(cityMap).forEach(function(c){var d=cityMap[c],r=d.total?Math.round((d.delivered/d.total)*100):0;csv+=c+','+d.total+','+d.delivered+','+d.returned+','+r+'%,'+d.collected+'\n'});var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chapshop_report.csv';a.click();toast('Report exported!','ok')}
+function exportReport(){var csv='City,Total,Delivered,Returned,Rate,COD\n',cityMap={};orders.forEach(function(o){var c=o.city||'Other',cod=o.cod_amount?Number(o.cod_amount):0;if(!cityMap[c])cityMap[c]={total:0,delivered:0,returned:0,collected:0};cityMap[c].total++;if(o.status==='delivered'){cityMap[c].delivered++;cityMap[c].collected+=cod}else if(o.status==='returned')cityMap[c].returned++});Object.keys(cityMap).forEach(function(c){var d=cityMap[c],r=d.total?Math.round((d.delivered/d.total)*100):0;csv+=c+','+d.total+','+d.delivered+','+d.returned+','+r+'%,'+d.collected+'\n'});var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chapshop_report.csv';a.click();toast('Exported!','ok')}
 
-function generateNotifs(){notifs=[];orders.forEach(function(o){var id=o.id.substring(0,8).toUpperCase(),dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';notifs.push({type:'created',title:'Order Created',msg:'Order '+id+' for '+(o.recipient_name||'')+' has been created.',time:dt,read:false});if(o.status==='picked')notifs.push({type:'picked',title:'Order Picked Up',msg:'Order '+id+' has been picked up.',time:dt,read:false});if(o.status==='delivered')notifs.push({type:'delivered',title:'Order Delivered',msg:'Order '+id+' was delivered.',time:dt,read:false});if(o.status==='returned')notifs.push({type:'returned',title:'Order Returned',msg:'Order '+id+' was returned.',time:dt,read:false})});notifs.sort(function(a,b){return new Date(b.time)-new Date(a.time)});updateNotifUI()}
+function generateNotifs(){notifs=[];orders.forEach(function(o){var id=o.id.substring(0,8).toUpperCase(),dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';notifs.push({type:'created',title:'Order Created',msg:'Order '+id+' for '+(o.recipient_name||''),time:dt,read:false});if(o.status==='picked')notifs.push({type:'picked',title:'Picked Up',msg:'Order '+id+' picked up.',time:dt,read:false});if(o.status==='delivered')notifs.push({type:'delivered',title:'Delivered',msg:'Order '+id+' delivered.',time:dt,read:false});if(o.status==='returned')notifs.push({type:'returned',title:'Returned',msg:'Order '+id+' returned.',time:dt,read:false})});notifs.sort(function(a,b){return new Date(b.time)-new Date(a.time)});updateNotifUI()}
 
 function updateNotifUI(){var unread=notifs.filter(function(n){return!n.read}).length,dot=document.getElementById('notif-dot'),dot2=document.getElementById('notif-dot2'),cnt=document.getElementById('notif-count');if(unread){dot.classList.remove('hidden');dot2.classList.remove('hidden');cnt.textContent=unread;cnt.classList.remove('hidden')}else{dot.classList.add('hidden');dot2.classList.add('hidden');cnt.classList.add('hidden')}renderNotifs()}
 
-function renderNotifs(){var el=document.getElementById('notif-list');if(!notifs.length){el.innerHTML='<div class="p-10 text-center"><span class="iconify text-3xl text-slate-800 mb-2" data-icon="mdi:bell-off-outline"></span><p class="text-slate-600 text-xs">No notifications yet</p></div>';return}var icons={created:'mdi:plus-circle',picked:'mdi:truck-delivery',delivered:'mdi:check-circle',returned:'mdi:arrow-u-left-top'},colors={created:'text-cyan-400',picked:'text-blue-400',delivered:'text-emerald-400',returned:'text-red-400'},h='';notifs.forEach(function(n,i){h+='<div class="notif-item'+(n.read?'':' unread')+'" onclick="readNotif('+i+')"><div class="flex items-start gap-3"><div class="mt-0.5"><span class="iconify text-lg '+colors[n.type]+'" data-icon="'+icons[n.type]+'"></span></div><div class="flex-1 min-w-0"><p class="text-[12px] font-semibold text-white">'+n.title+'</p><p class="text-[11px] text-slate-500 mt-0.5">'+n.msg+'</p><p class="text-[10px] text-slate-700 mt-1">'+n.time+'</p></div>'+(n.read?'':'<span class="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0"></span>')+'</div></div>'});el.innerHTML=h}
+function renderNotifs(){var el=document.getElementById('notif-list');if(!notifs.length){el.innerHTML='<div class="p-10 text-center text-slate-600 text-xs">No notifications</div>';return}var icons={created:'mdi:plus-circle',picked:'mdi:truck-delivery',delivered:'mdi:check-circle',returned:'mdi:arrow-u-left-top'},colors={created:'text-cyan-400',picked:'text-blue-400',delivered:'text-emerald-400',returned:'text-red-400'},h='';notifs.forEach(function(n,i){h+='<div class="notif-item'+(n.read?'':' unread')+'" onclick="readNotif('+i+')"><div class="flex items-start gap-3"><span class="iconify text-lg '+colors[n.type]+'" data-icon="'+icons[n.type]+'"></span><div class="flex-1"><p class="text-[12px] font-semibold text-white">'+n.title+'</p><p class="text-[11px] text-slate-500">'+n.msg+'</p><p class="text-[10px] text-slate-700 mt-1">'+n.time+'</p></div>'+(n.read?'':'<span class="w-2 h-2 bg-cyan-400 rounded-full mt-2"></span>')+'</div></div>'});el.innerHTML=h}
 
 function readNotif(i){notifs[i].read=true;updateNotifUI()}
-function markAllRead(){notifs.forEach(function(n){n.read=true});updateNotifUI();toast('All marked as read','ok')}
+function markAllRead(){notifs.forEach(function(n){n.read=true});updateNotifUI();toast('All read','ok')}
 
 function renderFAQ(){var el=document.getElementById('faq-list'),h='';faqs.forEach(function(f,i){h+='<div class="faq-item"><div class="faq-q" onclick="toggleFAQ('+i+')"><span class="flex-1 text-[13px] font-semibold text-white">'+f.q+'</span><span class="iconify faq-icon text-slate-500" data-icon="mdi:chevron-down" id="faq-i'+i+'"></span></div><div class="faq-a text-[12px] text-slate-400 leading-relaxed" id="faq-a'+i+'">'+f.a+'</div></div>'});el.innerHTML=h}
-function toggleFAQ(i){var a=document.getElementById('faq-a'+i),ic=document.getElementById('faq-i'+i);a.classList.toggle('open');ic.classList.toggle('rotated')}
+function toggleFAQ(i){document.getElementById('faq-a'+i).classList.toggle('open');document.getElementById('faq-i'+i).classList.toggle('rotated')}
 
-function openOM(id){var o=orders.find(function(x){return x.id===id});if(!o)return;var s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'',cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—',h='<div class="space-y-4">';
-h+='<div class="flex items-center justify-between"><span class="text-[10px] text-slate-600 uppercase font-bold">Order ID</span><span class="font-mono text-cyan-400 text-[12px] font-bold cursor-pointer" onclick="copyT(\''+o.id.substring(0,8).toUpperCase()+'\')">'+o.id.substring(0,8).toUpperCase()+' <span class="iconify text-[10px] text-slate-500" data-icon="mdi:content-copy"></span></span></div>';
-h+='<div class="flex items-center justify-between"><span class="text-[10px] text-slate-600 uppercase font-bold">Status</span><span class="badge b-'+s+'">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span></div>';
-h+='<hr class="border-white/[0.04]"><div class="grid grid-cols-2 gap-3">';
-h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Recipient</p><p class="text-[12px] text-white font-medium">'+(o.recipient_name||'')+'</p></div>';
-h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Phone</p><p class="text-[12px] text-white">'+(o.recipient_phone||'')+'</p></div>';
+function openOM(id){var o=orders.find(function(x){return x.id===id});if(!o)return;var s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'',cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—',h='<div class="space-y-3">';
+h+='<div class="flex justify-between"><span class="text-[10px] text-slate-600 uppercase font-bold">ID</span><span class="font-mono text-cyan-400 text-[12px] font-bold cursor-pointer" onclick="copyT(\''+o.id.substring(0,8).toUpperCase()+'\')">'+o.id.substring(0,8).toUpperCase()+' <span class="iconify text-[10px] text-slate-500" data-icon="mdi:content-copy"></span></span></div>';
+h+='<div class="flex justify-between"><span class="text-[10px] text-slate-600 uppercase font-bold">Status</span><span class="badge b-'+s+'">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span></div><hr class="border-white/[0.04]"><div class="grid grid-cols-2 gap-3">';
+h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Name</p><p class="text-[12px] text-white">'+(o.recipient_name||'')+'</p></div><div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Phone</p><p class="text-[12px] text-white">'+(o.recipient_phone||'')+'</p></div>';
 h+='<div class="col-span-2"><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Address</p><p class="text-[12px] text-slate-400">'+(o.address||'')+'</p></div>';
-h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">City</p><p class="text-[12px] text-white">'+(o.city||'')+'</p></div>';
-h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">COD</p><p class="text-[12px] text-white font-bold">'+cod+'</p></div>';
-h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Type</p><p class="text-[12px] text-white">'+(o.delivery_type||'standard').charAt(0).toUpperCase()+(o.delivery_type||'standard').slice(1)+'</p></div>';
-h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Created</p><p class="text-[12px] text-slate-500">'+dt+'</p></div></div>';
-if(o.description)h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Description</p><p class="text-[12px] text-slate-400">'+o.description+'</p></div>';
-if(o.notes)h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Notes</p><p class="text-[12px] text-slate-400">'+o.notes+'</p></div>';
-h+='<hr class="border-white/[0.04]"><div class="flex gap-2"><button onclick="closeOM();openSM(\''+o.id+'\',\''+s+'\')" class="btn-s flex-1 justify-center text-[11px]"><span class="iconify" data-icon="mdi:swap-horizontal"></span>Status</button><button onclick="delOrder(\''+o.id+'\')" class="btn-d flex-1 justify-center text-[11px]"><span class="iconify" data-icon="mdi:delete-outline"></span>Delete</button></div></div>';
+h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">City</p><p class="text-[12px] text-white">'+(o.city||'')+'</p></div><div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">COD</p><p class="text-[12px] text-white font-bold">'+cod+'</p></div>';
+h+='<div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Type</p><p class="text-[12px] text-white">'+(o.delivery_type||'standard')+'</p></div><div><p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Date</p><p class="text-[12px] text-slate-500">'+dt+'</p></div></div>';
+if(o.description)h+='<p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Description</p><p class="text-[12px] text-slate-400">'+o.description+'</p>';
+if(o.notes)h+='<p class="text-[10px] text-slate-600 uppercase font-bold mb-0.5">Notes</p><p class="text-[12px] text-slate-400">'+o.notes+'</p>';
+h+='<hr class="border-white/[0.04]"><div class="flex gap-2"><button onclick="closeOM();openSM(\''+o.id+'\',\''+s+'\')" class="btn-s flex-1 justify-center text-[11px]">Change Status</button><button onclick="delOrder(\''+o.id+'\')" class="btn-d flex-1 justify-center text-[11px]">Delete</button></div></div>';
 document.getElementById('o-modal-body').innerHTML=h;document.getElementById('o-modal').classList.add('show')}
 function closeOM(){document.getElementById('o-modal').classList.remove('show')}
 
@@ -414,16 +408,16 @@ function openSM(id,cur){var sts=['pending','picked','delivered','returned'],cols
 function closeSM(){document.getElementById('s-modal').classList.remove('show')}
 
 async function chgStatus(id,status){try{var{error}=await sb.from('orders').update({status:status,updated_at:new Date().toISOString()}).eq('id',id);if(error)throw error;closeSM();closeOM();toast('Status → '+status,'ok');await loadOrders();generateNotifs()}catch(e){toast(e.message,'err')}}
-async function delOrder(id){if(!confirm('Delete this order?'))return;try{var{error}=await sb.from('orders').delete().eq('id',id);if(error)throw error;closeOM();toast('Order deleted','ok');await loadOrders();generateNotifs()}catch(e){toast('Error','err')}}
+async function delOrder(id){if(!confirm('Delete this order?'))return;try{var{error}=await sb.from('orders').delete().eq('id',id);if(error)throw error;closeOM();toast('Deleted','ok');await loadOrders();generateNotifs()}catch(e){toast('Error','err')}}
 function copyT(t){navigator.clipboard.writeText(t).then(function(){toast('Copied!','inf')})}
 
 document.getElementById('co-form').addEventListener('submit',async function(e){e.preventDefault();var btn=document.getElementById('co-btn');btn.innerHTML='<div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full anim-spin"></div> Creating...';btn.disabled=true;try{var d={merchant_id:cu.id,recipient_name:document.getElementById('f-name').value.trim(),recipient_phone:document.getElementById('f-phone').value.trim(),address:document.getElementById('f-addr').value.trim(),city:document.getElementById('f-city').value,cod_amount:document.getElementById('f-cod').value?parseInt(document.getElementById('f-cod').value):0,description:document.getElementById('f-desc').value.trim(),delivery_type:document.getElementById('f-type').value,notes:document.getElementById('f-notes').value.trim(),status:'pending'};var{error}=await sb.from('orders').insert(d);if(error)throw error;document.getElementById('co-form').reset();toast('Order created!','ok');setTimeout(function(){switchPage('orders')},700)}catch(e){toast(e.message,'err')}finally{btn.innerHTML='<span class="iconify text-base" data-icon="mdi:check-circle-outline"></span>Submit Order';btn.disabled=false}});
 
-document.getElementById('p-form').addEventListener('submit',async function(e){e.preventDefault();var btn=this.querySelector('button[type="submit"]'),orig=btn.innerHTML;btn.innerHTML='<div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full anim-spin"></div> Saving...';btn.disabled=true;try{var u={business:document.getElementById('pf-biz').value.trim(),phone:document.getElementById('pf-phone').value.trim(),city:document.getElementById('pf-city').value.trim(),platforms:document.getElementById('pf-plat').value.trim(),updated_at:new Date().toISOString()};var{error}=await sb.from('merchants').update(u).eq('user_id',cu.id);if(error)throw error;mp=Object.assign({},mp,u);renderProfile();toast('Profile saved!','ok')}catch(e){toast('Error','err')}finally{btn.innerHTML=orig;btn.disabled=false}});
+document.getElementById('p-form').addEventListener('submit',async function(e){e.preventDefault();var btn=this.querySelector('button[type="submit"]'),orig=btn.innerHTML;btn.innerHTML='<div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full anim-spin"></div> Saving...';btn.disabled=true;try{var u={business:document.getElementById('pf-biz').value.trim(),phone:document.getElementById('pf-phone').value.trim(),city:document.getElementById('pf-city').value.trim(),platforms:document.getElementById('pf-plat').value.trim(),updated_at:new Date().toISOString()};var{error}=await sb.from('merchants').update(u).eq('user_id',cu.id);if(error)throw error;mp=Object.assign({},mp,u);renderProfile();toast('Saved!','ok')}catch(e){toast('Error','err')}finally{btn.innerHTML=orig;btn.disabled=false}});
 
 document.getElementById('logout-btn').addEventListener('click',async function(){this.innerHTML='<div class="w-3 h-3 border-2 border-red-400/30 border-t-red-400 rounded-full anim-spin"></div>';this.disabled=true;try{await sb.auth.signOut()}catch(e){}setTimeout(function(){location.href='merchants.html'},500)});
 document.getElementById('del-acc-btn').addEventListener('click',function(){document.getElementById('d-modal').classList.add('show')});
-document.getElementById('del-confirm').addEventListener('click',async function(){var btn=this;btn.textContent='Deleting...';btn.disabled=true;try{await sb.from('merchants').delete().eq('user_id',cu.id);await sb.auth.signOut();toast('Deleted.','ok');setTimeout(function(){location.href='merchants.html'},800)}catch(e){toast('Error','err');btn.textContent='Delete Forever';btn.disabled=false}});
+document.getElementById('del-confirm').addEventListener('click',async function(){var btn=this;btn.textContent='Deleting...';btn.disabled=true;try{await sb.from('merchants').delete().eq('user_id',cu.id);await sb.auth.signOut();toast('Deleted','ok');setTimeout(function(){location.href='merchants.html'},800)}catch(e){toast('Error','err');btn.textContent='Delete';btn.disabled=false}});
 
 document.querySelectorAll('.filter-btn').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.filter-btn').forEach(function(x){x.classList.remove('active')});this.classList.add('active');curFilter=this.dataset.f;renderOTable()})});
 document.getElementById('o-search').addEventListener('input',renderOTable);
@@ -436,10 +430,7 @@ document.getElementById('mob-btn').addEventListener('click',function(){document.
 document.getElementById('sb-back').addEventListener('click',closeSB);
 document.querySelectorAll('.modal-o').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('show')})});
 
-function showApp(){var l=document.getElementById('loader');l.style.opacity='0';l.style.transition='opacity .4s';setTimeout(function(){l.style.display='none';document.getElementById('app').classList.remove('hidden')},400)}
 function toast(msg,type){type=type||'ok';var ic={ok:'mdi:check-circle',err:'mdi:alert-circle',inf:'mdi:information'};var t=document.createElement('div');t.className='toast toast-'+type;t.innerHTML='<span class="iconify text-base" data-icon="'+ic[type]+'"></span><span>'+msg+'</span>';document.getElementById('toasts').appendChild(t);setTimeout(function(){t.classList.add('show')},10);setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},350)},3000)}
-
-init();
 </script>
 </body>
 </html>
