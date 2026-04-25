@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courier & Delivery — ChapShop Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        *{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+        .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .glow-line{background:linear-gradient(to right,transparent,#164e63,transparent);height:1px}
+        .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .whatsapp-float{position:fixed;bottom:24px;right:24px;z-index:50;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:transform .3s}
+        .whatsapp-float:hover{transform:scale(1.1)}
+        .feature-card:hover{border-color:rgba(6,182,212,0.3);background:rgba(6,182,212,0.04)}
+    </style>
+</head>
+<body class="bg-[#020617] text-white">
+    <a href="https://wa.me/255769799110" target="_blank" class="whatsapp-float"><span class="iconify text-white text-3xl" data-icon="mdi:whatsapp"></span></a>
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2.5"><div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div><div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div></a>
+            <div class="hidden md:flex items-center gap-6"><a href="index.html" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a><a href="index.html#services" class="text-sm text-white">Services</a><a href="faq.html" class="text-sm text-slate-400 hover:text-white transition-colors">FAQ</a><a href="index.html#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a></div>
+            <a href="merchants.html" class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors flex items-center gap-2"><span class="iconify text-base" data-icon="mdi:storefront"></span> Join as Merchant</a>
+        </div>
+    </nav>
+
+    <section class="relative pt-32 pb-20 overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-cyan-500/8 rounded-full blur-3xl"></div>
+        <div class="relative max-w-5xl mx-auto px-6 text-center">
+            <div class="w-20 h-20 bg-cyan-500/10 border border-cyan-500/20 rounded-3xl flex items-center justify-center mx-auto mb-8"><span class="iconify text-cyan-400 text-4xl" data-icon="mdi:truck-delivery"></span></div>
+            <h1 class="text-4xl md:text-6xl font-medium tracking-tight gradient-text mb-6">Courier & Delivery</h1>
+            <p class="text-lg md:text-xl text-slate-400 font-light max-w-2xl mx-auto mb-8 leading-relaxed">Same-day delivery in major cities, next-day across all 31 regions. Our network of 500+ riders ensures fast and reliable parcel delivery nationwide.</p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="merchants.html" class="bg-cyan-500 text-white font-medium text-sm px-8 py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 shadow-lg shadow-cyan-500/20"><span class="iconify text-lg" data-icon="mdi:rocket-launch"></span> Start Shipping</a>
+                <a href="https://wa.me/255769799110" target="_blank" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-8 py-3.5 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:whatsapp"></span> Chat With Us</a>
+            </div>
+        </div>
+    </section>
+    <div class="max-w-7xl mx-auto px-6"><div class="glow-line"></div></div>
+
+    <!-- Delivery Zones -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-medium tracking-tight gradient-text mb-4">Delivery Zones & Speed</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-green-400 text-xl" data-icon="mdi:flash"></span></div>
+                        <h3 class="text-lg font-medium text-white">Same-Day</h3>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-4">Order before 12 PM, delivered same day.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Dar es Salaam</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Mwanza</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Arusha</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Dodoma</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Mbeya</span></div>
+                    </div>
+                </div>
+                <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-yellow-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-yellow-400 text-xl" data-icon="mdi:clock-fast"></span></div>
+                        <h3 class="text-lg font-medium text-white">Next-Day (1-2 Days)</h3>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-4">Delivered within 1-2 business days.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Morogoro</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Tanga</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Iringa</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Kagera</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Lindi + 10 more</span></div>
+                    </div>
+                </div>
+                <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-blue-500/15 rounded-lg flex items-center justify-center"><span class="iconify text-blue-400 text-xl" data-icon="mdi:map-marker-distance"></span></div>
+                        <h3 class="text-lg font-medium text-white">Remote (2-5 Days)</h3>
+                    </div>
+                    <p class="text-sm text-slate-400 mb-4">Delivered within 2-5 business days.</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Kigoma</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Rukwa</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Katavi</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Simiyu</span></div>
+                        <div class="flex items-center gap-2"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check-circle"></span><span class="text-sm text-slate-300">Geita + 6 more</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="py-20 bg-[#0f172a]/50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12"><h2 class="text-3xl font-medium tracking-tight gradient-text mb-4">Delivery Features</h2></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all"><div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:map-marker-path"></span></div><h3 class="text-base font-medium text-white mb-2">Live GPS Tracking</h3><p class="text-sm text-slate-400">Track your rider on a live map. Know exactly where your parcel is at any moment.</p></div>
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all"><div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:message-text"></span></div><h3 class="text-base font-medium text-white mb-2">SMS Notifications</h3><p class="text-sm text-slate-400">Automatic SMS to sender and receiver at every milestone — picked up, out for delivery, delivered.</p></div>
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all"><div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:camera"></span></div><h3 class="text-base font-medium text-white mb-2">Proof of Delivery</h3><p class="text-sm text-slate-400">Photo of parcel at doorstep + receiver signature. Digital POD available in dashboard.</p></div>
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all"><div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:package-variant"></span></div><h3 class="text-base font-medium text-white mb-2">Any Size Parcel</h3><p class="text-sm text-slate-400">From small envelopes to large boxes up to 50kg. We handle all sizes.</p></div>
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all"><div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:calendar-clock"></span></div><h3 class="text-base font-medium text-white mb-2">Scheduled Delivery</h3><p class="text-sm text-slate-400">Choose a specific date and time window for delivery. Perfect for B2B shipments.</p></div>
+                <div class="feature-card bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 transition-all"><div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/20 rounded-xl flex items-center justify-center mb-4"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:api"></span></div><h3 class="text-base font-medium text-white mb-2">API Integration</h3><p class="text-sm text-slate-400">Create shipments automatically from your Shopify, WooCommerce, or custom store via REST API.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section class="py-20">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-12"><h2 class="text-3xl font-medium tracking-tight gradient-text mb-4">Delivery Rates</h2></div>
+            <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                <table class="w-full"><thead><tr class="border-b border-white/[0.08]"><th class="text-left px-6 py-4 text-sm font-medium text-slate-300">Weight</th><th class="text-left px-6 py-4 text-sm font-medium text-slate-300">Dar (Same Day)</th><th class="text-left px-6 py-4 text-sm font-medium text-slate-300">Major Cities</th><th class="text-left px-6 py-4 text-sm font-medium text-slate-300">Regional</th></tr></thead>
+                <tbody>
+                    <tr class="border-b border-white/[0.05]"><td class="px-6 py-4 text-sm text-white">0 - 1 kg</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 3,000</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 5,000</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 8,000</td></tr>
+                    <tr class="border-b border-white/[0.05]"><td class="px-6 py-4 text-sm text-white">1 - 5 kg</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 5,000</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 8,000</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 12,000</td></tr>
+                    <tr class="border-b border-white/[0.05]"><td class="px-6 py-4 text-sm text-white">5 - 10 kg</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 8,000</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 12,000</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 18,000</td></tr>
+                    <tr><td class="px-6 py-4 text-sm text-white">10 - 50 kg</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 15,000</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 20,000</td><td class="px-6 py-4 text-sm text-cyan-400">TZS 30,000</td></tr>
+                </tbody></table>
+            </div>
+            <p class="text-xs text-slate-500 text-center mt-4">* Rates are per parcel. Volume discounts available for 100+ parcels/month.</p>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="py-20 bg-[#0f172a]/50 relative overflow-hidden">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-3xl"></div>
+        <div class="relative max-w-3xl mx-auto px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-medium tracking-tight gradient-text mb-6">Start Shipping Today</h2>
+            <p class="text-lg text-slate-400 font-light mb-8">Create your first shipment in under 2 minutes.</p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="merchants.html" class="bg-cyan-500 text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2 shadow-lg shadow-cyan-500/20"><span class="iconify text-lg" data-icon="mdi:storefront"></span> Sign Up Free</a>
+                <a href="tel:0769799110" class="bg-white/[0.05] border border-white/[0.1] text-white font-medium text-sm px-8 py-4 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:phone"></span> Call 0769 799 110</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Other Services -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-2xl font-medium tracking-tight gradient-text mb-8 text-center">Other Services</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="service-cod.html" class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 text-center hover:border-cyan-500/30 transition-all"><span class="iconify text-cyan-400 text-2xl mb-2" data-icon="mdi:cash-multiple"></span><div class="text-sm font-medium text-white">Cash On Delivery</div></a>
+                <a href="service-warehouse.html" class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 text-center hover:border-cyan-500/30 transition-all"><span class="iconify text-cyan-400 text-2xl mb-2" data-icon="mdi:warehouse"></span><div class="text-sm font-medium text-white">Warehouse</div></a>
+                <a href="service-callcenter.html" class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 text-center hover:border-cyan-500/30 transition-all"><span class="iconify text-cyan-400 text-2xl mb-2" data-icon="mdi:headset"></span><div class="text-sm font-medium text-white">Call Center</div></a>
+                <a href="service-fulfillment.html" class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 text-center hover:border-cyan-500/30 transition-all"><span class="iconify text-cyan-400 text-2xl mb-2" data-icon="mdi:package-variant-closed-check"></span><div class="text-sm font-medium text-white">Fulfillment</div></a>
+                <a href="service-medical.html" class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 text-center hover:border-cyan-500/30 transition-all"><span class="iconify text-cyan-400 text-2xl mb-2" data-icon="mdi:medical-bag"></span><div class="text-sm font-medium text-white">Medical Courier</div></a>
+                <a href="service-reverse.html" class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 text-center hover:border-cyan-500/30 transition-all"><span class="iconify text-cyan-400 text-2xl mb-2" data-icon="mdi:swap-horizontal"></span><div class="text-sm font-medium text-white">Reverse Logistics</div></a>
+                <a href="service-3pl.html" class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 text-center hover:border-cyan-500/30 transition-all col-span-2 md:col-span-1"><span class="iconify text-cyan-400 text-2xl mb-2" data-icon="mdi:box-cutter"></span><div class="text-sm font-medium text-white">3PL Services</div></a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/[0.05] py-8"><div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4"><a href="index.html" class="flex items-center gap-2"><div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-sm" data-icon="mdi:truck-fast"></span></div><span class="font-semibold text-white text-sm">ChapShop<span class="text-cyan-400 ml-0.5">Delivery</span></span></a><p class="text-xs text-slate-500">© 2025 ChapShop Delivery. All rights reserved.</p><div class="flex items-center gap-4"><a href="tel:0769799110" class="text-xs text-slate-400 hover:text-cyan-400 transition-colors">0769 799 110</a></div></div></footer>
+</body>
+</html>

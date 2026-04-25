@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ — ChapShop Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        *{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+        .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .glow-line{background:linear-gradient(to right,transparent,#164e63,transparent);height:1px}
+        .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .whatsapp-float{position:fixed;bottom:24px;right:24px;z-index:50;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:transform .3s}
+        .whatsapp-float:hover{transform:scale(1.1)}
+        .faq-item{border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;transition:all .3s ease}
+        .faq-item:hover{border-color:rgba(6,182,212,0.2)}
+        .faq-item.active{border-color:rgba(6,182,212,0.3);background:rgba(6,182,212,0.04)}
+        .faq-question{cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:20px 24px;gap:16px;user-select:none;transition:background .2s}
+        .faq-question:hover{background:rgba(255,255,255,0.02)}
+        .faq-answer{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(0.16,1,0.3,1),padding .3s}
+        .faq-answer.open{max-height:500px}
+        .faq-chevron{transition:transform .3s ease;flex-shrink:0}
+        .faq-item.active .faq-chevron{transform:rotate(180deg)}
+        .cat-btn{transition:all .2s ease}
+        .cat-btn.active{background:rgba(6,182,212,0.15);border-color:rgba(6,182,212,0.3);color:#06b6d4}
+        .cat-btn:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.15)}
+        .search-input:focus{border-color:rgba(6,182,212,0.5);box-shadow:0 0 0 3px rgba(6,182,212,0.1)}
+    </style>
+</head>
+<body class="bg-[#020617] text-white">
+
+    <a href="https://wa.me/255769799110" target="_blank" class="whatsapp-float"><span class="iconify text-white text-3xl" data-icon="mdi:whatsapp"></span></a>
+
+    <!-- Nav -->
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
+                <div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div>
+            </a>
+            <div class="hidden md:flex items-center gap-6">
+                <a href="index.html" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a>
+                <a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Services</a>
+                <a href="faq.html" class="text-sm text-white">FAQ</a>
+                <a href="about.html" class="text-sm text-slate-400 hover:text-white transition-colors">About Us</a>
+                <a href="index.html#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
+            </div>
+            <a href="merchants.html" class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors flex items-center gap-2">
+                <span class="iconify text-base" data-icon="mdi:storefront"></span> Join as Merchant
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="relative pt-32 pb-16 overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-cyan-500/8 rounded-full blur-3xl"></div>
+        <div class="relative max-w-4xl mx-auto px-6 text-center">
+            <div class="w-20 h-20 bg-cyan-500/10 border border-cyan-500/20 rounded-3xl flex items-center justify-center mx-auto mb-8">
+                <span class="iconify text-cyan-400 text-4xl" data-icon="mdi:frequently-asked-questions"></span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-medium tracking-tight gradient-text mb-6">Frequently Asked Questions</h1>
+            <p class="text-lg text-slate-400 font-light max-w-2xl mx-auto mb-8">Find answers to common questions about our delivery, COD, warehousing, and merchant services.</p>
+
+            <!-- Search -->
+            <div class="max-w-xl mx-auto relative">
+                <span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-lg" data-icon="mdi:magnify"></span>
+                <input id="faq-search" type="text" placeholder="Search questions..." class="search-input w-full bg-white/[0.05] border border-white/[0.1] rounded-xl pl-12 pr-6 py-4 text-sm text-white placeholder:text-slate-500 focus:outline-none transition-all">
+            </div>
+        </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-6"><div class="glow-line"></div></div>
+
+    <!-- Category Filter -->
+    <section class="py-8">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="flex flex-wrap items-center justify-center gap-3" id="cat-filters">
+                <button class="cat-btn active text-sm px-4 py-2 rounded-lg border border-white/[0.1] bg-transparent text-slate-300 cursor-pointer" data-cat="all">All Questions</button>
+                <button class="cat-btn text-sm px-4 py-2 rounded-lg border border-white/[0.1] bg-transparent text-slate-300 cursor-pointer" data-cat="getting-started">Getting Started</button>
+                <button class="cat-btn text-sm px-4 py-2 rounded-lg border border-white/[0.1] bg-transparent text-slate-300 cursor-pointer" data-cat="cod">COD & Payments</button>
+                <button class="cat-btn text-sm px-4 py-2 rounded-lg border border-white/[0.1] bg-transparent text-slate-300 cursor-pointer" data-cat="delivery">Delivery</button>
+                <button class="cat-btn text-sm px-4 py-2 rounded-lg border border-white/[0.1] bg-transparent text-slate-300 cursor-pointer" data-cat="pricing">Pricing</button>
+                <button class="cat-btn text-sm px-4 py-2 rounded-lg border border-white/[0.1] bg-transparent text-slate-300 cursor-pointer" data-cat="warehouse">Warehouse & 3PL</button>
+                <button class="cat-btn text-sm px-4 py-2 rounded-lg border border-white/[0.1] bg-transparent text-slate-300 cursor-pointer" data-cat="technical">Technical</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Items -->
+    <section class="py-8 pb-20">
+        <div class="max-w-4xl mx-auto px-6">
+            <div id="faq-list" class="space-y-4">
+
+                <!-- GETTING STARTED -->
+                <div class="faq-item" data-cat="getting-started">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:account-plus"></span></div>
+                            <span class="text-sm font-medium text-white">How do I join as a merchant?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Click "Join as Merchant" on our website, fill in your business details (name, business type, email, phone, city), create a password, and you're in. The whole process takes under 2 minutes. Once registered, you can immediately start creating orders from your dashboard.</p>
+                            <a href="merchants.html" class="inline-flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 mt-3 transition-colors">Sign up now <span class="iconify" data-icon="mdi:arrow-right"></span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="getting-started">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:file-document-check"></span></div>
+                            <span class="text-sm font-medium text-white">What documents do I need to register?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">You only need your business name, email, phone number, and city to register. For full account activation and COD remittance, you'll also need:</p>
+                            <ul class="mt-3 space-y-2">
+                                <li class="flex items-start gap-2 text-sm text-slate-400"><span class="iconify text-cyan-400 text-sm mt-0.5" data-icon="mdi:check-circle"></span>Business license or registration certificate (NIDA/BRELA)</li>
+                                <li class="flex items-start gap-2 text-sm text-slate-400"><span class="iconify text-cyan-400 text-sm mt-0.5" data-icon="mdi:check-circle"></span>TIN number (for invoice purposes)</li>
+                                <li class="flex items-start gap-2 text-sm text-slate-400"><span class="iconify text-cyan-400 text-sm mt-0.5" data-icon="mdi:check-circle"></span>Bank account or M-Pesa details for COD remittance</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="getting-started">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:clock-fast"></span></div>
+                            <span class="text-sm font-medium text-white">How long does onboarding take?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Basic onboarding is instant — you can start creating orders right after registration. Full verification (for COD remittance) takes 1-2 business days after you submit your documents. For 3PL/warehouse clients, full onboarding takes about 1 week including integration setup.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COD & PAYMENTS -->
+                <div class="faq-item" data-cat="cod">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-green-400 text-sm" data-icon="mdi:cash-multiple"></span></div>
+                            <span class="text-sm font-medium text-white">How does Cash On Delivery work?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">When your customer places a COD order, we confirm it via call center, then our rider delivers the parcel and collects the exact cash amount from the customer. The rider photographs the cash as proof, and we remit the amount to your M-Pesa or bank account within 24 hours. You can track every step in your dashboard.</p>
+                            <a href="service-cod.html" target="_blank" class="inline-flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 mt-3 transition-colors">Learn more about COD <span class="iconify" data-icon="mdi:arrow-right"></span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="cod">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-green-400 text-sm" data-icon="mdi:bank-transfer"></span></div>
+                            <span class="text-sm font-medium text-white">How fast do I get my COD money?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">COD amounts are remitted within <strong class="text-white">24 hours</strong> for Dar es Salaam and major cities, <strong class="text-white">48 hours</strong> for regional towns, and <strong class="text-white">72 hours</strong> for remote areas. Remittance is sent directly to your M-Pesa or bank account. You'll receive an SMS and email notification when payment is sent.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="cod">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-green-400 text-sm" data-icon="mdi:alert-circle"></span></div>
+                            <span class="text-sm font-medium text-white">What if a customer refuses to pay on delivery?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">If a customer refuses, our rider marks it as "RTO" (Return to Origin) and the parcel is shipped back to your warehouse or our hub. We provide daily RTO reports so you can identify patterns. Our call center confirmation calls reduce RTO rates by up to 40% by verifying customer intent before dispatch.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="cod">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-green-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-green-400 text-sm" data-icon="mdi:percent"></span></div>
+                            <span class="text-sm font-medium text-white">What is the COD fee?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">COD fees depend on the delivery zone:</p>
+                            <div class="mt-3 space-y-2">
+                                <div class="flex justify-between text-sm"><span class="text-slate-300">Dar es Salaam</span><span class="text-cyan-400 font-medium">1.5% of COD value</span></div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-300">Major Cities</span><span class="text-cyan-400 font-medium">2% of COD value</span></div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-300">Regional Towns</span><span class="text-cyan-400 font-medium">2.5% of COD value</span></div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-300">Remote Areas</span><span class="text-cyan-400 font-medium">3% of COD value</span></div>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-3">Minimum TZS 500. Negotiable for high-volume merchants (100+ parcels/month).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DELIVERY -->
+                <div class="faq-item" data-cat="delivery">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-blue-400 text-sm" data-icon="mdi:truck-delivery"></span></div>
+                            <span class="text-sm font-medium text-white">Which areas do you deliver to?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">We deliver to all <strong class="text-white">31 regions of Tanzania</strong>, covering 150+ delivery routes. Same-day delivery in Dar es Salaam, Mwanza, Arusha, Dodoma, and Mbeya. Next-day delivery to most regional towns. 2-5 day delivery to remote areas like Kigoma, Rukwa, and Katavi.</p>
+                            <a href="index.html#coverage" class="inline-flex items-center gap-1.5 text-sm text-cyan-400 hover:text-cyan-300 mt-3 transition-colors">See coverage map <span class="iconify" data-icon="mdi:arrow-right"></span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="delivery">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-blue-400 text-sm" data-icon="mdi:clock-outline"></span></div>
+                            <span class="text-sm font-medium text-white">What are the delivery timeframes?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3"><div class="w-2 h-2 rounded-full bg-green-400 mt-1.5 flex-shrink-0"></div><div><p class="text-sm text-white font-medium">Same-Day</p><p class="text-xs text-slate-500">Order before 12 PM → delivered same evening (major cities only)</p></div></div>
+                                <div class="flex items-start gap-3"><div class="w-2 h-2 rounded-full bg-yellow-400 mt-1.5 flex-shrink-0"></div><div><p class="text-sm text-white font-medium">Next-Day</p><p class="text-xs text-slate-500">1-2 business days for regional towns</p></div></div>
+                                <div class="flex items-start gap-3"><div class="w-2 h-2 rounded-full bg-blue-400 mt-1.5 flex-shrink-0"></div><div><p class="text-sm text-white font-medium">Standard</p><p class="text-xs text-slate-500">2-5 business days for remote areas</p></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="delivery">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-blue-400 text-sm" data-icon="mdi:package-variant"></span></div>
+                            <span class="text-sm font-medium text-white">What is the maximum parcel weight?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Standard delivery supports up to <strong class="text-white">50 kg per parcel</strong>. For heavier items (up to 200 kg), we offer special freight delivery with custom pricing. Maximum dimensions are 100cm x 60cm x 60cm for standard parcels. Contact us for oversized items.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="delivery">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-blue-400 text-sm" data-icon="mdi:map-marker-path"></span></div>
+                            <span class="text-sm font-medium text-white">Can I track my parcels?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Yes! Every parcel has real-time GPS tracking. You can see your rider's live location on a map in your dashboard. Your customers also receive SMS updates at every milestone: order confirmed, picked up, out for delivery, and delivered. Photo proof of delivery is available for every parcel.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRICING -->
+                <div class="faq-item" data-cat="pricing">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:tag"></span></div>
+                            <span class="text-sm font-medium text-white">Is there a monthly subscription fee?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed"><strong class="text-white">No monthly subscription fee.</strong> You only pay per parcel delivered and COD fees. There are no hidden charges, no setup fees, and no minimum volume requirements. You only pay for what you use. Volume discounts are available automatically for 100+ parcels/month.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="pricing">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:cash-off"></span></div>
+                            <span class="text-sm font-medium text-white">Do you offer volume discounts?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Yes! Discounts are automatic based on monthly volume:</p>
+                            <div class="mt-3 space-y-2">
+                                <div class="flex justify-between text-sm"><span class="text-slate-300">100-500 parcels/month</span><span class="text-cyan-400 font-medium">5% off</span></div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-300">500-1000 parcels/month</span><span class="text-cyan-400 font-medium">10% off</span></div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-300">1000-5000 parcels/month</span><span class="text-cyan-400 font-medium">15% off</span></div>
+                                <div class="flex justify-between text-sm"><span class="text-slate-300">5000+ parcels/month</span><span class="text-cyan-400 font-medium">Custom pricing</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="pricing">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-yellow-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-yellow-400 text-sm" data-icon="mdi:receipt-text"></span></div>
+                            <span class="text-sm font-medium text-white">How do I pay for delivery charges?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Delivery charges are deducted from your COD remittance. For example, if COD value is TZS 50,000 and delivery charge is TZS 5,000, you receive TZS 45,000. For non-COD parcels, you can pay via M-Pesa, bank transfer, or top up your ChapShop wallet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WAREHOUSE & 3PL -->
+                <div class="faq-item" data-cat="warehouse">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-purple-400 text-sm" data-icon="mdi:warehouse"></span></div>
+                            <span class="text-sm font-medium text-white">Can I store my products in your warehouse?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Yes! We offer warehouse space starting from 10 sqm to 1000+ sqm in Dar es Salaam. Features include 24/7 CCTV, inventory management, pick & pack services, and climate-controlled zones. You only pay for the space you use. <a href="service-warehouse.html" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-colors">Learn more about warehousing →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="warehouse">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-purple-400 text-sm" data-icon="mdi:box-cutter"></span></div>
+                            <span class="text-sm font-medium text-white">What is 3PL and do I need it?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">3PL (Third-Party Logistics) means we handle your ENTIRE logistics operation: warehousing, order fulfillment, delivery, COD collection, call center, and returns. You need 3PL if you're processing 500+ orders/month and want to focus on marketing instead of logistics. It typically reduces logistics costs by 40%. <a href="service-3pl.html" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-colors">Learn about 3PL →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="warehouse">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-purple-400 text-sm" data-icon="mdi:swap-horizontal"></span></div>
+                            <span class="text-sm font-medium text-white">Do you handle product returns?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Yes, through our Reverse Logistics service. We pick up returned items from the customer's door, inspect them at our hub, and either restock them at your warehouse or dispose of them based on your predefined rules. We can also trigger automatic refunds after inspection. <a href="service-reverse.html" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-colors">Learn about returns →</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TECHNICAL -->
+                <div class="faq-item" data-cat="technical">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-orange-400 text-sm" data-icon="mdi:api"></span></div>
+                            <span class="text-sm font-medium text-white">Do you have an API for integration?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Yes! We provide a REST API that allows you to:</p>
+                            <ul class="mt-3 space-y-2">
+                                <li class="flex items-start gap-2 text-sm text-slate-400"><span class="iconify text-cyan-400 text-sm mt-0.5" data-icon="mdi:check-circle"></span>Create shipment orders automatically</li>
+                                <li class="flex items-start gap-2 text-sm text-slate-400"><span class="iconify text-cyan-400 text-sm mt-0.5" data-icon="mdi:check-circle"></span>Track parcel status in real-time</li>
+                                <li class="flex items-start gap-2 text-sm text-slate-400"><span class="iconify text-cyan-400 text-sm mt-0.5" data-icon="mdi:check-circle"></span>Receive webhook notifications for delivery events</li>
+                                <li class="flex items-start gap-2 text-sm text-slate-400"><span class="iconify text-cyan-400 text-sm mt-0.5" data-icon="mdi:check-circle"></span>Sync orders from Shopify, WooCommerce, etc.</li>
+                            </ul>
+                            <p class="text-xs text-slate-500 mt-3">API documentation is available in your merchant dashboard after registration.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="technical">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-orange-400 text-sm" data-icon="mdi:shopify"></span></div>
+                            <span class="text-sm font-medium text-white">Does it work with Shopify / WooCommerce?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Yes! We have direct integrations with:</p>
+                            <div class="flex flex-wrap gap-3 mt-3">
+                                <span class="inline-flex items-center gap-1.5 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-300"><span class="iconify text-green-400" data-icon="mdi:shopify"></span> Shopify</span>
+                                <span class="inline-flex items-center gap-1.5 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-300"><span class="iconify text-purple-400" data-icon="mdi:wordpress"></span> WooCommerce</span>
+                                <span class="inline-flex items-center gap-1.5 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-300"><span class="iconify text-orange-400" data-icon="mdi:api"></span> Custom (REST API)</span>
+                                <span class="inline-flex items-center gap-1.5 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-1.5 text-xs text-slate-300"><span class="iconify text-blue-400" data-icon="mdi:file-csv"></span> CSV Upload</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-3">Orders auto-sync — no manual work needed.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item" data-cat="technical">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-orange-400 text-sm" data-icon="mdi:file-csv"></span></div>
+                            <span class="text-sm font-medium text-white">Can I upload orders via CSV?</span>
+                        </div>
+                        <span class="iconify faq-chevron text-slate-500 text-xl" data-icon="mdi:chevron-down"></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="px-7 pb-6 pl-[60px]">
+                            <p class="text-sm text-slate-400 leading-relaxed">Yes! You can upload bulk orders via CSV file from your dashboard. Just download our template, fill in your orders (name, phone, address, COD amount, items), and upload. We process up to 1,000 orders per CSV upload. This is great for businesses not using Shopify or WooCommerce.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Still have questions -->
+                <div class="faq-item" data-cat="all" style="background:rgba(6,182,212,0.06);border-color:rgba(6,182,212,0.2)">
+                    <div class="p-8 text-center">
+                        <div class="w-14 h-14 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <span class="iconify text-cyan-400 text-2xl" data-icon="mdi:chat-question"></span>
+                        </div>
+                        <h3 class="text-lg font-medium text-white mb-2">Still have questions?</h3>
+                        <p class="text-sm text-slate-400 mb-6">Can't find what you're looking for? Contact us and we'll respond within 2 hours.</p>
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <a href="index.html#contact" class="bg-cyan-500 text-white text-sm font-medium px-6 py-3 rounded-xl hover:bg-cyan-400 transition-colors flex items-center gap-2">
+                                <span class="iconify" data-icon="mdi:email"></span> Send a Message
+                            </a>
+                            <a href="https://wa.me/255769799110" target="_blank" class="bg-white/[0.05] border border-white/[0.1] text-white text-sm font-medium px-6 py-3 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2">
+                                <span class="iconify text-green-400" data-icon="mdi:whatsapp"></span> WhatsApp Us
+                            </a>
+                            <a href="tel:0769799110" class="bg-white/[0.05] border border-white/[0.1] text-white text-sm font-medium px-6 py-3 rounded-xl hover:bg-white/[0.1] transition-all flex items-center gap-2">
+                                <span class="iconify text-cyan-400" data-icon="mdi:phone"></span> Call Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- No results message -->
+            <div id="no-results" class="hidden text-center py-16">
+                <span class="iconify text-4xl text-slate-600 mb-4" data-icon="mdi:magnify-close"></span>
+                <h3 class="text-lg font-medium text-slate-400 mb-2">No questions found</h3>
+                <p class="text-sm text-slate-500">Try a different search term or <a href="index.html#contact" class="text-cyan-400 hover:text-cyan-300">contact us directly</a>.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/[0.05] py-8">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <a href="index.html" class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-sm" data-icon="mdi:truck-fast"></span></div>
+                <span class="font-semibold text-white text-sm">ChapShop<span class="text-cyan-400 ml-0.5">Delivery</span></span>
+            </a>
+            <p class="text-xs text-slate-500">© 2025 ChapShop Delivery. All rights reserved.</p>
+            <div class="flex items-center gap-4">
+                <a href="tel:0769799110" class="text-xs text-slate-400 hover:text-cyan-400 transition-colors">0769 799 110</a>
+                <a href="mailto:chapshopdelivery@gmail.com" class="text-xs text-slate-400 hover:text-cyan-400 transition-colors">chapshopdelivery@gmail.com</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // Toggle FAQ
+    function toggleFaq(el) {
+        var item = el.parentElement;
+        var answer = item.querySelector('.faq-answer');
+        var wasActive = item.classList.contains('active');
+
+        // Close all
+        document.querySelectorAll('.faq-item.active').forEach(function(i) {
+            i.classList.remove('active');
+            i.querySelector('.faq-answer').classList.remove('open');
+        });
+
+        // Open clicked if it wasn't active
+        if (!wasActive) {
+            item.classList.add('active');
+            answer.classList.add('open');
+        }
+    }
+
+    // Category filter
+    var catBtns = document.querySelectorAll('.cat-btn');
+    var faqItems = document.querySelectorAll('.faq-item[data-cat]');
+    var lastContact = document.querySelector('.faq-item[data-cat="all"]');
+
+    catBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            catBtns.forEach(function(b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+
+            var cat = btn.getAttribute('data-cat');
+            var visibleCount = 0;
+
+            faqItems.forEach(function(item) {
+                if (cat === 'all' || item.getAttribute('data-cat') === cat) {
+                    item.style.display = '';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Always show "still have questions" card
+            lastContact.style.display = '';
+
+            // Clear search
+            document.getElementById('faq-search').value = '';
+            document.getElementById('no-results').classList.add('hidden');
+        });
+    });
+
+    // Search
+    var searchInput = document.getElementById('faq-search');
+    searchInput.addEventListener('input', function() {
+        var query = this.value.toLowerCase().trim();
+
+        // Reset category buttons
+        catBtns.forEach(function(b) { b.classList.remove('active'); });
+        catBtns[0].classList.add('active');
+
+        if (!query) {
+            faqItems.forEach(function(item) { item.style.display = ''; });
+            document.getElementById('no-results').classList.add('hidden');
+            return;
+        }
+
+        var found = 0;
+        faqItems.forEach(function(item) {
+            var text = item.textContent.toLowerCase();
+            if (text.indexOf(query) !== -1) {
+                item.style.display = '';
+                found++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        if (found === 0) {
+            document.getElementById('no-results').classList.remove('hidden');
+        } else {
+            document.getElementById('no-results').classList.add('hidden');
+        }
+    });
+
+    // Open FAQ from URL hash
+    if (window.location.hash) {
+        setTimeout(function() {
+            var hash = window.location.hash.replace('#', '');
+            var decoded = decodeURIComponent(hash);
+            faqItems.forEach(function(item) {
+                if (item.textContent.toLowerCase().indexOf(decoded.toLowerCase()) !== -1) {
+                    item.classList.add('active');
+                    item.querySelector('.faq-answer').classList.add('open');
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        }, 500);
+    }
+    </script>
+</body>
+</html>
