@@ -3,10 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAQ — ChapShop Delivery</title>
+    
+    <!-- SEO: Meta Tags -->
+    <title>FAQ — ChapShop Delivery | Logistics, COD & Shipping Answers</title>
+    <meta name="description" content="Find answers to common questions about ChapShop Delivery in Tanzania. Learn about Cash on Delivery (COD), pricing, delivery times, merchant registration, and warehousing.">
+    <meta name="keywords" content="ChapShop Delivery, Tanzania Logistics, COD FAQ, Shipping FAQ, E-commerce Delivery, Dar es Salaam Courier, Merchant Onboarding">
+    <meta name="author" content="ChapShop Delivery">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://chapshopdelivery.tz/faq.html">
+
+    <!-- SEO: Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chapshopdelivery.tz/faq.html">
+    <meta property="og:title" content="FAQ — ChapShop Delivery">
+    <meta property="og:description" content="Everything you need to know about our delivery, COD, and merchant services in Tanzania.">
+    <meta property="og:image" content="https://picsum.photos/seed/chapshop/1200/630.jpg">
+
+    <!-- SEO: Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://chapshopdelivery.tz/faq.html">
+    <meta property="twitter:title" content="FAQ — ChapShop Delivery">
+    <meta property="twitter:description" content="Everything you need to know about our delivery, COD, and merchant services in Tanzania.">
+    <meta property="twitter:image" content="https://picsum.photos/seed/chapshop/1200/630.jpg">
+
+    <!-- SEO: Structured Data (JSON-LD) for FAQ Page -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I join as a merchant?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Click \"Join as Merchant\" on our website, fill in your business details (name, business type, email, phone, city), create a password, and you're in. The whole process takes under 2 minutes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What documents do I need to register?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You need a business name, email, phone number, and city. For full activation: Business license (NIDA/BRELA), TIN number, and Bank account or M-Pesa details."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Cash On Delivery work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We confirm the order, our rider delivers and collects cash. The cash is photographed as proof and remitted to your M-Pesa or bank account within 24 hours."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which areas do you deliver to?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "We deliver to all 31 regions of Tanzania, covering 150+ delivery routes. Same-day delivery in Dar es Salaam, Mwanza, Arusha, Dodoma, and Mbeya."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there a monthly subscription fee?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No monthly subscription fee. You only pay per parcel delivered and COD fees. No hidden charges or minimum volume requirements."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do you have an API for integration?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! We provide a REST API to create shipments, track parcels, receive webhook notifications, and sync orders from Shopify and WooCommerce."
+          }
+        }
+      ]
+    }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    
+    <!-- Translation Script Source -->
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
     <style>
         *{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
         .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -27,29 +111,96 @@
         .cat-btn.active{background:rgba(6,182,212,0.15);border-color:rgba(6,182,212,0.3);color:#06b6d4}
         .cat-btn:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.15)}
         .search-input:focus{border-color:rgba(6,182,212,0.5);box-shadow:0 0 0 3px rgba(6,182,212,0.1)}
+        
+        /* Custom Translation Styles */
+        .lang-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            min-width: 160px;
+            overflow: hidden;
+            z-index: 100;
+        }
+        .lang-dropdown-menu.show { display: block; }
+        .lang-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            font-size: 0.875rem;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .lang-option:hover { background: rgba(255,255,255,0.05); color: white; }
+        
+        /* Hide default Google Translate top bar & gadget for cleaner UI */
+        .goog-te-banner-frame, .skiptranslate { display: none !important; }
+        body { top: 0 !important; }
+        .goog-te-gadget { font-family: inherit !important; }
     </style>
 </head>
 <body class="bg-[#020617] text-white">
 
-    <a href="https://wa.me/255769799110" target="_blank" class="whatsapp-float"><span class="iconify text-white text-3xl" data-icon="mdi:whatsapp"></span></a>
+    <!-- Hidden Google Translate Element (Functionality Only) -->
+    <div id="google_translate_element" style="display:none;"></div>
+
+    <a href="https://wa.me/255769799110" target="_blank" class="whatsapp-float" aria-label="Chat on WhatsApp"><span class="iconify text-white text-3xl" data-icon="mdi:whatsapp"></span></a>
 
     <!-- Nav -->
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
-        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="index.html" class="flex items-center gap-2.5">
-                <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
-                <div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div>
-            </a>
-            <div class="hidden md:flex items-center gap-6">
-                <a href="index.html" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a>
-                <a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Services</a>
-                <a href="faq.html" class="text-sm text-white">FAQ</a>
-                <a href="about.html" class="text-sm text-slate-400 hover:text-white transition-colors">About Us</a>
-                <a href="index.html#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between relative">
+            <!-- Left: Logo & Links -->
+            <div class="flex items-center gap-6">
+                <a href="index.html" class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
+                    <div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div>
+                </a>
+                <div class="hidden md:flex items-center gap-6">
+                    <a href="index.html" class="text-sm text-slate-400 hover:text-white transition-colors">Home</a>
+                    <a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors">Services</a>
+                    <a href="faq.html" class="text-sm text-white">FAQ</a>
+                    <a href="about.html" class="text-sm text-slate-400 hover:text-white transition-colors">About Us</a>
+                    <a href="index.html#contact" class="text-sm text-slate-400 hover:text-white transition-colors">Contact</a>
+                </div>
             </div>
-            <a href="merchants.html" class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors flex items-center gap-2">
-                <span class="iconify text-base" data-icon="mdi:storefront"></span> Join as Merchant
-            </a>
+
+            <!-- Right: Actions -->
+            <div class="flex items-center gap-4">
+                <!-- Language Selector -->
+                <div class="relative">
+                    <button id="lang-trigger" class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors px-3 py-2 rounded-lg hover:bg-white/[0.05]">
+                        <span class="iconify text-lg" data-icon="mdi:translate"></span>
+                        <!-- Default text set to English, JS will update this -->
+                        <span id="current-lang-text" class="hidden sm:inline text-sm font-medium">English</span>
+                        <span class="iconify text-sm" data-icon="mdi:chevron-down"></span>
+                    </button>
+                    <div id="lang-menu" class="lang-dropdown-menu">
+                        <div class="lang-option" onclick="changeLanguage('en')">
+                            <span class="iconify" data-icon="flag:us-4x3"></span> English
+                        </div>
+                        <div class="lang-option" onclick="changeLanguage('fr')">
+                            <span class="iconify" data-icon="flag:fr-4x3"></span> Français
+                        </div>
+                        <div class="lang-option" onclick="changeLanguage('ar')">
+                            <span class="iconify" data-icon="flag:sa-4x3"></span> العربية
+                        </div>
+                        <div class="lang-option" onclick="changeLanguage('zh-CN')">
+                            <span class="iconify" data-icon="flag:cn-4x3"></span> 中文
+                        </div>
+                    </div>
+                </div>
+
+                <a href="merchants.html" class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors flex items-center gap-2">
+                    <span class="iconify text-base" data-icon="mdi:storefront"></span> <span class="hidden sm:inline">Join as Merchant</span>
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -487,6 +638,86 @@
     </footer>
 
     <script>
+    // --- Translation Logic ---
+
+    // Map language codes to display names
+    const langNames = {
+        'en': 'English',
+        'fr': 'Français',
+        'ar': 'العربية',
+        'zh-CN': '中文'
+    };
+
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,fr,ar,zh-CN',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+        
+        // After widget initializes, check if there is a saved language
+        checkInitialLanguage();
+    }
+
+    // Update the button text based on language code
+    function updateButtonText(langCode) {
+        const textEl = document.getElementById('current-lang-text');
+        if (textEl && langNames[langCode]) {
+            textEl.innerText = langNames[langCode];
+        }
+    }
+
+    // Check LocalStorage for previously selected language
+    function checkInitialLanguage() {
+        const googTrans = localStorage.getItem('googtrans');
+        if (googTrans) {
+            // Format is usually "/en/fr" or "/en/zh-CN"
+            const parts = googTrans.split('/');
+            if (parts.length >= 3) {
+                const lang = parts[2];
+                updateButtonText(lang);
+            }
+        }
+    }
+
+    // Custom Language Switcher
+    function changeLanguage(lang) {
+        // Update UI immediately for responsiveness
+        updateButtonText(lang);
+
+        // Try to trigger the hidden Google Translate widget
+        var select = document.querySelector('.goog-te-combo');
+        if(select){
+            select.value = lang;
+            select.dispatchEvent(new Event('change'));
+        } else {
+            // Fallback method if widget isn't ready (reload with param)
+            var url = window.location.href;
+            if(url.indexOf('?') > -1){
+                url += '&googtrans=/en/'+lang;
+            } else {
+                url += '?googtrans=/en/'+lang;
+            }
+            window.location.assign(url);
+            window.location.reload();
+        }
+        
+        // Close dropdown
+        document.getElementById('lang-menu').classList.remove('show');
+    }
+
+    // Language Dropdown Toggle
+    document.getElementById('lang-trigger').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('lang-menu').classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+        document.getElementById('lang-menu').classList.remove('show');
+    });
+
     // Toggle FAQ
     function toggleFaq(el) {
         var item = el.parentElement;
