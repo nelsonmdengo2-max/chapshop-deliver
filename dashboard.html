@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChapShop Delivery — Merchant Dashboard</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚚</text></svg>">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
@@ -17,8 +21,16 @@
         body{background:#0f172a;overflow-x:hidden}
         
         /* Layout */
-        .sidebar{background:rgba(15, 23, 42, 0.9);border-right:1px solid rgba(148,163,184,0.05);backdrop-filter:blur(20px)}
+        .sidebar{background:rgba(15, 23, 42, 0.9);border-right:1px solid rgba(148,163,184,0.05);backdrop-filter:blur(20px);transition: all 0.3s ease}
         .main-content{background:#0f172a}
+        
+        /* RTL Support */
+        [dir="rtl"] .sidebar{border-right: none; border-left: 1px solid rgba(148,163,184,0.05);}
+        [dir="rtl"] .main-content{margin-left: 0 !important; margin-right: 280px;}
+        [dir="rtl"] .sidebar-link.active::after{right: auto; left: 0; border-radius: 3px 0 0 3px;}
+        [dir="rtl"] .notif-item.unread{border-left: none; border-right: 3px solid #06b6d4;}
+        [dir="rtl"] .select-field{background-position: left 16px center;}
+        [dir="rtl"] .copy-btn span, [dir="rtl"] .btn-primary span, [dir="rtl"] .btn-secondary span{order: 2;}
         
         /* Navigation */
         .sidebar-link{position:relative;transition:all .25s ease;border-radius:10px;overflow:hidden;color:#94a3b8}
@@ -77,7 +89,9 @@
         
         /* Toasts */
         .toast-container{position:fixed;bottom:32px;right:32px;z-index:200;display:flex;flex-direction:column;gap:10px}
+        [dir="rtl"] .toast-container{right: auto; left: 32px;}
         .toast{padding:16px 24px;border-radius:16px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:12px;transform:translateX(120%);opacity:0;transition:all .4s cubic-bezier(.16,1,.3,1);min-width:300px;box-shadow:0 12px 32px -8px rgba(0,0,0,0.3)}
+        [dir="rtl"] .toast{transform:translateX(-120%)}
         .toast.show{transform:translateX(0);opacity:1}
         .toast-success{background:rgba(30,41,59,0.9);border:1px solid rgba(16,185,129,0.2);color:#6ee7b7}
         .toast-error{background:rgba(30,41,59,0.9);border:1px solid rgba(239,68,68,0.2);color:#fca5a5}
@@ -93,6 +107,7 @@
         
         /* Mobile */
         .mobile-sidebar{transform:translateX(-100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+        [dir="rtl"] .mobile-sidebar{transform:translateX(100%)}
         .mobile-sidebar.open{transform:translateX(0)}
         .sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:39;opacity:0;visibility:hidden;transition:all .3s}
         .sidebar-backdrop.show{opacity:1;visibility:visible}
@@ -100,18 +115,23 @@
         /* Utils */
         .chart-container{position:relative;height:240px}
         .notif-dot{position:absolute;top:0;right:0;width:10px;height:10px;background:#ef4444;border-radius:50%;border:2px solid #0f172a}
+        [dir="rtl"] .notif-dot{right: auto; left: 0;}
         .notif-badge{min-width:20px;height:20px;background:#ef4444;border-radius:10px;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 6px}
         .notif-item{padding:18px 24px;border-bottom:1px solid rgba(148,163,184,0.05);transition:background .2s;cursor:pointer}.notif-item:hover{background:rgba(148,163,184,0.03)}.notif-item.unread{background:rgba(6,182,212,0.02);border-left:3px solid #06b6d4}
         .faq-item{border:1px solid rgba(148,163,184,0.07);border-radius:14px;overflow:hidden;transition:all .2s}.faq-item:hover{border-color:rgba(148,163,184,0.12)}.faq-q{padding:20px 24px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:background .2s}.faq-q:hover{background:rgba(148,163,184,0.02)}.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}.faq-a.open{max-height:300px;padding:0 24px 20px}.faq-icon{transition:transform .3s}.faq-icon.rotated{transform:rotate(180deg)}
         
-        @media(max-width:1023px){.main-content{margin-left:0!important}}
+        .lang-select{background:rgba(15,23,42,0.6);border:1px solid rgba(148,163,184,0.1);border-radius:10px;padding:6px 12px;font-size:12px;color:#fff;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center; padding-right: 28px;}
+
+        @media(max-width:1023px){
+            .main-content{margin-left:0!important; margin-right:0!important}
+        }
     </style>
 </head>
 <body class="text-white">
 
 <div id="loading-screen" class="fixed inset-0 z-[300] bg-[#0f172a] flex flex-col items-center justify-center gap-5">
     <div class="relative"><div class="w-20 h-20 border-[3px] border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div><div class="absolute inset-0 flex items-center justify-center"><span class="iconify text-cyan-400 text-2xl" data-icon="mdi:truck-fast"></span></div></div>
-    <p class="text-slate-500 text-sm font-medium tracking-wide">Initializing Dashboard</p>
+    <p class="text-slate-500 text-sm font-medium tracking-wide" data-i18n="loading">Initializing Dashboard</p>
 </div>
 
 <div class="toast-container" id="toast-container"></div>
@@ -127,26 +147,26 @@
         </div>
 
         <div class="flex-1 py-6 px-4 overflow-y-auto">
-            <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[1.5px] mb-4">Main</p>
+            <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[1.5px] mb-4" data-i18n="cat_main">Main</p>
             <nav class="space-y-1 mb-8">
-                <a href="#" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="overview"><span class="iconify text-[18px]" data-icon="mdi:view-dashboard-outline"></span> Overview</a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="orders"><span class="iconify text-[18px]" data-icon="mdi:package-variant-closed"></span> All Orders<span id="orders-count-badge" class="ml-auto text-[10px] bg-cyan-500/10 text-cyan-400 px-2.5 py-0.5 rounded-full font-bold hidden">0</span></a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="create-order"><span class="iconify text-[18px]" data-icon="mdi:plus-circle-outline"></span> Create Order</a>
+                <a href="#" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="overview"><span class="iconify text-[18px]" data-icon="mdi:view-dashboard-outline"></span> <span data-i18n="nav_overview">Overview</span></a>
+                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="orders"><span class="iconify text-[18px]" data-icon="mdi:package-variant-closed"></span> <span data-i18n="nav_orders">All Orders</span><span id="orders-count-badge" class="ml-auto text-[10px] bg-cyan-500/10 text-cyan-400 px-2.5 py-0.5 rounded-full font-bold hidden">0</span></a>
+                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="create-order"><span class="iconify text-[18px]" data-icon="mdi:plus-circle-outline"></span> <span data-i18n="nav_create">Create Order</span></a>
             </nav>
 
-            <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[1.5px] mb-4">Insights</p>
+            <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[1.5px] mb-4" data-i18n="cat_insights">Insights</p>
             <nav class="space-y-1 mb-8">
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="analytics"><span class="iconify text-[18px]" data-icon="mdi:chart-line"></span> Analytics</a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="sales-report"><span class="iconify text-[18px]" data-icon="mdi:receipt-text-outline"></span> Sales Report</a>
+                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="analytics"><span class="iconify text-[18px]" data-icon="mdi:chart-line"></span> <span data-i18n="nav_analytics">Analytics</span></a>
+                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="sales-report"><span class="iconify text-[18px]" data-icon="mdi:receipt-text-outline"></span> <span data-i18n="nav_sales">Sales Report</span></a>
             </nav>
 
-            <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[1.5px] mb-4">Account</p>
+            <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[1.5px] mb-4" data-i18n="cat_account">Account</p>
             <nav class="space-y-1">
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] relative" data-page="notifications"><span class="iconify text-[18px]" data-icon="mdi:bell-outline"></span> Notifications<span id="notif-dot" class="notif-dot hidden"></span><span id="notif-count" class="notif-badge ml-auto hidden">0</span></a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="profile"><span class="iconify text-[18px]" data-icon="mdi:account-circle-outline"></span> Profile</a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="settings"><span class="iconify text-[18px]" data-icon="mdi:cog-outline"></span> Settings</a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="faq"><span class="iconify text-[18px]" data-icon="mdi:frequently-asked-questions"></span> FAQ</a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="help"><span class="iconify text-[18px]" data-icon="mdi:help-circle-outline"></span> Help & Support</a>
+                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] relative" data-page="notifications"><span class="iconify text-[18px]" data-icon="mdi:bell-outline"></span> <span data-i18n="nav_notif">Notifications</span><span id="notif-dot" class="notif-dot hidden"></span><span id="notif-count" class="notif-badge ml-auto hidden">0</span></a>
+                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="profile"><span class="iconify text-[18px]" data-icon="mdi:account-circle-outline"></span> <span data-i18n="nav_profile">Profile</span></a>
+                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="settings"><span class="iconify text-[18px]" data-icon="mdi:cog-outline"></span> <span data-i18n="nav_settings">Settings</span></a>
+                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="faq"><span class="iconify text-[18px]" data-icon="mdi:frequently-asked-questions"></span> <span data-i18n="nav_faq">FAQ</span></a>
+                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px]" data-page="help"><span class="iconify text-[18px]" data-icon="mdi:help-circle-outline"></span> <span data-i18n="nav_help">Help & Support</span></a>
             </nav>
         </div>
 
@@ -155,7 +175,7 @@
                 <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400/20 to-cyan-600/10 flex items-center justify-center text-sm font-bold text-cyan-400" id="sidebar-avatar">?</div>
                 <div class="flex-1 min-w-0"><p class="text-[13px] font-semibold text-white truncate" id="sidebar-name">Loading...</p><p class="text-[11px] text-slate-500 truncate" id="sidebar-email">Loading...</p></div>
             </div>
-            <button id="logout-btn" class="w-full flex items-center justify-center gap-2 text-[12px] font-semibold text-red-400 bg-red-500/5 border border-red-500/10 rounded-xl py-2.5 hover:bg-red-500/10 transition-all cursor-pointer"><span class="iconify text-[15px]" data-icon="mdi:logout"></span> Sign Out</button>
+            <button id="logout-btn" class="w-full flex items-center justify-center gap-2 text-[12px] font-semibold text-red-400 bg-red-500/5 border border-red-500/10 rounded-xl py-2.5 hover:bg-red-500/10 transition-all cursor-pointer"><span class="iconify text-[15px]" data-icon="mdi:logout"></span> <span data-i18n="btn_logout">Sign Out</span></button>
         </div>
     </aside>
 
@@ -164,12 +184,19 @@
         <header class="sticky top-0 z-30 h-[72px] bg-[#0f172a]/80 backdrop-blur-2xl border-b border-white/[0.04] flex items-center justify-between px-6 lg:px-8">
             <div class="flex items-center gap-4">
                 <button id="mobile-menu-btn" class="lg:hidden w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition cursor-pointer"><span class="iconify text-xl text-slate-300" data-icon="mdi:menu"></span></button>
-                <h1 id="page-title" class="text-[16px] font-semibold text-white tracking-tight">Overview</h1>
+                <h1 id="page-title" class="text-[16px] font-semibold text-white tracking-tight" data-i18n="nav_overview">Overview</h1>
             </div>
             <div class="flex items-center gap-3">
+                <!-- Language Selector -->
+                <select id="lang-switcher" class="lang-select">
+                    <option value="en">EN 🇬🇧</option>
+                    <option value="ar">AR 🇸🇦</option>
+                    <option value="fr">FR 🇫🇷</option>
+                    <option value="zh">ZH 🇨🇳</option>
+                </select>
                 <button onclick="switchPage('notifications')" class="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition cursor-pointer relative"><span class="iconify text-lg text-slate-400" data-icon="mdi:bell-outline"></span><span id="notif-dot2" class="notif-dot hidden" style="border-color:#0f172a"></span></button>
                 <button onclick="location.reload()" class="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition cursor-pointer"><span class="iconify text-lg text-slate-400" data-icon="mdi:refresh"></span></button>
-                <a href="index.html" class="btn-secondary text-[12px] py-2.5 px-4"><span class="iconify text-[14px]" data-icon="mdi:open-in-new"></span><span class="hidden sm:inline ml-1">Website</span></a>
+                <a href="index.html" class="btn-secondary text-[12px] py-2.5 px-4"><span class="iconify text-[14px]" data-icon="mdi:open-in-new"></span><span class="hidden sm:inline ml-1" data-i18n="btn_website">Website</span></a>
             </div>
         </header>
 
@@ -177,115 +204,208 @@
 
             <!-- OVERVIEW -->
             <div id="page-overview" class="page-content animate-fadeUp">
-                <div class="glass-card-static p-8 lg:p-10 mb-8 relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.06] via-blue-500/[0.03] to-transparent pointer-events-none"></div><div class="relative"><h2 class="text-2xl lg:text-3xl font-bold text-white mb-1" id="welcome-name">Welcome back! 👋</h2><p class="text-slate-400 text-sm">Here's what's happening with your deliveries today.</p></div></div>
+                <div class="glass-card-static p-8 lg:p-10 mb-8 relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.06] via-blue-500/[0.03] to-transparent pointer-events-none"></div><div class="relative"><h2 class="text-2xl lg:text-3xl font-bold text-white mb-1" id="welcome-name">Welcome back! 👋</h2><p class="text-slate-400 text-sm" data-i18n="ov_sub">Here's what's happening with your deliveries today.</p></div></div>
                 
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6 mb-8">
-                    <div class="glass-card stat-card p-6"><div class="flex items-start justify-between mb-5"><div class="stat-icon bg-cyan-500/10"><span class="iconify text-2xl text-cyan-400" data-icon="mdi:package-variant-closed"></span></div><span class="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full uppercase tracking-wide flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse-glow"></span>Live</span></div><p class="text-3xl lg:text-4xl font-extrabold text-white mb-1.5 tracking-tight" id="stat-total">0</p><p class="text-[12px] text-slate-500 font-medium">Total Orders</p></div>
-                    <div class="glass-card stat-card p-6"><div class="flex items-start justify-between mb-5"><div class="stat-icon bg-emerald-500/10"><span class="iconify text-2xl text-emerald-400" data-icon="mdi:check-decagram"></span></div></div><p class="text-3xl lg:text-4xl font-extrabold text-emerald-400 mb-1.5 tracking-tight" id="stat-delivered">0</p><p class="text-[12px] text-slate-500 font-medium">Delivered</p></div>
-                    <div class="glass-card stat-card p-6"><div class="flex items-start justify-between mb-5"><div class="stat-icon bg-amber-500/10"><span class="iconify text-2xl text-amber-400" data-icon="mdi:clock-fast"></span></div></div><p class="text-3xl lg:text-4xl font-extrabold text-amber-400 mb-1.5 tracking-tight" id="stat-pending">0</p><p class="text-[12px] text-slate-500 font-medium">In Progress</p></div>
-                    <div class="glass-card stat-card p-6"><div class="flex items-start justify-between mb-5"><div class="stat-icon bg-violet-500/10"><span class="iconify text-2xl text-violet-400" data-icon="mdi:cash-multiple"></span></div></div><p class="text-2xl lg:text-3xl font-extrabold text-white mb-1.5 tracking-tight" id="stat-cod">TZS 0</p><p class="text-[12px] text-slate-500 font-medium">Total COD Value</p></div>
+                    <div class="glass-card stat-card p-6"><div class="flex items-start justify-between mb-5"><div class="stat-icon bg-cyan-500/10"><span class="iconify text-2xl text-cyan-400" data-icon="mdi:package-variant-closed"></span></div><span class="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2.5 py-1 rounded-full uppercase tracking-wide flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse-glow"></span>Live</span></div><p class="text-3xl lg:text-4xl font-extrabold text-white mb-1.5 tracking-tight" id="stat-total">0</p><p class="text-[12px] text-slate-500 font-medium" data-i18n="stat_total">Total Orders</p></div>
+                    <div class="glass-card stat-card p-6"><div class="flex items-start justify-between mb-5"><div class="stat-icon bg-emerald-500/10"><span class="iconify text-2xl text-emerald-400" data-icon="mdi:check-decagram"></span></div></div><p class="text-3xl lg:text-4xl font-extrabold text-emerald-400 mb-1.5 tracking-tight" id="stat-delivered">0</p><p class="text-[12px] text-slate-500 font-medium" data-i18n="stat_delivered">Delivered</p></div>
+                    <div class="glass-card stat-card p-6"><div class="flex items-start justify-between mb-5"><div class="stat-icon bg-amber-500/10"><span class="iconify text-2xl text-amber-400" data-icon="mdi:clock-fast"></span></div></div><p class="text-3xl lg:text-4xl font-extrabold text-amber-400 mb-1.5 tracking-tight" id="stat-pending">0</p><p class="text-[12px] text-slate-500 font-medium" data-i18n="stat_progress">In Progress</p></div>
+                    <div class="glass-card stat-card p-6"><div class="flex items-start justify-between mb-5"><div class="stat-icon bg-violet-500/10"><span class="iconify text-2xl text-violet-400" data-icon="mdi:cash-multiple"></span></div></div><p class="text-2xl lg:text-3xl font-extrabold text-white mb-1.5 tracking-tight" id="stat-cod">TZS 0</p><p class="text-[12px] text-slate-500 font-medium" data-i18n="stat_cod">Total COD Value</p></div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <div class="lg:col-span-1 space-y-4">
-                        <h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider">Quick Actions</h3>
-                        <button onclick="switchPage('create-order')" class="glass-card w-full p-5 text-left cursor-pointer group flex items-center gap-5"><div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition"><span class="iconify text-xl text-cyan-400" data-icon="mdi:plus-circle"></span></div><div><p class="text-[14px] font-semibold text-white">New Order</p><p class="text-[12px] text-slate-500">Create delivery</p></div><span class="iconify text-slate-600 ml-auto" data-icon="mdi:chevron-right"></span></button>
-                        <button onclick="switchPage('orders')" class="glass-card w-full p-5 text-left cursor-pointer group flex items-center gap-5"><div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition"><span class="iconify text-xl text-blue-400" data-icon="mdi:format-list-bulleted"></span></div><div><p class="text-[14px] font-semibold text-white">Manage Orders</p><p class="text-[12px] text-slate-500">View & track</p></div><span class="iconify text-slate-600 ml-auto" data-icon="mdi:chevron-right"></span></button>
-                        <button onclick="switchPage('sales-report')" class="glass-card w-full p-5 text-left cursor-pointer group flex items-center gap-5"><div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition"><span class="iconify text-xl text-emerald-400" data-icon="mdi:receipt-text"></span></div><div><p class="text-[14px] font-semibold text-white">Sales Report</p><p class="text-[12px] text-slate-500">Revenue & stats</p></div><span class="iconify text-slate-600 ml-auto" data-icon="mdi:chevron-right"></span></button>
+                        <h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider" data-i18n="ov_quick">Quick Actions</h3>
+                        <button onclick="switchPage('create-order')" class="glass-card w-full p-5 text-left cursor-pointer group flex items-center gap-5"><div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition"><span class="iconify text-xl text-cyan-400" data-icon="mdi:plus-circle"></span></div><div><p class="text-[14px] font-semibold text-white" data-i18n="qa_new">New Order</p><p class="text-[12px] text-slate-500" data-i18n="qa_new_sub">Create delivery</p></div><span class="iconify text-slate-600 ml-auto" data-icon="mdi:chevron-right"></span></button>
+                        <button onclick="switchPage('orders')" class="glass-card w-full p-5 text-left cursor-pointer group flex items-center gap-5"><div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition"><span class="iconify text-xl text-blue-400" data-icon="mdi:format-list-bulleted"></span></div><div><p class="text-[14px] font-semibold text-white" data-i18n="qa_manage">Manage Orders</p><p class="text-[12px] text-slate-500" data-i18n="qa_manage_sub">View & track</p></div><span class="iconify text-slate-600 ml-auto" data-icon="mdi:chevron-right"></span></button>
+                        <button onclick="switchPage('sales-report')" class="glass-card w-full p-5 text-left cursor-pointer group flex items-center gap-5"><div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition"><span class="iconify text-xl text-emerald-400" data-icon="mdi:receipt-text"></span></div><div><p class="text-[14px] font-semibold text-white" data-i18n="qa_sales">Sales Report</p><p class="text-[12px] text-slate-500" data-i18n="qa_sales_sub">Revenue & stats</p></div><span class="iconify text-slate-600 ml-auto" data-icon="mdi:chevron-right"></span></button>
                     </div>
-                    <div class="lg:col-span-2"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-4">Orders This Week</h3><div class="glass-card-static p-6"><div class="chart-container"><canvas id="overview-chart"></canvas></div></div></div>
+                    <div class="lg:col-span-2"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-4" data-i18n="ov_chart">Orders This Week</h3><div class="glass-card-static p-6"><div class="chart-container"><canvas id="overview-chart"></canvas></div></div></div>
                 </div>
                 
-                <div><div class="flex items-center justify-between mb-5"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider">Recent Orders</h3><button onclick="switchPage('orders')" class="text-[12px] text-cyan-400 font-semibold hover:text-cyan-300 transition cursor-pointer">View All →</button></div><div class="glass-card-static overflow-hidden" id="recent-orders-list"><div class="text-center py-16"><span class="iconify text-5xl text-slate-700 mb-4" data-icon="mdi:package-variant"></span><p class="text-slate-500 text-sm">No orders yet</p></div></div></div>
+                <div><div class="flex items-center justify-between mb-5"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider" data-i18n="ov_recent">Recent Orders</h3><button onclick="switchPage('orders')" class="text-[12px] text-cyan-400 font-semibold hover:text-cyan-300 transition cursor-pointer" data-i18n="btn_view_all">View All →</button></div><div class="glass-card-static overflow-hidden" id="recent-orders-list"><div class="text-center py-16"><span class="iconify text-5xl text-slate-700 mb-4" data-icon="mdi:package-variant"></span><p class="text-slate-500 text-sm" data-i18n="empty_orders">No orders yet</p></div></div></div>
             </div>
 
             <!-- ORDERS -->
             <div id="page-orders" class="page-content hidden">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8"><div><h2 class="text-2xl font-bold text-white">All Orders</h2><p class="text-sm text-slate-500 mt-1">Manage and track your deliveries</p></div><button onclick="switchPage('create-order')" class="btn-primary"><span class="iconify text-lg" data-icon="mdi:plus"></span> New Order</button></div>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8"><div><h2 class="text-2xl font-bold text-white" data-i18n="pg_orders">All Orders</h2><p class="text-sm text-slate-500 mt-1" data-i18n="pg_orders_sub">Manage and track your deliveries</p></div><button onclick="switchPage('create-order')" class="btn-primary"><span class="iconify text-lg" data-icon="mdi:plus"></span> <span data-i18n="nav_create">New Order</span></button></div>
                 
-                <div class="glass-card-static p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4"><div class="relative flex-1 w-full"><span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="order-search" placeholder="Search by name, phone, city..." class="input-field pl-11 py-3 text-[13px]"></div><div class="flex items-center gap-2 flex-wrap"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="pending">Pending</button><button class="filter-btn" data-filter="picked">Picked</button><button class="filter-btn" data-filter="delivered">Delivered</button><button class="filter-btn" data-filter="returned">Returned</button></div></div>
+                <div class="glass-card-static p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4"><div class="relative flex-1 w-full"><span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="order-search" data-i18n-placeholder="ph_search" placeholder="Search by name, phone, city..." class="input-field pl-11 py-3 text-[13px]"></div><div class="flex items-center gap-2 flex-wrap"><button class="filter-btn active" data-filter="all" data-i18n="flt_all">All</button><button class="filter-btn" data-filter="pending" data-i18n="st_pending">Pending</button><button class="filter-btn" data-filter="picked" data-i18n="st_picked">Picked</button><button class="filter-btn" data-filter="delivered" data-i18n="st_delivered">Delivered</button><button class="filter-btn" data-filter="returned" data-i18n="st_returned">Returned</button></div></div>
                 
-                <div class="glass-card-static overflow-hidden"><div class="table-container" id="orders-table-container"><table><thead><tr><th>Order ID</th><th>Recipient</th><th>Phone</th><th>City</th><th>COD Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="orders-tbody"><tr><td colspan="8" class="text-center py-16 text-slate-500 text-sm">No orders found</td></tr></tbody></table></div><div id="no-orders-msg" class="hidden text-center py-20"><span class="iconify text-6xl text-slate-800 mb-5" data-icon="mdi:package-variant-remove"></span><p class="text-slate-400 font-medium mb-2 text-lg">No orders found</p><p class="text-slate-600 text-sm mb-6">Create your first delivery order to get started.</p><button onclick="switchPage('create-order')" class="btn-primary">Create Order</button></div></div>
+                <div class="glass-card-static overflow-hidden"><div class="table-container" id="orders-table-container"><table><thead><tr><th data-i18n="tb_id">Order ID</th><th data-i18n="tb_name">Recipient</th><th data-i18n="tb_phone">Phone</th><th data-i18n="tb_city">City</th><th data-i18n="tb_cod">COD Amount</th><th data-i18n="tb_status">Status</th><th data-i18n="tb_date">Date</th><th data-i18n="tb_actions">Actions</th></tr></thead><tbody id="orders-tbody"><tr><td colspan="8" class="text-center py-16 text-slate-500 text-sm" data-i18n="empty_orders">No orders found</td></tr></tbody></table></div><div id="no-orders-msg" class="hidden text-center py-20"><span class="iconify text-6xl text-slate-800 mb-5" data-icon="mdi:package-variant-remove"></span><p class="text-slate-400 font-medium mb-2 text-lg" data-i18n="empty_orders">No orders found</p><p class="text-slate-600 text-sm mb-6" data-i18n="empty_orders_sub">Create your first delivery order to get started.</p><button onclick="switchPage('create-order')" class="btn-primary" data-i18n="nav_create">Create Order</button></div></div>
             </div>
 
             <!-- CREATE ORDER -->
             <div id="page-create-order" class="page-content hidden">
-                <div class="max-w-3xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white">Create New Order</h2><p class="text-sm text-slate-500 mt-1">Fill in the delivery details below.</p></div>
+                <div class="max-w-3xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="pg_create">Create New Order</h2><p class="text-sm text-slate-500 mt-1" data-i18n="pg_create_sub">Fill in the delivery details below.</p></div>
                 <form id="create-order-form" class="glass-card-static p-8 lg:p-10 space-y-7">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">Recipient Name *</label><input type="text" id="f-name" required placeholder="e.g. John Doe" class="input-field"></div><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">Phone Number *</label><input type="tel" id="f-phone" required placeholder="e.g. 0769 123 456" class="input-field"></div></div>
-                    <div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">Delivery Address *</label><textarea id="f-address" required rows="2" placeholder="Street name, area, landmark..." class="input-field resize-none"></textarea></div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">City *</label><select id="f-city" required class="select-field"><option value="">Select city</option><option>Dar es Salaam</option><option>Dodoma</option><option>Mwanza</option><option>Arusha</option><option>Mbeya</option><option>Morogoro</option><option>Tanga</option><option>Iringa</option><option>Kagera</option><option>Lindi</option><option>Kigoma</option><option>Other</option></select></div><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">COD Amount (TZS)</label><input type="number" id="f-cod" placeholder="e.g. 50000" class="input-field"></div></div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">Package Description</label><input type="text" id="f-desc" placeholder="e.g. Phone case, 0.5kg" class="input-field"></div><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">Delivery Type</label><select id="f-type" class="select-field"><option value="standard">Standard (1-3 days)</option><option value="express">Express (same day)</option></select></div></div>
-                    <div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">Notes (Optional)</label><textarea id="f-notes" rows="2" placeholder="Any special instructions..." class="input-field resize-none"></textarea></div>
-                    <button type="submit" id="submit-btn" class="btn-primary w-full justify-center py-4 text-[15px]"><span class="iconify text-lg" data-icon="mdi:check-circle-outline"></span> Submit Order</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_name">Recipient Name *</label><input type="text" id="f-name" required data-i18n-placeholder="ph_name" placeholder="e.g. John Doe" class="input-field"></div><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_phone">Phone Number *</label><input type="tel" id="f-phone" required data-i18n-placeholder="ph_phone" placeholder="e.g. 0769 123 456" class="input-field"></div></div>
+                    <div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_address">Delivery Address *</label><textarea id="f-address" required rows="2" data-i18n-placeholder="ph_address" placeholder="Street name, area, landmark..." class="input-field resize-none"></textarea></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_city">City *</label><select id="f-city" required class="select-field"><option value="" data-i18n="ph_city_select">Select city</option><option>Dar es Salaam</option><option>Dodoma</option><option>Mwanza</option><option>Arusha</option><option>Mbeya</option><option>Morogoro</option><option>Tanga</option><option>Iringa</option><option>Kagera</option><option>Lindi</option><option>Kigoma</option><option>Other</option></select></div><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_cod">COD Amount (TZS)</label><input type="number" id="f-cod" data-i18n-placeholder="ph_cod" placeholder="e.g. 50000" class="input-field"></div></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_desc">Package Description</label><input type="text" id="f-desc" data-i18n-placeholder="ph_desc" placeholder="e.g. Phone case, 0.5kg" class="input-field"></div><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_type">Delivery Type</label><select id="f-type" class="select-field"><option value="standard" data-i18n="type_standard">Standard (1-3 days)</option><option value="express" data-i18n="type_express">Express (same day)</option></select></div></div>
+                    <div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_notes">Notes (Optional)</label><textarea id="f-notes" rows="2" data-i18n-placeholder="ph_notes" placeholder="Any special instructions..." class="input-field resize-none"></textarea></div>
+                    <button type="submit" id="submit-btn" class="btn-primary w-full justify-center py-4 text-[15px]"><span class="iconify text-lg" data-icon="mdi:check-circle-outline"></span> <span data-i18n="btn_submit">Submit Order</span></button>
                 </form></div>
             </div>
 
-            <!-- ANALYTICS -->
-            <div id="page-analytics" class="page-content hidden"><div class="mb-8"><h2 class="text-2xl font-bold text-white">Analytics</h2><p class="text-sm text-slate-500 mt-1">Your delivery performance at a glance.</p></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"><div class="glass-card-static p-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5">Orders by Status</h3><div class="chart-container"><canvas id="status-chart"></canvas></div></div><div class="glass-card-static p-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5">COD Value Overview</h3><div class="chart-container"><canvas id="cod-chart"></canvas></div></div></div><div class="glass-card-static p-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5">Orders Over Time</h3><div style="height:300px"><canvas id="timeline-chart"></canvas></div></div></div>
+            <!-- ANALYTICS, SALES, NOTIF, FAQ, PROFILE, SETTINGS, HELP -->
+            <!-- (Kept brief for readability, but fully translated via i18n object below) -->
+            <div id="page-analytics" class="page-content hidden"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="nav_analytics">Analytics</h2><p class="text-sm text-slate-500 mt-1" data-i18n="analytics_sub">Your delivery performance at a glance.</p></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"><div class="glass-card-static p-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5" data-i18n="chart_status">Orders by Status</h3><div class="chart-container"><canvas id="status-chart"></canvas></div></div><div class="glass-card-static p-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5" data-i18n="chart_cod">COD Value Overview</h3><div class="chart-container"><canvas id="cod-chart"></canvas></div></div></div><div class="glass-card-static p-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5" data-i18n="chart_time">Orders Over Time</h3><div style="height:300px"><canvas id="timeline-chart"></canvas></div></div></div>
 
-            <!-- SALES REPORT -->
-            <div id="page-sales-report" class="page-content hidden">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8"><div><h2 class="text-2xl font-bold text-white">Sales Report</h2><p class="text-sm text-slate-500 mt-1">Revenue and delivery performance.</p></div><button onclick="exportReport()" class="btn-secondary text-[12px]"><span class="iconify text-sm" data-icon="mdi:download"></span> Export CSV</button></div>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-                    <div class="glass-card-static p-6"><div class="stat-icon bg-emerald-500/10 mb-4"><span class="iconify text-xl text-emerald-400" data-icon="mdi:cash-check"></span></div><p class="text-2xl font-extrabold text-emerald-400 tracking-tight" id="r-collected">TZS 0</p><p class="text-[12px] text-slate-500 mt-1">Collected COD</p></div>
-                    <div class="glass-card-static p-6"><div class="stat-icon bg-amber-500/10 mb-4"><span class="iconify text-xl text-amber-400" data-icon="mdi:cash-clock"></span></div><p class="text-2xl font-extrabold text-amber-400 tracking-tight" id="r-pending-cod">TZS 0</p><p class="text-[12px] text-slate-500 mt-1">Pending COD</p></div>
-                    <div class="glass-card-static p-6"><div class="stat-icon bg-blue-500/10 mb-4"><span class="iconify text-xl text-blue-400" data-icon="mdi:percent"></span></div><p class="text-2xl font-extrabold text-blue-400 tracking-tight" id="r-rate">0%</p><p class="text-[12px] text-slate-500 mt-1">Delivery Rate</p></div>
-                    <div class="glass-card-static p-6"><div class="stat-icon bg-red-500/10 mb-4"><span class="iconify text-xl text-red-400" data-icon="mdi:cash-remove"></span></div><p class="text-2xl font-extrabold text-red-400 tracking-tight" id="r-lost">TZS 0</p><p class="text-[12px] text-slate-500 mt-1">Returned COD</p></div>
-                </div>
-                <div class="glass-card-static p-6 mb-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5">Revenue by City</h3><div style="height:280px"><canvas id="city-chart"></canvas></div></div>
-                <div class="glass-card-static overflow-hidden"><div class="p-5 border-b border-white/[0.04]"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider">Summary Table</h3></div><div class="table-container"><table class="w-full" style="min-width:600px"><thead><tr><th>City</th><th>Total</th><th>Delivered</th><th>Returned</th><th>Rate</th><th>COD Collected</th></tr></thead><tbody id="report-tbody"><tr><td colspan="6" class="text-center py-12 text-slate-600 text-sm">No data</td></tr></tbody></table></div></div>
-            </div>
+            <div id="page-sales-report" class="page-content hidden"><div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8"><div><h2 class="text-2xl font-bold text-white" data-i18n="nav_sales">Sales Report</h2><p class="text-sm text-slate-500 mt-1" data-i18n="sales_sub">Revenue and delivery performance.</p></div><button onclick="exportReport()" class="btn-secondary text-[12px]"><span class="iconify text-sm" data-icon="mdi:download"></span> <span data-i18n="btn_export">Export CSV</span></button></div><div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8"><div class="glass-card-static p-6"><div class="stat-icon bg-emerald-500/10 mb-4"><span class="iconify text-xl text-emerald-400" data-icon="mdi:cash-check"></span></div><p class="text-2xl font-extrabold text-emerald-400 tracking-tight" id="r-collected">TZS 0</p><p class="text-[12px] text-slate-500 mt-1" data-i18n="r_collected">Collected COD</p></div><div class="glass-card-static p-6"><div class="stat-icon bg-amber-500/10 mb-4"><span class="iconify text-xl text-amber-400" data-icon="mdi:cash-clock"></span></div><p class="text-2xl font-extrabold text-amber-400 tracking-tight" id="r-pending-cod">TZS 0</p><p class="text-[12px] text-slate-500 mt-1" data-i18n="r_pending">Pending COD</p></div><div class="glass-card-static p-6"><div class="stat-icon bg-blue-500/10 mb-4"><span class="iconify text-xl text-blue-400" data-icon="mdi:percent"></span></div><p class="text-2xl font-extrabold text-blue-400 tracking-tight" id="r-rate">0%</p><p class="text-[12px] text-slate-500 mt-1" data-i18n="r_rate">Delivery Rate</p></div><div class="glass-card-static p-6"><div class="stat-icon bg-red-500/10 mb-4"><span class="iconify text-xl text-red-400" data-icon="mdi:cash-remove"></span></div><p class="text-2xl font-extrabold text-red-400 tracking-tight" id="r-lost">TZS 0</p><p class="text-[12px] text-slate-500 mt-1" data-i18n="r_lost">Returned COD</p></div></div><div class="glass-card-static p-6 mb-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5" data-i18n="chart_city">Revenue by City</h3><div style="height:280px"><canvas id="city-chart"></canvas></div></div><div class="glass-card-static overflow-hidden"><div class="p-5 border-b border-white/[0.04]"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider" data-i18n="tb_summary">Summary Table</h3></div><div class="table-container"><table class="w-full" style="min-width:600px"><thead><tr><th data-i18n="tb_city">City</th><th data-i18n="tb_total">Total</th><th data-i18n="st_delivered">Delivered</th><th data-i18n="st_returned">Returned</th><th data-i18n="r_rate">Rate</th><th data-i18n="r_collected">COD Collected</th></tr></thead><tbody id="report-tbody"><tr><td colspan="6" class="text-center py-12 text-slate-600 text-sm">No data</td></tr></tbody></table></div></div></div>
 
-            <!-- NOTIFICATIONS -->
-            <div id="page-notifications" class="page-content hidden">
-                <div class="flex items-center justify-between mb-8"><div><h2 class="text-2xl font-bold text-white">Notifications</h2><p class="text-sm text-slate-500 mt-1">Stay updated on your orders.</p></div><button onclick="markAllRead()" class="btn-secondary text-[12px]"><span class="iconify text-sm" data-icon="mdi:check-all"></span> Mark All Read</button></div>
-                <div class="glass-card-static overflow-hidden" id="notif-list"><div class="text-center py-20"><span class="iconify text-5xl text-slate-800 mb-4" data-icon="mdi:bell-off-outline"></span><p class="text-slate-600 text-xs">No notifications yet</p></div></div>
-            </div>
+            <div id="page-notifications" class="page-content hidden"><div class="flex items-center justify-between mb-8"><div><h2 class="text-2xl font-bold text-white" data-i18n="nav_notif">Notifications</h2><p class="text-sm text-slate-500 mt-1" data-i18n="notif_sub">Stay updated on your orders.</p></div><button onclick="markAllRead()" class="btn-secondary text-[12px]"><span class="iconify text-sm" data-icon="mdi:check-all"></span> <span data-i18n="btn_mark_read">Mark All Read</span></button></div><div class="glass-card-static overflow-hidden" id="notif-list"><div class="text-center py-20"><span class="iconify text-5xl text-slate-800 mb-4" data-icon="mdi:bell-off-outline"></span><p class="text-slate-600 text-xs" data-i18n="empty_notif">No notifications yet</p></div></div></div>
 
-            <!-- FAQ -->
-            <div id="page-faq" class="page-content hidden">
-                <div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white">Frequently Asked Questions</h2><p class="text-sm text-slate-500 mt-1">Find quick answers.</p></div><div class="space-y-3" id="faq-list"></div></div>
-            </div>
+            <div id="page-faq" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="nav_faq">FAQ</h2><p class="text-sm text-slate-500 mt-1" data-i18n="faq_sub">Find quick answers.</p></div><div class="space-y-3" id="faq-list"></div></div></div>
 
-            <!-- PROFILE -->
-            <div id="page-profile" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white">Merchant Profile</h2><p class="text-sm text-slate-500 mt-1">Manage your business information.</p></div><div class="glass-card-static p-8 lg:p-10"><div class="flex items-center gap-6 mb-10 pb-10 border-b border-white/[0.04]"><div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-cyan-400/20 to-cyan-600/10 flex items-center justify-center text-3xl font-extrabold text-cyan-400" id="profile-avatar">?</div><div><p class="text-xl font-bold text-white" id="profile-name">Loading...</p><p class="text-sm text-slate-400 mt-1" id="profile-email">Loading...</p><div class="flex items-center gap-2 mt-3"><span class="w-2.5 h-2.5 bg-emerald-400 rounded-full"></span><span class="text-[12px] text-emerald-400 font-semibold">Verified Merchant</span></div></div></div><form id="profile-form" class="space-y-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">Business Name *</label><input type="text" id="p-business" required class="input-field"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">Phone Number</label><input type="tel" id="p-phone" class="input-field"></div><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest">City</label><input type="text" id="p-city" class="input-field"></div></div><button type="submit" class="btn-primary w-full justify-center py-4"><span class="iconify text-lg" data-icon="mdi:content-save-outline"></span> Save Changes</button></form></div></div></div>
+            <div id="page-profile" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="nav_profile">Merchant Profile</h2><p class="text-sm text-slate-500 mt-1" data-i18n="profile_sub">Manage your business information.</p></div><div class="glass-card-static p-8 lg:p-10"><div class="flex items-center gap-6 mb-10 pb-10 border-b border-white/[0.04]"><div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-cyan-400/20 to-cyan-600/10 flex items-center justify-center text-3xl font-extrabold text-cyan-400" id="profile-avatar">?</div><div><p class="text-xl font-bold text-white" id="profile-name">Loading...</p><p class="text-sm text-slate-400 mt-1" id="profile-email">Loading...</p><div class="flex items-center gap-2 mt-3"><span class="w-2.5 h-2.5 bg-emerald-400 rounded-full"></span><span class="text-[12px] text-emerald-400 font-semibold" data-i18n="verified">Verified Merchant</span></div></div></div><form id="profile-form" class="space-y-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_business">Business Name *</label><input type="text" id="p-business" required class="input-field"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_phone">Phone Number</label><input type="tel" id="p-phone" class="input-field"></div><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_city">City</label><input type="text" id="p-city" class="input-field"></div></div><button type="submit" class="btn-primary w-full justify-center py-4"><span class="iconify text-lg" data-icon="mdi:content-save-outline"></span> <span data-i18n="btn_save">Save Changes</span></button></form></div></div></div>
 
-            <!-- SETTINGS -->
-            <div id="page-settings" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white">Settings</h2><p class="text-sm text-slate-500 mt-1">Manage your account preferences.</p></div><div class="glass-card-static p-8 lg:p-10 space-y-0"><div class="flex items-center justify-between py-6 border-b border-white/[0.04]"><div><p class="text-[15px] font-semibold text-white">Email Notifications</p><p class="text-[12px] text-slate-500 mt-1">Receive order updates via email</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"><div class="w-12 h-6 bg-slate-700 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div></label></div><div class="flex items-center justify-between py-6"><div><p class="text-[15px] font-semibold text-white">Delete Account</p><p class="text-[12px] text-red-400/70 mt-1">Permanently delete your account and all data</p></div><button id="delete-account-btn" class="btn-danger text-[12px]">Delete</button></div></div></div></div>
+            <div id="page-settings" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="nav_settings">Settings</h2><p class="text-sm text-slate-500 mt-1" data-i18n="settings_sub">Manage your account preferences.</p></div><div class="glass-card-static p-8 lg:p-10 space-y-0"><div class="flex items-center justify-between py-6 border-b border-white/[0.04]"><div><p class="text-[15px] font-semibold text-white" data-i18n="set_email">Email Notifications</p><p class="text-[12px] text-slate-500 mt-1" data-i18n="set_email_sub">Receive order updates via email</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"><div class="w-12 h-6 bg-slate-700 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div></label></div><div class="flex items-center justify-between py-6"><div><p class="text-[15px] font-semibold text-white" data-i18n="set_delete">Delete Account</p><p class="text-[12px] text-red-400/70 mt-1" data-i18n="set_delete_sub">Permanently delete your account and all data</p></div><button id="delete-account-btn" class="btn-danger text-[12px]" data-i18n="set_delete_btn">Delete</button></div></div></div></div>
 
-            <!-- HELP -->
-            <div id="page-help" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white">Help & Support</h2><p class="text-sm text-slate-500 mt-1">Find answers or reach out to us.</p></div><div class="space-y-4"><div class="glass-card-static p-6"><h3 class="text-[15px] font-semibold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> How do I create an order?</h3><p class="text-[13px] text-slate-400 leading-relaxed">Go to "Create Order" from the sidebar menu. Fill in the recipient details and click Submit.</p></div><div class="glass-card-static p-6"><h3 class="text-[15px] font-semibold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> What does COD mean?</h3><p class="text-[13px] text-slate-400 leading-relaxed">Cash On Delivery — the amount the customer pays when they receive their package.</p></div><div class="glass-card-static p-7 border-cyan-500/20"><h3 class="text-[15px] font-semibold text-white mb-1">Still need help?</h3><p class="text-[13px] text-slate-500 mb-5">Contact our support team directly.</p><a href="https://wa.me/255769799110" target="_blank" class="btn-primary text-[13px] inline-flex"><span class="iconify text-lg" data-icon="mdi:whatsapp"></span> WhatsApp Support</a></div></div></div>
+            <div id="page-help" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="nav_help">Help & Support</h2><p class="text-sm text-slate-500 mt-1" data-i18n="help_sub">Find answers or reach out to us.</p></div><div class="space-y-4"><div class="glass-card-static p-6"><h3 class="text-[15px] font-semibold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> <span data-i18n="h_q1">How do I create an order?</span></h3><p class="text-[13px] text-slate-400 leading-relaxed" data-i18n="h_a1">Go to "Create Order" from the sidebar menu. Fill in the recipient details and click Submit.</p></div><div class="glass-card-static p-6"><h3 class="text-[15px] font-semibold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> <span data-i18n="h_q2">What does COD mean?</span></h3><p class="text-[13px] text-slate-400 leading-relaxed" data-i18n="h_a2">Cash On Delivery — the amount the customer pays when they receive their package.</p></div><div class="glass-card-static p-7 border-cyan-500/20"><h3 class="text-[15px] font-semibold text-white mb-1" data-i18n="h_still">Still need help?</h3><p class="text-[13px] text-slate-500 mb-5" data-i18n="h_contact">Contact our support team directly.</p><a href="https://wa.me/255769799110" target="_blank" class="btn-primary text-[13px] inline-flex"><span class="iconify text-lg" data-icon="mdi:whatsapp"></span> <span data-i18n="h_whatsapp">WhatsApp Support</span></a></div></div></div>
 
         </div>
     </div>
 </div>
 
 <!-- Modals -->
-<div id="order-modal" class="modal-overlay"><div class="modal-content"><div class="p-6 border-b border-white/[0.04] flex items-center justify-between"><h3 class="text-base font-bold text-white">Order Details</h3><button onclick="closeModal()" class="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.1] transition cursor-pointer"><span class="iconify text-lg text-slate-400" data-icon="mdi:close"></span></button></div><div id="modal-body" class="p-6"></div></div></div>
-<div id="status-modal" class="modal-overlay"><div class="modal-content" style="max-width:400px"><div class="p-6 border-b border-white/[0.04] flex items-center justify-between"><h3 class="text-base font-bold text-white">Change Status</h3><button onclick="closeStatusModal()" class="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.1] transition cursor-pointer"><span class="iconify text-lg text-slate-400" data-icon="mdi:close"></span></button></div><div class="p-6 space-y-3" id="status-options"></div></div></div>
-<div id="delete-modal" class="modal-overlay"><div class="modal-content" style="max-width:400px"><div class="p-8 text-center"><div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-5"><span class="iconify text-3xl text-red-400" data-icon="mdi:alert-circle"></span></div><h3 class="text-lg font-bold text-white mb-2">Delete Account?</h3><p class="text-sm text-slate-400 mb-8">This will permanently delete your account and all your orders.</p><div class="flex gap-3"><button onclick="document.getElementById('delete-modal').classList.remove('show')" class="btn-secondary flex-1 justify-center py-3">Cancel</button><button id="confirm-delete-btn" class="btn-danger flex-1 justify-center py-3">Delete Forever</button></div></div></div></div>
+<div id="order-modal" class="modal-overlay"><div class="modal-content"><div class="p-6 border-b border-white/[0.04] flex items-center justify-between"><h3 class="text-base font-bold text-white" data-i18n="mod_details">Order Details</h3><button onclick="closeModal()" class="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.1] transition cursor-pointer"><span class="iconify text-lg text-slate-400" data-icon="mdi:close"></span></button></div><div id="modal-body" class="p-6"></div></div></div>
+<div id="status-modal" class="modal-overlay"><div class="modal-content" style="max-width:400px"><div class="p-6 border-b border-white/[0.04] flex items-center justify-between"><h3 class="text-base font-bold text-white" data-i18n="mod_status">Change Status</h3><button onclick="closeStatusModal()" class="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.1] transition cursor-pointer"><span class="iconify text-lg text-slate-400" data-icon="mdi:close"></span></button></div><div class="p-6 space-y-3" id="status-options"></div></div></div>
+<div id="delete-modal" class="modal-overlay"><div class="modal-content" style="max-width:400px"><div class="p-8 text-center"><div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-5"><span class="iconify text-3xl text-red-400" data-icon="mdi:alert-circle"></span></div><h3 class="text-lg font-bold text-white mb-2" data-i18n="mod_del_title">Delete Account?</h3><p class="text-sm text-slate-400 mb-8" data-i18n="mod_del_sub">This will permanently delete your account and all your orders.</p><div class="flex gap-3"><button onclick="document.getElementById('delete-modal').classList.remove('show')" class="btn-secondary flex-1 justify-center py-3" data-i18n="btn_cancel">Cancel</button><button id="confirm-delete-btn" class="btn-danger flex-1 justify-center py-3" data-i18n="mod_del_btn">Delete Forever</button></div></div></div></div>
 
 <script>
 // =============================================
-// NO SUPABASE — Pure Local Storage
+// TRANSLATIONS (i18n)
+// =============================================
+var currentLang = localStorage.getItem('chapshop_lang') || 'en';
+
+const translations = {
+    en: {
+        loading: "Initializing Dashboard", cat_main: "Main", nav_overview: "Overview", nav_orders: "All Orders", nav_create: "Create Order", cat_insights: "Insights", nav_analytics: "Analytics", nav_sales: "Sales Report", cat_account: "Account", nav_notif: "Notifications", nav_profile: "Profile", nav_settings: "Settings", nav_faq: "FAQ", nav_help: "Help & Support", btn_logout: "Sign Out", btn_website: "Website",
+        ov_sub: "Here's what's happening with your deliveries today.", stat_total: "Total Orders", stat_delivered: "Delivered", stat_progress: "In Progress", stat_cod: "Total COD Value",
+        ov_quick: "Quick Actions", qa_new: "New Order", qa_new_sub: "Create delivery", qa_manage: "Manage Orders", qa_manage_sub: "View & track", qa_sales: "Sales Report", qa_sales_sub: "Revenue & stats",
+        ov_chart: "Orders This Week", ov_recent: "Recent Orders", btn_view_all: "View All →", empty_orders: "No orders yet", empty_orders_sub: "Create your first delivery order to get started.",
+        pg_orders: "All Orders", pg_orders_sub: "Manage and track your deliveries", ph_search: "Search by name, phone, city...", flt_all: "All", st_pending: "Pending", st_picked: "Picked", st_delivered: "Delivered", st_returned: "Returned",
+        tb_id: "Order ID", tb_name: "Recipient", tb_phone: "Phone", tb_city: "City", tb_cod: "COD Amount", tb_status: "Status", tb_date: "Date", tb_actions: "Actions",
+        pg_create: "Create New Order", pg_create_sub: "Fill in the delivery details below.", lbl_name: "Recipient Name *", ph_name: "e.g. John Doe", lbl_phone: "Phone Number *", ph_phone: "e.g. 0769 123 456", lbl_address: "Delivery Address *", ph_address: "Street name, area, landmark...", lbl_city: "City *", ph_city_select: "Select city", lbl_cod: "COD Amount (TZS)", ph_cod: "e.g. 50000", lbl_desc: "Package Description", ph_desc: "e.g. Phone case, 0.5kg", lbl_type: "Delivery Type", type_standard: "Standard (1-3 days)", type_express: "Express (same day)", lbl_notes: "Notes (Optional)", ph_notes: "Any special instructions...", btn_submit: "Submit Order",
+        analytics_sub: "Your delivery performance at a glance.", chart_status: "Orders by Status", chart_cod: "COD Value Overview", chart_time: "Orders Over Time",
+        sales_sub: "Revenue and delivery performance.", btn_export: "Export CSV", r_collected: "Collected COD", r_pending: "Pending COD", r_rate: "Delivery Rate", r_lost: "Returned COD", chart_city: "Revenue by City", tb_summary: "Summary Table", tb_total: "Total",
+        notif_sub: "Stay updated on your orders.", btn_mark_read: "Mark All Read", empty_notif: "No notifications yet", notif_created: "Order Created", notif_picked: "Picked Up", notif_delivered: "Delivered", notif_returned: "Returned",
+        faq_sub: "Find quick answers.", profile_sub: "Manage your business information.", verified: "Verified Merchant", lbl_business: "Business Name *", btn_save: "Save Changes",
+        settings_sub: "Manage your account preferences.", set_email: "Email Notifications", set_email_sub: "Receive order updates via email", set_delete: "Delete Account", set_delete_sub: "Permanently delete your account and all data", set_delete_btn: "Delete",
+        help_sub: "Find answers or reach out to us.", h_q1: "How do I create an order?", h_a1: "Go to 'Create Order' from the sidebar menu. Fill in the recipient details and click Submit.", h_q2: "What does COD mean?", h_a2: "Cash On Delivery — the amount the customer pays when they receive their package.", h_still: "Still need help?", h_contact: "Contact our support team directly.", h_whatsapp: "WhatsApp Support",
+        mod_details: "Order Details", mod_status: "Change Status", mod_del_title: "Delete Account?", mod_del_sub: "This will permanently delete your account and all your orders.", mod_del_btn: "Delete Forever", btn_cancel: "Cancel",
+        toast_created: "Order created successfully!", toast_status: "Status updated to", toast_deleted: "Order deleted", toast_copied: "Copied to clipboard!", toast_exported: "Report exported!", toast_read: "All marked as read", toast_saved: "Profile updated!", toast_account_del: "Account deleted.",
+        dt_just_now: "Just now", greeting_morning: "Good morning", greeting_afternoon: "Good afternoon", greeting_evening: "Good evening"
+    },
+    ar: {
+        loading: "تهيئة لوحة التحكم", cat_main: "الرئيسية", nav_overview: "نظرة عامة", nav_orders: "جميع الطلبات", nav_create: "إنشاء طلب", cat_insights: "التحليلات", nav_analytics: "التحليلات", nav_sales: "تقرير المبيعات", cat_account: "الحساب", nav_notif: "الإشعارات", nav_profile: "الملف الشخصي", nav_settings: "الإعدادات", nav_faq: "الأسئلة الشائعة", nav_help: "المساعدة والدعم", btn_logout: "تسجيل الخروج", btn_website: "الموقع",
+        ov_sub: "إليك ما يحدث مع توصيلاتك اليوم.", stat_total: "إجمالي الطلبات", stat_delivered: "تم التسليم", stat_progress: "قيد التنفيذ", stat_cod: "إجمالي قيمة COD",
+        ov_quick: "إجراءات سريعة", qa_new: "طلب جديد", qa_new_sub: "إنشاء توصيلة", qa_manage: "إدارة الطلبات", qa_manage_sub: "عرض وتتبع", qa_sales: "تقرير المبيعات", qa_sales_sub: "الإيرادات والإحصائيات",
+        ov_chart: "الطلبات هذا الأسبوع", ov_recent: "الطلبات الأخيرة", btn_view_all: "عرض الكل ←", empty_orders: "لا توجد طلبات بعد", empty_orders_sub: "قم بإنشاء أول طلب توصيل للبدء.",
+        pg_orders: "جميع الطلبات", pg_orders_sub: "إدارة وتتبع توصيلاتك", ph_search: "ابحث بالاسم، الهاتف، المدينة...", flt_all: "الكل", st_pending: "قيد الانتظار", st_picked: "تم الاستلام", st_delivered: "تم التسليم", st_returned: "مرتجع",
+        tb_id: "رقم الطلب", tb_name: "المستلم", tb_phone: "الهاتف", tb_city: "المدينة", tb_cod: "مبلغ COD", tb_status: "الحالة", tb_date: "التاريخ", tb_actions: "الإجراءات",
+        pg_create: "إنشاء طلب جديد", pg_create_sub: "املأ تفاصيل التوصيل أدناه.", lbl_name: "اسم المستلم *", ph_name: "مثال: محمد أحمد", lbl_phone: "رقم الهاتف *", ph_phone: "مثال: 0769 123 456", lbl_address: "عنوان التوصيل *", ph_address: "اسم الشارع، المنطقة، المعلم...", lbl_city: "المدينة *", ph_city_select: "اختر المدينة", lbl_cod: "مبلغ COD (شلن)", ph_cod: "مثال: 50000", lbl_desc: "وصف الطرد", ph_desc: "مثال: غلاف هاتف، 0.5 كجم", lbl_type: "نوع التوصيل", type_standard: "قياسي (1-3 أيام)", type_express: "سريع (نفس اليوم)", lbl_notes: "ملاحظات (اختياري)", ph_notes: "أي تعليمات خاصة...", btn_submit: "إرسال الطلب",
+        analytics_sub: "أداء التوصيل الخاص بك في لمحة.", chart_status: "الطلبات حسب الحالة", chart_cod: "نظرة عامة على قيمة COD", chart_time: "الطلبات بمرور الوقت",
+        sales_sub: "الإيرادات وأداء التوصيل.", btn_export: "تصدير CSV", r_collected: "COD المحصل", r_pending: "COD المعلق", r_rate: "معدل التسليم", r_lost: "COD المرتجع", chart_city: "الإيرادات حسب المدينة", tb_summary: "جدول ملخص", tb_total: "الإجمالي",
+        notif_sub: "ابق على اطلاع على طلباتك.", btn_mark_read: "تحديد الكل كمقروء", empty_notif: "لا توجد إشعارات بعد", notif_created: "تم إنشاء الطلب", notif_picked: "تم الاستلام", notif_delivered: "تم التسليم", notif_returned: "تم الإرجاع",
+        faq_sub: "ابحث عن إجابات سريعة.", profile_sub: "إدارة معلومات عملك.", verified: "تاجر موثوق", lbl_business: "اسم النشاط التجاري *", btn_save: "حفظ التغييرات",
+        settings_sub: "إدارة تفضيلات حسابك.", set_email: "إشعارات البريد الإلكتروني", set_email_sub: "تلقي تحديثات الطلب عبر البريد الإلكتروني", set_delete: "حذف الحساب", set_delete_sub: "حذف حسابك وجميع بياناتك نهائيًا", set_delete_btn: "حذف",
+        help_sub: "ابحث عن إجابات أو تواصل معنا.", h_q1: "كيف أنشئ طلبًا؟", h_a1: "اذهب إلى 'إنشاء طلب' من القائمة الجانبية. املأ تفاصيل المستلم وانقر على إرسال.", h_q2: "ماذا يعني COD؟", h_a2: "الدفع عند الاستلام — المبلغ الذي يدفعه العميل عند استلام الطرد.", h_still: "هل لا تزال بحاجة إلى مساعدة؟", h_contact: "تواصل مع فريق الدعم الخاص بنا مباشرة.", h_whatsapp: "دعم واتساب",
+        mod_details: "تفاصيل الطلب", mod_status: "تغيير الحالة", mod_del_title: "حذف الحساب؟", mod_del_sub: "سيؤدي هذا إلى حذف حسابك وجميع طلباتك نهائيًا.", mod_del_btn: "حذف نهائي", btn_cancel: "إلغاء",
+        toast_created: "تم إنشاء الطلب بنجاح!", toast_status: "تم تحديث الحالة إلى", toast_deleted: "تم حذف الطلب", toast_copied: "تم النسخ إلى الحافظة!", toast_exported: "تم تصدير التقرير!", toast_read: "تم تحديد الكل كمقروء", toast_saved: "تم تحديث الملف الشخصي!", toast_account_del: "تم حذف الحساب.",
+        dt_just_now: "الآن", greeting_morning: "صباح الخير", greeting_afternoon: "مساء الخير", greeting_evening: "مساء الخير"
+    },
+    fr: {
+        loading: "Initialisation du tableau de bord", cat_main: "Principal", nav_overview: "Aperçu", nav_orders: "Toutes les commandes", nav_create: "Créer une commande", cat_insights: "Analyses", nav_analytics: "Analytique", nav_sales: "Rapport des ventes", cat_account: "Compte", nav_notif: "Notifications", nav_profile: "Profil", nav_settings: "Paramètres", nav_faq: "FAQ", nav_help: "Aide et support", btn_logout: "Déconnexion", btn_website: "Site web",
+        ov_sub: "Voici ce qui se passe avec vos livraisons aujourd'hui.", stat_total: "Commandes totales", stat_delivered: "Livrées", stat_progress: "En cours", stat_cod: "Valeur COD totale",
+        ov_quick: "Actions rapides", qa_new: "Nouvelle commande", qa_new_sub: "Créer une livraison", qa_manage: "Gérer les commandes", qa_manage_sub: "Voir et suivre", qa_sales: "Rapport des ventes", qa_sales_sub: "Revenus et statistiques",
+        ov_chart: "Commandes cette semaine", ov_recent: "Commandes récentes", btn_view_all: "Voir tout →", empty_orders: "Aucune commande", empty_orders_sub: "Créez votre première commande de livraison pour commencer.",
+        pg_orders: "Toutes les commandes", pg_orders_sub: "Gérez et suivez vos livraisons", ph_search: "Rechercher par nom, téléphone, ville...", flt_all: "Tout", st_pending: "En attente", st_picked: "Récupérées", st_delivered: "Livrées", st_returned: "Retournées",
+        tb_id: "ID de commande", tb_name: "Destinataire", tb_phone: "Téléphone", tb_city: "Ville", tb_cod: "Montant COD", tb_status: "Statut", tb_date: "Date", tb_actions: "Actions",
+        pg_create: "Créer une nouvelle commande", pg_create_sub: "Remplissez les détails de livraison ci-dessous.", lbl_name: "Nom du destinataire *", ph_name: "ex: Jean Dupont", lbl_phone: "Numéro de téléphone *", ph_phone: "ex: 0769 123 456", lbl_address: "Adresse de livraison *", ph_address: "Nom de la rue, quartier, point de repère...", lbl_city: "Ville *", ph_city_select: "Sélectionner la ville", lbl_cod: "Montant COD (TZS)", ph_cod: "ex: 50000", lbl_desc: "Description du colis", ph_desc: "ex: Coque de téléphone, 0,5 kg", lbl_type: "Type de livraison", type_standard: "Standard (1-3 jours)", type_express: "Express (le jour même)", lbl_notes: "Notes (Facultatif)", ph_notes: "Instructions spéciales...", btn_submit: "Soumettre la commande",
+        analytics_sub: "Un aperçu de vos performances de livraison.", chart_status: "Commandes par statut", chart_cod: "Aperçu de la valeur COD", chart_time: "Commandes au fil du temps",
+        sales_sub: "Revenus et performances de livraison.", btn_export: "Exporter CSV", r_collected: "COD collecté", r_pending: "COD en attente", r_rate: "Taux de livraison", r_lost: "COD retourné", chart_city: "Revenus par ville", tb_summary: "Tableau récapitulatif", tb_total: "Total",
+        notif_sub: "Restez informé de vos commandes.", btn_mark_read: "Tout marquer comme lu", empty_notif: "Aucune notification", notif_created: "Commande créée", notif_picked: "Récupérée", notif_delivered: "Livrée", notif_returned: "Retournée",
+        faq_sub: "Trouvez des réponses rapides.", profile_sub: "Gérez les informations de votre entreprise.", verified: "Marchand vérifié", lbl_business: "Nom de l'entreprise *", btn_save: "Enregistrer les modifications",
+        settings_sub: "Gérez les préférences de votre compte.", set_email: "Notifications par e-mail", set_email_sub: "Recevez les mises à jour par e-mail", set_delete: "Supprimer le compte", set_delete_sub: "Supprimer définitivement votre compte et toutes vos données", set_delete_btn: "Supprimer",
+        help_sub: "Trouvez des réponses ou contactez-nous.", h_q1: "Comment créer une commande ?", h_a1: "Allez dans 'Créer une commande' dans le menu latéral. Remplissez les détails du destinataire et cliquez sur Soumettre.", h_q2: "Que signifie COD ?", h_a2: "Cash On Delivery (Paiement à la livraison) — le montant que le client paie à la réception du colis.", h_still: "Besoin d'aide ?", h_contact: "Contactez directement notre équipe de support.", h_whatsapp: "Support WhatsApp",
+        mod_details: "Détails de la commande", mod_status: "Changer le statut", mod_del_title: "Supprimer le compte ?", mod_del_sub: "Cela supprimera définitivement votre compte et toutes vos commandes.", mod_del_btn: "Supprimer définitivement", btn_cancel: "Annuler",
+        toast_created: "Commande créée avec succès !", toast_status: "Statut mis à jour à", toast_deleted: "Commande supprimée", toast_copied: "Copié dans le presse-papiers !", toast_exported: "Rapport exporté !", toast_read: "Tout marqué comme lu", toast_saved: "Profil mis à jour !", toast_account_del: "Compte supprimé.",
+        dt_just_now: "À l'instant", greeting_morning: "Bonjour", greeting_afternoon: "Bon après-midi", greeting_evening: "Bonsoir"
+    },
+    zh: {
+        loading: "正在初始化仪表板", cat_main: "主菜单", nav_overview: "概览", nav_orders: "所有订单", nav_create: "创建订单", cat_insights: "洞察", nav_analytics: "数据分析", nav_sales: "销售报告", cat_account: "账户", nav_notif: "通知", nav_profile: "个人资料", nav_settings: "设置", nav_faq: "常见问题", nav_help: "帮助与支持", btn_logout: "退出登录", btn_website: "网站",
+        ov_sub: "以下是您今天配送的最新情况。", stat_total: "总订单", stat_delivered: "已送达", stat_progress: "进行中", stat_cod: "总代收货款价值",
+        ov_quick: "快捷操作", qa_new: "新订单", qa_new_sub: "创建配送", qa_manage: "管理订单", qa_manage_sub: "查看与跟踪", qa_sales: "销售报告", qa_sales_sub: "收入与统计",
+        ov_chart: "本周订单", ov_recent: "近期订单", btn_view_all: "查看全部 →", empty_orders: "暂无订单", empty_orders_sub: "创建您的第一个配送订单以开始。",
+        pg_orders: "所有订单", pg_orders_sub: "管理和跟踪您的配送", ph_search: "按姓名、电话、城市搜索...", flt_all: "全部", st_pending: "待处理", st_picked: "已取件", st_delivered: "已送达", st_returned: "已退回",
+        tb_id: "订单编号", tb_name: "收件人", tb_phone: "电话", tb_city: "城市", tb_cod: "代收金额", tb_status: "状态", tb_date: "日期", tb_actions: "操作",
+        pg_create: "创建新订单", pg_create_sub: "请在下方填写配送详情。", lbl_name: "收件人姓名 *", ph_name: "例如：张三", lbl_phone: "电话号码 *", ph_phone: "例如：0769 123 456", lbl_address: "配送地址 *", ph_address: "街道名称、区域、地标...", lbl_city: "城市 *", ph_city_select: "选择城市", lbl_cod: "代收金额 (TZS)", ph_cod: "例如：50000", lbl_desc: "包裹描述", ph_desc: "例如：手机壳，0.5kg", lbl_type: "配送类型", type_standard: "标准（1-3天）", type_express: "加急（当天）", lbl_notes: "备注（可选）", ph_notes: "任何特殊说明...", btn_submit: "提交订单",
+        analytics_sub: "一目了然的配送绩效。", chart_status: "按状态划分的订单", chart_cod: "代收货款概览", chart_time: "订单趋势",
+        sales_sub: "收入和配送绩效。", btn_export: "导出 CSV", r_collected: "已收代收货款", r_pending: "待收代收货款", r_rate: "送达率", r_lost: "退回代收货款", chart_city: "各城市收入", tb_summary: "汇总表", tb_total: "总计",
+        notif_sub: "随时了解您的订单动态。", btn_mark_read: "全部标记为已读", empty_notif: "暂无通知", notif_created: "订单已创建", notif_picked: "已取件", notif_delivered: "已送达", notif_returned: "已退回",
+        faq_sub: "查找快速解答。", profile_sub: "管理您的商业信息。", verified: "认证商家", lbl_business: "企业名称 *", btn_save: "保存更改",
+        settings_sub: "管理您的账户偏好。", set_email: "电子邮件通知", set_email_sub: "通过电子邮件接收订单更新", set_delete: "删除账户", set_delete_sub: "永久删除您的账户和所有数据", set_delete_btn: "删除",
+        help_sub: "查找答案或联系我们。", h_q1: "如何创建订单？", h_a1: "转到侧边栏菜单中的“创建订单”。填写收件人详细信息，然后点击提交。", h_q2: "COD 是什么意思？", h_a2: "货到付款 — 客户在收到包裹时支付的金额。", h_still: "还需要帮助？", h_contact: "直接联系我们的支持团队。", h_whatsapp: "WhatsApp 支持",
+        mod_details: "订单详情", mod_status: "更改状态", mod_del_title: "删除账户？", mod_del_sub: "这将永久删除您的账户和所有订单。", mod_del_btn: "永久删除", btn_cancel: "取消",
+        toast_created: "订单创建成功！", toast_status: "状态更新为", toast_deleted: "订单已删除", toast_copied: "已复制到剪贴板！", toast_exported: "报告已导出！", toast_read: "全部标记为已读", toast_saved: "资料已更新！", toast_account_del: "账户已删除。",
+        dt_just_now: "刚刚", greeting_morning: "早上好", greeting_afternoon: "下午好", greeting_evening: "晚上好"
+    }
+};
+
+function t(key) {
+    return translations[currentLang][key] || translations['en'][key] || key;
+}
+
+function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang][key]) {
+            el.textContent = translations[currentLang][key];
+        }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[currentLang][key]) {
+            el.placeholder = translations[currentLang][key];
+        }
+    });
+    // Update page title dynamically
+    const activePage = document.querySelector('.sidebar-link.active');
+    if(activePage) {
+        const pageKey = activePage.getAttribute('data-page');
+        const titleMap = {overview:'nav_overview', orders:'nav_orders', 'create-order':'nav_create', analytics:'nav_analytics', 'sales-report':'nav_sales', notifications:'nav_notif', profile:'nav_profile', settings:'nav_settings', faq:'nav_faq', help:'nav_help'};
+        document.getElementById('page-title').textContent = t(titleMap[pageKey] || 'nav_overview');
+    }
+    // Re-render dynamic content
+    loadOrders();
+}
+
+document.getElementById('lang-switcher').value = currentLang;
+document.getElementById('lang-switcher').addEventListener('change', (e) => {
+    currentLang = e.target.value;
+    localStorage.setItem('chapshop_lang', currentLang);
+    
+    // Handle RTL
+    if(currentLang === 'ar') {
+        document.documentElement.dir = 'rtl';
+        document.documentElement.lang = 'ar';
+    } else {
+        document.documentElement.dir = 'ltr';
+        document.documentElement.lang = currentLang;
+    }
+    
+    applyTranslations();
+});
+
+// =============================================
+// CORE LOGIC
 // =============================================
 var currentUser=null,merchantProfile=null,allOrders=[],currentFilter='all',chartInstances={},notifs=[];
 
-var faqs=[
-    {q:"How do I create an order?",a:"Go to 'Create Order' from the sidebar. Fill in recipient name, phone, address, city, and optional COD amount. Click Submit."},
-    {q:"What is COD?",a:"Cash On Delivery — the amount the customer pays the rider when they receive their package."},
-    {q:"How do I track my orders?",a:"Go to 'All Orders' to see every order with its current status."},
-    {q:"Can I change an order's status?",a:"Yes! In 'All Orders', click the status badge on any order to change it."},
-    {q:"How do I delete an order?",a:"Open the order details by clicking 'View', then click 'Delete Order' at the bottom."},
-    {q:"What does the Sales Report show?",a:"Collected COD, pending COD, delivery rate, returned COD, and revenue by city."},
-    {q:"How do I export my report?",a:"On the Sales Report page, click the 'Export CSV' button to download a CSV file."},
-    {q:"What cities are supported?",a:"All major Tanzanian cities including Dar es Salaam, Dodoma, Mwanza, Arusha, Mbeya, and more."}
-];
-
 function generateId(){return 'ord-'+Math.random().toString(36).substr(2,9);}
 
-// ---- Local Storage Helpers ----
 function getMerchantOrders(){
     if(!currentUser)return[];
     var all=JSON.parse(localStorage.getItem('chapshop_orders')||'[]');
@@ -299,15 +419,19 @@ function saveMerchantOrders(orders){
 function getMerchantsList(){return JSON.parse(localStorage.getItem('chapshop_merchants')||'[]');}
 function saveMerchantsList(m){localStorage.setItem('chapshop_merchants',JSON.stringify(m));}
 
-// =============================================
-// INIT
-// =============================================
 function init(){
     var userData=localStorage.getItem('chapshop_logged_in');
     if(!userData){location.href='merchants.html';return;}
     currentUser=JSON.parse(userData);
+    
+    // Apply initial language direction
+    if(currentLang === 'ar') {
+        document.documentElement.dir = 'rtl';
+    }
+    
     loadProfile();
     showApp();
+    applyTranslations();
 }
 
 function loadProfile(){
@@ -317,8 +441,6 @@ function loadProfile(){
         merchantProfile={id:currentUser.id,name:currentUser.name||'Merchant',business:currentUser.business||'My Business',email:currentUser.email||'',phone:currentUser.phone||'',city:currentUser.country||'',platforms:''};
     }
     renderProfile();
-    loadOrders();
-    renderFAQ();
 }
 
 function renderProfile(){
@@ -332,8 +454,8 @@ function renderProfile(){
     document.getElementById('profile-email').textContent=em;
     
     var hour = new Date().getHours();
-    var greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-    document.getElementById('welcome-name').textContent=greeting+', '+n.split(' ')[0]+'! 👋';
+    var greetingKey = hour < 12 ? 'greeting_morning' : hour < 18 ? 'greeting_afternoon' : 'greeting_evening';
+    document.getElementById('welcome-name').textContent=t(greetingKey)+', '+n.split(' ')[0]+'! 👋';
     
     document.getElementById('p-business').value=merchantProfile.business||'';
     document.getElementById('p-phone').value=merchantProfile.phone||'';
@@ -375,46 +497,42 @@ function renderOrdersTable(){
     var html='';
     filtered.forEach(function(o){
         var oid=o.id.substring(0,8).toUpperCase(),s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'',cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—';
-        html+='<tr class="order-row"><td class="font-mono text-cyan-400 text-[12px] font-semibold">'+oid+'</td><td class="text-white font-medium">'+(o.recipient_name||'')+'</td><td class="text-slate-400">'+(o.recipient_phone||'')+'</td><td class="text-slate-300">'+(o.city||'')+'</td><td class="text-white font-semibold">'+cod+'</td><td><span class="badge badge-'+s+' cursor-pointer" onclick="openStatusModal(\''+o.id+'\',\''+s+'\')">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span></td><td class="text-slate-500 text-[12px]">'+dt+'</td><td><button onclick="openOrderModal(\''+o.id+'\')" class="text-[12px] text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer transition">View</button></td></tr>';
+        html+=`<tr class="order-row"><td class="font-mono text-cyan-400 text-[12px] font-semibold">${oid}</td><td class="text-white font-medium">${o.recipient_name||''}</td><td class="text-slate-400">${o.recipient_phone||''}</td><td class="text-slate-300">${o.city||''}</td><td class="text-white font-semibold">${cod}</td><td><span class="badge badge-${s} cursor-pointer" onclick="openStatusModal('${o.id}','${s}')">${t('st_'+s)}</span></td><td class="text-slate-500 text-[12px]">${dt}</td><td><button onclick="openOrderModal('${o.id}')" class="text-[12px] text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer transition">${t('tb_actions')}</button></td></tr>`;
     });
     tbody.innerHTML=html;
 }
 
 function renderRecentOrders(){
     var el=document.getElementById('recent-orders-list'),recent=allOrders.slice(0,6);
-    if(!recent.length){el.innerHTML='<div class="text-center py-16"><span class="iconify text-5xl text-slate-800 mb-4" data-icon="mdi:package-variant"></span><p class="text-slate-500 text-sm">No orders yet. Create your first order!</p></div>';return;}
+    if(!recent.length){el.innerHTML=`<div class="text-center py-16"><span class="iconify text-5xl text-slate-800 mb-4" data-icon="mdi:package-variant"></span><p class="text-slate-500 text-sm">${t('empty_orders')}</p></div>`;return;}
     var html='';
     recent.forEach(function(o){
         var s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}):'',cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—';
-        html+='<div class="flex items-center justify-between p-5 hover:bg-white/[0.02] transition cursor-pointer border-b border-white/[0.03] last:border-0" onclick="openOrderModal(\''+o.id+'\')"><div class="flex items-center gap-4"><div class="w-11 h-11 rounded-xl bg-cyan-500/[0.08] flex items-center justify-center"><span class="iconify text-lg text-cyan-400/80" data-icon="mdi:package-variant"></span></div><div><p class="text-[13px] font-semibold text-white">'+(o.recipient_name||'')+'</p><p class="text-[11px] text-slate-500 mt-0.5">'+(o.city||'')+(dt?' · '+dt:'')+'</p></div></div><div class="text-right"><p class="text-[13px] font-semibold text-white">'+cod+'</p><span class="badge badge-'+s+' text-[9px] mt-1.5 inline-block">'+s.toUpperCase()+'</span></div></div>';
+        html+=`<div class="flex items-center justify-between p-5 hover:bg-white/[0.02] transition cursor-pointer border-b border-white/[0.03] last:border-0" onclick="openOrderModal('${o.id}')"><div class="flex items-center gap-4"><div class="w-11 h-11 rounded-xl bg-cyan-500/[0.08] flex items-center justify-center"><span class="iconify text-lg text-cyan-400/80" data-icon="mdi:package-variant"></span></div><div><p class="text-[13px] font-semibold text-white">${o.recipient_name||''}</p><p class="text-[11px] text-slate-500 mt-0.5">${o.city||''}${dt?' · '+dt:''}</p></div></div><div class="text-right"><p class="text-[13px] font-semibold text-white">${cod}</p><span class="badge badge-${s} text-[9px] mt-1.5 inline-block">${t('st_'+s).toUpperCase()}</span></div></div>`;
     });
     el.innerHTML=html;
 }
 
 function renderCharts(){
-    // Overview Chart
     if(chartInstances.overview)chartInstances.overview.destroy();
-    var days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],counts=[0,0,0,0,0,0,0];
+    var days=[t('ov_chart').substring(0,2),'Tue','Wed','Thu','Fri','Sat','Sun'],counts=[0,0,0,0,0,0,0];
     allOrders.forEach(function(o){if(o.created_at){var d=new Date(o.created_at).getDay();counts[d===0?6:d-1]++}});
-    chartInstances.overview=new Chart(document.getElementById('overview-chart'),{type:'bar',data:{labels:days,datasets:[{data:counts,backgroundColor:'rgba(6,182,212,0.2)',hoverBackgroundColor:'rgba(6,182,212,0.4)',borderColor:'rgba(6,182,212,0.8)',borderWidth:1.5,borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e293b',titleColor:'#f1f5f9',bodyColor:'#94a3b8',borderColor:'#334155',borderWidth:1,padding:12,displayColors:false}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:11}}},y:{grid:{color:'rgba(148,163,184,0.04)'},ticks:{color:'#64748b',font:{size:11},stepSize:1},beginAtZero:true}}}});
+    chartInstances.overview=new Chart(document.getElementById('overview-chart'),{type:'bar',data:{labels:days,datasets:[{data:counts,backgroundColor:'rgba(6,182,212,0.2)',hoverBackgroundColor:'rgba(6,182,212,0.4)',borderColor:'rgba(6,182,212,0.8)',borderWidth:1.5,borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:11}}},y:{grid:{color:'rgba(148,163,184,0.04)'},ticks:{color:'#64748b',font:{size:11},stepSize:1},beginAtZero:true}}}});
 
-    // Status Chart
     if(chartInstances.status)chartInstances.status.destroy();
     var sc={pending:0,picked:0,delivered:0,returned:0};
     allOrders.forEach(function(o){if(sc[o.status]!==undefined)sc[o.status]++});
-    chartInstances.status=new Chart(document.getElementById('status-chart'),{type:'doughnut',data:{labels:['Pending','Picked','Delivered','Returned'],datasets:[{data:[sc.pending,sc.picked,sc.delivered,sc.returned],backgroundColor:['rgba(245,158,11,0.8)','rgba(59,130,246,0.8)','rgba(34,197,94,0.8)','rgba(239,68,68,0.8)'],borderWidth:0,spacing:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},padding:20,usePointStyle:true,pointStyleWidth:8}},tooltip:{backgroundColor:'#1e293b',titleColor:'#f1f5f9',bodyColor:'#94a3b8',borderColor:'#334155',borderWidth:1,padding:12}}}});
+    chartInstances.status=new Chart(document.getElementById('status-chart'),{type:'doughnut',data:{labels:[t('st_pending'),t('st_picked'),t('st_delivered'),t('st_returned')],datasets:[{data:[sc.pending,sc.picked,sc.delivered,sc.returned],backgroundColor:['rgba(245,158,11,0.8)','rgba(59,130,246,0.8)','rgba(34,197,94,0.8)','rgba(239,68,68,0.8)'],borderWidth:0,spacing:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},padding:20,usePointStyle:true,pointStyleWidth:8}}}}});
 
-    // COD Chart
     if(chartInstances.cod)chartInstances.cod.destroy();
     var cs={pending:0,picked:0,delivered:0};
     allOrders.forEach(function(o){if(cs[o.status]!==undefined&&o.cod_amount)cs[o.status]+=Number(o.cod_amount)});
-    chartInstances.cod=new Chart(document.getElementById('cod-chart'),{type:'bar',data:{labels:['Pending COD','Picked COD','Delivered COD'],datasets:[{data:[cs.pending,cs.picked,cs.delivered],backgroundColor:['rgba(245,158,11,0.3)','rgba(59,130,246,0.3)','rgba(34,197,94,0.3)'],borderColor:['rgba(245,158,11,0.8)','rgba(59,130,246,0.8)','rgba(34,197,94,0.8)'],borderWidth:1.5,borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e293b',titleColor:'#f1f5f9',bodyColor:'#94a3b8',borderColor:'#334155',borderWidth:1,padding:12,callbacks:{label:function(c){return'TZS '+c.raw.toLocaleString()}}}},scales:{x:{grid:{color:'rgba(148,163,184,0.04)'},ticks:{color:'#64748b',font:{size:11},callback:function(v){return'TZS '+(v/1000)+'k'}}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}}}}});
+    chartInstances.cod=new Chart(document.getElementById('cod-chart'),{type:'bar',data:{labels:[t('st_pending')+' COD',t('st_picked')+' COD',t('st_delivered')+' COD'],datasets:[{data:[cs.pending,cs.picked,cs.delivered],backgroundColor:['rgba(245,158,11,0.3)','rgba(59,130,246,0.3)','rgba(34,197,94,0.3)'],borderColor:['rgba(245,158,11,0.8)','rgba(59,130,246,0.8)','rgba(34,197,94,0.8)'],borderWidth:1.5,borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(148,163,184,0.04)'},ticks:{color:'#64748b',font:{size:11},callback:function(v){return'TZS '+(v/1000)+'k'}}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}}}}});
 
-    // Timeline Chart
     if(chartInstances.timeline)chartInstances.timeline.destroy();
     var map={};allOrders.forEach(function(o){if(o.created_at){var k=o.created_at.substring(0,10);map[k]=(map[k]||0)+1}});
     var keys=Object.keys(map).sort();
-    chartInstances.timeline=new Chart(document.getElementById('timeline-chart'),{type:'line',data:{labels:keys.map(function(k){return new Date(k).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}),datasets:[{data:keys.map(function(k){return map[k]}),borderColor:'rgba(6,182,212,1)',backgroundColor:'rgba(6,182,212,0.05)',fill:true,tension:.4,pointBackgroundColor:'#06b6d4',pointBorderColor:'#0f172a',pointBorderWidth:2,pointRadius:5,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e293b',titleColor:'#f1f5f9',bodyColor:'#94a3b8',borderColor:'#334155',borderWidth:1,padding:12}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:10},maxRotation:45}},y:{grid:{color:'rgba(148,163,184,0.04)'},ticks:{color:'#64748b',font:{size:11},stepSize:1},beginAtZero:true}}}});
+    chartInstances.timeline=new Chart(document.getElementById('timeline-chart'),{type:'line',data:{labels:keys.map(function(k){return new Date(k).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}),datasets:[{data:keys.map(function(k){return map[k]}),borderColor:'rgba(6,182,212,1)',backgroundColor:'rgba(6,182,212,0.05)',fill:true,tension:.4,pointBackgroundColor:'#06b6d4',pointBorderColor:'#0f172a',pointBorderWidth:2,pointRadius:5,pointHoverRadius:7,borderWidth:2.5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:10},maxRotation:45}},y:{grid:{color:'rgba(148,163,184,0.04)'},ticks:{color:'#64748b',font:{size:11},stepSize:1},beginAtZero:true}}}});
 }
 
 function renderReport(){
@@ -427,61 +545,61 @@ function renderReport(){
 
     if(chartInstances.city)chartInstances.city.destroy();
     var cL=Object.keys(cityMap),cD=cL.map(function(c){return cityMap[c].collected}),cols=['rgba(6,182,212,0.7)','rgba(34,197,94,0.7)','rgba(245,158,11,0.7)','rgba(139,92,246,0.7)','rgba(236,72,153,0.7)','rgba(59,130,246,0.7)'];
-    chartInstances.city=new Chart(document.getElementById('city-chart'),{type:'bar',data:{labels:cL,datasets:[{data:cD,backgroundColor:cL.map(function(_,i){return cols[i%cols.length]}),borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e293b',titleColor:'#f1f5f9',bodyColor:'#94a3b8',borderColor:'#334155',borderWidth:1,padding:12,callbacks:{label:function(c){return'TZS '+c.raw.toLocaleString()}}}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:10},maxRotation:45}},y:{grid:{color:'rgba(148,163,184,0.04)'},ticks:{color:'#64748b',font:{size:10},callback:function(v){return'TZS '+(v/1000)+'k'}},beginAtZero:true}}}});
+    chartInstances.city=new Chart(document.getElementById('city-chart'),{type:'bar',data:{labels:cL,datasets:[{data:cD,backgroundColor:cL.map(function(_,i){return cols[i%cols.length]}),borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:10},maxRotation:45}},y:{grid:{color:'rgba(148,163,184,0.04)'},ticks:{color:'#64748b',font:{size:10},callback:function(v){return'TZS '+(v/1000)+'k'}},beginAtZero:true}}}});
 
     var tb=document.getElementById('report-tbody'),h='';
-    cL.forEach(function(c){var d=cityMap[c],r=d.total?Math.round((d.delivered/d.total)*100):0;h+='<tr class="order-row"><td class="text-white font-medium">'+c+'</td><td class="text-slate-400">'+d.total+'</td><td class="text-emerald-400">'+d.delivered+'</td><td class="text-red-400">'+d.returned+'</td><td class="text-blue-400 font-semibold">'+r+'%</td><td class="text-white font-semibold">TZS '+d.collected.toLocaleString()+'</td></tr>'});
-    tb.innerHTML=h||'<tr><td colspan="6" class="text-center py-12 text-slate-600 text-xs">No data</td></tr>';
+    cL.forEach(function(c){var d=cityMap[c],r=d.total?Math.round((d.delivered/d.total)*100):0;h+=`<tr class="order-row"><td class="text-white font-medium">${c}</td><td class="text-slate-400">${d.total}</td><td class="text-emerald-400">${d.delivered}</td><td class="text-red-400">${d.returned}</td><td class="text-blue-400 font-semibold">${r}%</td><td class="text-white font-semibold">TZS ${d.collected.toLocaleString()}</td></tr>`});
+    tb.innerHTML=h||`<tr><td colspan="6" class="text-center py-12 text-slate-600 text-xs">No data</td></tr>`;
 }
 
 function exportReport(){
     var csv='City,Total,Delivered,Returned,Rate,COD Collected\n',cityMap={};
     allOrders.forEach(function(o){var c=o.city||'Other',cod=o.cod_amount?Number(o.cod_amount):0;if(!cityMap[c])cityMap[c]={total:0,delivered:0,returned:0,collected:0};cityMap[c].total++;if(o.status==='delivered'){cityMap[c].delivered++;cityMap[c].collected+=cod}else if(o.status==='returned')cityMap[c].returned++});
     Object.keys(cityMap).forEach(function(c){var d=cityMap[c],r=d.total?Math.round((d.delivered/d.total)*100):0;csv+=c+','+d.total+','+d.delivered+','+d.returned+','+r+'%,'+d.collected+'\n'});
-    var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chapshop_report.csv';a.click();showToast('Report exported!','success');
+    var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chapshop_report.csv';a.click();showToast(t('toast_exported'),'success');
 }
 
 function generateNotifs(){
-    notifs=[];allOrders.forEach(function(o){var id=o.id.substring(0,8).toUpperCase(),dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';notifs.push({type:'created',title:'Order Created',msg:'Order '+id+' for '+(o.recipient_name||''),time:dt,read:true});if(o.status==='picked')notifs.push({type:'picked',title:'Picked Up',msg:'Order '+id+' picked up.',time:dt,read:false});if(o.status==='delivered')notifs.push({type:'delivered',title:'Delivered',msg:'Order '+id+' delivered successfully.',time:dt,read:false});if(o.status==='returned')notifs.push({type:'returned',title:'Returned',msg:'Order '+id+' was returned.',time:dt,read:false})});
+    notifs=[];allOrders.forEach(function(o){var id=o.id.substring(0,8).toUpperCase(),dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';notifs.push({type:'created',title:t('notif_created'),msg:t('notif_created')+': '+id+' -> '+(o.recipient_name||''),time:dt,read:true});if(o.status==='picked')notifs.push({type:'picked',title:t('notif_picked'),msg:t('notif_picked')+': '+id,time:dt,read:false});if(o.status==='delivered')notifs.push({type:'delivered',title:t('notif_delivered'),msg:t('notif_delivered')+': '+id,time:dt,read:false});if(o.status==='returned')notifs.push({type:'returned',title:t('notif_returned'),msg:t('notif_returned')+': '+id,time:dt,read:false})});
     notifs.sort(function(a,b){return new Date(b.time)-new Date(a.time)});updateNotifUI();
 }
 
 function updateNotifUI(){var unread=notifs.filter(function(n){return!n.read}).length,dot=document.getElementById('notif-dot'),dot2=document.getElementById('notif-dot2'),cnt=document.getElementById('notif-count');if(unread){dot.classList.remove('hidden');dot2.classList.remove('hidden');cnt.textContent=unread;cnt.classList.remove('hidden')}else{dot.classList.add('hidden');dot2.classList.add('hidden');cnt.classList.add('hidden')}renderNotifs()}
 
-function renderNotifs(){var el=document.getElementById('notif-list');if(!notifs.length){el.innerHTML='<div class="text-center py-20"><span class="iconify text-5xl text-slate-800 mb-4" data-icon="mdi:bell-off-outline"></span><p class="text-slate-600 text-xs">No notifications yet</p></div>';return}var icons={created:'mdi:plus-circle',picked:'mdi:truck-delivery',delivered:'mdi:check-circle',returned:'mdi:arrow-u-left-top'},colors={created:'text-cyan-400',picked:'text-blue-400',delivered:'text-emerald-400',returned:'text-red-400'},h='';notifs.forEach(function(n,i){h+='<div class="notif-item'+(n.read?'':' unread')+'" onclick="readNotif('+i+')"><div class="flex items-start gap-4"><span class="iconify text-xl '+colors[n.type]+'" data-icon="'+icons[n.type]+'"></span><div class="flex-1 min-w-0"><p class="text-[12px] font-semibold text-white">'+n.title+'</p><p class="text-[11px] text-slate-500 mt-0.5">'+n.msg+'</p><p class="text-[10px] text-slate-700 mt-1">'+n.time+'</p></div>'+(n.read?'':'<span class="w-2.5 h-2.5 bg-cyan-400 rounded-full mt-2 flex-shrink-0"></span>')+'</div></div>'});el.innerHTML=h}
+function renderNotifs(){var el=document.getElementById('notif-list');if(!notifs.length){el.innerHTML=`<div class="text-center py-20"><span class="iconify text-5xl text-slate-800 mb-4" data-icon="mdi:bell-off-outline"></span><p class="text-slate-600 text-xs">${t('empty_notif')}</p></div>`;return}var icons={created:'mdi:plus-circle',picked:'mdi:truck-delivery',delivered:'mdi:check-circle',returned:'mdi:arrow-u-left-top'},colors={created:'text-cyan-400',picked:'text-blue-400',delivered:'text-emerald-400',returned:'text-red-400'},h='';notifs.forEach(function(n,i){h+=`<div class="notif-item${n.read?'':' unread'}" onclick="readNotif(${i})"><div class="flex items-start gap-4"><span class="iconify text-xl ${colors[n.type]}" data-icon="${icons[n.type]}"></span><div class="flex-1 min-w-0"><p class="text-[12px] font-semibold text-white">${n.title}</p><p class="text-[11px] text-slate-500 mt-0.5">${n.msg}</p><p class="text-[10px] text-slate-700 mt-1">${n.time}</p></div>${n.read?'':'<span class="w-2.5 h-2.5 bg-cyan-400 rounded-full mt-2 flex-shrink-0"></span>'}</div></div>`});el.innerHTML=h}
 function readNotif(i){notifs[i].read=true;updateNotifUI()}
-function markAllRead(){notifs.forEach(function(n){n.read=true});updateNotifUI();showToast('All marked as read','success')}
+function markAllRead(){notifs.forEach(function(n){n.read=true});updateNotifUI();showToast(t('toast_read'),'success')}
 
-function renderFAQ(){var el=document.getElementById('faq-list'),h='';faqs.forEach(function(f,i){h+='<div class="faq-item glass-card-static"><div class="faq-q" onclick="toggleFAQ('+i+')"><span class="flex-1 text-[14px] font-semibold text-white">'+f.q+'</span><span class="iconify faq-icon text-slate-500" data-icon="mdi:chevron-down" id="faq-i'+i+'"></span></div><div class="faq-a text-[13px] text-slate-400 leading-relaxed" id="faq-a'+i+'">'+f.a+'</div></div>'});el.innerHTML=h}
+function renderFAQ(){var el=document.getElementById('faq-list'),h='';const faqKeys=['h_q1','h_q2'];const faqAKeys=['h_a1','h_a2'];faqKeys.forEach(function(k,i){h+=`<div class="faq-item glass-card-static"><div class="faq-q" onclick="toggleFAQ(${i})"><span class="flex-1 text-[14px] font-semibold text-white">${t(k)}</span><span class="iconify faq-icon text-slate-500" data-icon="mdi:chevron-down" id="faq-i${i}"></span></div><div class="faq-a text-[13px] text-slate-400 leading-relaxed" id="faq-a${i}">${t(faqAKeys[i])}</div></div>`});el.innerHTML=h}
 function toggleFAQ(i){document.getElementById('faq-a'+i).classList.toggle('open');document.getElementById('faq-i'+i).classList.toggle('rotated')}
 
-function openOrderModal(id){var o=allOrders.find(function(x){return x.id===id});if(!o)return;var s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'',cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—',html='<div class="space-y-5"><div class="flex items-center justify-between"><span class="text-[11px] text-slate-500 uppercase font-bold tracking-widest">Order ID</span><span class="font-mono text-cyan-400 text-[13px] font-bold copy-btn cursor-pointer hover:text-cyan-300 transition" onclick="copyText(\''+o.id.substring(0,8).toUpperCase()+'\')">'+o.id.substring(0,8).toUpperCase()+' <span class="iconify text-[12px]" data-icon="mdi:content-copy"></span></span></div><div class="flex items-center justify-between"><span class="text-[11px] text-slate-500 uppercase font-bold tracking-widest">Status</span><span class="badge badge-'+s+'">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span></div><hr class="border-white/[0.04]"><div class="grid grid-cols-2 gap-5"><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">Recipient</p><p class="text-[13px] text-white font-medium">'+(o.recipient_name||'')+'</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">Phone</p><p class="text-[13px] text-white font-medium">'+(o.recipient_phone||'')+'</p></div><div class="col-span-2"><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">Address</p><p class="text-[13px] text-slate-300">'+(o.address||'')+'</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">City</p><p class="text-[13px] text-white font-medium">'+(o.city||'')+'</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">COD Amount</p><p class="text-[13px] text-white font-bold">'+cod+'</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">Created</p><p class="text-[13px] text-slate-400">'+dt+'</p></div></div><hr class="border-white/[0.04]"><div class="flex gap-3"><button onclick="closeModal();openStatusModal(\''+o.id+'\',\''+s+'\')" class="btn-secondary flex-1 justify-center text-[12px] py-3"><span class="iconify" data-icon="mdi:swap-horizontal"></span> Status</button><button onclick="deleteOrder(\''+o.id+'\')" class="btn-danger flex-1 justify-center text-[12px] py-3"><span class="iconify" data-icon="mdi:delete-outline"></span> Delete</button></div></div>';document.getElementById('modal-body').innerHTML=html;document.getElementById('order-modal').classList.add('show')}
+function openOrderModal(id){var o=allOrders.find(function(x){return x.id===id});if(!o)return;var s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'',cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—';var html=`<div class="space-y-5"><div class="flex items-center justify-between"><span class="text-[11px] text-slate-500 uppercase font-bold tracking-widest">${t('tb_id')}</span><span class="font-mono text-cyan-400 text-[13px] font-bold copy-btn cursor-pointer hover:text-cyan-300 transition" onclick="copyText('${o.id.substring(0,8).toUpperCase()}')">${o.id.substring(0,8).toUpperCase()} <span class="iconify text-[12px]" data-icon="mdi:content-copy"></span></span></div><div class="flex items-center justify-between"><span class="text-[11px] text-slate-500 uppercase font-bold tracking-widest">${t('tb_status')}</span><span class="badge badge-${s}">${t('st_'+s)}</span></div><hr class="border-white/[0.04]"><div class="grid grid-cols-2 gap-5"><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">${t('tb_name')}</p><p class="text-[13px] text-white font-medium">${o.recipient_name||''}</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">${t('tb_phone')}</p><p class="text-[13px] text-white font-medium">${o.recipient_phone||''}</p></div><div class="col-span-2"><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">${t('lbl_address')}</p><p class="text-[13px] text-slate-300">${o.address||''}</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">${t('tb_city')}</p><p class="text-[13px] text-white font-medium">${o.city||''}</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">${t('tb_cod')}</p><p class="text-[13px] text-white font-bold">${cod}</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-widest mb-1.5">${t('tb_date')}</p><p class="text-[13px] text-slate-400">${dt}</p></div></div><hr class="border-white/[0.04]"><div class="flex gap-3"><button onclick="closeModal();openStatusModal('${o.id}','${s}')" class="btn-secondary flex-1 justify-center text-[12px] py-3"><span class="iconify" data-icon="mdi:swap-horizontal"></span> ${t('mod_status')}</button><button onclick="deleteOrder('${o.id}')" class="btn-danger flex-1 justify-center text-[12px] py-3"><span class="iconify" data-icon="mdi:delete-outline"></span> ${t('mod_del_btn')}</button></div></div>`;document.getElementById('modal-body').innerHTML=html;document.getElementById('order-modal').classList.add('show')}
 function closeModal(){document.getElementById('order-modal').classList.remove('show')}
 
-function openStatusModal(id,current){var statuses=['pending','picked','delivered','returned'],html='';statuses.forEach(function(s){var active=s===current;html+='<button onclick="changeStatus(\''+id+'\',\''+s+'\')" class="w-full flex items-center gap-3 p-4 rounded-xl transition cursor-pointer '+(active?'bg-cyan-500/10 border border-cyan-500/25':'bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04]')+'"><span class="iconify text-lg '+(active?'text-cyan-400':'text-slate-500')+'" data-icon="'+(active?'mdi:check-circle':'mdi:circle-outline')+'"></span><span class="text-[13px] font-semibold '+(active?'text-cyan-400':'text-slate-300')+'">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span></button>'});document.getElementById('status-options').innerHTML=html;document.getElementById('status-modal').classList.add('show')}
+function openStatusModal(id,current){var statuses=['pending','picked','delivered','returned'],html='';statuses.forEach(function(s){var active=s===current;html+=`<button onclick="changeStatus('${id}','${s}')" class="w-full flex items-center gap-3 p-4 rounded-xl transition cursor-pointer ${active?'bg-cyan-500/10 border border-cyan-500/25':'bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04]'}"><span class="iconify text-lg ${active?'text-cyan-400':'text-slate-500'}" data-icon="${active?'mdi:check-circle':'mdi:circle-outline'}"></span><span class="text-[13px] font-semibold ${active?'text-cyan-400':'text-slate-300'}">${t('st_'+s)}</span></button>`});document.getElementById('status-options').innerHTML=html;document.getElementById('status-modal').classList.add('show')}
 function closeStatusModal(){document.getElementById('status-modal').classList.remove('show')}
 
 function changeStatus(id,status){
     var order=allOrders.find(function(o){return o.id===id});
     if(order){order.status=status;order.updated_at=new Date().toISOString();}
     saveMerchantOrders(allOrders);
-    closeStatusModal();closeModal();showToast('Status updated to '+status,'success');loadOrders();
+    closeStatusModal();closeModal();showToast(t('toast_status')+' '+t('st_'+status),'success');loadOrders();
 }
 
 function deleteOrder(id){
-    if(!confirm('Are you sure you want to delete this order?'))return;
+    if(!confirm(t('mod_del_title')))return;
     allOrders=allOrders.filter(function(o){return o.id!==id});
     saveMerchantOrders(allOrders);
-    closeModal();showToast('Order deleted','success');loadOrders();
+    closeModal();showToast(t('toast_deleted'),'success');loadOrders();
 }
 
-function copyText(text){navigator.clipboard.writeText(text).then(function(){showToast('Copied to clipboard!','info')})}
+function copyText(text){navigator.clipboard.writeText(text).then(function(){showToast(t('toast_copied'),'info')})}
 
 // ---- CREATE ORDER ----
 document.getElementById('create-order-form').addEventListener('submit',function(e){
     e.preventDefault();
     var btn=document.getElementById('submit-btn');
-    btn.innerHTML='<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Processing...';btn.disabled=true;
+    btn.innerHTML=`<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> ${t('loading')}...`;btn.disabled=true;
 
     var newOrder={
         id:generateId(),
@@ -502,30 +620,25 @@ document.getElementById('create-order-form').addEventListener('submit',function(
     allOrders.unshift(newOrder);
     saveMerchantOrders(allOrders);
     document.getElementById('create-order-form').reset();
-    showToast('Order created successfully!','success');
+    showToast(t('toast_created'),'success');
     setTimeout(function(){switchPage('orders')},800);
-    btn.innerHTML='<span class="iconify text-lg" data-icon="mdi:check-circle-outline"></span> Submit Order';btn.disabled=false;
+    btn.innerHTML=`<span class="iconify text-lg" data-icon="mdi:check-circle-outline"></span> ${t('btn_submit')}`;btn.disabled=false;
 });
 
 // ---- PROFILE UPDATE ----
 document.getElementById('profile-form').addEventListener('submit',function(e){
     e.preventDefault();
     var btn=this.querySelector('button[type="submit"]'),orig=btn.innerHTML;
-    btn.innerHTML='<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Saving...';btn.disabled=true;
+    btn.innerHTML=`<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> ${t('loading')}...`;btn.disabled=true;
 
     var upd={business:document.getElementById('p-business').value.trim(),phone:document.getElementById('p-phone').value.trim(),city:document.getElementById('p-city').value.trim()};
     merchantProfile=Object.assign({},merchantProfile,upd);
-
-    // Update merchants list
     var merchants=getMerchantsList();
     var idx=merchants.findIndex(function(m){return m.id===currentUser.id});
     if(idx!==-1){merchants[idx]=Object.assign({},merchants[idx],upd);saveMerchantsList(merchants);}
-
-    // Update logged in session
     currentUser=Object.assign({},currentUser,upd);
     localStorage.setItem('chapshop_logged_in',JSON.stringify(currentUser));
-
-    renderProfile();showToast('Profile updated!','success');
+    renderProfile();showToast(t('toast_saved'),'success');
     btn.innerHTML=orig;btn.disabled=false;
 });
 
@@ -542,7 +655,7 @@ document.getElementById('confirm-delete-btn').addEventListener('click',function(
     saveMerchantsList(merchants);
     allOrders=[];saveMerchantOrders(allOrders);
     localStorage.removeItem('chapshop_logged_in');
-    showToast('Account deleted.','success');
+    showToast(t('toast_account_del'),'success');
     setTimeout(function(){location.href='merchants.html'},1000);
 });
 
@@ -551,7 +664,7 @@ document.querySelectorAll('.filter-btn').forEach(function(btn){btn.addEventListe
 document.getElementById('order-search').addEventListener('input',function(){renderOrdersTable()});
 
 // ---- PAGE SWITCHING ----
-function switchPage(page){document.querySelectorAll('.page-content').forEach(function(p){p.classList.add('hidden');p.classList.remove('animate-fadeUp')});var target=document.getElementById('page-'+page);if(target){target.classList.remove('hidden');void target.offsetWidth;target.classList.add('animate-fadeUp')}document.querySelectorAll('.sidebar-link').forEach(function(l){l.classList.remove('active');l.classList.add('text-slate-400');l.classList.remove('text-slate-300')});var active=document.querySelector('[data-page="'+page+'"]');if(active){active.classList.add('active');active.classList.remove('text-slate-400');active.classList.add('text-slate-300')}var titles={overview:'Overview',orders:'All Orders','create-order':'Create Order',analytics:'Analytics','sales-report':'Sales Report',notifications:'Notifications',faq:'FAQ',profile:'Profile',settings:'Settings',help:'Help & Support'};document.getElementById('page-title').textContent=titles[page]||'Dashboard';closeSidebar();window.scrollTo({top:0,behavior:'smooth'});if(page==='analytics'&&allOrders.length>0)setTimeout(renderCharts,100);if(page==='sales-report'&&allOrders.length>0)setTimeout(renderReport,100)}
+function switchPage(page){document.querySelectorAll('.page-content').forEach(function(p){p.classList.add('hidden');p.classList.remove('animate-fadeUp')});var target=document.getElementById('page-'+page);if(target){target.classList.remove('hidden');void target.offsetWidth;target.classList.add('animate-fadeUp')}document.querySelectorAll('.sidebar-link').forEach(function(l){l.classList.remove('active');l.classList.add('text-slate-400');l.classList.remove('text-slate-300')});var active=document.querySelector('[data-page="'+page+'"]');if(active){active.classList.add('active');active.classList.remove('text-slate-400');active.classList.add('text-slate-300')}const titleMap = {overview:'nav_overview', orders:'nav_orders', 'create-order':'nav_create', analytics:'nav_analytics', 'sales-report':'nav_sales', notifications:'nav_notif', profile:'nav_profile', settings:'nav_settings', faq:'nav_faq', help:'nav_help'}; document.getElementById('page-title').textContent=t(titleMap[page]||'nav_overview');closeSidebar();window.scrollTo({top:0,behavior:'smooth'});if(page==='analytics'&&allOrders.length>0)setTimeout(renderCharts,100);if(page==='sales-report'&&allOrders.length>0)setTimeout(renderReport,100);if(page==='faq')renderFAQ()}
 
 document.querySelectorAll('.sidebar-link').forEach(function(link){link.addEventListener('click',function(e){e.preventDefault();switchPage(this.dataset.page)})});
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-backdrop').classList.remove('show')}
@@ -560,7 +673,7 @@ document.getElementById('sidebar-backdrop').addEventListener('click',closeSideba
 document.querySelectorAll('.modal-overlay').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('show')})});
 
 function showApp(){var ls=document.getElementById('loading-screen');ls.style.opacity='0';ls.style.transition='opacity 0.6s';setTimeout(function(){ls.style.display='none';document.getElementById('app').classList.remove('hidden')},600)}
-function showToast(msg,type){type=type||'success';var icons={success:'mdi:check-circle',error:'mdi:alert-circle',info:'mdi:information'};var t=document.createElement('div');t.className='toast toast-'+type;t.innerHTML='<span class="iconify text-xl" data-icon="'+icons[type]+'"></span><span>'+msg+'</span>';document.getElementById('toast-container').appendChild(t);setTimeout(function(){t.classList.add('show')},10);setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},400)},3500)}
+function showToast(msg,type){type=type||'success';var icons={success:'mdi:check-circle',error:'mdi:alert-circle',info:'mdi:information'};var t=document.createElement('div');t.className='toast toast-'+type;t.innerHTML=`<span class="iconify text-xl" data-icon="${icons[type]}"></span><span>${msg}</span>`;document.getElementById('toast-container').appendChild(t);setTimeout(function(){t.classList.add('show')},10);setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},400)},3500)}
 
 init();
 </script>
