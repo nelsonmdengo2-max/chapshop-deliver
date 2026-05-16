@@ -1,24 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join as Merchant — ChapShop Delivery</title>
+
+    <!-- ===== FAVICON (Inline SVG) ===== -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2306b6d4'/%3E%3Cstop offset='100%25' stop-color='%230e7490'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M18 42l6-20h4l6 20h-4l-1.2-4h-5.6L22 42h-4zm6.4-8h3.2L26 26l-1.6 8zM36 26h6c3.3 0 5 1.8 5 4.5 0 1.8-.8 3.2-2.2 4L47 42h-4.4L41 35.6h-1V42h-4V26zm4 6.6h1.5c1.2 0 1.8-.7 1.8-2s-.6-2-1.8-2H40v4z' fill='white'/%3E%3C/svg%3E">
+
+    <!-- ===== SEO META TAGS ===== -->
+    <title>Join as Merchant — ChapShop Delivery | Sign Up & Deliver Across Tanzania</title>
+    <meta name="description" content="Join 500+ merchants on ChapShop Delivery. Sign up for free, integrate instantly, and start delivering across Dar es Salaam, Dodoma, Mwanza, Arusha and more. No setup fee, no hassle.">
+    <meta name="keywords" content="ChapShop Delivery, merchant signup, delivery service Tanzania, Dar es Salaam delivery, logistics Tanzania, last mile delivery, courier service, merchant dashboard, free delivery integration, Africa delivery platform">
+    <meta name="author" content="ChapShop Delivery">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://chapshopdelivery.live/merchant.html">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chapshopdelivery.live/merchant.html">
+    <meta property="og:title" content="Join as Merchant — ChapShop Delivery">
+    <meta property="og:description" content="Join 500+ merchants on ChapShop Delivery. No setup fee, free integration. Start delivering across Tanzania today.">
+    <meta property="og:image" content="https://chapshopdelivery.live/og-image.png">
+    <meta property="og:site_name" content="ChapShop Delivery">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ar_SA">
+    <meta property="og:locale:alternate" content="fr_FR">
+    <meta property="og:locale:alternate" content="zh_CN">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://chapshopdelivery.live/merchant.html">
+    <meta name="twitter:title" content="Join as Merchant — ChapShop Delivery">
+    <meta name="twitter:description" content="Join 500+ merchants on ChapShop Delivery. No setup fee, free integration. Start delivering across Tanzania today.">
+    <meta name="twitter:image" content="https://chapshopdelivery.live/og-image.png">
+
+    <!-- Additional SEO -->
+    <meta name="theme-color" content="#06b6d4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ChapShop">
+
+    <!-- Hreflang for multilingual SEO -->
+    <link rel="alternate" hreflang="en" href="https://chapshopdelivery.live/merchant.html">
+    <link rel="alternate" hreflang="ar" href="https://chapshopdelivery.live/ar/merchant.html">
+    <link rel="alternate" hreflang="fr" href="https://chapshopdelivery.live/fr/merchant.html">
+    <link rel="alternate" hreflang="zh" href="https://chapshopdelivery.live/zh/merchant.html">
+    <link rel="alternate" hreflang="x-default" href="https://chapshopdelivery.live/merchant.html">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Join as Merchant — ChapShop Delivery",
+        "description": "Sign up as a merchant on ChapShop Delivery. No setup fee, free integration. Deliver across Tanzania.",
+        "url": "https://chapshopdelivery.live/merchant.html",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "ChapShop Delivery",
+            "url": "https://chapshopdelivery.live",
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://chapshopdelivery.live/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+            }
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "ChapShop Delivery",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://chapshopdelivery.live/logo.png"
+            }
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://chapshopdelivery.live" },
+            { "@type": "ListItem", "position": 2, "name": "Join as Merchant", "item": "https://chapshopdelivery.live/merchant.html" }
+        ]
+    }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+
     <style>
         * { font-family: 'Inter', sans-serif; }
         .gradient-text { background: linear-gradient(to bottom, #fff, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero-glow { background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(6,182,212,0.12) 0%, transparent 60%); }
         .form-input { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9; }
-        .form-input:focus { border-color: #06b6d4; outline: none; }
+        .form-input:focus { border-color: #06b6d4; outline: none; box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
         .form-input::placeholder { color: #475569; }
         .nav-blur { backdrop-filter: blur(12px); }
+        [dir="rtl"] .breadcrumb-sep { transform: scaleX(-1); }
+
+        .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 6px; min-width: 180px; z-index: 100; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .lang-dropdown.active { display: block; }
+        .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; cursor: pointer; transition: all 0.15s; color: #94a3b8; font-size: 13px; }
+        .lang-option:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .lang-option.active-lang { background: rgba(6,182,212,0.1); color: #06b6d4; }
+        .lang-flag { font-size: 18px; line-height: 1; }
     </style>
 </head>
 <body class="bg-[#020617] text-white">
 
+    <!-- ===== NAVIGATION ===== -->
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <a href="index.html" class="flex items-center gap-2.5">
@@ -27,41 +120,73 @@
                 </div>
                 <span class="font-semibold text-white text-[15px]">ChapShop<span class="text-cyan-400 ml-0.5">Delivery</span></span>
             </a>
-            <a href="index.html" class="text-sm text-slate-400 hover:text-white">← Back</a>
+            <div class="flex items-center gap-4">
+                <!-- Language Translator Button -->
+                <div class="relative" id="langWrapper">
+                    <button type="button" id="langBtn" onclick="toggleLangDropdown()" class="flex items-center gap-2 bg-white/[0.04] border border-white/[0.1] rounded-xl px-3 py-2 text-sm text-slate-300 hover:text-white hover:border-white/20 transition-all">
+                        <span id="currentFlag" class="lang-flag">🇬🇧</span>
+                        <span id="currentLang" class="hidden sm:inline text-xs">EN</span>
+                        <span class="iconify text-xs text-slate-500" data-icon="mdi:chevron-down"></span>
+                    </button>
+                    <div class="lang-dropdown" id="langDropdown">
+                        <div class="lang-option active-lang" onclick="setLanguage('en')" data-lang="en">
+                            <span class="lang-flag">🇬🇧</span>
+                            <span>English</span>
+                        </div>
+                        <div class="lang-option" onclick="setLanguage('ar')" data-lang="ar">
+                            <span class="lang-flag">🇸🇦</span>
+                            <span>العربية</span>
+                        </div>
+                        <div class="lang-option" onclick="setLanguage('fr')" data-lang="fr">
+                            <span class="lang-flag">🇫🇷</span>
+                            <span>Français</span>
+                        </div>
+                        <div class="lang-option" onclick="setLanguage('zh')" data-lang="zh">
+                            <span class="lang-flag">🇨🇳</span>
+                            <span>中文</span>
+                        </div>
+                    </div>
+                </div>
+                <a href="index.html" class="text-sm text-slate-400 hover:text-white" data-i18n="back">← Back</a>
+            </div>
         </div>
     </nav>
 
+    <!-- ===== HERO ===== -->
     <section class="hero-glow pt-28 pb-12">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
-                <a href="index.html" class="hover:text-white">Home</a>
-                <span class="iconify text-xs" data-icon="mdi:chevron-right"></span>
-                <span class="text-cyan-400">Join as Merchant</span>
+                <a href="index.html" class="hover:text-white" data-i18n="breadcrumb_home">Home</a>
+                <span class="iconify text-xs breadcrumb-sep" data-icon="mdi:chevron-right"></span>
+                <span class="text-cyan-400" data-i18n="breadcrumb_current">Join as Merchant</span>
             </div>
-            <h1 class="text-3xl md:text-5xl font-medium tracking-tight gradient-text mb-4">Join 500+ Merchants</h1>
-            <p class="text-lg text-slate-400 font-light">Sign up or login to manage your deliveries.</p>
+            <h1 class="text-3xl md:text-5xl font-medium tracking-tight gradient-text mb-4" data-i18n="hero_title">Join 500+ Merchants</h1>
+            <p class="text-lg text-slate-400 font-light" data-i18n="hero_subtitle">Sign up or login to manage your deliveries.</p>
         </div>
     </section>
 
+    <!-- ===== BADGES ===== -->
     <section class="border-y border-white/[0.05] py-6">
         <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-center gap-3">
             <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-4 py-2">
                 <span class="iconify text-green-400" data-icon="mdi:check-circle"></span>
-                <span class="text-xs text-slate-300">No Setup Fee</span>
+                <span class="text-xs text-slate-300" data-i18n="badge_no_fee">No Setup Fee</span>
             </div>
             <div class="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] rounded-full px-4 py-2">
                 <span class="iconify text-green-400" data-icon="mdi:check-circle"></span>
-                <span class="text-xs text-slate-300">Free Integration</span>
+                <span class="text-xs text-slate-300" data-i18n="badge_free_integration">Free Integration</span>
             </div>
         </div>
     </section>
 
+    <!-- ===== FORM SECTION ===== -->
     <section class="pb-16">
         <div class="max-w-md mx-auto px-6">
 
+            <!-- Tabs -->
             <div class="flex mb-6 bg-white/[0.03] border border-white/[0.08] rounded-lg p-1">
-                <button type="button" onclick="showSignup()" id="tabSignup" class="flex-1 py-2.5 text-sm font-medium rounded-md text-cyan-400 bg-cyan-500/10 border border-cyan-500/30">Sign Up</button>
-                <button type="button" onclick="showLogin()" id="tabLogin" class="flex-1 py-2.5 text-sm font-medium rounded-md text-slate-500 border border-transparent">Login</button>
+                <button type="button" onclick="showSignup()" id="tabSignup" class="flex-1 py-2.5 text-sm font-medium rounded-md text-cyan-400 bg-cyan-500/10 border border-cyan-500/30" data-i18n="tab_signup">Sign Up</button>
+                <button type="button" onclick="showLogin()" id="tabLogin" class="flex-1 py-2.5 text-sm font-medium rounded-md text-slate-500 border border-transparent" data-i18n="tab_login">Login</button>
             </div>
 
             <!-- Sign Up -->
@@ -70,43 +195,43 @@
                     <div class="w-14 h-14 bg-cyan-500/15 border border-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <span class="iconify text-cyan-400 text-2xl" data-icon="mdi:account-plus"></span>
                     </div>
-                    <h2 class="text-xl font-semibold text-white">Create Account</h2>
+                    <h2 class="text-xl font-semibold text-white" data-i18n="signup_title">Create Account</h2>
                 </div>
                 <form id="signupForm" class="space-y-4">
                     <div>
-                        <label class="text-xs text-slate-400 mb-1 block">Full Name *</label>
-                        <input type="text" id="sName" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Your name" required>
+                        <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_name">Full Name *</label>
+                        <input type="text" id="sName" class="form-input w-full rounded-xl px-4 py-3 text-sm" data-i18n-placeholder="placeholder_name" placeholder="Your name" required>
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 mb-1 block">Business Name *</label>
-                        <input type="text" id="sBusiness" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Business name" required>
+                        <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_business">Business Name *</label>
+                        <input type="text" id="sBusiness" class="form-input w-full rounded-xl px-4 py-3 text-sm" data-i18n-placeholder="placeholder_business" placeholder="Business name" required>
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 mb-1 block">Email *</label>
-                        <input type="email" id="sEmail" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="you@email.com" required>
+                        <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_email">Email *</label>
+                        <input type="email" id="sEmail" class="form-input w-full rounded-xl px-4 py-3 text-sm" data-i18n-placeholder="placeholder_email" placeholder="you@email.com" required>
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 mb-1 block">Phone *</label>
-                        <input type="tel" id="sPhone" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="0769 xxx xxx" required>
+                        <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_phone">Phone *</label>
+                        <input type="tel" id="sPhone" class="form-input w-full rounded-xl px-4 py-3 text-sm" data-i18n-placeholder="placeholder_phone" placeholder="0769 xxx xxx" required>
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 mb-1 block">City *</label>
+                        <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_city">City *</label>
                         <select id="sCity" class="form-input w-full rounded-xl px-4 py-3 text-sm text-slate-400" required>
-                            <option value="">Select city</option>
-                            <option>Dar es Salaam</option>
-                            <option>Dodoma</option>
-                            <option>Mwanza</option>
-                            <option>Arusha</option>
-                            <option>Mbeya</option>
-                            <option>Other</option>
+                            <option value="" data-i18n="city_select">Select city</option>
+                            <option data-i18n="city_dar">Dar es Salaam</option>
+                            <option data-i18n="city_dodoma">Dodoma</option>
+                            <option data-i18n="city_mwanza">Mwanza</option>
+                            <option data-i18n="city_arusha">Arusha</option>
+                            <option data-i18n="city_mbeya">Mbeya</option>
+                            <option data-i18n="city_other">Other</option>
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 mb-1 block">Password * (min 6)</label>
-                        <input type="password" id="sPassword" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Min 6 characters" required>
+                        <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_password">Password * (min 6)</label>
+                        <input type="password" id="sPassword" class="form-input w-full rounded-xl px-4 py-3 text-sm" data-i18n-placeholder="placeholder_password" placeholder="Min 6 characters" required>
                     </div>
-                    <button type="submit" id="signupBtn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400">Create Account</button>
-                    <p class="text-center text-slate-500 text-xs">Already have an account? <a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">Login here</a></p>
+                    <button type="submit" id="signupBtn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400 transition-colors" data-i18n="btn_create">Create Account</button>
+                    <p class="text-center text-slate-500 text-xs" data-i18n="signup_link">Already have an account? <a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">Login here</a></p>
                 </form>
             </div>
 
@@ -116,186 +241,442 @@
                     <div class="w-14 h-14 bg-cyan-500/15 border border-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <span class="iconify text-cyan-400 text-2xl" data-icon="mdi:login"></span>
                     </div>
-                    <h2 class="text-xl font-semibold text-white">Welcome Back</h2>
+                    <h2 class="text-xl font-semibold text-white" data-i18n="login_title">Welcome Back</h2>
                 </div>
 
                 <div id="loginError" style="display:none; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:8px; padding:8px 12px; margin-bottom:16px;">
-                    <p class="text-sm text-red-400" id="loginErrorMsg">Invalid email or password</p>
+                    <p class="text-sm text-red-400" id="loginErrorMsg" data-i18n="error_invalid">Invalid email or password</p>
                 </div>
 
                 <form id="loginForm" class="space-y-4">
                     <div>
-                        <label class="text-xs text-slate-400 mb-1 block">Email *</label>
-                        <input type="email" id="lEmail" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="you@email.com" required>
+                        <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_email">Email *</label>
+                        <input type="email" id="lEmail" class="form-input w-full rounded-xl px-4 py-3 text-sm" data-i18n-placeholder="placeholder_email" placeholder="you@email.com" required>
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 mb-1 block">Password *</label>
-                        <input type="password" id="lPassword" class="form-input w-full rounded-xl px-4 py-3 text-sm" placeholder="Your password" required>
+                        <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_password_login">Password *</label>
+                        <input type="password" id="lPassword" class="form-input w-full rounded-xl px-4 py-3 text-sm" data-i18n-placeholder="placeholder_login_password" placeholder="Your password" required>
                     </div>
-                    <button type="submit" id="loginBtn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400 flex items-center justify-center gap-2">
-                        <span id="loginBtnText">Login to Dashboard</span>
+                    <button type="submit" id="loginBtn" class="w-full bg-cyan-500 text-white font-medium text-sm py-3.5 rounded-xl hover:bg-cyan-400 flex items-center justify-center gap-2 transition-colors">
+                        <span id="loginBtnText" data-i18n="btn_login">Login to Dashboard</span>
                         <span id="loginBtnLoading" style="display:none" class="iconify animate-spin text-lg" data-icon="mdi:loading"></span>
                     </button>
-                    <p class="text-center text-slate-500 text-xs">New here? <a href="javascript:void(0)" onclick="showSignup()" class="text-cyan-400">Create an account</a></p>
+                    <p class="text-center text-slate-500 text-xs" data-i18n="login_link">New here? <a href="javascript:void(0)" onclick="showSignup()" class="text-cyan-400">Create an account</a></p>
                 </form>
             </div>
 
         </div>
     </section>
 
+    <!-- ===== FOOTER ===== -->
     <footer class="border-t border-white/[0.05] py-8">
         <div class="max-w-7xl mx-auto px-6 text-center">
-            <p class="text-xs text-slate-500">© 2025 ChapShop Delivery. All rights reserved.</p>
+            <p class="text-xs text-slate-500" data-i18n="footer_copy">© 2025 ChapShop Delivery. All rights reserved.</p>
         </div>
     </footer>
 
+    <!-- ===== SUPABASE ===== -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
 
     <script>
-        var SUPABASE_URL = 'https://lmbpnnfyelsqhwzatwbv.supabase.co';
-        var SUPABASE_KEY = 'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm';
-        var db = null;
-        var useLocal = false;
+    // =============================================
+    // TRANSLATIONS
+    // =============================================
+    var translations = {
+        en: {
+            back: "← Back",
+            breadcrumb_home: "Home",
+            breadcrumb_current: "Join as Merchant",
+            hero_title: "Join 500+ Merchants",
+            hero_subtitle: "Sign up or login to manage your deliveries.",
+            badge_no_fee: "No Setup Fee",
+            badge_free_integration: "Free Integration",
+            tab_signup: "Sign Up",
+            tab_login: "Login",
+            signup_title: "Create Account",
+            label_name: "Full Name *",
+            label_business: "Business Name *",
+            label_email: "Email *",
+            label_phone: "Phone *",
+            label_city: "City *",
+            label_password: "Password * (min 6)",
+            label_password_login: "Password *",
+            placeholder_name: "Your name",
+            placeholder_business: "Business name",
+            placeholder_email: "you@email.com",
+            placeholder_phone: "0769 xxx xxx",
+            placeholder_password: "Min 6 characters",
+            placeholder_login_password: "Your password",
+            city_select: "Select city",
+            city_dar: "Dar es Salaam",
+            city_dodoma: "Dodoma",
+            city_mwanza: "Mwanza",
+            city_arusha: "Arusha",
+            city_mbeya: "Mbeya",
+            city_other: "Other",
+            btn_create: "Create Account",
+            btn_login: "Login to Dashboard",
+            signup_link: 'Already have an account? <a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">Login here</a>',
+            login_link: 'New here? <a href="javascript:void(0)" onclick="showSignup()" class="text-cyan-400">Create an account</a>',
+            login_title: "Welcome Back",
+            error_invalid: "Invalid email or password",
+            footer_copy: "© 2025 ChapShop Delivery. All rights reserved.",
+            alert_created: "Account created! Please login.",
+            alert_creating: "Creating...",
+            error_email_exists: "Email already registered"
+        },
+        ar: {
+            back: "→ رجوع",
+            breadcrumb_home: "الرئيسية",
+            breadcrumb_current: "انضم كتاجر",
+            hero_title: "انضم إلى أكثر من 500 تاجر",
+            hero_subtitle: "سجّل دخولك أو أنشئ حساباً لإدارة توصيلاتك.",
+            badge_no_fee: "بدون رسوم إعداد",
+            badge_free_integration: "تكامل مجاني",
+            tab_signup: "تسجيل",
+            tab_login: "دخول",
+            signup_title: "إنشاء حساب",
+            label_name: "الاسم الكامل *",
+            label_business: "اسم التجارة *",
+            label_email: "البريد الإلكتروني *",
+            label_phone: "الهاتف *",
+            label_city: "المدينة *",
+            label_password: "كلمة المرور * (6 أحرف على الأقل)",
+            label_password_login: "كلمة المرور *",
+            placeholder_name: "اسمك",
+            placeholder_business: "اسم التجارة",
+            placeholder_email: "you@email.com",
+            placeholder_phone: "0769 xxx xxx",
+            placeholder_password: "6 أحرف على الأقل",
+            placeholder_login_password: "كلمة المرور الخاصة بك",
+            city_select: "اختر المدينة",
+            city_dar: "دار السلام",
+            city_dodoma: "دودوما",
+            city_mwanza: "موانزا",
+            city_arusha: "أروشا",
+            city_mbeya: "مبيا",
+            city_other: "أخرى",
+            btn_create: "إنشاء حساب",
+            btn_login: "تسجيل الدخول",
+            signup_link: 'لديك حساب بالفعل؟ <a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">سجّل دخولك هنا</a>',
+            login_link: 'جديد هنا؟ <a href="javascript:void(0)" onclick="showSignup()" class="text-cyan-400">أنشئ حساباً</a>',
+            login_title: "مرحباً بعودتك",
+            error_invalid: "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+            footer_copy: "© 2025 تشاب شوب للتوصيل. جميع الحقوق محفوظة.",
+            alert_created: "تم إنشاء الحساب! يرجى تسجيل الدخول.",
+            alert_creating: "جارٍ الإنشاء...",
+            error_email_exists: "البريد الإلكتروني مسجل بالفعل"
+        },
+        fr: {
+            back: "← Retour",
+            breadcrumb_home: "Accueil",
+            breadcrumb_current: "Rejoindre en tant que marchand",
+            hero_title: "Rejoignez 500+ marchands",
+            hero_subtitle: "Inscrivez-vous ou connectez-vous pour gérer vos livraisons.",
+            badge_no_fee: "Sans frais d'installation",
+            badge_free_integration: "Intégration gratuite",
+            tab_signup: "Inscription",
+            tab_login: "Connexion",
+            signup_title: "Créer un compte",
+            label_name: "Nom complet *",
+            label_business: "Nom de l'entreprise *",
+            label_email: "E-mail *",
+            label_phone: "Téléphone *",
+            label_city: "Ville *",
+            label_password: "Mot de passe * (min 6)",
+            label_password_login: "Mot de passe *",
+            placeholder_name: "Votre nom",
+            placeholder_business: "Nom de l'entreprise",
+            placeholder_email: "vous@email.com",
+            placeholder_phone: "0769 xxx xxx",
+            placeholder_password: "6 caractères minimum",
+            placeholder_login_password: "Votre mot de passe",
+            city_select: "Sélectionner la ville",
+            city_dar: "Dar es Salaam",
+            city_dodoma: "Dodoma",
+            city_mwanza: "Mwanza",
+            city_arusha: "Arusha",
+            city_mbeya: "Mbeya",
+            city_other: "Autre",
+            btn_create: "Créer un compte",
+            btn_login: "Se connecter",
+            signup_link: 'Vous avez déjà un compte ? <a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">Connectez-vous ici</a>',
+            login_link: 'Nouveau ici ? <a href="javascript:void(0)" onclick="showSignup()" class="text-cyan-400">Créer un compte</a>',
+            login_title: "Bienvenue",
+            error_invalid: "E-mail ou mot de passe incorrect",
+            footer_copy: "© 2025 ChapShop Livraison. Tous droits réservés.",
+            alert_created: "Compte créé ! Veuillez vous connecter.",
+            alert_creating: "Création en cours...",
+            error_email_exists: "E-mail déjà enregistré"
+        },
+        zh: {
+            back: "← 返回",
+            breadcrumb_home: "首页",
+            breadcrumb_current: "加入成为商户",
+            hero_title: "加入 500+ 商户",
+            hero_subtitle: "注册或登录以管理您的配送。",
+            badge_no_fee: "免设置费",
+            badge_free_integration: "免费集成",
+            tab_signup: "注册",
+            tab_login: "登录",
+            signup_title: "创建账户",
+            label_name: "全名 *",
+            label_business: "商家名称 *",
+            label_email: "电子邮箱 *",
+            label_phone: "电话 *",
+            label_city: "城市 *",
+            label_password: "密码 *（最少6位）",
+            label_password_login: "密码 *",
+            placeholder_name: "您的姓名",
+            placeholder_business: "商家名称",
+            placeholder_email: "you@email.com",
+            placeholder_phone: "0769 xxx xxx",
+            placeholder_password: "至少6个字符",
+            placeholder_login_password: "您的密码",
+            city_select: "选择城市",
+            city_dar: "达累斯萨拉姆",
+            city_dodoma: "多多马",
+            city_mwanza: "姆万扎",
+            city_arusha: "阿鲁沙",
+            city_mbeya: "姆贝亚",
+            city_other: "其他",
+            btn_create: "创建账户",
+            btn_login: "登录控制台",
+            signup_link: '已有账户？<a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">在此登录</a>',
+            login_link: '新用户？<a href="javascript:void(0)" onclick="showSignup()" class="text-cyan-400">创建账户</a>',
+            login_title: "欢迎回来",
+            error_invalid: "邮箱或密码无效",
+            footer_copy: "© 2025 ChapShop 配送。保留所有权利。",
+            alert_created: "账户已创建！请登录。",
+            alert_creating: "创建中...",
+            error_email_exists: "该邮箱已注册"
+        }
+    };
 
-        function showSignup() {
-            document.getElementById('signupBox').style.display = 'block';
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('tabSignup').className = 'flex-1 py-2.5 text-sm font-medium rounded-md text-cyan-400 bg-cyan-500/10 border border-cyan-500/30';
-            document.getElementById('tabLogin').className = 'flex-1 py-2.5 text-sm font-medium rounded-md text-slate-500 border border-transparent';
-            document.getElementById('loginError').style.display = 'none';
+    var currentLang = localStorage.getItem('chapshop_lang') || 'en';
+    var langFlags = { en: '🇬🇧', ar: '🇸🇦', fr: '🇫🇷', zh: '🇨🇳' };
+    var langLabels = { en: 'EN', ar: 'عر', fr: 'FR', zh: '中' };
+
+    // =============================================
+    // LANGUAGE SWITCHER
+    // =============================================
+    function toggleLangDropdown() {
+        document.getElementById('langDropdown').classList.toggle('active');
+    }
+
+    document.addEventListener('click', function(e) {
+        var wrapper = document.getElementById('langWrapper');
+        if (!wrapper.contains(e.target)) {
+            document.getElementById('langDropdown').classList.remove('active');
+        }
+    });
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('chapshop_lang', lang);
+        document.getElementById('currentFlag').textContent = langFlags[lang];
+        document.getElementById('currentLang').textContent = langLabels[lang];
+
+        document.querySelectorAll('.lang-option').forEach(function(opt) {
+            opt.classList.remove('active-lang');
+            if (opt.getAttribute('data-lang') === lang) opt.classList.add('active-lang');
+        });
+
+        if (lang === 'ar') {
+            document.documentElement.setAttribute('dir', 'rtl');
+            document.documentElement.setAttribute('lang', 'ar');
+        } else {
+            document.documentElement.setAttribute('dir', 'ltr');
+            document.documentElement.setAttribute('lang', lang);
         }
 
-        function showLogin() {
-            document.getElementById('signupBox').style.display = 'none';
-            document.getElementById('loginBox').style.display = 'block';
-            document.getElementById('tabLogin').className = 'flex-1 py-2.5 text-sm font-medium rounded-md text-cyan-400 bg-cyan-500/10 border border-cyan-500/30';
-            document.getElementById('tabSignup').className = 'flex-1 py-2.5 text-sm font-medium rounded-md text-slate-500 border border-transparent';
-        }
+        applyTranslations(lang);
+        document.getElementById('langDropdown').classList.remove('active');
+    }
 
-        function localSignUp(name, business, email, phone, city, password) {
-            var merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
-            for (var i = 0; i < merchants.length; i++) {
-                if (merchants[i].email === email) return { error: { message: 'Email already registered' } };
+    function applyTranslations(lang) {
+        var t = translations[lang];
+        if (!t) return;
+
+        document.querySelectorAll('[data-i18n]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n');
+            if (t[key] !== undefined) el.innerHTML = t[key];
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n-placeholder');
+            if (t[key] !== undefined) el.placeholder = t[key];
+        });
+
+        var signupBox = document.getElementById('signupBox');
+        var loginBox = document.getElementById('loginBox');
+        if (signupBox.style.display === 'none') {
+            showLogin();
+        } else {
+            showSignup();
+        }
+    }
+
+    // =============================================
+    // TAB SWITCHING
+    // =============================================
+    function showSignup() {
+        document.getElementById('signupBox').style.display = 'block';
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('tabSignup').className = 'flex-1 py-2.5 text-sm font-medium rounded-md text-cyan-400 bg-cyan-500/10 border border-cyan-500/30';
+        document.getElementById('tabLogin').className = 'flex-1 py-2.5 text-sm font-medium rounded-md text-slate-500 border border-transparent';
+        document.getElementById('loginError').style.display = 'none';
+    }
+
+    function showLogin() {
+        document.getElementById('signupBox').style.display = 'none';
+        document.getElementById('loginBox').style.display = 'block';
+        document.getElementById('tabLogin').className = 'flex-1 py-2.5 text-sm font-medium rounded-md text-cyan-400 bg-cyan-500/10 border border-cyan-500/30';
+        document.getElementById('tabSignup').className = 'flex-1 py-2.5 text-sm font-medium rounded-md text-slate-500 border border-transparent';
+    }
+
+    // =============================================
+    // AUTH
+    // =============================================
+    var SUPABASE_URL = 'https://lmbpnnfyelsqhwzatwbv.supabase.co';
+    var SUPABASE_KEY = 'sb_publishable_TbtYsONPIVJ_9LLt2cGybA_oXMi6vbm';
+    var db = null;
+    var useLocal = false;
+
+    function localSignUp(name, business, email, phone, city, password) {
+        var merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
+        for (var i = 0; i < merchants.length; i++) {
+            if (merchants[i].email === email) return { error: { message: translations[currentLang].error_email_exists } };
+        }
+        merchants.push({ name: name, business: business, email: email, phone: phone, city: city, password: password });
+        localStorage.setItem('chapshop_merchants', JSON.stringify(merchants));
+        return { data: { user: { id: 'local-' + Date.now() } } };
+    }
+
+    function localLogin(email, password) {
+        var merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
+        for (var i = 0; i < merchants.length; i++) {
+            if (merchants[i].email === email && merchants[i].password === password) {
+                localStorage.setItem('chapshop_logged_in', JSON.stringify(merchants[i]));
+                return { data: { user: merchants[i] } };
             }
-            merchants.push({ name: name, business: business, email: email, phone: phone, city: city, password: password });
-            localStorage.setItem('chapshop_merchants', JSON.stringify(merchants));
-            return { data: { user: { id: 'local-' + Date.now() } } };
         }
+        return { error: { message: translations[currentLang].error_invalid } };
+    }
 
-        function localLogin(email, password) {
-            var merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
-            for (var i = 0; i < merchants.length; i++) {
-                if (merchants[i].email === email && merchants[i].password === password) {
-                    localStorage.setItem('chapshop_logged_in', JSON.stringify(merchants[i]));
-                    return { data: { user: merchants[i] } };
-                }
-            }
-            return { error: { message: 'Invalid email or password' } };
-        }
+    function localGetUser() {
+        var user = localStorage.getItem('chapshop_logged_in');
+        return user ? { data: { user: JSON.parse(user) } } : { data: { user: null } };
+    }
 
-        function localGetUser() {
-            var user = localStorage.getItem('chapshop_logged_in');
-            return user ? { data: { user: JSON.parse(user) } } : { data: { user: null } };
-        }
+    function doSignUp(name, business, email, phone, city, password) {
+        if (useLocal) return Promise.resolve(localSignUp(name, business, email, phone, city, password));
+        return db.auth.signUp({ email: email, password: password, options: { data: { name: name, business: business, phone: phone, city: city } } })
+        .then(function(authResult) {
+            if (authResult.error) return authResult;
+            return db.from('merchants').insert([{ user_id: authResult.data.user.id, name: name, business: business, email: email, phone: phone, city: city }])
+            .then(function() { return authResult; });
+        });
+    }
 
-        function doSignUp(name, business, email, phone, city, password) {
-            if (useLocal) return Promise.resolve(localSignUp(name, business, email, phone, city, password));
-            return db.auth.signUp({ email: email, password: password, options: { data: { name: name, business: business, phone: phone, city: city } } })
-            .then(function(authResult) {
-                if (authResult.error) return authResult;
-                return db.from('merchants').insert([{ user_id: authResult.data.user.id, name: name, business: business, email: email, phone: phone, city: city }])
-                .then(function() { return authResult; });
-            });
-        }
+    function doLogin(email, password) {
+        if (useLocal) return Promise.resolve(localLogin(email, password));
+        return db.auth.signInWithPassword({ email: email, password: password });
+    }
 
-        function doLogin(email, password) {
-            if (useLocal) return Promise.resolve(localLogin(email, password));
-            return db.auth.signInWithPassword({ email: email, password: password });
-        }
+    function doGetUser() {
+        if (useLocal) return Promise.resolve(localGetUser());
+        return db.auth.getUser();
+    }
 
-        function doGetUser() {
-            if (useLocal) return Promise.resolve(localGetUser());
-            return db.auth.getUser();
-        }
+    // =============================================
+    // FORM HANDLERS
+    // =============================================
+    document.getElementById('signupForm').onsubmit = function(e) {
+        e.preventDefault();
+        var btn = document.getElementById('signupBtn');
+        var t = translations[currentLang];
+        btn.textContent = t.alert_creating;
+        btn.disabled = true;
 
-        document.getElementById('signupForm').onsubmit = function(e) {
-            e.preventDefault();
-            var btn = document.getElementById('signupBtn');
-            btn.textContent = 'Creating...';
-            btn.disabled = true;
+        doSignUp(
+            document.getElementById('sName').value,
+            document.getElementById('sBusiness').value,
+            document.getElementById('sEmail').value,
+            document.getElementById('sPhone').value,
+            document.getElementById('sCity').value,
+            document.getElementById('sPassword').value
+        ).then(function(result) {
+            btn.textContent = t.btn_create;
+            btn.disabled = false;
+            if (result.error) { alert('Error: ' + result.error.message); return; }
+            alert(t.alert_created);
+            showLogin();
+            document.getElementById('lEmail').value = document.getElementById('sEmail').value;
+            document.getElementById('lPassword').focus();
+        }).catch(function(err) {
+            btn.textContent = t.btn_create;
+            btn.disabled = false;
+            alert('Error: ' + err.message);
+        });
+    };
 
-            doSignUp(
-                document.getElementById('sName').value,
-                document.getElementById('sBusiness').value,
-                document.getElementById('sEmail').value,
-                document.getElementById('sPhone').value,
-                document.getElementById('sCity').value,
-                document.getElementById('sPassword').value
-            ).then(function(result) {
-                btn.textContent = 'Create Account';
-                btn.disabled = false;
-                if (result.error) { alert('Error: ' + result.error.message); return; }
-                alert('Account created! Please login.');
-                showLogin();
-                document.getElementById('lEmail').value = document.getElementById('sEmail').value;
-                document.getElementById('lPassword').focus();
-            }).catch(function(err) {
-                btn.textContent = 'Create Account';
-                btn.disabled = false;
-                alert('Error: ' + err.message);
-            });
-        };
+    document.getElementById('loginForm').onsubmit = function(e) {
+        e.preventDefault();
+        var email = document.getElementById('lEmail').value;
+        var password = document.getElementById('lPassword').value;
 
-        document.getElementById('loginForm').onsubmit = function(e) {
-            e.preventDefault();
-            var email = document.getElementById('lEmail').value;
-            var password = document.getElementById('lPassword').value;
+        document.getElementById('loginError').style.display = 'none';
+        document.getElementById('loginBtnText').style.display = 'none';
+        document.getElementById('loginBtnLoading').style.display = 'inline-block';
+        document.getElementById('loginBtn').disabled = true;
 
-            document.getElementById('loginError').style.display = 'none';
-            document.getElementById('loginBtnText').style.display = 'none';
-            document.getElementById('loginBtnLoading').style.display = 'inline-block';
-            document.getElementById('loginBtn').disabled = true;
-
-            doLogin(email, password).then(function(result) {
-                if (result.error) {
-                    document.getElementById('loginBtnText').style.display = 'inline';
-                    document.getElementById('loginBtnLoading').style.display = 'none';
-                    document.getElementById('loginBtn').disabled = false;
-                    document.getElementById('loginErrorMsg').textContent = result.error.message;
-                    document.getElementById('loginError').style.display = 'block';
-                    return;
-                }
-                window.location.href = 'dashboard.html';
-            }).catch(function(err) {
+        doLogin(email, password).then(function(result) {
+            if (result.error) {
                 document.getElementById('loginBtnText').style.display = 'inline';
                 document.getElementById('loginBtnLoading').style.display = 'none';
                 document.getElementById('loginBtn').disabled = false;
-                document.getElementById('loginErrorMsg').textContent = err.message;
+                document.getElementById('loginErrorMsg').textContent = result.error.message;
                 document.getElementById('loginError').style.display = 'block';
-            });
-        };
+                return;
+            }
+            window.location.href = 'dashboard.html';
+        }).catch(function(err) {
+            document.getElementById('loginBtnText').style.display = 'inline';
+            document.getElementById('loginBtnLoading').style.display = 'none';
+            document.getElementById('loginBtn').disabled = false;
+            document.getElementById('loginErrorMsg').textContent = err.message;
+            document.getElementById('loginError').style.display = 'block';
+        });
+    };
 
-        function init() {
-            if (typeof window.supabase !== 'undefined') {
-                try {
-                    db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    useLocal = false;
-                } catch(e) {
-                    useLocal = true;
-                }
-            } else {
+    // =============================================
+    // INIT
+    // =============================================
+    function init() {
+        if (typeof window.supabase !== 'undefined') {
+            try {
+                db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                useLocal = false;
+            } catch(e) {
                 useLocal = true;
             }
-            doGetUser().then(function(result) {
-                if (result.data && result.data.user) window.location.href = 'dashboard.html';
-            });
+        } else {
+            useLocal = true;
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', init);
-        } else {
-            init();
-        }
+        doGetUser().then(function(result) {
+            if (result.data && result.data.user) window.location.href = 'dashboard.html';
+        });
+
+        setLanguage(currentLang);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
     </script>
 </body>
 </html>
