@@ -8,9 +8,9 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2306b6d4'/%3E%3Cstop offset='100%25' stop-color='%230e7490'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M18 42l6-20h4l6 20h-4l-1.2-4h-5.6L22 42h-4zm6.4-8h3.2L26 26l-1.6 8zM36 26h6c3.3 0 5 1.8 5 4.5 0 1.8-.8 3.2-2.2 4L47 42h-4.4L41 35.6h-1V42h-4V26zm4 6.6h1.5c1.2 0 1.8-.7 1.8-2s-.6-2-1.8-2H40v4z' fill='white'/%3E%3C/svg%3E">
 
     <!-- ===== SEO META TAGS ===== -->
-    <title>Join as Merchant — ChapShop Delivery | Sign Up & Deliver Across Tanzania</title>
-    <meta name="description" content="Join 500+ merchants on ChapShop Delivery. Sign up for free, integrate instantly, and start delivering across Dar es Salaam, Dodoma, Mwanza, Arusha and more. No setup fee, no hassle.">
-    <meta name="keywords" content="ChapShop Delivery, merchant signup, delivery service Tanzania, Dar es Salaam delivery, logistics Tanzania, last mile delivery, courier service, merchant dashboard, free delivery integration, Africa delivery platform">
+    <title>Join as Merchant — ChapShop Delivery | Sign Up & Deliver Worldwide</title>
+    <meta name="description" content="Join 500+ merchants on ChapShop Delivery. Sign up for free, integrate instantly, and start delivering worldwide. No setup fee, no hassle. Available in Tanzania, Kenya, Nigeria, UAE, UK, and more.">
+    <meta name="keywords" content="ChapShop Delivery, merchant signup, delivery service worldwide, international delivery, logistics platform, last mile delivery, courier service, merchant dashboard, free delivery integration, Africa delivery platform, global shipping">
     <meta name="author" content="ChapShop Delivery">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="https://chapshopdelivery.live/merchant.html">
@@ -19,7 +19,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://chapshopdelivery.live/merchant.html">
     <meta property="og:title" content="Join as Merchant — ChapShop Delivery">
-    <meta property="og:description" content="Join 500+ merchants on ChapShop Delivery. No setup fee, free integration. Start delivering across Tanzania today.">
+    <meta property="og:description" content="Join 500+ merchants on ChapShop Delivery. No setup fee, free integration. Start delivering worldwide today.">
     <meta property="og:image" content="https://chapshopdelivery.live/og-image.png">
     <meta property="og:site_name" content="ChapShop Delivery">
     <meta property="og:locale" content="en_US">
@@ -31,7 +31,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://chapshopdelivery.live/merchant.html">
     <meta name="twitter:title" content="Join as Merchant — ChapShop Delivery">
-    <meta name="twitter:description" content="Join 500+ merchants on ChapShop Delivery. No setup fee, free integration. Start delivering across Tanzania today.">
+    <meta name="twitter:description" content="Join 500+ merchants on ChapShop Delivery. No setup fee, free integration. Start delivering worldwide today.">
     <meta name="twitter:image" content="https://chapshopdelivery.live/og-image.png">
 
     <!-- Additional SEO -->
@@ -54,7 +54,7 @@
         "@context": "https://schema.org",
         "@type": "WebPage",
         "name": "Join as Merchant — ChapShop Delivery",
-        "description": "Sign up as a merchant on ChapShop Delivery. No setup fee, free integration. Deliver across Tanzania.",
+        "description": "Sign up as a merchant on ChapShop Delivery. No setup fee, free integration. Deliver worldwide.",
         "url": "https://chapshopdelivery.live/merchant.html",
         "isPartOf": {
             "@type": "WebSite",
@@ -107,6 +107,10 @@
         .lang-option:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .lang-option.active-lang { background: rgba(6,182,212,0.1); color: #06b6d4; }
         .lang-flag { font-size: 18px; line-height: 1; }
+
+        /* Custom select arrow */
+        select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M4.646 5.646a.5.5 0 0 1 .708 0L8 8.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+        [dir="rtl"] select.form-input { background-position: left 12px center; padding-right: 16px; padding-left: 36px; }
     </style>
 </head>
 <body class="bg-[#020617] text-white">
@@ -212,18 +216,32 @@
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_phone">Phone *</label>
-                        <input type="tel" id="sPhone" class="form-input w-full rounded-xl px-4 py-3 text-sm" data-i18n-placeholder="placeholder_phone" placeholder="0769 xxx xxx" required>
+                        <input type="tel" id="sPhone" class="form-input w-full rounded-xl px-4 py-3 text-sm" data-i18n-placeholder="placeholder_phone" placeholder="+255 xxx xxx xxx" required>
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_city">City *</label>
-                        <select id="sCity" class="form-input w-full rounded-xl px-4 py-3 text-sm text-slate-400" required>
-                            <option value="" data-i18n="city_select">Select city</option>
-                            <option data-i18n="city_dar">Dar es Salaam</option>
-                            <option data-i18n="city_dodoma">Dodoma</option>
-                            <option data-i18n="city_mwanza">Mwanza</option>
-                            <option data-i18n="city_arusha">Arusha</option>
-                            <option data-i18n="city_mbeya">Mbeya</option>
-                            <option data-i18n="city_other">Other</option>
+                        <label class="text-xs text-slate-400 mb-1 block" data-i18n="label_country">Country *</label>
+                        <select id="sCountry" class="form-input w-full rounded-xl px-4 py-3 text-sm text-slate-400" required>
+                            <option value="" data-i18n="country_select">Select country</option>
+                            <option value="TZ" data-i18n="country_tz">Tanzania</option>
+                            <option value="KE" data-i18n="country_ke">Kenya</option>
+                            <option value="NG" data-i18n="country_ng">Nigeria</option>
+                            <option value="ZA" data-i18n="country_za">South Africa</option>
+                            <option value="EG" data-i18n="country_eg">Egypt</option>
+                            <option value="MA" data-i18n="country_ma">Morocco</option>
+                            <option value="GH" data-i18n="country_gh">Ghana</option>
+                            <option value="US" data-i18n="country_us">United States</option>
+                            <option value="CA" data-i18n="country_ca">Canada</option>
+                            <option value="BR" data-i18n="country_br">Brazil</option>
+                            <option value="GB" data-i18n="country_gb">United Kingdom</option>
+                            <option value="FR" data-i18n="country_fr">France</option>
+                            <option value="DE" data-i18n="country_de">Germany</option>
+                            <option value="SA" data-i18n="country_sa">Saudi Arabia</option>
+                            <option value="AE" data-i18n="country_ae">United Arab Emirates</option>
+                            <option value="CN" data-i18n="country_cn">China</option>
+                            <option value="IN" data-i18n="country_in">India</option>
+                            <option value="JP" data-i18n="country_jp">Japan</option>
+                            <option value="AU" data-i18n="country_au">Australia</option>
+                            <option value="OTHER" data-i18n="country_other">Other</option>
                         </select>
                     </div>
                     <div>
@@ -298,22 +316,36 @@
             label_business: "Business Name *",
             label_email: "Email *",
             label_phone: "Phone *",
-            label_city: "City *",
+            label_country: "Country *",
             label_password: "Password * (min 6)",
             label_password_login: "Password *",
             placeholder_name: "Your name",
             placeholder_business: "Business name",
             placeholder_email: "you@email.com",
-            placeholder_phone: "0769 xxx xxx",
+            placeholder_phone: "+255 xxx xxx xxx",
             placeholder_password: "Min 6 characters",
             placeholder_login_password: "Your password",
-            city_select: "Select city",
-            city_dar: "Dar es Salaam",
-            city_dodoma: "Dodoma",
-            city_mwanza: "Mwanza",
-            city_arusha: "Arusha",
-            city_mbeya: "Mbeya",
-            city_other: "Other",
+            country_select: "Select country",
+            country_tz: "Tanzania",
+            country_ke: "Kenya",
+            country_ng: "Nigeria",
+            country_za: "South Africa",
+            country_eg: "Egypt",
+            country_ma: "Morocco",
+            country_gh: "Ghana",
+            country_us: "United States",
+            country_ca: "Canada",
+            country_br: "Brazil",
+            country_gb: "United Kingdom",
+            country_fr: "France",
+            country_de: "Germany",
+            country_sa: "Saudi Arabia",
+            country_ae: "United Arab Emirates",
+            country_cn: "China",
+            country_in: "India",
+            country_jp: "Japan",
+            country_au: "Australia",
+            country_other: "Other",
             btn_create: "Create Account",
             btn_login: "Login to Dashboard",
             signup_link: 'Already have an account? <a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">Login here</a>',
@@ -340,22 +372,36 @@
             label_business: "اسم التجارة *",
             label_email: "البريد الإلكتروني *",
             label_phone: "الهاتف *",
-            label_city: "المدينة *",
+            label_country: "الدولة *",
             label_password: "كلمة المرور * (6 أحرف على الأقل)",
             label_password_login: "كلمة المرور *",
             placeholder_name: "اسمك",
             placeholder_business: "اسم التجارة",
             placeholder_email: "you@email.com",
-            placeholder_phone: "0769 xxx xxx",
+            placeholder_phone: "+255 xxx xxx xxx",
             placeholder_password: "6 أحرف على الأقل",
             placeholder_login_password: "كلمة المرور الخاصة بك",
-            city_select: "اختر المدينة",
-            city_dar: "دار السلام",
-            city_dodoma: "دودوما",
-            city_mwanza: "موانزا",
-            city_arusha: "أروشا",
-            city_mbeya: "مبيا",
-            city_other: "أخرى",
+            country_select: "اختر الدولة",
+            country_tz: "تنزانيا",
+            country_ke: "كينيا",
+            country_ng: "نيجيريا",
+            country_za: "جنوب أفريقيا",
+            country_eg: "مصر",
+            country_ma: "المغرب",
+            country_gh: "غانا",
+            country_us: "الولايات المتحدة",
+            country_ca: "كندا",
+            country_br: "البرازيل",
+            country_gb: "المملكة المتحدة",
+            country_fr: "فرنسا",
+            country_de: "ألمانيا",
+            country_sa: "المملكة العربية السعودية",
+            country_ae: "الإمارات العربية المتحدة",
+            country_cn: "الصين",
+            country_in: "الهند",
+            country_jp: "اليابان",
+            country_au: "أستراليا",
+            country_other: "أخرى",
             btn_create: "إنشاء حساب",
             btn_login: "تسجيل الدخول",
             signup_link: 'لديك حساب بالفعل؟ <a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">سجّل دخولك هنا</a>',
@@ -382,22 +428,36 @@
             label_business: "Nom de l'entreprise *",
             label_email: "E-mail *",
             label_phone: "Téléphone *",
-            label_city: "Ville *",
+            label_country: "Pays *",
             label_password: "Mot de passe * (min 6)",
             label_password_login: "Mot de passe *",
             placeholder_name: "Votre nom",
             placeholder_business: "Nom de l'entreprise",
             placeholder_email: "vous@email.com",
-            placeholder_phone: "0769 xxx xxx",
+            placeholder_phone: "+255 xxx xxx xxx",
             placeholder_password: "6 caractères minimum",
             placeholder_login_password: "Votre mot de passe",
-            city_select: "Sélectionner la ville",
-            city_dar: "Dar es Salaam",
-            city_dodoma: "Dodoma",
-            city_mwanza: "Mwanza",
-            city_arusha: "Arusha",
-            city_mbeya: "Mbeya",
-            city_other: "Autre",
+            country_select: "Sélectionner le pays",
+            country_tz: "Tanzanie",
+            country_ke: "Kenya",
+            country_ng: "Nigeria",
+            country_za: "Afrique du Sud",
+            country_eg: "Égypte",
+            country_ma: "Maroc",
+            country_gh: "Ghana",
+            country_us: "États-Unis",
+            country_ca: "Canada",
+            country_br: "Brésil",
+            country_gb: "Royaume-Uni",
+            country_fr: "France",
+            country_de: "Allemagne",
+            country_sa: "Arabie Saoudite",
+            country_ae: "Émirats Arabes Unis",
+            country_cn: "Chine",
+            country_in: "Inde",
+            country_jp: "Japon",
+            country_au: "Australie",
+            country_other: "Autre",
             btn_create: "Créer un compte",
             btn_login: "Se connecter",
             signup_link: 'Vous avez déjà un compte ? <a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">Connectez-vous ici</a>',
@@ -424,22 +484,36 @@
             label_business: "商家名称 *",
             label_email: "电子邮箱 *",
             label_phone: "电话 *",
-            label_city: "城市 *",
+            label_country: "国家 *",
             label_password: "密码 *（最少6位）",
             label_password_login: "密码 *",
             placeholder_name: "您的姓名",
             placeholder_business: "商家名称",
             placeholder_email: "you@email.com",
-            placeholder_phone: "0769 xxx xxx",
+            placeholder_phone: "+255 xxx xxx xxx",
             placeholder_password: "至少6个字符",
             placeholder_login_password: "您的密码",
-            city_select: "选择城市",
-            city_dar: "达累斯萨拉姆",
-            city_dodoma: "多多马",
-            city_mwanza: "姆万扎",
-            city_arusha: "阿鲁沙",
-            city_mbeya: "姆贝亚",
-            city_other: "其他",
+            country_select: "选择国家",
+            country_tz: "坦桑尼亚",
+            country_ke: "肯尼亚",
+            country_ng: "尼日利亚",
+            country_za: "南非",
+            country_eg: "埃及",
+            country_ma: "摩洛哥",
+            country_gh: "加纳",
+            country_us: "美国",
+            country_ca: "加拿大",
+            country_br: "巴西",
+            country_gb: "英国",
+            country_fr: "法国",
+            country_de: "德国",
+            country_sa: "沙特阿拉伯",
+            country_ae: "阿拉伯联合酋长国",
+            country_cn: "中国",
+            country_in: "印度",
+            country_jp: "日本",
+            country_au: "澳大利亚",
+            country_other: "其他",
             btn_create: "创建账户",
             btn_login: "登录控制台",
             signup_link: '已有账户？<a href="javascript:void(0)" onclick="showLogin()" class="text-cyan-400">在此登录</a>',
@@ -543,12 +617,12 @@
     var db = null;
     var useLocal = false;
 
-    function localSignUp(name, business, email, phone, city, password) {
+    function localSignUp(name, business, email, phone, country, password) {
         var merchants = JSON.parse(localStorage.getItem('chapshop_merchants') || '[]');
         for (var i = 0; i < merchants.length; i++) {
             if (merchants[i].email === email) return { error: { message: translations[currentLang].error_email_exists } };
         }
-        merchants.push({ name: name, business: business, email: email, phone: phone, city: city, password: password });
+        merchants.push({ name: name, business: business, email: email, phone: phone, country: country, password: password });
         localStorage.setItem('chapshop_merchants', JSON.stringify(merchants));
         return { data: { user: { id: 'local-' + Date.now() } } };
     }
@@ -569,12 +643,12 @@
         return user ? { data: { user: JSON.parse(user) } } : { data: { user: null } };
     }
 
-    function doSignUp(name, business, email, phone, city, password) {
-        if (useLocal) return Promise.resolve(localSignUp(name, business, email, phone, city, password));
-        return db.auth.signUp({ email: email, password: password, options: { data: { name: name, business: business, phone: phone, city: city } } })
+    function doSignUp(name, business, email, phone, country, password) {
+        if (useLocal) return Promise.resolve(localSignUp(name, business, email, phone, country, password));
+        return db.auth.signUp({ email: email, password: password, options: { data: { name: name, business: business, phone: phone, country: country } } })
         .then(function(authResult) {
             if (authResult.error) return authResult;
-            return db.from('merchants').insert([{ user_id: authResult.data.user.id, name: name, business: business, email: email, phone: phone, city: city }])
+            return db.from('merchants').insert([{ user_id: authResult.data.user.id, name: name, business: business, email: email, phone: phone, country: country }])
             .then(function() { return authResult; });
         });
     }
@@ -604,7 +678,7 @@
             document.getElementById('sBusiness').value,
             document.getElementById('sEmail').value,
             document.getElementById('sPhone').value,
-            document.getElementById('sCity').value,
+            document.getElementById('sCountry').value,
             document.getElementById('sPassword').value
         ).then(function(result) {
             btn.textContent = t.btn_create;
