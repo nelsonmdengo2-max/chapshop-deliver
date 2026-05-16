@@ -30,7 +30,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://chapshopdelivery.live/about">
     <meta name="twitter:title" content="About ChapShop Delivery — Tanzania's #1 COD & Logistics Partner">
-    <meta name="twitter:description" content="Tanzania's most trusted COD & logistics company. 500+ merchants. 31 regions. 98% success rate.">
+    <meta name="twitter:description" content="Tanzania's most trusted COD & logistics company. 500+ merchants. 31 regions.">
     <meta name="twitter:image" content="https://chapshopdelivery.live/og-image.png">
 
     <meta name="theme-color" content="#06b6d4">
@@ -48,21 +48,10 @@
     <link rel="alternate" hreflang="x-default" href="https://chapshopdelivery.live/about">
 
     <script type="application/ld+json">
-    {
-        "@context":"https://schema.org","@type":"AboutPage","name":"About ChapShop Delivery","url":"https://chapshopdelivery.live/about","description":"Tanzania's most trusted COD and logistics company helping 500+ merchants sell online nationwide.",
-        "mainEntity":{"@type":"Organization","name":"ChapShop Delivery","url":"https://chapshopdelivery.live","telephone":"+255769799110","email":"chapshopdelivery@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Dar es Salaam","addressCountry":"TZ"},"areaServed":{"@type":"Country","name":"Tanzania"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","reviewCount":"500"}},
-        "breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://chapshopdelivery.live/"},{"@type":"ListItem","position":2,"name":"About Us","item":"https://chapshopdelivery.live/about"}]}
-    }
+    {"@context":"https://schema.org","@type":"AboutPage","name":"About ChapShop Delivery","url":"https://chapshopdelivery.live/about","description":"Tanzania's most trusted COD and logistics company.","mainEntity":{"@type":"Organization","name":"ChapShop Delivery","url":"https://chapshopdelivery.live","telephone":"+255769799110","email":"chapshopdelivery@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Dar es Salaam","addressCountry":"TZ"},"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.8","reviewCount":"500"}},"breadcrumb":{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://chapshopdelivery.live/"},{"@type":"ListItem","position":2,"name":"About Us","item":"https://chapshopdelivery.live/about"}]}}
     </script>
     <script type="application/ld+json">
-    {
-        "@context":"https://schema.org","@type":"FAQPage","mainEntity":[
-        {"@type":"Question","name":"What does ChapShop Delivery do?","acceptedAnswer":{"@type":"Answer","text":"Complete e-commerce logistics: COD, warehousing, fulfillment, last-mile delivery, and call center services across Tanzania."}},
-        {"@type":"Question","name":"How many merchants use ChapShop Delivery?","acceptedAnswer":{"@type":"Answer","text":"Over 500 active merchants with 2M+ parcels delivered and 98% COD success rate."}},
-        {"@type":"Question","name":"Does ChapShop Delivery finance e-commerce projects?","acceptedAnswer":{"@type":"Answer","text":"Yes, for entrepreneurs with a clear product vision and market study."}},
-        {"@type":"Question","name":"What regions does ChapShop Delivery cover?","acceptedAnswer":{"@type":"Answer","text":"All 31 regions of Tanzania. Same-day delivery in major cities."}}
-        ]
-    }
+    {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What does ChapShop Delivery do?","acceptedAnswer":{"@type":"Answer","text":"Complete e-commerce logistics: COD, warehousing, fulfillment, last-mile delivery and call center services across Tanzania."}},{"@type":"Question","name":"How many merchants use ChapShop Delivery?","acceptedAnswer":{"@type":"Answer","text":"Over 500 active merchants with 2M+ parcels delivered and 98% COD success rate."}}]}
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -79,13 +68,12 @@
         .glow-line{background:linear-gradient(to right,transparent,#164e63,transparent);height:1px}
         .hero-glow{background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(6,182,212,0.12) 0%,transparent 60%)}
         .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-        .mobile-menu{transform:translateX(100%);transition:transform 0.3s ease}
-        .mobile-menu.open{transform:translateX(0)}
-        [data-lang="ar"] .mobile-menu{transform:translateX(-100%)}
-        [data-lang="ar"] .mobile-menu.open{transform:translateX(0)}
-        [data-lang="ar"] .whatsapp-float{right:auto;left:24px}
+
+        /* WhatsApp float - same as 3PL */
         .whatsapp-float{position:fixed;bottom:24px;right:24px;z-index:50;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:transform .3s}
         .whatsapp-float:hover{transform:scale(1.1)}
+        [data-lang="ar"] .whatsapp-float{right:auto;left:24px}
+
         .feature-card{transition:all 0.3s ease}
         .feature-card:hover{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.15);transform:translateY(-2px)}
         .ecosystem-step{position:relative}
@@ -93,9 +81,33 @@
         .ecosystem-step:last-child::after{display:none}
         @media(max-width:768px){.ecosystem-step::after{display:none}}
 
+        /* Language dropdown - same as 3PL */
         .lang-dropdown{position:absolute;top:calc(100% + 6px);right:0;transform:translateY(6px);opacity:0;visibility:hidden;pointer-events:none;transition:all .25s ease;z-index:100;background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,0.5);padding:6px;min-width:170px}
         .lang-dropdown.open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
         [data-lang="ar"] .lang-dropdown{right:auto;left:0}
+
+        /* Mobile menu - fixes for RTL */
+        .mobile-menu{transform:translateX(100%);transition:transform 0.3s ease}
+        .mobile-menu.open{transform:translateX(0)}
+        [data-lang="ar"] .mobile-menu{transform:translateX(-100%);right:auto;left:0;border-left:none;border-right:1px solid rgba(255,255,255,0.1)}
+        [data-lang="ar"] .mobile-menu.open{transform:translateX(0)}
+
+        /* RTL breadcrumb arrow */
+        [data-lang="ar"] .breadcrumb-arrow{transform:scaleX(-1)}
+
+        /* RTL image gradient overlays */
+        [data-lang="ar"] .img-overlay-l{background:linear-gradient(to left,from-[#020617],via-transparent,to-transparent)}
+        [data-lang="ar"] .img-overlay-r{background:linear-gradient(to right,from-[#020617],via-transparent,to-transparent)}
+
+        /* RTL stat cards */
+        [data-lang="ar"] .stat-grid{direction:rtl}
+
+        /* RTL footer */
+        [data-lang="ar"] footer .flex-row{direction:rtl}
+
+        /* RTL check marks alignment */
+        [data-lang="ar"] .check-item{flex-direction:row}
+
         select.form-input option{background-color:#0f172a;color:#e2e8f0}
     </style>
 </head>
@@ -106,7 +118,7 @@
     <!-- NAV -->
     <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2.5"><div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div><div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div></a>
+            <a href="/" class="flex items-center gap-2.5 flex-shrink-0"><div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div><div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div></a>
             <div class="hidden md:flex items-center gap-6">
                 <a href="/#services" class="text-sm text-slate-400 hover:text-white transition-colors" data-lang-text="nav_services">Services</a>
                 <a href="/#coverage" class="text-sm text-slate-400 hover:text-white transition-colors" data-lang-text="nav_coverage">Coverage</a>
@@ -116,7 +128,7 @@
             <div class="flex items-center gap-3">
                 <!-- Language Selector Desktop (same as 3PL) -->
                 <div class="relative hidden md:block" id="lang-wrapper">
-                    <button id="lang-btn" class="flex items-center gap-1.5 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/[0.08] transition-all cursor-pointer font-medium" aria-label="Select language" aria-expanded="false" aria-haspopup="true">
+                    <button id="lang-btn" class="flex items-center gap-1.5 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/[0.08] transition-all cursor-pointer font-medium" aria-label="Select language">
                         <span class="iconify text-base" data-icon="mdi:translate"></span>
                         <span id="lang-label">EN</span>
                         <span class="iconify text-xs" data-icon="mdi:chevron-down"></span>
@@ -128,11 +140,9 @@
                         <button onclick="setLang('zh')" class="lang-opt w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer font-medium" data-lang-code="zh" role="menuitem"><span class="text-base">🇨🇳</span> 中文</button>
                     </div>
                 </div>
-                <a href="/merchants" class="bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors flex items-center gap-2"><span class="iconify text-base" data-icon="mdi:storefront"></span> <span data-lang-text="nav_join">Join as Merchant</span></a>
+                <a href="/merchants" class="hidden md:flex bg-cyan-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors items-center gap-2"><span class="iconify text-base" data-icon="mdi:storefront"></span> <span data-lang-text="nav_join">Join as Merchant</span></a>
                 <!-- Mobile Language Button (same as 3PL) -->
-                <button id="mobile-lang-btn" class="md:hidden flex items-center justify-center w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-lg text-slate-300" aria-label="Change language">
-                    <span class="iconify text-lg" data-icon="mdi:translate"></span>
-                </button>
+                <button id="mobile-lang-btn" class="md:hidden flex items-center justify-center w-10 h-10 bg-white/[0.05] border border-white/[0.1] rounded-lg text-slate-300" aria-label="Change language"><span class="iconify text-lg" data-icon="mdi:translate"></span></button>
                 <button id="menu-btn" class="md:hidden text-white p-2"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
             </div>
         </div>
@@ -142,14 +152,14 @@
     <div id="mobile-lang-panel" class="fixed top-16 right-0 left-0 z-40 bg-[#0f172a] border-b border-white/10 p-4 hidden">
         <div class="flex items-center justify-center gap-2">
             <button onclick="setLang('en')" class="mob-lang text-sm px-4 py-2.5 rounded-lg transition-colors cursor-pointer font-medium flex items-center gap-2" data-lang-code="en">🇬🇧 EN</button>
-            <button onclick="setLang('ar')" class="mob-lang text-sm px-4 py-2.5 rounded-lg transition-colors cursor-pointer font-medium flex items-center gap-2" data-lang-code="ar">🇸🇦 AR</button>
+            <button onclick="setLang('ar')" class="mob-lang text-sm px-4 py-2.5 rounded-lg transition-colors cursor-pointer font-medium flex items-center gap-2" data-lang-code="ar">🇸🇦 عربي</button>
             <button onclick="setLang('fr')" class="mob-lang text-sm px-4 py-2.5 rounded-lg transition-colors cursor-pointer font-medium flex items-center gap-2" data-lang-code="fr">🇫🇷 FR</button>
             <button onclick="setLang('zh')" class="mob-lang text-sm px-4 py-2.5 rounded-lg transition-colors cursor-pointer font-medium flex items-center gap-2" data-lang-code="zh">🇨🇳 中文</button>
         </div>
     </div>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 bottom-0 w-72 z-[60] bg-[#0f172a] border-l border-white/10 p-6">
+    <div id="mobile-menu" class="mobile-menu fixed top-0 right-0 bottom-0 w-72 z-[60] bg-[#0f172a] border-l border-white/10 p-6 overflow-y-auto">
         <div class="flex justify-end mb-8"><button id="close-menu" class="text-white p-2"><span class="iconify text-2xl" data-icon="mdi:close"></span></button></div>
         <div class="flex flex-col gap-4">
             <a href="/" class="mobile-link text-slate-300 hover:text-white py-2 text-base transition-colors" data-lang-text="nav_home">Home</a>
@@ -168,7 +178,7 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center gap-2 text-sm text-slate-500 mb-6">
                 <a href="/" class="hover:text-white transition-colors" data-lang-text="nav_home">Home</a>
-                <span class="iconify text-xs" data-icon="mdi:chevron-right"></span>
+                <span class="iconify text-xs breadcrumb-arrow" data-icon="mdi:chevron-right"></span>
                 <span class="text-cyan-400" data-lang-text="nav_about">About Us</span>
             </div>
             <div class="max-w-3xl">
@@ -198,7 +208,7 @@
                         <img src="https://z-cdn-media.chatglm.cn/files/8cba3be5-0f75-488a-917e-bacfc901979c.png?auth_key=1878903406-498ca35be6144d3890fd12ef69b1aaec-0-1a29967252dc164735174f816ca915cf" alt="ChapShop Delivery Team — Delivering Smiles Across Tanzania" class="w-full h-[400px] object-cover object-center" loading="lazy">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent"></div>
                         <div class="absolute bottom-6 left-6 right-6">
-                            <div class="grid grid-cols-3 gap-3">
+                            <div class="grid grid-cols-3 gap-3 stat-grid">
                                 <div class="bg-[#0f172a]/90 border border-white/10 rounded-xl p-3 text-center"><div class="text-xl font-semibold text-cyan-400">31</div><div class="text-[10px] text-slate-400 mt-0.5" data-lang-text="stat_regions">Regions</div></div>
                                 <div class="bg-[#0f172a]/90 border border-white/10 rounded-xl p-3 text-center"><div class="text-xl font-semibold text-cyan-400">500+</div><div class="text-[10px] text-slate-400 mt-0.5" data-lang-text="stat_merchants">Merchants</div></div>
                                 <div class="bg-[#0f172a]/90 border border-white/10 rounded-xl p-3 text-center"><div class="text-xl font-semibold text-cyan-400">24/7</div><div class="text-[10px] text-slate-400 mt-0.5" data-lang-text="stat_support">Support</div></div>
@@ -260,7 +270,7 @@
                 <div class="relative order-2 lg:order-1">
                     <div class="absolute -inset-4 bg-gradient-to-r from-cyan-500/5 to-transparent rounded-3xl blur-2xl"></div>
                     <div class="relative bg-[#0f172a] border border-white/[0.08] rounded-2xl overflow-hidden">
-                        <img src="https://z-cdn-media.chatglm.cn/files/49cff362-bc60-44e3-9f89-10a591ff0578.png?auth_key=1878903406-eac472aa85304153bd7c5e7ed35bbb91-0-e374776fb96b06241f8be64feb8d87d8" alt="ChapShop Delivery Office — Delivering Smiles Across Tanzania" class="w-full h-[400px] object-cover object-center" loading="lazy">
+                        <img src="https://z-cdn-media.chatglm.cn/files/49cff362-bc60-44e3-9f89-10a591ff0578.png?auth_key=1878903406-eac472aa85304153bd7c5e7ed35bbb91-0-e374776fb96b06241f8be64feb8d87d8" alt="ChapShop Delivery Office" class="w-full h-[400px] object-cover object-center" loading="lazy">
                         <div class="absolute inset-0 bg-gradient-to-r from-[#0f172a]/50 to-transparent"></div>
                     </div>
                 </div>
@@ -269,10 +279,10 @@
                     <h2 class="text-2xl md:text-3xl font-medium tracking-tight gradient-text mb-6" data-lang-text="tz_title">A Massive Market Waiting to Be Served</h2>
                     <p class="text-slate-400 font-light text-base leading-relaxed mb-6" data-lang-text="tz_desc">Tanzania is one of Africa's fastest-growing economies with over 65 million people. E-commerce is booming, driven by mobile penetration and a young population hungry for online shopping.</p>
                     <div class="space-y-4">
-                        <div class="flex items-start gap-3"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white" data-lang-text="tz_p1">65M+ Population</p><p class="text-xs text-slate-500" data-lang-text="tz_p1d">Growing middle class with increasing purchasing power</p></div></div>
-                        <div class="flex items-start gap-3"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white" data-lang-text="tz_p2">Cash-First Economy</p><p class="text-xs text-slate-500" data-lang-text="tz_p2d">Over 80% of transactions are cash-based — COD is king</p></div></div>
-                        <div class="flex items-start gap-3"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white" data-lang-text="tz_p3">Mobile Penetration 90%+</p><p class="text-xs text-slate-500" data-lang-text="tz_p3d">M-Pesa, Tigo Pesa, Airtel Money — everyone's connected</p></div></div>
-                        <div class="flex items-start gap-3"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white" data-lang-text="tz_p4">Low E-Commerce Competition</p><p class="text-xs text-slate-500" data-lang-text="tz_p4d">The market is still early — first movers have huge advantage</p></div></div>
+                        <div class="flex items-start gap-3 check-item"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white" data-lang-text="tz_p1">65M+ Population</p><p class="text-xs text-slate-500" data-lang-text="tz_p1d">Growing middle class with increasing purchasing power</p></div></div>
+                        <div class="flex items-start gap-3 check-item"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white" data-lang-text="tz_p2">Cash-First Economy</p><p class="text-xs text-slate-500" data-lang-text="tz_p2d">Over 80% of transactions are cash-based — COD is king</p></div></div>
+                        <div class="flex items-start gap-3 check-item"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white" data-lang-text="tz_p3">Mobile Penetration 90%+</p><p class="text-xs text-slate-500" data-lang-text="tz_p3d">M-Pesa, Tigo Pesa, Airtel Money — everyone's connected</p></div></div>
+                        <div class="flex items-start gap-3 check-item"><div class="w-6 h-6 rounded-full bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5"><span class="iconify text-cyan-400 text-sm" data-icon="mdi:check"></span></div><div><p class="text-sm font-medium text-white" data-lang-text="tz_p4">Low E-Commerce Competition</p><p class="text-xs text-slate-500" data-lang-text="tz_p4d">The market is still early — first movers have huge advantage</p></div></div>
                     </div>
                 </div>
             </div>
@@ -286,7 +296,7 @@
             <blockquote class="text-2xl md:text-3xl font-light text-white leading-relaxed mb-8" data-lang-text="mission_quote">"To empower every entrepreneur in Tanzania to sell online <span class="text-cyan-400 font-medium">without barriers</span> — by providing the logistics, warehousing, and support infrastructure they need to succeed."</blockquote>
             <div class="flex items-center justify-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-full flex items-center justify-center text-sm font-semibold">CS</div>
-                <div class="text-left"><div class="text-sm font-medium text-white" data-lang-text="mission_author">ChapShop Delivery Team</div><div class="text-xs text-slate-500" data-lang-text="mission_location">Dar es Salaam, Tanzania</div></div>
+                <div class="text-left" style="direction:ltr"><div class="text-sm font-medium text-white" data-lang-text="mission_author">ChapShop Delivery Team</div><div class="text-xs text-slate-500" data-lang-text="mission_location">Dar es Salaam, Tanzania</div></div>
             </div>
         </div>
     </section>
@@ -309,8 +319,8 @@
     <footer class="border-t border-white/[0.05] pt-12 pb-8">
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-                <a href="/" class="flex items-center gap-2.5"><div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div><div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div></a>
-                <div class="flex items-center gap-6">
+                <a href="/" class="flex items-center gap-2.5 flex-shrink-0"><div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div><div><span class="font-semibold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-semibold text-[15px] ml-0.5">Delivery</span></div></a>
+                <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
                     <a href="/" class="text-sm text-slate-400 hover:text-white transition-colors" data-lang-text="nav_home">Home</a>
                     <a href="/#services" class="text-sm text-slate-400 hover:text-white transition-colors" data-lang-text="nav_services">Services</a>
                     <a href="/about" class="text-sm text-white transition-colors" data-lang-text="nav_about">About Us</a>
@@ -320,7 +330,7 @@
             </div>
             <div class="glow-line mb-6"></div>
             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-xs text-slate-500">© 2025 ChapShop Delivery. All rights reserved. Registered in Tanzania.</p>
+                <p class="text-xs text-slate-500">© 2025 ChapShop Delivery. All rights reserved.</p>
                 <div class="flex items-center gap-4">
                     <span class="text-xs text-slate-500 flex items-center gap-1.5"><span class="iconify text-cyan-400" data-icon="mdi:shield-check"></span> SSL Secured</span>
                     <span class="text-xs text-slate-500 flex items-center gap-1.5"><span class="iconify text-cyan-400" data-icon="mdi:lock"></span> Insured</span>
@@ -340,75 +350,42 @@
     document.querySelectorAll('.mobile-link').forEach(function(l){l.addEventListener('click',closeMenu)});
 
     // =============================================
-    // TRANSLATIONS (4 languages — same as 3PL)
+    // TRANSLATIONS
     // =============================================
     var T={
     en:{nav_services:"Services",nav_coverage:"Coverage",nav_about:"About Us",nav_contact:"Contact",nav_join:"Join as Merchant",nav_home:"Home",page_title:"About ChapShop Delivery",page_subtitle:"We provide you with a complete system to start and scale your e-commerce business in the Tanzanian market easily — without customs or legal restrictions.",partner_title:"Your E-Commerce Partner From A to Z",partner_p1:'All you have to do is focus on selecting products and launching advertising campaigns — and we take care of the rest: <span class="text-white font-medium">importing, order confirmation, warehousing, packing, and shipping</span> across Tanzania.',partner_p2:"Whether you're a social media seller on Instagram or WhatsApp, or running a full e-commerce store on Shopify, ChapShop Delivery gives you the logistics backbone to deliver nationwide with cash on delivery.",partner_p3:'If you have a clear product and market study or vision, we can also <span class="text-cyan-400 font-medium">finance your project</span> and help you launch faster.',btn_start:"Start Selling",btn_talk:"Talk to Us",stat_regions:"Regions",stat_merchants:"Merchants",stat_support:"Support",handle_badge:"What We Handle",handle_title:"You Focus on Selling. We Handle The Rest.",handle_desc:"From the moment a customer places an order to the moment they receive it — we manage every step.",f1_title:"Importing & Sourcing",f1_desc:"We help you source and import products without the hassle of customs clearance or legal restrictions in Tanzania.",f2_title:"Order Confirmation",f2_desc:"Our call center confirms every order with your customers via phone calls and SMS to reduce returns and boost delivery rates.",f3_title:"Warehousing & Storage",f3_desc:"Strategic warehouses in Dar es Salaam with real-time inventory management, so your products are always ready to ship.",f4_title:"Packing & Labeling",f4_desc:"Professional pick & pack services with branded labeling. Each order is carefully packed and ready for last-mile delivery.",f5_title:"Last-Mile Delivery",f5_desc:"Nationwide COD delivery covering all 31 regions — same-day in major cities, 1-5 days to remote areas.",f6_title:"COD Collection & Remittance",f6_desc:"We collect cash on delivery and remit directly to your M-Pesa or bank account within 24 hours — no delays.",eco_badge:"Complete Ecosystem",eco_title:"Complete E-Commerce Ecosystem From A to Z",eco_desc:"Everything you need to sell online in Tanzania, integrated into one seamless platform.",eco_s1_title:"Product Selection",eco_s1_desc:"Choose what to sell. We guide you on trending products in Tanzania.",eco_s2_title:"Launch Campaigns",eco_s2_desc:"Run ads on social media. We help with marketing strategy and content.",eco_s3_title:"We Handle Operations",eco_s3_desc:"Import, confirm, store, pack, ship — all managed by our team.",eco_s4_title:"You Get Paid",eco_s4_desc:"COD collected and remitted to you. Track everything from your dashboard.",eco_c1_title:"Multi-Region Logistics & Warehousing",eco_c1_desc:"Strategic warehouse locations across Tanzania with delivery routes covering all 31 regions — urban and rural.",eco_c2_title:"Dedicated Support Team Available 24/7",eco_c2_desc:"Our support team is always available — via WhatsApp, phone, or email. Your dedicated account manager knows your business.",eco_c3_title:"Project Financing Available",eco_c3_desc:"Have a clear vision? We can finance your e-commerce project — from product import to first sales. Talk to us to learn more.",tz_badge:"Why Tanzania",tz_title:"A Massive Market Waiting to Be Served",tz_desc:"Tanzania is one of Africa's fastest-growing economies with over 65 million people. E-commerce is booming, driven by mobile penetration and a young population hungry for online shopping.",tz_p1:"65M+ Population",tz_p1d:"Growing middle class with increasing purchasing power",tz_p2:"Cash-First Economy",tz_p2d:"Over 80% of transactions are cash-based — COD is king",tz_p3:"Mobile Penetration 90%+",tz_p3d:"M-Pesa, Tigo Pesa, Airtel Money — everyone's connected",tz_p4:"Low E-Commerce Competition",tz_p4d:"The market is still early — first movers have huge advantage",mission_badge:"Our Mission",mission_quote:'"To empower every entrepreneur in Tanzania to sell online <span class="text-cyan-400 font-medium">without barriers</span> — by providing the logistics, warehousing, and support infrastructure they need to succeed."',mission_author:"ChapShop Delivery Team",mission_location:"Dar es Salaam, Tanzania",cta_title:"Ready to Start Your E-Commerce Journey?",cta_desc:"Join 500+ merchants who are already growing their online business with ChapShop Delivery. No setup fees, no restrictions — just results.",cta_btn1:"Join as Merchant — Free",cta_btn2:"Chat on WhatsApp"},
-    ar:{nav_services:"الخدمات",nav_coverage:"التغطية",nav_about:"من نحن",nav_contact:"اتصل بنا",nav_join:"انضم كتاجر",nav_home:"الرئيسية",page_title:"عن ChapShop Delivery",page_subtitle:"نوفر لك نظاماً كاملاً لبدء وتوسيع تجارتك الإلكترونية في السوق التنزاني بسهولة — دون قيود جمركية أو قانونية.",partner_title:"شريكك في التجارة الإلكترونية من الألف إلى الياء",partner_p1:'كل ما عليك هو التركيز على اختيار المنتجات وإطلاق الحملات الإعلانية — ونحن نتولى الباقي: <span class="text-white font-medium">الاستيراد، تأكيد الطلبات، التخزين، التعبئة، والشحن</span> عبر تنزانيا.',partner_p2:"سواء كنت بائعاً على وسائل التواصل الاجتماعي أو تدير متجراً إلكترونياً كاملاً على شوبيفاي، يمنحك ChapShop Delivery البنية اللوجستية للتوصيل مع الدفع عند الاستلام.",partner_p3:'إذا كان لديك منتج واضح ودراسة جدوى، يمكننا أيضاً <span class="text-cyan-400 font-medium">تمويل مشروعك</span> ومساعدتك على الإطلاق بشكل أسرع.',btn_start:"ابدأ البيع",btn_talk:"تحدث معنا",stat_regions:"المناطق",stat_merchants:"التجار",stat_support:"الدعم",handle_badge:"ما نتولاه",handle_title:"ركز على البيع. نتولى الباقي.",handle_desc:"من لحظة تقديم العميل للطلب وحتى لحظة استلامه — ندير كل خطوة.",f1_title:"الاستيراد والتوريد",f1_desc:"نساعدك في توريد واستيراد المنتجات دون تعقيدات التخليص الجمركي أو القيود القانونية في تنزانيا.",f2_title:"تأكيد الطلبات",f2_desc:"يؤكد مركز الاتصال لدينا كل طلب مع عملائك عبر المكالمات الهاتفية ورسائل SMS لتقليل الإرجاعات وتعزيز معدلات التوصيل.",f3_title:"التخزين",f3_desc:"مستودعات استراتيجية في دار السلام مع إدارة المخزون في الوقت الفعلي.",f4_title:"التعبئة والتوسيم",f4_desc:"خدمات احترافية لاختيار وتعبئة المنتجات مع توسيم بعلامتك التجارية.",f5_title:"التوصيل في الميل الأخير",f5_desc:"توصيل الدفع عند الاستلام يغطي جميع الـ 31 منطقة — نفس اليوم في المدن الكبرى.",f6_title:"تحصيل الدفع عند الاستلام والتحويل",f6_desc:"نجمع النقد عند التوصيل ونحوله مباشرة إلى حسابك خلال 24 ساعة.",eco_badge:"نظام متكامل",eco_title:"نظام تجارة إلكترونية متكامل من الألف إلى الياء",eco_desc:"كل ما تحتاجه للبيع عبر الإنترنت في تنزانيا، مدمج في منصة واحدة سلسة.",eco_s1_title:"اختيار المنتجات",eco_s1_desc:"اختر ما تبيعه. نرشدك إلى المنتجات الرائجة في تنزانيا.",eco_s2_title:"إطلاق الحملات",eco_s2_desc:"شغل إعلانات على وسائل التواصل. نساعدك في استراتيجية التسويق.",eco_s3_title:"نتولى العمليات",eco_s3_desc:"الاستيراد، التأكيد، التخزين، التعبئة، الشحن — كل شيء تدار بواسطة فريقنا.",eco_s4_title:"تحصل على الدفع",eco_s4_desc:"يتم تحصيل الدفع عند الاستلام وتحويله إليك. تتبع كل شيء من لوحة التحكم.",eco_c1_title:"لوجستيات وتخزين متعدد المناطق",eco_c1_desc:"مواقع مستودعات استراتيجية عبر تنزانيا تغطي جميع الـ 31 منطقة.",eco_c2_title:"فريق دعم مخصص متاح 24/7",eco_c2_desc:"فريق الدعم متاح دائماً — عبر واتساب أو الهاتف أو البريد الإلكتروني.",eco_c3_title:"تمويل المشاريع متاح",eco_c3_desc:"لديك رؤية واضحة؟ يمكننا تمويل مشروعك للتجارة الإلكترونية.",tz_badge:"لماذا تنزانيا",tz_title:"سوق ضخمة تنتظر من يخدمها",tz_desc:"تنزانيا واحدة من أسرع الاقتصادات نمواً في أفريقيا مع أكثر من 65 مليون نسمة. التجارة الإلكترونية مزدهرة.",tz_p1:"أكثر من 65 مليون نسمة",tz_p1d:"طبقة متوسطة نامية مع قوة شرائية متزايدة",tz_p2:"اقتصاد يعتمد على النقد",tz_p2d:"أكثر من 80% من المعاملات نقدية — الدفع عند الاستلام هو الملك",tz_p3:"انتشار الهواتف 90%+",tz_p3d:"M-Pesa، Tigo Pesa، Airtel Money — الجميع متصلون",tz_p4:"منافسة منخفضة",tz_p4d:"السوق لا يزال في بدايته — للمتحركين الأولين ميزة كبيرة",mission_badge:"مهمتنا",mission_quote:'"تمكين كل رائد أعمال في تنزانيا للبيع عبر الإنترنت <span class="text-cyan-400 font-medium">بدون حواجز</span> — من خلال توفير البنية التحتية اللوجستية والتخزين والدعم التي يحتاجونها للنجاح."',mission_author:"فريق ChapShop Delivery",mission_location:"دار السلام، تنزانيا",cta_title:"مستعد لبدء رحلتك في التجارة الإلكترونية؟",cta_desc:"انضم إلى أكثر من 500 تاجر ينمون تجارتهم مع ChapShop Delivery. بدون رسوم إعداد، بدون قيود — فقط نتائج.",cta_btn1:"انضم كتاجر — مجاناً",cta_btn2:"تحدث عبر واتساب"},
-    fr:{nav_services:"Services",nav_coverage:"Couverture",nav_about:"À propos",nav_contact:"Contact",nav_join:"Rejoindre",nav_home:"Accueil",page_title:"À propos de ChapShop Delivery",page_subtitle:"Nous vous fournissons un système complet pour démarrer et développer votre activité e-commerce en Tanzanie facilement — sans restrictions douanières ou légales.",partner_title:"Votre partenaire e-commerce de A à Z",partner_p1:'Concentrez-vous sur la sélection des produits et le lancement de campagnes — et nous nous occupons du reste : <span class="text-white font-medium">importation, confirmation, entreposage, emballage et expédition</span> à travers la Tanzanie.',partner_p2:"Que vous soyez vendeur sur les réseaux sociaux ou sur Shopify, ChapShop Delivery vous donne l'infrastructure logistique pour livrer à l'échelle nationale avec paiement à la livraison.",partner_p3:'Si vous avez un produit clair et une étude de marché, nous pouvons aussi <span class="text-cyan-400 font-medium">financer votre projet</span> et vous aider à vous lancer plus rapidement.',btn_start:"Commencer à vendre",btn_talk:"Parlez-nous",stat_regions:"Régions",stat_merchants:"Marchands",stat_support:"Support",handle_badge:"Ce que nous gérons",handle_title:"Concentrez-vous sur les ventes. Nous gérons le reste.",handle_desc:"Du moment où un client passe une commande au moment où il la reçoit — nous gérons chaque étape.",f1_title:"Importation & Approvisionnement",f1_desc:"Nous vous aidons à sourcer et importer des produits sans les tracas de dédouanement.",f2_title:"Confirmation de commande",f2_desc:"Notre centre d'appels confirme chaque commande par téléphone et SMS.",f3_title:"Entreposage & Stockage",f3_desc:"Entrepôts stratégiques à Dar es Salaam avec gestion des stocks en temps réel.",f4_title:"Emballage & Étiquetage",f4_desc:"Services professionnels de préparation et d'emballage avec étiquetage de marque.",f5_title:"Livraison du dernier kilomètre",f5_desc:"Livraison COD nationale couvrant les 31 régions — même jour dans les grandes villes.",f6_title:"Collecte COD & Virement",f6_desc:"Nous collectons l'argent à la livraison et versons sur votre compte dans les 24 heures.",eco_badge:"Écosystème complet",eco_title:"Écosystème e-commerce complet de A à Z",eco_desc:"Tout ce dont vous avez besoin pour vendre en ligne en Tanzanie.",eco_s1_title:"Sélection de produits",eco_s1_desc:"Choisissez quoi vendre. Nous vous guidons sur les produits tendance.",eco_s2_title:"Lancer des campagnes",eco_s2_desc:"Lancez des publicités sur les réseaux sociaux.",eco_s3_title:"Nous gérons les opérations",eco_s3_desc:"Importation, confirmation, stockage, emballage, expédition — tout géré par notre équipe.",eco_s4_title:"Vous êtes payé",eco_s4_desc:"COD collecté et viré sur votre compte.",eco_c1_title:"Logistique et entreposage multi-régions",eco_c1_desc:"Entrepôts stratégiques couvrant les 31 régions de Tanzanie.",eco_c2_title:"Équipe de support dédiée 24/7",eco_c2_desc:"Support toujours disponible — WhatsApp, téléphone ou email.",eco_c3_title:"Financement de projet disponible",eco_c3_desc:"Nous pouvons financer votre projet e-commerce.",tz_badge:"Pourquoi la Tanzanie",tz_title:"Un marché massif attendant d'être servi",tz_desc:"La Tanzanie est l'une des économies à la croissance la plus rapide d'Afrique avec plus de 65 millions d'habitants.",tz_p1:"65M+ d'habitants",tz_p1d:"Classe moyenne croissante avec pouvoir d'achat augmenté",tz_p2:"Économie basée sur le cash",tz_p2d:"Plus de 80% des transactions en espèces — le COD est roi",tz_p3:"Pénétration mobile 90%+",tz_p3d:"M-Pesa, Tigo Pesa, Airtel Money — tout le monde est connecté",tz_p4:"Faible concurrence e-commerce",tz_p4d:"Le marché est encore tôt — les premiers arrivants ont un énorme avantage",mission_badge:"Notre mission",mission_quote:'"Permettre à chaque entrepreneur en Tanzanie de vendre en ligne <span class="text-cyan-400 font-medium">sans barrières</span> — en fournissant l\'infrastructure logistique et de support dont ils ont besoin pour réussir."',mission_author:"Équipe ChapShop Delivery",mission_location:"Dar es Salaam, Tanzanie",cta_title:"Prêt à démarrer votre aventure e-commerce ?",cta_desc:"Rejoignez 500+ marchands avec ChapShop Delivery. Pas de frais de configuration — juste des résultats.",cta_btn1:"Rejoindre — Gratuit",cta_btn2:"Discuter sur WhatsApp"},
-    zh:{nav_services:"服务",nav_coverage:"覆盖范围",nav_about:"关于我们",nav_contact:"联系我们",nav_join:"加入商户",nav_home:"首页",page_title:"关于 ChapShop Delivery",page_subtitle:"我们为您提供一套完整的系统，帮助您轻松启动和扩展坦桑尼亚电商业务——无需海关或法律限制。",partner_title:"您的电商合作伙伴 从 A 到 Z",partner_p1:'您只需专注于选品和启动广告活动——剩下的交给我们：<span class="text-white font-medium">进口、订单确认、仓储、打包和发货</span>覆盖坦桑尼亚。',partner_p2:"无论您是社交媒体卖家还是运营 Shopify 商店，ChapShop Delivery 都为您提供覆盖全国的物流后盾，支持货到付款。",partner_p3:'如果您有明确的产品和市场研究，我们还可以<span class="text-cyan-400 font-medium">为您的项目融资</span>，帮助您更快上线。',btn_start:"开始销售",btn_talk:"联系我们",stat_regions:"区域",stat_merchants:"商户",stat_support:"支持",handle_badge:"我们处理的内容",handle_title:"您专注销售，剩下的交给我们。",handle_desc:"从客户下单到收货——我们管理每一步。",f1_title:"进口与采购",f1_desc:"我们帮助您采购进口产品，无需处理海关清关或法律限制。",f2_title:"订单确认",f2_desc:"我们的客服中心通过电话和短信确认每个订单，减少退货，提高配送成功率。",f3_title:"仓储与存储",f3_desc:"达累斯萨拉姆的战略仓库配合实时库存管理。",f4_title:"打包与贴标",f4_desc:"专业的拣选包和贴标服务。",f5_title:"最后一公里配送",f5_desc:"全国货到付款覆盖全部31个区域——大城市当日达。",f6_title:"货到付款收款与汇款",f6_desc:"我们代收货到付款，24小时内汇入您的账户。",eco_badge:"完整生态",eco_title:"从 A 到 Z 的完整电商生态",eco_desc:"在坦桑尼亚在线销售所需的一切。",eco_s1_title:"选品",eco_s1_desc:"选择卖什么。我们指导您坦桑尼亚的热门产品。",eco_s2_title:"启动广告",eco_s2_desc:"在社交媒体上投放广告。",eco_s3_title:"我们处理运营",eco_s3_desc:"进口、确认、存储、打包、发货——全部由我们的团队管理。",eco_s4_title:"您收到货款",eco_s4_desc:"代收货到付款并汇入您的账户。",eco_c1_title:"多区域物流与仓储",eco_c1_desc:"坦桑尼亚战略仓库位置，配送路线覆盖全部31个区域。",eco_c2_title:"24/7 专属支持团队",eco_c2_desc:"支持团队全天候可用——通过 WhatsApp、电话或邮件。",eco_c3_title:"项目融资可用",eco_c3_desc:"有清晰愿景？我们可以为您的电商项目融资。",tz_badge:"为什么选择坦桑尼亚",tz_title:"一个等待服务的巨大市场",tz_desc:"坦桑尼亚是非洲增长最快的经济体之一，拥有超过6500万人口。电商蓬勃发展。",tz_p1:"6500万+人口",tz_p1d:"不断增长的中产阶级，购买力提升",tz_p2:"现金经济",tz_p2d:"超过80%的交易使用现金——货到付款为王",tz_p3:"手机渗透率 90%+",tz_p3d:"M-Pesa、Tigo Pesa、Airtel Money —人人在线",tz_p4:"电商竞争低",tz_p4d:"市场尚处早期——先行者优势巨大",mission_badge:"我们的使命",mission_quote:'"赋能坦桑尼亚每位企业家<span class="text-cyan-400 font-medium">无障碍地</span>在线销售——通过提供所需的物流、仓储和支持基础设施助力成功。"',mission_author:"ChapShop Delivery 团队",mission_location:"坦桑尼亚 达累斯萨拉姆",cta_title:"准备好开始您的电商之旅了吗？",cta_desc:"加入500+已经在使用 ChapShop Delivery 发展在线业务的商户。零设置费——只看结果。",cta_btn1:"免费加入",cta_btn2:"WhatsApp 联系"}
+    ar:{nav_services:"الخدمات",nav_coverage:"التغطية",nav_about:"من نحن",nav_contact:"اتصل بنا",nav_join:"انضم كتاجر",nav_home:"الرئيسية",page_title:"عن ChapShop Delivery",page_subtitle:"نوفر لك نظاماً كاملاً لبدء وتوسيع تجارتك الإلكترونية في السوق التنزاني بسهولة — دون قيود جمركية أو قانونية.",partner_title:"شريكك في التجارة الإلكترونية من الألف إلى الياء",partner_p1:'كل ما عليك هو التركيز على اختيار المنتجات وإطلاق الحملات الإعلانية — ونحن نتولى الباقي: <span class="text-white font-medium">الاستيراد، تأكيد الطلبات، التخزين، التعبئة، والشحن</span> عبر تنزانيا.',partner_p2:"سواء كنت بائعاً على وسائل التواصل الاجتماعي أو تدير متجراً إلكترونياً كاملاً على شوبيفاي، يمنحك ChapShop Delivery البنية اللوجستية للتوصيل مع الدفع عند الاستلام.",partner_p3:'إذا كان لديك منتج واضح ودراسة جدوى، يمكننا أيضاً <span class="text-cyan-400 font-medium">تمويل مشروعك</span> ومساعدتك على الإطلاق بشكل أسرع.',btn_start:"ابدأ البيع",btn_talk:"تحدث معنا",stat_regions:"المناطق",stat_merchants:"التجار",stat_support:"الدعم",handle_badge:"ما نتولاه",handle_title:"ركز على البيع. نتولى الباقي.",handle_desc:"من لحظة تقديم العميل للطلب وحتى لحظة استلامه — ندير كل خطوة.",f1_title:"الاستيراد والتوريد",f1_desc:"نساعدك في توريد واستيراد المنتجات دون تعقيدات التخليص الجمركي أو القيود القانونية في تنزانيا.",f2_title:"تأكيد الطلبات",f2_desc:"يؤكد مركز الاتصال لدينا كل طلب مع عملائك عبر المكالمات و SMS لتقليل الإرجاعات.",f3_title:"التخزين",f3_desc:"مستودعات استراتيجية في دار السلام مع إدارة المخزون في الوقت الفعلي.",f4_title:"التعبئة والتوسيم",f4_desc:"خدمات احترافية لاختيار وتعبئة المنتجات مع توسيم بعلامتك التجارية.",f5_title:"التوصيل في الميل الأخير",f5_desc:"توصيل الدفع عند الاستلام يغطي جميع الـ 31 منطقة — نفس اليوم في المدن الكبرى.",f6_title:"تحصيل وتحويل الدفع عند الاستلام",f6_desc:"نجمع النقد عند التوصيل ونحوله مباشرة إلى حسابك خلال 24 ساعة.",eco_badge:"نظام متكامل",eco_title:"نظام تجارة إلكترونية متكامل من الألف إلى الياء",eco_desc:"كل ما تحتاجه للبيع عبر الإنترنت في تنزانيا، مدمج في منصة واحدة سلسة.",eco_s1_title:"اختيار المنتجات",eco_s1_desc:"اختر ما تبيعه. نرشدك إلى المنتجات الرائجة في تنزانيا.",eco_s2_title:"إطلاق الحملات",eco_s2_desc:"شغل إعلانات على وسائل التواصل. نساعدك في استراتيجية التسويق.",eco_s3_title:"نتولى العمليات",eco_s3_desc:"الاستيراد، التأكيد، التخزين، التعبئة، الشحن — كل شيء تدار بواسطة فريقنا.",eco_s4_title:"تحصل على الدفع",eco_s4_desc:"يتم تحصيل الدفع عند الاستلام وتحويله إليك.",eco_c1_title:"لوجستيات وتخزين متعدد المناطق",eco_c1_desc:"مواقع مستودعات استراتيجية عبر تنزانيا تغطي جميع الـ 31 منطقة.",eco_c2_title:"فريق دعم مخصص متاح 24/7",eco_c2_desc:"فريق الدعم متاح دائماً — عبر واتساب أو الهاتف أو البريد الإلكتروني.",eco_c3_title:"تمويل المشاريع متاح",eco_c3_desc:"لديك رؤية واضحة؟ يمكننا تمويل مشروعك للتجارة الإلكترونية.",tz_badge:"لماذا تنزانيا",tz_title:"سوق ضخمة تنتظر من يخدمها",tz_desc:"تنزانيا واحدة من أسرع الاقتصادات نمواً في أفريقيا مع أكثر من 65 مليون نسمة.",tz_p1:"أكثر من 65 مليون نسمة",tz_p1d:"طبقة متوسطة نامية مع قوة شرائية متزايدة",tz_p2:"اقتصاد يعتمد على النقد",tz_p2d:"أكثر من 80% من المعاملات نقدية — الدفع عند الاستلام هو الملك",tz_p3:"انتشار الهواتف 90%+",tz_p3d:"M-Pesa، Tigo Pesa، Airtel Money — الجميع متصلون",tz_p4:"منافسة منخفضة",tz_p4d:"السوق لا يزال في بدايته — للمتحركين الأولين ميزة كبيرة",mission_badge:"مهمتنا",mission_quote:'"تمكين كل رائد أعمال في تنزانيا للبيع عبر الإنترنت <span class="text-cyan-400 font-medium">بدون حواجز</span> — من خلال توفير البنية التحتية اللوجستية والتخزين والدعم التي يحتاجونها للنجاح."',mission_author:"فريق ChapShop Delivery",mission_location:"دار السلام، تنزانيا",cta_title:"مستعد لبدء رحلتك في التجارة الإلكترونية؟",cta_desc:"انضم إلى أكثر من 500 تاجر ينمون تجارتهم مع ChapShop Delivery. بدون رسوم — فقط نتائج.",cta_btn1:"انضم كتاجر — مجاناً",cta_btn2:"تحدث عبر واتساب"},
+    fr:{nav_services:"Services",nav_coverage:"Couverture",nav_about:"À propos",nav_contact:"Contact",nav_join:"Rejoindre",nav_home:"Accueil",page_title:"À propos de ChapShop Delivery",page_subtitle:"Nous vous fournissons un système complet pour démarrer votre activité e-commerce en Tanzanie — sans restrictions douanières ou légales.",partner_title:"Votre partenaire e-commerce de A à Z",partner_p1:'Concentrez-vous sur les produits et les campagnes — nous nous occupons du reste : <span class="text-white font-medium">importation, confirmation, entreposage, emballage et expédition</span> à travers la Tanzanie.',partner_p2:"Que vous soyez vendeur sur les réseaux sociaux ou sur Shopify, ChapShop Delivery vous donne l'infrastructure logistique pour livrer avec paiement à la livraison.",partner_p3:'Si vous avez un produit clair, nous pouvons aussi <span class="text-cyan-400 font-medium">financer votre projet</span>.',btn_start:"Commencer à vendre",btn_talk:"Parlez-nous",stat_regions:"Régions",stat_merchants:"Marchands",stat_support:"Support",handle_badge:"Ce que nous gérons",handle_title:"Concentrez-vous sur les ventes. Nous gérons le reste.",handle_desc:"De la commande à la réception — nous gérons chaque étape.",f1_title:"Importation & Approvisionnement",f1_desc:"Nous vous aidons à sourcer et importer sans tracas de dédouanement.",f2_title:"Confirmation de commande",f2_desc:"Notre centre d'appels confirme chaque commande par téléphone et SMS.",f3_title:"Entreposage & Stockage",f3_desc:"Entrepôts stratégiques à Dar es Salaam avec gestion des stocks en temps réel.",f4_title:"Emballage & Étiquetage",f4_desc:"Services professionnels de préparation et emballage.",f5_title:"Livraison du dernier kilomètre",f5_desc:"Livraison COD couvrant les 31 régions — même jour dans les grandes villes.",f6_title:"Collecte COD & Virement",f6_desc:"Nous collectons et versons sur votre compte dans les 24 heures.",eco_badge:"Écosystème complet",eco_title:"Écosystème e-commerce complet de A à Z",eco_desc:"Tout pour vendre en ligne en Tanzanie.",eco_s1_title:"Sélection de produits",eco_s1_desc:"Choisissez quoi vendre.",eco_s2_title:"Lancer des campagnes",eco_s2_desc:"Publicités sur les réseaux sociaux.",eco_s3_title:"Nous gérons les opérations",eco_s3_desc:"Import, stockage, emballage, expédition — tout géré.",eco_s4_title:"Vous êtes payé",eco_s4_desc:"COD collecté et viré sur votre compte.",eco_c1_title:"Logistique multi-régions",eco_c1_desc:"Entrepôts couvrant les 31 régions.",eco_c2_title:"Support dédié 24/7",eco_c2_desc:"Toujours disponible — WhatsApp, téléphone, email.",eco_c3_title:"Financement disponible",eco_c3_desc:"Nous pouvons financer votre projet.",tz_badge:"Pourquoi la Tanzanie",tz_title:"Un marché massif",tz_desc:"L'une des économies les plus dynamiques d'Afrique avec 65M+ d'habitants.",tz_p1:"65M+ d'habitants",tz_p1d:"Classe moyenne croissante",tz_p2:"Économie cash",tz_p2d:"80%+ en espèces — le COD est roi",tz_p3:"Mobile 90%+",tz_p3d:"M-Pesa, Tigo Pesa, Airtel Money",tz_p4:"Faible concurrence",tz_p4d:"Marché précoce — avantage aux premiers",mission_badge:"Notre mission",mission_quote:'"Permettre à chaque entrepreneur en Tanzanie de vendre en ligne <span class="text-cyan-400 font-medium">sans barrières</span>."',mission_author:"Équipe ChapShop Delivery",mission_location:"Dar es Salaam, Tanzanie",cta_title:"Prêt à démarrer ?",cta_desc:"Rejoignez 500+ marchands. Pas de frais — juste des résultats.",cta_btn1:"Rejoindre — Gratuit",cta_btn2:"WhatsApp"},
+    zh:{nav_services:"服务",nav_coverage:"覆盖范围",nav_about:"关于我们",nav_contact:"联系我们",nav_join:"加入商户",nav_home:"首页",page_title:"关于 ChapShop Delivery",page_subtitle:"我们为您提供一套完整的系统，帮助您轻松启动和扩展坦桑尼亚电商业务——无需海关或法律限制。",partner_title:"您的电商合作伙伴 从 A 到 Z",partner_p1:'您只需专注于选品和广告——剩下的交给我们：<span class="text-white font-medium">进口、订单确认、仓储、打包和发货</span>。',partner_p2:"无论您是社交媒体卖家还是 Shopify 商店，ChapShop Delivery 都为您提供覆盖全国的物流后盾。",partner_p3:'如果您有明确的产品和市场研究，我们还可以<span class="text-cyan-400 font-medium">为您的项目融资</span>。',btn_start:"开始销售",btn_talk:"联系我们",stat_regions:"区域",stat_merchants:"商户",stat_support:"支持",handle_badge:"我们处理的内容",handle_title:"您专注销售，剩下的交给我们。",handle_desc:"从客户下单到收货——我们管理每一步。",f1_title:"进口与采购",f1_desc:"无需处理海关清关或法律限制。",f2_title:"订单确认",f2_desc:"客服中心通过电话和短信确认订单，减少退货。",f3_title:"仓储与存储",f3_desc:"达累斯萨拉姆战略仓库，实时库存管理。",f4_title:"打包与贴标",f4_desc:"专业的拣选包和贴标服务。",f5_title:"最后一公里配送",f5_desc:"全国货到付款覆盖全部31个区域。",f6_title:"货到付款收款与汇款",f6_desc:"24小时内汇入您的账户。",eco_badge:"完整生态",eco_title:"从 A 到 Z 的完整电商生态",eco_desc:"在线销售所需的一切。",eco_s1_title:"选品",eco_s1_desc:"选择卖什么。",eco_s2_title:"启动广告",eco_s2_desc:"在社交媒体上投放广告。",eco_s3_title:"我们处理运营",eco_s3_desc:"进口、确认、存储、打包、发货——全部管理。",eco_s4_title:"您收到货款",eco_s4_desc:"代收并汇入您的账户。",eco_c1_title:"多区域物流与仓储",eco_c1_desc:"覆盖全部31个区域。",eco_c2_title:"24/7 专属支持",eco_c2_desc:"全天候可用。",eco_c3_title:"项目融资可用",eco_c3_desc:"我们可以为您融资。",tz_badge:"为什么选择坦桑尼亚",tz_title:"一个等待服务的巨大市场",tz_desc:"超过6500万人口，电商蓬勃发展。",tz_p1:"6500万+人口",tz_p1d:"不断增长的中产阶级",tz_p2:"现金经济",tz_p2d:"超过80%使用现金——货到付款为王",tz_p3:"手机渗透率 90%+",tz_p3d:"M-Pesa、Tigo Pesa、Airtel Money",tz_p4:"电商竞争低",tz_p4d:"市场早期——先行者优势巨大",mission_badge:"我们的使命",mission_quote:'"赋能坦桑尼亚每位企业家<span class="text-cyan-400 font-medium">无障碍地</span>在线销售。"',mission_author:"ChapShop Delivery 团队",mission_location:"坦桑尼亚 达累斯萨拉姆",cta_title:"准备好开始您的电商之旅了吗？",cta_desc:"加入500+商户。零设置费——只看结果。",cta_btn1:"免费加入",cta_btn2:"WhatsApp 联系"}
     };
 
     var currentLang=localStorage.getItem('chapshop-lang')||'en';
 
     // =============================================
-    // applyTranslations (same pattern as 3PL)
+    // applyTranslations (same as 3PL)
     // =============================================
     function applyTranslations(){
         document.documentElement.setAttribute('data-lang',currentLang);
         document.getElementById('lang-label').textContent={en:'EN',ar:'عربي',fr:'FR',zh:'中文'}[currentLang];
         var d=T[currentLang];if(!d)return;
-        document.querySelectorAll('[data-lang-text]').forEach(function(e){
-            var k=e.getAttribute('data-lang-text');if(d[k])e.innerHTML=d[k];
-        });
-        document.querySelectorAll('.lang-opt').forEach(function(o){
-            o.style.background=o.getAttribute('data-lang-code')===currentLang?'rgba(6,182,212,.15)':'transparent';
-            o.style.color=o.getAttribute('data-lang-code')===currentLang?'#06b6d4':'#94a3b8';
-        });
-        document.querySelectorAll('.mob-lang').forEach(function(o){
-            o.style.background=o.getAttribute('data-lang-code')===currentLang?'rgba(6,182,212,.15)':'transparent';
-            o.style.color=o.getAttribute('data-lang-code')===currentLang?'#06b6d4':'#94a3b8';
-        });
+        document.querySelectorAll('[data-lang-text]').forEach(function(e){var k=e.getAttribute('data-lang-text');if(d[k])e.innerHTML=d[k]});
+        document.querySelectorAll('.lang-opt').forEach(function(o){o.style.background=o.getAttribute('data-lang-code')===currentLang?'rgba(6,182,212,.15)':'transparent';o.style.color=o.getAttribute('data-lang-code')===currentLang?'#06b6d4':'#94a3b8'});
+        document.querySelectorAll('.mob-lang').forEach(function(o){o.style.background=o.getAttribute('data-lang-code')===currentLang?'rgba(6,182,212,.15)':'transparent';o.style.color=o.getAttribute('data-lang-code')===currentLang?'#06b6d4':'#94a3b8'});
     }
 
-    // =============================================
-    // setLang (same as 3PL)
-    // =============================================
-    function setLang(l){
-        currentLang=l;
-        localStorage.setItem('chapshop-lang',l);
-        applyTranslations();
-        document.getElementById('lang-dropdown').classList.remove('open');
-        document.getElementById('mobile-lang-panel').classList.add('hidden');
-    }
+    function setLang(l){currentLang=l;localStorage.setItem('chapshop-lang',l);applyTranslations();document.getElementById('lang-dropdown').classList.remove('open');document.getElementById('mobile-lang-panel').classList.add('hidden')}
 
     applyTranslations();
 
-    // =============================================
     // Desktop dropdown (same as 3PL)
-    // =============================================
-    document.getElementById('lang-btn').addEventListener('click',function(e){
-        e.stopPropagation();
-        document.getElementById('lang-dropdown').classList.toggle('open');
-    });
+    document.getElementById('lang-btn').addEventListener('click',function(e){e.stopPropagation();document.getElementById('lang-dropdown').classList.toggle('open')});
 
-    // =============================================
     // Mobile language panel (same as 3PL)
-    // =============================================
-    document.getElementById('mobile-lang-btn').addEventListener('click',function(){
-        document.getElementById('mobile-lang-panel').classList.toggle('hidden');
-    });
+    document.getElementById('mobile-lang-btn').addEventListener('click',function(){document.getElementById('mobile-lang-panel').classList.toggle('hidden')});
 
-    // =============================================
-    // Close dropdown on outside click (same as 3PL)
-    // =============================================
-    document.addEventListener('click',function(){
-        document.getElementById('lang-dropdown').classList.remove('open');
-    });
-    document.getElementById('lang-dropdown').addEventListener('click',function(e){
-        e.stopPropagation();
-    });
-
+    // Close on outside click
+    document.addEventListener('click',function(){document.getElementById('lang-dropdown').classList.remove('open')});
+    document.getElementById('lang-dropdown').addEventListener('click',function(e){e.stopPropagation()});
     </script>
 </body>
 </html>
