@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChapShop Delivery — Merchant Dashboard</title>
     
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚚</text></svg>">
-    
+    <!-- Favicon from merchant.html -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2306b6d4'/%3E%3Cstop offset='100%25' stop-color='%230e7490'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M18 42l6-20h4l6 20h-4l-1.2-4h-5.6L22 42h-4zm6.4-8h3.2L26 26l-1.6 8zM36 26h6c3.3 0 5 1.8 5 4.5 0 1.8-.8 3.2-2.2 4L47 42h-4.4L41 35.6h-1V42h-4V26zm4 6.6h1.5c1.2 0 1.8-.7 1.8-2s-.6-2-1.8-2H40v4z' fill='white'/%3E%3C/svg%3E">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
@@ -30,7 +30,7 @@
         [dir="rtl"] .sidebar-link.active::after{right: auto; left: 0; border-radius: 3px 0 0 3px;}
         [dir="rtl"] .notif-item.unread{border-left: none; border-right: 3px solid #06b6d4;}
         [dir="rtl"] .select-field{background-position: left 16px center;}
-        [dir="rtl"] .copy-btn span, [dir="rtl"] .btn-primary span, [dir="rtl"] .btn-secondary span{order: 2;}
+        [dir="rtl"] .lang-dropdown {right: auto; left: 0;}
         
         /* Navigation */
         .sidebar-link{position:relative;transition:all .25s ease;border-radius:10px;overflow:hidden;color:#94a3b8}
@@ -120,7 +120,13 @@
         .notif-item{padding:18px 24px;border-bottom:1px solid rgba(148,163,184,0.05);transition:background .2s;cursor:pointer}.notif-item:hover{background:rgba(148,163,184,0.03)}.notif-item.unread{background:rgba(6,182,212,0.02);border-left:3px solid #06b6d4}
         .faq-item{border:1px solid rgba(148,163,184,0.07);border-radius:14px;overflow:hidden;transition:all .2s}.faq-item:hover{border-color:rgba(148,163,184,0.12)}.faq-q{padding:20px 24px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:background .2s}.faq-q:hover{background:rgba(148,163,184,0.02)}.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}.faq-a.open{max-height:300px;padding:0 24px 20px}.faq-icon{transition:transform .3s}.faq-icon.rotated{transform:rotate(180deg)}
         
-        .lang-select{background:rgba(15,23,42,0.6);border:1px solid rgba(148,163,184,0.1);border-radius:10px;padding:6px 12px;font-size:12px;color:#fff;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center; padding-right: 28px;}
+        /* Language Dropdown from merchant.html */
+        .lang-dropdown { display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 6px; min-width: 180px; z-index: 100; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .lang-dropdown.active { display: block; }
+        .lang-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; cursor: pointer; transition: all 0.15s; color: #94a3b8; font-size: 13px; }
+        .lang-option:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .lang-option.active-lang { background: rgba(6,182,212,0.1); color: #06b6d4; }
+        .lang-flag { font-size: 18px; line-height: 1; }
 
         @media(max-width:1023px){
             .main-content{margin-left:0!important; margin-right:0!important}
@@ -187,13 +193,33 @@
                 <h1 id="page-title" class="text-[16px] font-semibold text-white tracking-tight" data-i18n="nav_overview">Overview</h1>
             </div>
             <div class="flex items-center gap-3">
-                <!-- Language Selector -->
-                <select id="lang-switcher" class="lang-select">
-                    <option value="en">EN 🇬🇧</option>
-                    <option value="ar">AR 🇸🇦</option>
-                    <option value="fr">FR 🇫🇷</option>
-                    <option value="zh">ZH 🇨🇳</option>
-                </select>
+                <!-- Custom Language Selector UI -->
+                <div class="relative" id="langWrapper">
+                    <button type="button" id="langBtn" onclick="toggleLangDropdown()" class="flex items-center gap-2 bg-white/[0.04] border border-white/[0.1] rounded-xl px-3 py-2 text-sm text-slate-300 hover:text-white hover:border-white/20 transition-all">
+                        <span id="currentFlag" class="lang-flag">🇬🇧</span>
+                        <span id="currentLang" class="hidden sm:inline text-xs">EN</span>
+                        <span class="iconify text-xs text-slate-500" data-icon="mdi:chevron-down"></span>
+                    </button>
+                    <div class="lang-dropdown" id="langDropdown">
+                        <div class="lang-option active-lang" onclick="setLanguage('en')" data-lang="en">
+                            <span class="lang-flag">🇬🇧</span>
+                            <span>English</span>
+                        </div>
+                        <div class="lang-option" onclick="setLanguage('ar')" data-lang="ar">
+                            <span class="lang-flag">🇸🇦</span>
+                            <span>العربية</span>
+                        </div>
+                        <div class="lang-option" onclick="setLanguage('fr')" data-lang="fr">
+                            <span class="lang-flag">🇫🇷</span>
+                            <span>Français</span>
+                        </div>
+                        <div class="lang-option" onclick="setLanguage('zh')" data-lang="zh">
+                            <span class="lang-flag">🇨🇳</span>
+                            <span>中文</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Language Selector -->
                 <button onclick="switchPage('notifications')" class="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition cursor-pointer relative"><span class="iconify text-lg text-slate-400" data-icon="mdi:bell-outline"></span><span id="notif-dot2" class="notif-dot hidden" style="border-color:#0f172a"></span></button>
                 <button onclick="location.reload()" class="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition cursor-pointer"><span class="iconify text-lg text-slate-400" data-icon="mdi:refresh"></span></button>
                 <a href="index.html" class="btn-secondary text-[12px] py-2.5 px-4"><span class="iconify text-[14px]" data-icon="mdi:open-in-new"></span><span class="hidden sm:inline ml-1" data-i18n="btn_website">Website</span></a>
@@ -201,7 +227,6 @@
         </header>
 
         <div class="flex-1 p-6 lg:p-8">
-
             <!-- OVERVIEW -->
             <div id="page-overview" class="page-content animate-fadeUp">
                 <div class="glass-card-static p-8 lg:p-10 mb-8 relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.06] via-blue-500/[0.03] to-transparent pointer-events-none"></div><div class="relative"><h2 class="text-2xl lg:text-3xl font-bold text-white mb-1" id="welcome-name">Welcome back! 👋</h2><p class="text-slate-400 text-sm" data-i18n="ov_sub">Here's what's happening with your deliveries today.</p></div></div>
@@ -248,20 +273,25 @@
                 </form></div>
             </div>
 
-            <!-- ANALYTICS, SALES, NOTIF, FAQ, PROFILE, SETTINGS, HELP -->
-            <!-- (Kept brief for readability, but fully translated via i18n object below) -->
+            <!-- ANALYTICS -->
             <div id="page-analytics" class="page-content hidden"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="nav_analytics">Analytics</h2><p class="text-sm text-slate-500 mt-1" data-i18n="analytics_sub">Your delivery performance at a glance.</p></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"><div class="glass-card-static p-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5" data-i18n="chart_status">Orders by Status</h3><div class="chart-container"><canvas id="status-chart"></canvas></div></div><div class="glass-card-static p-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5" data-i18n="chart_cod">COD Value Overview</h3><div class="chart-container"><canvas id="cod-chart"></canvas></div></div></div><div class="glass-card-static p-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5" data-i18n="chart_time">Orders Over Time</h3><div style="height:300px"><canvas id="timeline-chart"></canvas></div></div></div>
 
+            <!-- SALES REPORT -->
             <div id="page-sales-report" class="page-content hidden"><div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8"><div><h2 class="text-2xl font-bold text-white" data-i18n="nav_sales">Sales Report</h2><p class="text-sm text-slate-500 mt-1" data-i18n="sales_sub">Revenue and delivery performance.</p></div><button onclick="exportReport()" class="btn-secondary text-[12px]"><span class="iconify text-sm" data-icon="mdi:download"></span> <span data-i18n="btn_export">Export CSV</span></button></div><div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8"><div class="glass-card-static p-6"><div class="stat-icon bg-emerald-500/10 mb-4"><span class="iconify text-xl text-emerald-400" data-icon="mdi:cash-check"></span></div><p class="text-2xl font-extrabold text-emerald-400 tracking-tight" id="r-collected">TZS 0</p><p class="text-[12px] text-slate-500 mt-1" data-i18n="r_collected">Collected COD</p></div><div class="glass-card-static p-6"><div class="stat-icon bg-amber-500/10 mb-4"><span class="iconify text-xl text-amber-400" data-icon="mdi:cash-clock"></span></div><p class="text-2xl font-extrabold text-amber-400 tracking-tight" id="r-pending-cod">TZS 0</p><p class="text-[12px] text-slate-500 mt-1" data-i18n="r_pending">Pending COD</p></div><div class="glass-card-static p-6"><div class="stat-icon bg-blue-500/10 mb-4"><span class="iconify text-xl text-blue-400" data-icon="mdi:percent"></span></div><p class="text-2xl font-extrabold text-blue-400 tracking-tight" id="r-rate">0%</p><p class="text-[12px] text-slate-500 mt-1" data-i18n="r_rate">Delivery Rate</p></div><div class="glass-card-static p-6"><div class="stat-icon bg-red-500/10 mb-4"><span class="iconify text-xl text-red-400" data-icon="mdi:cash-remove"></span></div><p class="text-2xl font-extrabold text-red-400 tracking-tight" id="r-lost">TZS 0</p><p class="text-[12px] text-slate-500 mt-1" data-i18n="r_lost">Returned COD</p></div></div><div class="glass-card-static p-6 mb-6"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-5" data-i18n="chart_city">Revenue by City</h3><div style="height:280px"><canvas id="city-chart"></canvas></div></div><div class="glass-card-static overflow-hidden"><div class="p-5 border-b border-white/[0.04]"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider" data-i18n="tb_summary">Summary Table</h3></div><div class="table-container"><table class="w-full" style="min-width:600px"><thead><tr><th data-i18n="tb_city">City</th><th data-i18n="tb_total">Total</th><th data-i18n="st_delivered">Delivered</th><th data-i18n="st_returned">Returned</th><th data-i18n="r_rate">Rate</th><th data-i18n="r_collected">COD Collected</th></tr></thead><tbody id="report-tbody"><tr><td colspan="6" class="text-center py-12 text-slate-600 text-sm">No data</td></tr></tbody></table></div></div></div>
 
+            <!-- NOTIFICATIONS -->
             <div id="page-notifications" class="page-content hidden"><div class="flex items-center justify-between mb-8"><div><h2 class="text-2xl font-bold text-white" data-i18n="nav_notif">Notifications</h2><p class="text-sm text-slate-500 mt-1" data-i18n="notif_sub">Stay updated on your orders.</p></div><button onclick="markAllRead()" class="btn-secondary text-[12px]"><span class="iconify text-sm" data-icon="mdi:check-all"></span> <span data-i18n="btn_mark_read">Mark All Read</span></button></div><div class="glass-card-static overflow-hidden" id="notif-list"><div class="text-center py-20"><span class="iconify text-5xl text-slate-800 mb-4" data-icon="mdi:bell-off-outline"></span><p class="text-slate-600 text-xs" data-i18n="empty_notif">No notifications yet</p></div></div></div>
 
+            <!-- FAQ -->
             <div id="page-faq" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="nav_faq">FAQ</h2><p class="text-sm text-slate-500 mt-1" data-i18n="faq_sub">Find quick answers.</p></div><div class="space-y-3" id="faq-list"></div></div></div>
 
+            <!-- PROFILE -->
             <div id="page-profile" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="nav_profile">Merchant Profile</h2><p class="text-sm text-slate-500 mt-1" data-i18n="profile_sub">Manage your business information.</p></div><div class="glass-card-static p-8 lg:p-10"><div class="flex items-center gap-6 mb-10 pb-10 border-b border-white/[0.04]"><div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-cyan-400/20 to-cyan-600/10 flex items-center justify-center text-3xl font-extrabold text-cyan-400" id="profile-avatar">?</div><div><p class="text-xl font-bold text-white" id="profile-name">Loading...</p><p class="text-sm text-slate-400 mt-1" id="profile-email">Loading...</p><div class="flex items-center gap-2 mt-3"><span class="w-2.5 h-2.5 bg-emerald-400 rounded-full"></span><span class="text-[12px] text-emerald-400 font-semibold" data-i18n="verified">Verified Merchant</span></div></div></div><form id="profile-form" class="space-y-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_business">Business Name *</label><input type="text" id="p-business" required class="input-field"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-6"><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_phone">Phone Number</label><input type="tel" id="p-phone" class="input-field"></div><div><label class="text-[11px] font-bold text-slate-400 mb-2.5 block uppercase tracking-widest" data-i18n="lbl_city">City</label><input type="text" id="p-city" class="input-field"></div></div><button type="submit" class="btn-primary w-full justify-center py-4"><span class="iconify text-lg" data-icon="mdi:content-save-outline"></span> <span data-i18n="btn_save">Save Changes</span></button></form></div></div></div>
 
+            <!-- SETTINGS -->
             <div id="page-settings" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="nav_settings">Settings</h2><p class="text-sm text-slate-500 mt-1" data-i18n="settings_sub">Manage your account preferences.</p></div><div class="glass-card-static p-8 lg:p-10 space-y-0"><div class="flex items-center justify-between py-6 border-b border-white/[0.04]"><div><p class="text-[15px] font-semibold text-white" data-i18n="set_email">Email Notifications</p><p class="text-[12px] text-slate-500 mt-1" data-i18n="set_email_sub">Receive order updates via email</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"><div class="w-12 h-6 bg-slate-700 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div></label></div><div class="flex items-center justify-between py-6"><div><p class="text-[15px] font-semibold text-white" data-i18n="set_delete">Delete Account</p><p class="text-[12px] text-red-400/70 mt-1" data-i18n="set_delete_sub">Permanently delete your account and all data</p></div><button id="delete-account-btn" class="btn-danger text-[12px]" data-i18n="set_delete_btn">Delete</button></div></div></div></div>
 
+            <!-- HELP -->
             <div id="page-help" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-8"><h2 class="text-2xl font-bold text-white" data-i18n="nav_help">Help & Support</h2><p class="text-sm text-slate-500 mt-1" data-i18n="help_sub">Find answers or reach out to us.</p></div><div class="space-y-4"><div class="glass-card-static p-6"><h3 class="text-[15px] font-semibold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> <span data-i18n="h_q1">How do I create an order?</span></h3><p class="text-[13px] text-slate-400 leading-relaxed" data-i18n="h_a1">Go to "Create Order" from the sidebar menu. Fill in the recipient details and click Submit.</p></div><div class="glass-card-static p-6"><h3 class="text-[15px] font-semibold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> <span data-i18n="h_q2">What does COD mean?</span></h3><p class="text-[13px] text-slate-400 leading-relaxed" data-i18n="h_a2">Cash On Delivery — the amount the customer pays when they receive their package.</p></div><div class="glass-card-static p-7 border-cyan-500/20"><h3 class="text-[15px] font-semibold text-white mb-1" data-i18n="h_still">Still need help?</h3><p class="text-[13px] text-slate-500 mb-5" data-i18n="h_contact">Contact our support team directly.</p><a href="https://wa.me/255769799110" target="_blank" class="btn-primary text-[13px] inline-flex"><span class="iconify text-lg" data-icon="mdi:whatsapp"></span> <span data-i18n="h_whatsapp">WhatsApp Support</span></a></div></div></div>
 
         </div>
@@ -278,6 +308,8 @@
 // TRANSLATIONS (i18n)
 // =============================================
 var currentLang = localStorage.getItem('chapshop_lang') || 'en';
+var langFlags = { en: '🇬🇧', ar: '🇸🇦', fr: '🇫🇷', zh: '🇨🇳' };
+var langLabels = { en: 'EN', ar: 'عر', fr: 'FR', zh: '中' };
 
 const translations = {
     en: {
@@ -358,19 +390,61 @@ function t(key) {
     return translations[currentLang][key] || translations['en'][key] || key;
 }
 
+// =============================================
+// LANGUAGE SWITCHER LOGIC (From merchant.html)
+// =============================================
+function toggleLangDropdown() {
+    document.getElementById('langDropdown').classList.toggle('active');
+}
+
+document.addEventListener('click', function(e) {
+    var wrapper = document.getElementById('langWrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+        document.getElementById('langDropdown').classList.remove('active');
+    }
+});
+
+function setLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('chapshop_lang', lang);
+    
+    // Update UI of the custom dropdown button
+    document.getElementById('currentFlag').textContent = langFlags[lang];
+    document.getElementById('currentLang').textContent = langLabels[lang];
+
+    // Update active state in dropdown
+    document.querySelectorAll('.lang-option').forEach(function(opt) {
+        opt.classList.remove('active-lang');
+        if (opt.getAttribute('data-lang') === lang) opt.classList.add('active-lang');
+    });
+
+    // Handle RTL
+    if(lang === 'ar') {
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.documentElement.setAttribute('lang', 'ar');
+    } else {
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.documentElement.setAttribute('lang', lang);
+    }
+    
+    applyTranslations();
+    document.getElementById('langDropdown').classList.remove('active');
+}
+
 function applyTranslations() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (translations[currentLang][key]) {
-            el.textContent = translations[currentLang][key];
-        }
+    var tDict = translations[currentLang];
+    if (!tDict) return;
+
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (tDict[key] !== undefined) el.innerHTML = tDict[key];
     });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        if (translations[currentLang][key]) {
-            el.placeholder = translations[currentLang][key];
-        }
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n-placeholder');
+        if (tDict[key] !== undefined) el.placeholder = tDict[key];
     });
+
     // Update page title dynamically
     const activePage = document.querySelector('.sidebar-link.active');
     if(activePage) {
@@ -378,26 +452,9 @@ function applyTranslations() {
         const titleMap = {overview:'nav_overview', orders:'nav_orders', 'create-order':'nav_create', analytics:'nav_analytics', 'sales-report':'nav_sales', notifications:'nav_notif', profile:'nav_profile', settings:'nav_settings', faq:'nav_faq', help:'nav_help'};
         document.getElementById('page-title').textContent = t(titleMap[pageKey] || 'nav_overview');
     }
-    // Re-render dynamic content
+    // Re-render dynamic content with new language
     loadOrders();
 }
-
-document.getElementById('lang-switcher').value = currentLang;
-document.getElementById('lang-switcher').addEventListener('change', (e) => {
-    currentLang = e.target.value;
-    localStorage.setItem('chapshop_lang', currentLang);
-    
-    // Handle RTL
-    if(currentLang === 'ar') {
-        document.documentElement.dir = 'rtl';
-        document.documentElement.lang = 'ar';
-    } else {
-        document.documentElement.dir = 'ltr';
-        document.documentElement.lang = currentLang;
-    }
-    
-    applyTranslations();
-});
 
 // =============================================
 // CORE LOGIC
@@ -424,14 +481,11 @@ function init(){
     if(!userData){location.href='merchants.html';return;}
     currentUser=JSON.parse(userData);
     
-    // Apply initial language direction
-    if(currentLang === 'ar') {
-        document.documentElement.dir = 'rtl';
-    }
+    // Apply initial language direction and set UI
+    setLanguage(currentLang);
     
     loadProfile();
     showApp();
-    applyTranslations();
 }
 
 function loadProfile(){
@@ -476,9 +530,9 @@ function loadOrders(){
 }
 
 function updateStats(){
-    var t=allOrders.length,d=0,p=0,cod=0;
+    var tO=allOrders.length,d=0,p=0,cod=0;
     allOrders.forEach(function(o){if(o.status==='delivered')d++;else if(o.status!=='returned')p++;if(o.cod_amount)cod+=Number(o.cod_amount)});
-    document.getElementById('stat-total').textContent=t;
+    document.getElementById('stat-total').textContent=tO;
     document.getElementById('stat-delivered').textContent=d;
     document.getElementById('stat-pending').textContent=p;
     document.getElementById('stat-cod').textContent='TZS '+cod.toLocaleString();
@@ -515,7 +569,7 @@ function renderRecentOrders(){
 
 function renderCharts(){
     if(chartInstances.overview)chartInstances.overview.destroy();
-    var days=[t('ov_chart').substring(0,2),'Tue','Wed','Thu','Fri','Sat','Sun'],counts=[0,0,0,0,0,0,0];
+    var days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],counts=[0,0,0,0,0,0,0];
     allOrders.forEach(function(o){if(o.created_at){var d=new Date(o.created_at).getDay();counts[d===0?6:d-1]++}});
     chartInstances.overview=new Chart(document.getElementById('overview-chart'),{type:'bar',data:{labels:days,datasets:[{data:counts,backgroundColor:'rgba(6,182,212,0.2)',hoverBackgroundColor:'rgba(6,182,212,0.4)',borderColor:'rgba(6,182,212,0.8)',borderWidth:1.5,borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#64748b',font:{size:11}}},y:{grid:{color:'rgba(148,163,184,0.04)'},ticks:{color:'#64748b',font:{size:11},stepSize:1},beginAtZero:true}}}});
 
@@ -673,7 +727,7 @@ document.getElementById('sidebar-backdrop').addEventListener('click',closeSideba
 document.querySelectorAll('.modal-overlay').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('show')})});
 
 function showApp(){var ls=document.getElementById('loading-screen');ls.style.opacity='0';ls.style.transition='opacity 0.6s';setTimeout(function(){ls.style.display='none';document.getElementById('app').classList.remove('hidden')},600)}
-function showToast(msg,type){type=type||'success';var icons={success:'mdi:check-circle',error:'mdi:alert-circle',info:'mdi:information'};var t=document.createElement('div');t.className='toast toast-'+type;t.innerHTML=`<span class="iconify text-xl" data-icon="${icons[type]}"></span><span>${msg}</span>`;document.getElementById('toast-container').appendChild(t);setTimeout(function(){t.classList.add('show')},10);setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},400)},3500)}
+function showToast(msg,type){type=type||'success';var icons={success:'mdi:check-circle',error:'mdi:alert-circle',info:'mdi:information'};var toast=document.createElement('div');toast.className='toast toast-'+type;toast.innerHTML=`<span class="iconify text-xl" data-icon="${icons[type]}"></span><span>${msg}</span>`;document.getElementById('toast-container').appendChild(toast);setTimeout(function(){toast.classList.add('show')},10);setTimeout(function(){toast.classList.remove('show');setTimeout(function(){toast.remove()},400)},3500)}
 
 init();
 </script>
