@@ -5,307 +5,685 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChapShop Delivery — Merchant Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        *{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-        ::-webkit-scrollbar{width:6px;height:6px}
+        *{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;box-sizing:border-box}
+        ::-webkit-scrollbar{width:5px;height:5px}
         ::-webkit-scrollbar-track{background:transparent}
-        ::-webkit-scrollbar-thumb{background:#334155;border-radius:10px}
-        ::-webkit-scrollbar-thumb:hover{background:#475569}
-        body{background:#0a0e1a;overflow-x:hidden}
-        .sidebar{background:linear-gradient(180deg,#0d1224 0%,#0a0e1a 100%);border-right:1px solid rgba(255,255,255,0.06)}
-        .sidebar-link{position:relative;transition:all .25s ease;border-radius:10px;overflow:hidden}
-        .sidebar-link::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(6,182,212,0.12),rgba(6,182,212,0.04));opacity:0;transition:opacity .25s}
-        .sidebar-link:hover::before,.sidebar-link.active::before{opacity:1}
+        ::-webkit-scrollbar-thumb{background:rgba(100,116,139,0.3);border-radius:10px}
+        ::-webkit-scrollbar-thumb:hover{background:rgba(100,116,139,0.5)}
+        body{background:#060913;overflow-x:hidden;color:#e2e8f0}
+
+        /* Sidebar */
+        .sidebar{background:linear-gradient(180deg,#080c18 0%,#060913 100%);border-right:1px solid rgba(255,255,255,0.04)}
+        .sidebar-link{position:relative;transition:all .2s ease;border-radius:10px;overflow:hidden;display:flex;align-items:center;gap:12px;padding:10px 14px;font-size:13px;color:#64748b;cursor:pointer;text-decoration:none}
+        .sidebar-link::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(6,182,212,0.1),rgba(6,182,212,0.02));opacity:0;transition:opacity .2s}
+        .sidebar-link:hover::before{opacity:1}
+        .sidebar-link:hover{color:#cbd5e1}
+        .sidebar-link.active::before{opacity:1}
         .sidebar-link.active{color:#06b6d4;font-weight:600}
-        .sidebar-link.active::after{content:'';position:absolute;right:0;top:15%;height:70%;width:3px;background:#06b6d4;border-radius:3px 0 0 3px}
-        .glass-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(20px);border-radius:16px;transition:all .3s ease}
-        .glass-card:hover{border-color:rgba(6,182,212,0.15);background:rgba(255,255,255,0.03)}
-        .glass-card-static{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(20px);border-radius:16px}
-        .stat-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center}
-        .stat-card{transition:all .3s cubic-bezier(.4,0,.2,1)}
-        .stat-card:hover{transform:translateY(-4px);box-shadow:0 20px 40px -12px rgba(0,0,0,0.5)}
-        .input-field{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 16px;font-size:14px;color:#fff;transition:all .25s}
-        .input-field::placeholder{color:#4b5563}
-        .input-field:focus{outline:none;border-color:rgba(6,182,212,0.5);box-shadow:0 0 0 3px rgba(6,182,212,0.1);background:rgba(255,255,255,0.06)}
-        .input-field:hover{border-color:rgba(255,255,255,0.12)}
-        .select-field{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 16px;font-size:14px;color:#94a3b8;transition:all .25s;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
-        .select-field:focus{outline:none;border-color:rgba(6,182,212,0.5);box-shadow:0 0 0 3px rgba(6,182,212,0.1)}
-        .btn-primary{background:linear-gradient(135deg,#06b6d4,#0891b2);color:#fff;font-weight:600;border:none;border-radius:12px;padding:12px 24px;font-size:14px;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px}
-        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px -4px rgba(6,182,212,0.4)}
+        .sidebar-link.active::after{content:'';position:absolute;right:0;top:20%;height:60%;width:3px;background:linear-gradient(180deg,#06b6d4,#0891b2);border-radius:3px 0 0 3px}
+        .sidebar-section-title{font-size:10px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:1.5px;padding:0 14px;margin-bottom:8px;margin-top:24px}
+        .sidebar-link .link-icon{font-size:18px;flex-shrink:0;position:relative;z-index:1}
+        .sidebar-link .link-text{position:relative;z-index:1}
+
+        /* Glass Cards */
+        .glass-card{background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.05);border-radius:16px;transition:all .3s cubic-bezier(.4,0,.2,1)}
+        .glass-card:hover{border-color:rgba(6,182,212,0.12);background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));transform:translateY(-2px);box-shadow:0 20px 40px -15px rgba(0,0,0,0.4)}
+        .glass-s{background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.05);border-radius:16px}
+
+        /* Stat Cards */
+        .stat-card{position:relative;overflow:hidden}
+        .stat-card::before{content:'';position:absolute;top:-50%;right:-30%;width:120px;height:120px;border-radius:50%;opacity:0.06;transition:opacity .3s}
+        .stat-card:hover::before{opacity:0.1}
+        .stat-card.cyan::before{background:#06b6d4}
+        .stat-card.green::before{background:#10b981}
+        .stat-card.amber::before{background:#f59e0b}
+        .stat-card.violet::before{background:#8b5cf6}
+        .stat-card.rose::before{background:#f43f5e}
+        .stat-card.blue::before{background:#3b82f6}
+
+        /* Inputs */
+        .input-field{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:11px 16px;font-size:13px;color:#fff;transition:all .25s}
+        .input-field::placeholder{color:#374151}
+        .input-field:focus{outline:none;border-color:rgba(6,182,212,0.5);box-shadow:0 0 0 3px rgba(6,182,212,0.08);background:rgba(255,255,255,0.05)}
+        .input-field:hover:not(:focus){border-color:rgba(255,255,255,0.12)}
+        .select-field{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:11px 16px;font-size:13px;color:#94a3b8;transition:all .25s;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+        .select-field:focus{outline:none;border-color:rgba(6,182,212,0.5);box-shadow:0 0 0 3px rgba(6,182,212,0.08)}
+
+        /* Buttons */
+        .btn-primary{background:linear-gradient(135deg,#06b6d4,#0891b2);color:#fff;font-weight:600;border:none;border-radius:12px;padding:11px 22px;font-size:13px;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px;position:relative;overflow:hidden}
+        .btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);opacity:0;transition:opacity .25s}
+        .btn-primary:hover::before{opacity:1}
+        .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 25px -5px rgba(6,182,212,0.4)}
         .btn-primary:active{transform:translateY(0)}
-        .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none}
-        .btn-secondary{background:rgba(255,255,255,0.05);color:#e2e8f0;font-weight:500;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 20px;font-size:13px;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:6px}
-        .btn-secondary:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15)}
-        .btn-danger{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s}
-        .btn-danger:hover{background:rgba(239,68,68,0.2)}
-        .badge{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;letter-spacing:0.3px;text-transform:uppercase}
-        .badge-pending{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.2)}
-        .badge-picked{background:rgba(59,130,246,0.12);color:#60a5fa;border:1px solid rgba(59,130,246,0.2)}
-        .badge-delivered{background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.2)}
-        .badge-returned{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
-        .order-row{transition:background .2s}
-        .order-row:hover{background:rgba(255,255,255,0.02)}
-        .filter-btn{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:#6b7280;border:1px solid transparent}
-        .filter-btn:hover{color:#e2e8f0;background:rgba(255,255,255,0.04)}
-        .filter-btn.active{background:rgba(6,182,212,0.12);color:#06b6d4;border-color:rgba(6,182,212,0.25)}
-        .modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:all .3s}
+        .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+        .btn-secondary{background:rgba(255,255,255,0.04);color:#94a3b8;font-weight:500;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:9px 18px;font-size:12px;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:6px}
+        .btn-secondary:hover{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.12);color:#e2e8f0}
+        .btn-danger{background:rgba(239,68,68,0.08);color:#f87171;border:1px solid rgba(239,68,68,0.15);border-radius:10px;padding:9px 18px;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s}
+        .btn-danger:hover{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.25)}
+        .btn-ghost{background:transparent;color:#64748b;border:none;border-radius:8px;padding:8px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center}
+        .btn-ghost:hover{color:#e2e8f0;background:rgba(255,255,255,0.05)}
+
+        /* Badges */
+        .badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;letter-spacing:0.5px;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px}
+        .badge-pending{background:rgba(245,158,11,0.1);color:#fbbf24;border:1px solid rgba(245,158,11,0.15)}
+        .badge-picked{background:rgba(59,130,246,0.1);color:#60a5fa;border:1px solid rgba(59,130,246,0.15)}
+        .badge-delivered{background:rgba(16,185,129,0.1);color:#34d399;border:1px solid rgba(16,185,129,0.15)}
+        .badge-returned{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.15)}
+
+        /* Filter pills */
+        .filter-btn{padding:6px 14px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:#475569;border:1px solid transparent;letter-spacing:0.3px}
+        .filter-btn:hover{color:#94a3b8;background:rgba(255,255,255,0.03)}
+        .filter-btn.active{background:rgba(6,182,212,0.08);color:#06b6d4;border-color:rgba(6,182,212,0.2)}
+
+        /* Table */
+        .table-wrap{overflow-x:auto}
+        .table-wrap table{width:100%;border-collapse:collapse;min-width:750px}
+        .table-wrap th{padding:10px 16px;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.04);white-space:nowrap}
+        .table-wrap td{padding:12px 16px;font-size:12.5px;border-bottom:1px solid rgba(255,255,255,0.03);white-space:nowrap}
+        .table-wrap tr:hover td{background:rgba(255,255,255,0.015)}
+
+        /* Modals */
+        .modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:all .3s}
         .modal-overlay.show{opacity:1;visibility:visible}
-        .modal-content{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.95);z-index:101;width:90%;max-width:540px;max-height:85vh;overflow-y:auto;background:#111827;border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:0;opacity:0;visibility:hidden;transition:all .35s cubic-bezier(.16,1,.3,1)}
-        .modal-overlay.show .modal-content{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
-        .toast-container{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;gap:8px}
-        .toast{padding:14px 20px;border-radius:14px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;transform:translateX(120%);opacity:0;transition:all .4s cubic-bezier(.16,1,.3,1);min-width:280px}
+        .modal-box{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.96);z-index:101;width:92%;max-width:520px;max-height:88vh;overflow-y:auto;background:linear-gradient(180deg,#0f1629,#0b1022);border:1px solid rgba(255,255,255,0.07);border-radius:20px;opacity:0;visibility:hidden;transition:all .35s cubic-bezier(.16,1,.3,1)}
+        .modal-overlay.show .modal-box{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+
+        /* Toast */
+        .toast-wrap{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px}
+        .toast{padding:12px 18px;border-radius:12px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:10px;transform:translateX(120%);opacity:0;transition:all .4s cubic-bezier(.16,1,.3,1);min-width:260px;backdrop-filter:blur(12px)}
         .toast.show{transform:translateX(0);opacity:1}
-        .toast-success{background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05));border:1px solid rgba(16,185,129,0.25);color:#34d399}
-        .toast-error{background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.05));border:1px solid rgba(239,68,68,0.25);color:#f87171}
-        .toast-info{background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(59,130,246,0.05));border:1px solid rgba(59,130,246,0.25);color:#60a5fa}
+        .toast-success{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);color:#34d399}
+        .toast-error{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);color:#f87171}
+        .toast-info{background:rgba(59,130,246,0.12);border:1px solid rgba(59,130,246,0.2);color:#60a5fa}
+
+        /* Animations */
         @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes pulse-glow{0%,100%{box-shadow:0 0 0 0 rgba(6,182,212,0.3)}50%{box-shadow:0 0 0 8px rgba(6,182,212,0)}}
-        .animate-spin{animation:spin .8s linear infinite}
-        .animate-fadeUp{animation:fadeUp .5s ease forwards}
-        .animate-pulse-glow{animation:pulse-glow 2s infinite}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        @keyframes slideRight{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
+        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        @keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .anim-fadeUp{animation:fadeUp .45s ease forwards}
+        .anim-fadeIn{animation:fadeIn .3s ease forwards}
+        .anim-slideRight{animation:slideRight .4s ease forwards}
+        .anim-spin{animation:spin .7s linear infinite}
+        .anim-pulse{animation:pulse-dot 2s infinite}
+        .anim-count{animation:countUp .5s ease forwards}
+
+        /* Mobile sidebar */
         .mobile-sidebar{transform:translateX(-100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
         .mobile-sidebar.open{transform:translateX(0)}
         .sidebar-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:39;opacity:0;visibility:hidden;transition:all .3s}
         .sidebar-backdrop.show{opacity:1;visibility:visible}
-        .chart-container{position:relative;height:220px}
-        .empty-state{text-align:center;padding:60px 20px}
-        .table-container{overflow-x:auto}
-        .table-container table{width:100%;border-collapse:collapse;min-width:700px}
-        .table-container th{padding:12px 16px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:0.5px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06);white-space:nowrap}
-        .table-container td{padding:14px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04);white-space:nowrap}
-        .copy-btn{cursor:pointer;transition:all .2s}
-        .copy-btn:hover{color:#06b6d4}
-        .notif-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#ef4444;border-radius:50%;border:2px solid #0d1224}
-        .notif-badge{min-width:18px;height:18px;background:#ef4444;border-radius:9px;font-size:10px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 5px}
-        .notif-item{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .2s;cursor:pointer}.notif-item:hover{background:rgba(255,255,255,0.02)}.notif-item.unread{background:rgba(6,182,212,0.03);border-left:3px solid #06b6d4}
-        .faq-item{border:1px solid rgba(255,255,255,0.05);border-radius:12px;overflow:hidden;transition:all .2s}.faq-item:hover{border-color:rgba(255,255,255,0.1)}.faq-q{padding:16px 20px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background .2s}.faq-q:hover{background:rgba(255,255,255,0.02)}.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}.faq-a.open{max-height:300px;padding:0 20px 16px}.faq-icon{transition:transform .3s}.faq-icon.rotated{transform:rotate(180deg)}
+
+        /* Notification */
+        .notif-dot{position:absolute;top:0;right:0;width:7px;height:7px;background:#ef4444;border-radius:50%;border:1.5px solid #080c18}
+        .notif-badge{min-width:16px;height:16px;background:#ef4444;border-radius:8px;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 4px}
+        .notif-item{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background .2s;cursor:pointer}
+        .notif-item:hover{background:rgba(255,255,255,0.02)}
+        .notif-item.unread{background:rgba(6,182,212,0.02);border-left:2px solid #06b6d4}
+
+        /* FAQ */
+        .faq-item{border:1px solid rgba(255,255,255,0.04);border-radius:12px;overflow:hidden;transition:all .2s}
+        .faq-item:hover{border-color:rgba(255,255,255,0.08)}
+        .faq-q{padding:14px 18px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:background .2s}
+        .faq-q:hover{background:rgba(255,255,255,0.015)}
+        .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s;padding:0 18px}
+        .faq-a.open{max-height:300px;padding:0 18px 14px}
+        .faq-chevron{transition:transform .3s}
+        .faq-chevron.rotated{transform:rotate(180deg)}
+
+        /* Order Timeline */
+        .timeline-item{position:relative;padding-left:28px;padding-bottom:20px}
+        .timeline-item::before{content:'';position:absolute;left:7px;top:20px;bottom:0;width:1px;background:rgba(255,255,255,0.06)}
+        .timeline-item:last-child::before{display:none}
+        .timeline-dot{position:absolute;left:0;top:4px;width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,0.1);background:#0f1629}
+        .timeline-dot.active{border-color:#06b6d4;background:rgba(6,182,212,0.2);box-shadow:0 0 0 4px rgba(6,182,212,0.1)}
+        .timeline-dot.done{border-color:#10b981;background:rgba(16,185,129,0.2)}
+
+        /* Step indicator */
+        .step-bar{display:flex;align-items:center;gap:0}
+        .step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid rgba(255,255,255,0.08);color:#475569;background:rgba(255,255,255,0.02);transition:all .3s;position:relative;z-index:1}
+        .step-dot.active{border-color:#06b6d4;color:#06b6d4;background:rgba(6,182,212,0.08);box-shadow:0 0 0 4px rgba(6,182,212,0.06)}
+        .step-dot.done{border-color:#10b981;color:#10b981;background:rgba(16,185,129,0.08)}
+        .step-line{flex:1;height:2px;background:rgba(255,255,255,0.06);transition:background .3s}
+        .step-line.done{background:rgba(16,185,129,0.3)}
+
+        /* Chart */
+        .chart-box{position:relative;height:220px}
+
+        /* Toggle */
+        .toggle-track{width:40px;height:22px;background:#1e293b;border-radius:11px;position:relative;cursor:pointer;transition:background .25s}
+        .toggle-track.on{background:#0891b2}
+        .toggle-knob{position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .25s}
+        .toggle-track.on .toggle-knob{transform:translateX(18px)}
+
+        /* Quick action card */
+        .quick-action{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,0.015);border:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:all .25s}
+        .quick-action:hover{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08);transform:translateX(4px)}
+
+        /* Shimmer loading */
+        .shimmer{background:linear-gradient(90deg,rgba(255,255,255,0.02) 25%,rgba(255,255,255,0.06) 50%,rgba(255,255,255,0.02) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+
+        /* Responsive */
         @media(max-width:1023px){.main-content{margin-left:0!important}}
+        @media(max-width:640px){.stat-grid-4{grid-template-columns:1fr 1fr!important}.hide-mobile{display:none!important}}
     </style>
 </head>
-<body class="text-white">
+<body>
 
-<div id="loading-screen" class="fixed inset-0 z-[300] bg-[#0a0e1a] flex flex-col items-center justify-center gap-4">
-    <div class="relative"><div class="w-16 h-16 border-[3px] border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div><div class="absolute inset-0 flex items-center justify-center"><span class="iconify text-cyan-400 text-lg" data-icon="mdi:truck-fast"></span></div></div>
-    <p class="text-slate-500 text-sm font-medium">Loading dashboard...</p>
+<!-- Loading Screen -->
+<div id="loading-screen" class="fixed inset-0 z-[300] bg-[#060913] flex flex-col items-center justify-center gap-5">
+    <div class="relative">
+        <div class="w-14 h-14 border-[2.5px] border-cyan-500/15 border-t-cyan-400 rounded-full anim-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+            <span class="iconify text-cyan-400 text-base" data-icon="mdi:truck-fast"></span>
+        </div>
+    </div>
+    <div class="text-center">
+        <p class="text-slate-400 text-sm font-semibold">ChapShop Delivery</p>
+        <p class="text-slate-600 text-xs mt-1">Loading your dashboard...</p>
+    </div>
 </div>
 
-<div class="toast-container" id="toast-container"></div>
+<!-- Toast Container -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<!-- Sidebar Backdrop -->
 <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
+<!-- App -->
 <div id="app" class="hidden min-h-screen">
 
-    <aside id="sidebar" class="sidebar fixed left-0 top-0 bottom-0 w-[260px] z-40 flex flex-col mobile-sidebar">
-        <div class="px-5 py-5 flex items-center gap-3 border-b border-white/[0.06]">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
-            <div><span class="font-bold text-white text-[15px]">ChapShop</span><span class="text-cyan-400 font-bold text-[15px] ml-0.5">Delivery</span></div>
-        </div>
-
-        <div class="flex-1 py-5 px-3 overflow-y-auto">
-            <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[1.5px] mb-3">Main</p>
-            <nav class="space-y-1 mb-6">
-                <a href="#" class="sidebar-link active flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-300" data-page="overview"><span class="iconify text-[18px]" data-icon="mdi:view-dashboard-outline"></span> Overview</a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-400" data-page="orders"><span class="iconify text-[18px]" data-icon="mdi:package-variant-closed"></span> All Orders<span id="orders-count-badge" class="ml-auto text-[10px] bg-cyan-500/15 text-cyan-400 px-2 py-0.5 rounded-full font-bold hidden">0</span></a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-400" data-page="create-order"><span class="iconify text-[18px]" data-icon="mdi:plus-circle-outline"></span> Create Order</a>
-            </nav>
-
-            <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[1.5px] mb-3">Insights</p>
-            <nav class="space-y-1 mb-6">
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-400" data-page="analytics"><span class="iconify text-[18px]" data-icon="mdi:chart-line"></span> Analytics</a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-400" data-page="sales-report"><span class="iconify text-[18px]" data-icon="mdi:receipt-text-outline"></span> Sales Report</a>
-            </nav>
-
-            <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[1.5px] mb-3">Updates</p>
-            <nav class="space-y-1 mb-6">
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-400 relative" data-page="notifications"><span class="iconify text-[18px]" data-icon="mdi:bell-outline"></span> Notifications<span id="notif-dot" class="notif-dot hidden"></span><span id="notif-count" class="notif-badge ml-auto hidden">0</span></a>
-            </nav>
-
-            <p class="px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[1.5px] mb-3">Account</p>
-            <nav class="space-y-1">
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-400" data-page="profile"><span class="iconify text-[18px]" data-icon="mdi:account-circle-outline"></span> Profile</a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-400" data-page="settings"><span class="iconify text-[18px]" data-icon="mdi:cog-outline"></span> Settings</a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-400" data-page="faq"><span class="iconify text-[18px]" data-icon="mdi:frequently-asked-questions"></span> FAQ</a>
-                <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-2.5 text-[13px] text-slate-400" data-page="help"><span class="iconify text-[18px]" data-icon="mdi:help-circle-outline"></span> Help & Support</a>
-            </nav>
-        </div>
-
-        <div class="p-4 border-t border-white/[0.06]">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400/20 to-cyan-600/20 flex items-center justify-center text-sm font-bold text-cyan-400" id="sidebar-avatar">?</div>
-                <div class="flex-1 min-w-0"><p class="text-[13px] font-semibold text-white truncate" id="sidebar-name">Loading...</p><p class="text-[11px] text-slate-500 truncate" id="sidebar-email">Loading...</p></div>
+    <!-- ========== SIDEBAR ========== -->
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 bottom-0 w-[250px] z-40 flex flex-col mobile-sidebar">
+        <!-- Logo -->
+        <div class="px-5 py-4 flex items-center gap-3 border-b border-white/[0.04]">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                <span class="iconify text-white text-base" data-icon="mdi:truck-fast"></span>
             </div>
-            <button id="logout-btn" class="w-full flex items-center justify-center gap-2 text-[12px] font-semibold text-red-400 bg-red-500/5 border border-red-500/10 rounded-lg py-2.5 hover:bg-red-500/10 transition-all cursor-pointer"><span class="iconify text-[15px]" data-icon="mdi:logout"></span> Sign Out</button>
+            <div>
+                <span class="font-extrabold text-white text-[14px] tracking-tight">ChapShop</span>
+                <span class="text-cyan-400 font-extrabold text-[14px]"> Delivery</span>
+            </div>
+            <button onclick="closeSidebar()" class="ml-auto btn-ghost lg:hidden"><span class="iconify text-lg" data-icon="mdi:close"></span></button>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex-1 py-4 px-3 overflow-y-auto">
+            <div class="sidebar-section-title">Main</div>
+            <nav class="space-y-1">
+                <a href="#" class="sidebar-link active" data-page="overview"><span class="iconify link-icon" data-icon="mdi:view-dashboard-outline"></span><span class="link-text">Overview</span></a>
+                <a href="#" class="sidebar-link" data-page="orders"><span class="iconify link-icon" data-icon="mdi:package-variant-closed"></span><span class="link-text">All Orders</span><span id="orders-badge" class="ml-auto text-[9px] bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded-full font-bold hidden">0</span></a>
+                <a href="#" class="sidebar-link" data-page="create-order"><span class="iconify link-icon" data-icon="mdi:plus-circle-outline"></span><span class="link-text">Create Order</span></a>
+            </nav>
+
+            <div class="sidebar-section-title">Insights</div>
+            <nav class="space-y-1">
+                <a href="#" class="sidebar-link" data-page="analytics"><span class="iconify link-icon" data-icon="mdi:chart-line"></span><span class="link-text">Analytics</span></a>
+                <a href="#" class="sidebar-link" data-page="sales-report"><span class="iconify link-icon" data-icon="mdi:receipt-text-outline"></span><span class="link-text">Sales Report</span></a>
+            </nav>
+
+            <div class="sidebar-section-title">Updates</div>
+            <nav class="space-y-1">
+                <a href="#" class="sidebar-link" data-page="notifications"><span class="iconify link-icon" data-icon="mdi:bell-outline"></span><span class="link-text">Notifications</span><span id="notif-dot-side" class="notif-dot hidden" style="position:static;margin-left:auto"></span><span id="notif-badge-side" class="notif-badge ml-auto hidden">0</span></a>
+            </nav>
+
+            <div class="sidebar-section-title">Account</div>
+            <nav class="space-y-1">
+                <a href="#" class="sidebar-link" data-page="profile"><span class="iconify link-icon" data-icon="mdi:account-circle-outline"></span><span class="link-text">Profile</span></a>
+                <a href="#" class="sidebar-link" data-page="settings"><span class="iconify link-icon" data-icon="mdi:cog-outline"></span><span class="link-text">Settings</span></a>
+                <a href="#" class="sidebar-link" data-page="faq"><span class="iconify link-icon" data-icon="mdi:frequently-asked-questions"></span><span class="link-text">FAQ</span></a>
+                <a href="#" class="sidebar-link" data-page="help"><span class="iconify link-icon" data-icon="mdi:help-circle-outline"></span><span class="link-text">Help & Support</span></a>
+            </nav>
+        </div>
+
+        <!-- User Card -->
+        <div class="p-4 border-t border-white/[0.04]">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-400/15 to-cyan-600/15 flex items-center justify-center text-xs font-bold text-cyan-400" id="sb-avatar">?</div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-[12px] font-semibold text-white truncate" id="sb-name">Loading...</p>
+                    <p class="text-[10px] text-slate-600 truncate" id="sb-email">Loading...</p>
+                </div>
+            </div>
+            <button id="logout-btn" class="w-full flex items-center justify-center gap-2 text-[11px] font-semibold text-red-400/80 bg-red-500/[0.04] border border-red-500/10 rounded-lg py-2 hover:bg-red-500/[0.08] transition cursor-pointer">
+                <span class="iconify text-sm" data-icon="mdi:logout"></span> Sign Out
+            </button>
         </div>
     </aside>
 
-    <div class="main-content lg:ml-[260px] min-h-screen flex flex-col">
-        <header class="sticky top-0 z-30 h-[64px] bg-[#0a0e1a]/80 backdrop-blur-2xl border-b border-white/[0.06] flex items-center justify-between px-5 lg:px-7">
+    <!-- ========== MAIN ========== -->
+    <div class="main-content lg:ml-[250px] min-h-screen flex flex-col">
+
+        <!-- Header -->
+        <header class="sticky top-0 z-30 h-[56px] bg-[#060913]/85 backdrop-blur-2xl border-b border-white/[0.04] flex items-center justify-between px-4 lg:px-6">
             <div class="flex items-center gap-3">
-                <button id="mobile-menu-btn" class="lg:hidden w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition cursor-pointer"><span class="iconify text-xl text-slate-300" data-icon="mdi:menu"></span></button>
-                <h1 id="page-title" class="text-[15px] font-semibold text-white">Overview</h1>
+                <button id="mobile-menu-btn" class="lg:hidden btn-ghost"><span class="iconify text-xl text-slate-400" data-icon="mdi:menu"></span></button>
+                <div>
+                    <h1 id="page-title" class="text-[14px] font-semibold text-white">Overview</h1>
+                    <p id="page-subtitle" class="text-[10px] text-slate-600 hide-mobile">Dashboard overview</p>
+                </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="switchPage('notifications')" class="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition cursor-pointer relative"><span class="iconify text-lg text-slate-400" data-icon="mdi:bell-outline"></span><span id="notif-dot2" class="notif-dot hidden" style="border-color:#0a0e1a"></span></button>
-                <button onclick="location.reload()" class="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center hover:bg-white/[0.08] transition cursor-pointer"><span class="iconify text-lg text-slate-400" data-icon="mdi:refresh"></span></button>
-                <a href="index.html" class="btn-secondary text-[12px] py-2 px-3"><span class="iconify text-[14px]" data-icon="mdi:open-in-new"></span><span class="hidden sm:inline">Website</span></a>
+            <div class="flex items-center gap-1.5">
+                <button onclick="switchPage('notifications')" class="btn-ghost relative"><span class="iconify text-lg text-slate-500" data-icon="mdi:bell-outline"></span><span id="notif-dot-hdr" class="notif-dot hidden"></span></button>
+                <button onclick="location.reload()" class="btn-ghost"><span class="iconify text-lg text-slate-500" data-icon="mdi:refresh"></span></button>
+                <a href="index.html" class="btn-secondary text-[11px] py-1.5 px-3 ml-1"><span class="iconify text-xs" data-icon="mdi:open-in-new"></span><span class="hidden sm:inline">Website</span></a>
             </div>
         </header>
 
-        <div class="flex-1 p-5 lg:p-7">
+        <!-- Content Area -->
+        <div class="flex-1 p-4 lg:p-6">
 
-            <!-- OVERVIEW -->
-            <div id="page-overview" class="page-content animate-fadeUp">
-                <div class="glass-card-static p-6 lg:p-8 mb-7 relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.07] via-blue-500/[0.04] to-transparent pointer-events-none"></div><div class="relative"><h2 class="text-xl lg:text-2xl font-bold text-white mb-1" id="welcome-name">Welcome back! 👋</h2><p class="text-sm text-slate-400">Here's what's happening with your deliveries today.</p></div></div>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5 mb-7">
-                    <div class="glass-card stat-card p-5"><div class="flex items-start justify-between mb-4"><div class="stat-icon bg-cyan-500/10"><span class="iconify text-2xl text-cyan-400" data-icon="mdi:package-variant-closed"></span></div><span class="text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full uppercase tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse-glow"></span>Live</span></div><p class="text-2xl lg:text-3xl font-extrabold text-white mb-1" id="stat-total">0</p><p class="text-[12px] text-slate-500 font-medium">Total Orders</p></div>
-                    <div class="glass-card stat-card p-5"><div class="flex items-start justify-between mb-4"><div class="stat-icon bg-emerald-500/10"><span class="iconify text-2xl text-emerald-400" data-icon="mdi:check-decagram"></span></div></div><p class="text-2xl lg:text-3xl font-extrabold text-emerald-400 mb-1" id="stat-delivered">0</p><p class="text-[12px] text-slate-500 font-medium">Delivered</p></div>
-                    <div class="glass-card stat-card p-5"><div class="flex items-start justify-between mb-4"><div class="stat-icon bg-amber-500/10"><span class="iconify text-2xl text-amber-400" data-icon="mdi:clock-fast"></span></div></div><p class="text-2xl lg:text-3xl font-extrabold text-amber-400 mb-1" id="stat-pending">0</p><p class="text-[12px] text-slate-500 font-medium">In Progress</p></div>
-                    <div class="glass-card stat-card p-5"><div class="flex items-start justify-between mb-4"><div class="stat-icon bg-violet-500/10"><span class="iconify text-2xl text-violet-400" data-icon="mdi:cash-multiple"></span></div></div><p class="text-xl lg:text-2xl font-extrabold text-white mb-1" id="stat-cod">TZS 0</p><p class="text-[12px] text-slate-500 font-medium">Total COD Value</p></div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-7">
-                    <div class="lg:col-span-1 space-y-4">
-                        <h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider">Quick Actions</h3>
-                        <button onclick="switchPage('create-order')" class="glass-card w-full p-4 text-left cursor-pointer group flex items-center gap-4"><div class="w-11 h-11 rounded-xl bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition"><span class="iconify text-xl text-cyan-400" data-icon="mdi:plus-circle"></span></div><div><p class="text-[13px] font-semibold text-white">New Order</p><p class="text-[11px] text-slate-500">Create delivery</p></div><span class="iconify text-slate-600 ml-auto" data-icon="mdi:chevron-right"></span></button>
-                        <button onclick="switchPage('orders')" class="glass-card w-full p-4 text-left cursor-pointer group flex items-center gap-4"><div class="w-11 h-11 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition"><span class="iconify text-xl text-blue-400" data-icon="mdi:format-list-bulleted"></span></div><div><p class="text-[13px] font-semibold text-white">Manage Orders</p><p class="text-[11px] text-slate-500">View & track</p></div><span class="iconify text-slate-600 ml-auto" data-icon="mdi:chevron-right"></span></button>
-                        <button onclick="switchPage('sales-report')" class="glass-card w-full p-4 text-left cursor-pointer group flex items-center gap-4"><div class="w-11 h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/20 transition"><span class="iconify text-xl text-emerald-400" data-icon="mdi:receipt-text"></span></div><div><p class="text-[13px] font-semibold text-white">Sales Report</p><p class="text-[11px] text-slate-500">Revenue & stats</p></div><span class="iconify text-slate-600 ml-auto" data-icon="mdi:chevron-right"></span></button>
-                        <button onclick="switchPage('notifications')" class="glass-card w-full p-4 text-left cursor-pointer group flex items-center gap-4"><div class="w-11 h-11 rounded-xl bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/20 transition"><span class="iconify text-xl text-amber-400" data-icon="mdi:bell"></span></div><div><p class="text-[13px] font-semibold text-white">Notifications</p><p class="text-[11px] text-slate-500">Updates & alerts</p></div><span class="iconify text-slate-600 ml-auto" data-icon="mdi:chevron-right"></span></button>
+            <!-- ===== OVERVIEW ===== -->
+            <div id="page-overview" class="page-content anim-fadeUp">
+                <!-- Welcome Banner -->
+                <div class="glass-s p-5 lg:p-6 mb-6 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.06] via-blue-500/[0.03] to-transparent pointer-events-none"></div>
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/[0.03] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+                    <div class="relative flex items-center justify-between">
+                        <div>
+                            <h2 class="text-lg lg:text-xl font-bold text-white mb-1" id="welcome-msg">Welcome back! 👋</h2>
+                            <p class="text-xs text-slate-500">Here's what's happening with your deliveries today.</p>
+                        </div>
+                        <button onclick="switchPage('create-order')" class="btn-primary text-[12px] py-2.5 px-5 hide-mobile"><span class="iconify text-base" data-icon="mdi:plus"></span> New Order</button>
                     </div>
-                    <div class="lg:col-span-2"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-4">Orders This Week</h3><div class="glass-card-static p-5"><div class="chart-container"><canvas id="overview-chart"></canvas></div></div></div>
                 </div>
-                <div><div class="flex items-center justify-between mb-4"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider">Recent Orders</h3><button onclick="switchPage('orders')" class="text-[12px] text-cyan-400 font-semibold hover:text-cyan-300 transition cursor-pointer">View All →</button></div><div class="glass-card-static overflow-hidden" id="recent-orders-list"><div class="empty-state"><p class="text-slate-500 text-sm">No orders yet</p></div></div></div>
+
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6 stat-grid-4">
+                    <div class="glass-card stat-card cyan p-4 lg:p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-cyan-500/[0.08] flex items-center justify-center"><span class="iconify text-xl text-cyan-400" data-icon="mdi:package-variant-closed"></span></div>
+                            <span class="text-[9px] font-bold text-emerald-400 bg-emerald-400/[0.08] px-2 py-0.5 rounded-md uppercase tracking-wide flex items-center gap-1"><span class="w-1 h-1 bg-emerald-400 rounded-full anim-pulse"></span>Live</span>
+                        </div>
+                        <p class="text-2xl lg:text-3xl font-extrabold text-white anim-count" id="s-total">0</p>
+                        <p class="text-[11px] text-slate-600 mt-0.5 font-medium">Total Orders</p>
+                    </div>
+                    <div class="glass-card stat-card green p-4 lg:p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/[0.08] flex items-center justify-center"><span class="iconify text-xl text-emerald-400" data-icon="mdi:check-decagram"></span></div>
+                        </div>
+                        <p class="text-2xl lg:text-3xl font-extrabold text-emerald-400 anim-count" id="s-delivered">0</p>
+                        <p class="text-[11px] text-slate-600 mt-0.5 font-medium">Delivered</p>
+                    </div>
+                    <div class="glass-card stat-card amber p-4 lg:p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/[0.08] flex items-center justify-center"><span class="iconify text-xl text-amber-400" data-icon="mdi:clock-fast"></span></div>
+                        </div>
+                        <p class="text-2xl lg:text-3xl font-extrabold text-amber-400 anim-count" id="s-pending">0</p>
+                        <p class="text-[11px] text-slate-600 mt-0.5 font-medium">In Progress</p>
+                    </div>
+                    <div class="glass-card stat-card violet p-4 lg:p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-violet-500/[0.08] flex items-center justify-center"><span class="iconify text-xl text-violet-400" data-icon="mdi:cash-multiple"></span></div>
+                        </div>
+                        <p class="text-lg lg:text-xl font-extrabold text-white anim-count" id="s-cod">TZS 0</p>
+                        <p class="text-[11px] text-slate-600 mt-0.5 font-medium">Total COD Value</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions + Chart -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                    <div class="lg:col-span-1 space-y-2">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[1.5px] mb-2 px-1">Quick Actions</p>
+                        <div class="quick-action" onclick="switchPage('create-order')">
+                            <div class="w-9 h-9 rounded-xl bg-cyan-500/[0.08] flex items-center justify-center flex-shrink-0"><span class="iconify text-lg text-cyan-400" data-icon="mdi:plus-circle"></span></div>
+                            <div class="flex-1"><p class="text-[12px] font-semibold text-white">New Order</p><p class="text-[10px] text-slate-600">Create a delivery</p></div>
+                            <span class="iconify text-slate-700 text-base" data-icon="mdi:chevron-right"></span>
+                        </div>
+                        <div class="quick-action" onclick="switchPage('orders')">
+                            <div class="w-9 h-9 rounded-xl bg-blue-500/[0.08] flex items-center justify-center flex-shrink-0"><span class="iconify text-lg text-blue-400" data-icon="mdi:format-list-bulleted"></span></div>
+                            <div class="flex-1"><p class="text-[12px] font-semibold text-white">Manage Orders</p><p class="text-[10px] text-slate-600">View & track</p></div>
+                            <span class="iconify text-slate-700 text-base" data-icon="mdi:chevron-right"></span>
+                        </div>
+                        <div class="quick-action" onclick="switchPage('sales-report')">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-500/[0.08] flex items-center justify-center flex-shrink-0"><span class="iconify text-lg text-emerald-400" data-icon="mdi:receipt-text"></span></div>
+                            <div class="flex-1"><p class="text-[12px] font-semibold text-white">Sales Report</p><p class="text-[10px] text-slate-600">Revenue & stats</p></div>
+                            <span class="iconify text-slate-700 text-base" data-icon="mdi:chevron-right"></span>
+                        </div>
+                        <div class="quick-action" onclick="switchPage('analytics')">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/[0.08] flex items-center justify-center flex-shrink-0"><span class="iconify text-lg text-amber-400" data-icon="mdi:chart-line"></span></div>
+                            <div class="flex-1"><p class="text-[12px] font-semibold text-white">Analytics</p><p class="text-[10px] text-slate-600">Performance charts</p></div>
+                            <span class="iconify text-slate-700 text-base" data-icon="mdi:chevron-right"></span>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[1.5px] mb-3 px-1">Orders This Week</p>
+                        <div class="glass-s p-4">
+                            <div class="chart-box"><canvas id="overview-chart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[1.5px] px-1">Recent Orders</p>
+                        <button onclick="switchPage('orders')" class="text-[11px] text-cyan-400 font-semibold hover:text-cyan-300 transition cursor-pointer">View All →</button>
+                    </div>
+                    <div class="glass-s overflow-hidden" id="recent-orders">
+                        <div class="py-12 text-center"><p class="text-slate-600 text-xs">No orders yet</p></div>
+                    </div>
+                </div>
             </div>
 
-            <!-- ORDERS -->
+            <!-- ===== ORDERS ===== -->
             <div id="page-orders" class="page-content hidden">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6"><div><h2 class="text-xl font-bold text-white">All Orders</h2><p class="text-sm text-slate-500 mt-0.5">Manage and track your deliveries</p></div><button onclick="switchPage('create-order')" class="btn-primary"><span class="iconify text-lg" data-icon="mdi:plus"></span> New Order</button></div>
-                <div class="glass-card-static p-4 mb-5 flex flex-col sm:flex-row items-start sm:items-center gap-4"><div class="relative flex-1 w-full"><span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="order-search" placeholder="Search by name, phone, city..." class="input-field pl-10 py-2.5 text-[13px]"></div><div class="flex items-center gap-2 flex-wrap"><button class="filter-btn active" data-filter="all">All</button><button class="filter-btn" data-filter="pending">Pending</button><button class="filter-btn" data-filter="picked">Picked</button><button class="filter-btn" data-filter="delivered">Delivered</button><button class="filter-btn" data-filter="returned">Returned</button></div></div>
-                <div class="glass-card-static overflow-hidden"><div class="table-container" id="orders-table-container"><table><thead><tr><th>Order ID</th><th>Recipient</th><th>Phone</th><th>City</th><th>COD Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody id="orders-tbody"><tr><td colspan="8" class="text-center py-12 text-slate-500 text-sm">No orders found</td></tr></tbody></table></div><div id="no-orders-msg" class="hidden empty-state"><span class="iconify text-5xl text-slate-700 mb-4" data-icon="mdi:package-variant-remove"></span><p class="text-slate-400 font-medium mb-2">No orders found</p><p class="text-slate-600 text-sm mb-5">Create your first delivery order to get started.</p><button onclick="switchPage('create-order')" class="btn-primary text-[13px]">Create Order</button></div></div>
-            </div>
-
-            <!-- CREATE ORDER -->
-            <div id="page-create-order" class="page-content hidden">
-                <div class="max-w-3xl mx-auto"><div class="mb-7"><h2 class="text-xl font-bold text-white">Create New Order</h2><p class="text-sm text-slate-500 mt-0.5">Fill in the delivery details below.</p></div>
-                <form id="create-order-form" class="glass-card-static p-6 lg:p-8 space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5"><div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">Recipient Name *</label><input type="text" id="f-name" required placeholder="e.g. John Doe" class="input-field"></div><div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">Phone Number *</label><input type="tel" id="f-phone" required placeholder="e.g. 0769 123 456" class="input-field"></div></div>
-                    <div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">Delivery Address *</label><textarea id="f-address" required rows="2" placeholder="Street name, area, landmark..." class="input-field resize-none"></textarea></div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5"><div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">City *</label><select id="f-city" required class="select-field"><option value="">Select city</option><option>Dar es Salaam</option><option>Dodoma</option><option>Mwanza</option><option>Arusha</option><option>Mbeya</option><option>Morogoro</option><option>Tanga</option><option>Iringa</option><option>Kagera</option><option>Lindi</option><option>Kigoma</option><option>Other</option></select></div><div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">COD Amount (TZS)</label><input type="number" id="f-cod" placeholder="e.g. 50000" class="input-field"></div></div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5"><div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">Package Description</label><input type="text" id="f-desc" placeholder="e.g. Phone case, 0.5kg" class="input-field"></div><div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">Delivery Type</label><select id="f-type" class="select-field"><option value="standard">Standard (1-3 days)</option><option value="express">Express (same day)</option></select></div></div>
-                    <div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">Notes (Optional)</label><textarea id="f-notes" rows="2" placeholder="Any special instructions..." class="input-field resize-none"></textarea></div>
-                    <button type="submit" id="submit-btn" class="btn-primary w-full justify-center py-3.5 text-[14px]"><span class="iconify text-lg" data-icon="mdi:check-circle-outline"></span> Submit Order</button>
-                </form></div>
-            </div>
-
-            <!-- ANALYTICS -->
-            <div id="page-analytics" class="page-content hidden"><div class="mb-7"><h2 class="text-xl font-bold text-white">Analytics</h2><p class="text-sm text-slate-500 mt-0.5">Your delivery performance at a glance.</p></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-7"><div class="glass-card-static p-5"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-4">Orders by Status</h3><div class="chart-container"><canvas id="status-chart"></canvas></div></div><div class="glass-card-static p-5"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-4">COD Value Overview</h3><div class="chart-container"><canvas id="cod-chart"></canvas></div></div></div><div class="glass-card-static p-5"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-4">Orders Over Time</h3><div style="height:280px"><canvas id="timeline-chart"></canvas></div></div></div>
-
-            <!-- SALES REPORT -->
-            <div id="page-sales-report" class="page-content hidden">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6"><div><h2 class="text-xl font-bold text-white">Sales Report</h2><p class="text-sm text-slate-500 mt-0.5">Revenue and delivery performance.</p></div><button onclick="exportReport()" class="btn-secondary text-[12px]"><span class="iconify text-sm" data-icon="mdi:download"></span> Export CSV</button></div>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <div class="glass-card-static p-5"><div class="stat-icon bg-emerald-500/10 mb-3"><span class="iconify text-xl text-emerald-400" data-icon="mdi:cash-check"></span></div><p class="text-xl font-extrabold text-emerald-400" id="r-collected">TZS 0</p><p class="text-[12px] text-slate-500">Collected COD</p></div>
-                    <div class="glass-card-static p-5"><div class="stat-icon bg-amber-500/10 mb-3"><span class="iconify text-xl text-amber-400" data-icon="mdi:cash-clock"></span></div><p class="text-xl font-extrabold text-amber-400" id="r-pending-cod">TZS 0</p><p class="text-[12px] text-slate-500">Pending COD</p></div>
-                    <div class="glass-card-static p-5"><div class="stat-icon bg-blue-500/10 mb-3"><span class="iconify text-xl text-blue-400" data-icon="mdi:percent"></span></div><p class="text-xl font-extrabold text-blue-400" id="r-rate">0%</p><p class="text-[12px] text-slate-500">Delivery Rate</p></div>
-                    <div class="glass-card-static p-5"><div class="stat-icon bg-red-500/10 mb-3"><span class="iconify text-xl text-red-400" data-icon="mdi:cash-remove"></span></div><p class="text-xl font-extrabold text-red-400" id="r-lost">TZS 0</p><p class="text-[12px] text-slate-500">Returned COD</p></div>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+                    <div><h2 class="text-lg font-bold text-white">All Orders</h2><p class="text-xs text-slate-600 mt-0.5">Manage and track your deliveries</p></div>
+                    <button onclick="switchPage('create-order')" class="btn-primary text-[12px] py-2.5"><span class="iconify text-base" data-icon="mdi:plus"></span> New Order</button>
                 </div>
-                <div class="glass-card-static p-5 mb-5"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider mb-4">Revenue by City</h3><div style="height:260px"><canvas id="city-chart"></canvas></div></div>
-                <div class="glass-card-static overflow-hidden"><div class="p-4 border-b border-white/[0.04]"><h3 class="text-[13px] font-bold text-slate-400 uppercase tracking-wider">Summary Table</h3></div><div class="table-container"><table class="w-full" style="min-width:500px"><thead><tr><th>City</th><th>Total</th><th>Delivered</th><th>Returned</th><th>Rate</th><th>COD Collected</th></tr></thead><tbody id="report-tbody"><tr><td colspan="6" class="text-center py-8 text-slate-500 text-sm">No data</td></tr></tbody></table></div></div>
+                <!-- Search & Filters -->
+                <div class="glass-s p-3 mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <div class="relative flex-1 w-full">
+                        <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 text-sm" data-icon="mdi:magnify"></span>
+                        <input type="text" id="order-search" placeholder="Search by name, phone, city..." class="input-field pl-9 py-2 text-[12px]">
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="pending">Pending</button>
+                        <button class="filter-btn" data-filter="picked">Picked</button>
+                        <button class="filter-btn" data-filter="delivered">Delivered</button>
+                        <button class="filter-btn" data-filter="returned">Returned</button>
+                    </div>
+                </div>
+                <!-- Table -->
+                <div class="glass-s overflow-hidden">
+                    <div class="table-wrap" id="orders-tbl-wrap">
+                        <table>
+                            <thead><tr><th>Order ID</th><th>Recipient</th><th>Phone</th><th>City</th><th>COD</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+                            <tbody id="orders-tbody"><tr><td colspan="8" class="text-center py-10 text-slate-600 text-xs">Loading...</td></tr></tbody>
+                        </table>
+                    </div>
+                    <div id="no-orders" class="hidden py-16 text-center">
+                        <span class="iconify text-4xl text-slate-700 mb-3" data-icon="mdi:package-variant-remove"></span>
+                        <p class="text-slate-500 text-sm font-medium mb-1">No orders found</p>
+                        <p class="text-slate-700 text-xs mb-4">Create your first delivery order to get started.</p>
+                        <button onclick="switchPage('create-order')" class="btn-primary text-[12px]">Create Order</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- NOTIFICATIONS -->
+            <!-- ===== CREATE ORDER ===== -->
+            <div id="page-create-order" class="page-content hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="mb-6"><h2 class="text-lg font-bold text-white">Create New Order</h2><p class="text-xs text-slate-600 mt-0.5">Fill in the delivery details below.</p></div>
+                    <!-- Steps -->
+                    <div class="flex items-center justify-center mb-8 px-8">
+                        <div class="step-dot active" id="step1-dot">1</div>
+                        <div class="step-line" id="step1-line"></div>
+                        <div class="step-dot" id="step2-dot">2</div>
+                        <div class="step-line" id="step2-line"></div>
+                        <div class="step-dot" id="step3-dot">3</div>
+                    </div>
+                    <form id="create-order-form" class="glass-s p-5 lg:p-7 space-y-5">
+                        <!-- Step 1: Recipient -->
+                        <div id="form-step-1">
+                            <p class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider mb-4 flex items-center gap-2"><span class="iconify" data-icon="mdi:account"></span> Recipient Details</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Full Name *</label><input type="text" id="f-name" required placeholder="e.g. John Doe" class="input-field"></div>
+                                <div><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Phone Number *</label><input type="tel" id="f-phone" required placeholder="e.g. 0769 123 456" class="input-field"></div>
+                            </div>
+                            <div class="mt-4"><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Delivery Address *</label><textarea id="f-address" required rows="2" placeholder="Street name, area, landmark..." class="input-field resize-none"></textarea></div>
+                            <div class="mt-5 flex justify-end"><button type="button" onclick="goStep(2)" class="btn-primary text-[12px]">Next <span class="iconify" data-icon="mdi:arrow-right"></span></button></div>
+                        </div>
+                        <!-- Step 2: Package -->
+                        <div id="form-step-2" class="hidden">
+                            <p class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider mb-4 flex items-center gap-2"><span class="iconify" data-icon="mdi:package-variant"></span> Package Details</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">City *</label>
+                                    <select id="f-city" required class="select-field"><option value="">Select city</option><option>Dar es Salaam</option><option>Dodoma</option><option>Mwanza</option><option>Arusha</option><option>Mbeya</option><option>Morogoro</option><option>Tanga</option><option>Iringa</option><option>Kagera</option><option>Lindi</option><option>Kigoma</option><option>Other</option></select>
+                                </div>
+                                <div><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">COD Amount (TZS)</label><input type="number" id="f-cod" placeholder="e.g. 50000" class="input-field"></div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                                <div><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Package Description</label><input type="text" id="f-desc" placeholder="e.g. Phone case, 0.5kg" class="input-field"></div>
+                                <div><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Delivery Type</label>
+                                    <select id="f-type" class="select-field"><option value="standard">Standard (1-3 days)</option><option value="express">Express (same day)</option></select>
+                                </div>
+                            </div>
+                            <div class="mt-5 flex justify-between"><button type="button" onclick="goStep(1)" class="btn-secondary text-[12px]"><span class="iconify" data-icon="mdi:arrow-left"></span> Back</button><button type="button" onclick="goStep(3)" class="btn-primary text-[12px]">Next <span class="iconify" data-icon="mdi:arrow-right"></span></button></div>
+                        </div>
+                        <!-- Step 3: Confirm -->
+                        <div id="form-step-3" class="hidden">
+                            <p class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider mb-4 flex items-center gap-2"><span class="iconify" data-icon="mdi:check-circle"></span> Review & Submit</p>
+                            <div id="order-review" class="space-y-3 mb-5"></div>
+                            <div><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Notes (Optional)</label><textarea id="f-notes" rows="2" placeholder="Any special instructions..." class="input-field resize-none"></textarea></div>
+                            <div class="mt-5 flex justify-between"><button type="button" onclick="goStep(2)" class="btn-secondary text-[12px]"><span class="iconify" data-icon="mdi:arrow-left"></span> Back</button><button type="submit" id="submit-btn" class="btn-primary text-[12px]"><span class="iconify text-base" data-icon="mdi:check-circle-outline"></span> Submit Order</button></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ===== ANALYTICS ===== -->
+            <div id="page-analytics" class="page-content hidden">
+                <div class="mb-6"><h2 class="text-lg font-bold text-white">Analytics</h2><p class="text-xs text-slate-600 mt-0.5">Your delivery performance at a glance.</p></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+                    <div class="glass-s p-4"><p class="text-[10px] font-bold text-slate-500 uppercase tracking-[1.5px] mb-3">Orders by Status</p><div class="chart-box"><canvas id="status-chart"></canvas></div></div>
+                    <div class="glass-s p-4"><p class="text-[10px] font-bold text-slate-500 uppercase tracking-[1.5px] mb-3">COD Value Overview</p><div class="chart-box"><canvas id="cod-chart"></canvas></div></div>
+                </div>
+                <div class="glass-s p-4"><p class="text-[10px] font-bold text-slate-500 uppercase tracking-[1.5px] mb-3">Orders Over Time</p><div style="height:260px"><canvas id="timeline-chart"></canvas></div></div>
+            </div>
+
+            <!-- ===== SALES REPORT ===== -->
+            <div id="page-sales-report" class="page-content hidden">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+                    <div><h2 class="text-lg font-bold text-white">Sales Report</h2><p class="text-xs text-slate-600 mt-0.5">Revenue and delivery performance.</p></div>
+                    <button onclick="exportReport()" class="btn-secondary text-[11px]"><span class="iconify text-sm" data-icon="mdi:download"></span> Export CSV</button>
+                </div>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+                    <div class="glass-s p-4"><div class="w-9 h-9 rounded-xl bg-emerald-500/[0.08] flex items-center justify-center mb-2"><span class="iconify text-lg text-emerald-400" data-icon="mdi:cash-check"></span></div><p class="text-lg font-extrabold text-emerald-400" id="r-collected">TZS 0</p><p class="text-[10px] text-slate-600 mt-0.5">Collected COD</p></div>
+                    <div class="glass-s p-4"><div class="w-9 h-9 rounded-xl bg-amber-500/[0.08] flex items-center justify-center mb-2"><span class="iconify text-lg text-amber-400" data-icon="mdi:cash-clock"></span></div><p class="text-lg font-extrabold text-amber-400" id="r-pending-cod">TZS 0</p><p class="text-[10px] text-slate-600 mt-0.5">Pending COD</p></div>
+                    <div class="glass-s p-4"><div class="w-9 h-9 rounded-xl bg-blue-500/[0.08] flex items-center justify-center mb-2"><span class="iconify text-lg text-blue-400" data-icon="mdi:percent"></span></div><p class="text-lg font-extrabold text-blue-400" id="r-rate">0%</p><p class="text-[10px] text-slate-600 mt-0.5">Delivery Rate</p></div>
+                    <div class="glass-s p-4"><div class="w-9 h-9 rounded-xl bg-red-500/[0.08] flex items-center justify-center mb-2"><span class="iconify text-lg text-red-400" data-icon="mdi:cash-remove"></span></div><p class="text-lg font-extrabold text-red-400" id="r-lost">TZS 0</p><p class="text-[10px] text-slate-600 mt-0.5">Returned COD</p></div>
+                </div>
+                <div class="glass-s p-4 mb-4"><p class="text-[10px] font-bold text-slate-500 uppercase tracking-[1.5px] mb-3">Revenue by City</p><div style="height:240px"><canvas id="city-chart"></canvas></div></div>
+                <div class="glass-s overflow-hidden">
+                    <div class="p-3 border-b border-white/[0.03]"><p class="text-[10px] font-bold text-slate-500 uppercase tracking-[1.5px]">Summary Table</p></div>
+                    <div class="table-wrap"><table style="min-width:500px"><thead><tr><th>City</th><th>Total</th><th>Delivered</th><th>Returned</th><th>Rate</th><th>COD Collected</th></tr></thead><tbody id="report-tbody"><tr><td colspan="6" class="text-center py-8 text-slate-700 text-xs">No data</td></tr></tbody></table></div>
+                </div>
+            </div>
+
+            <!-- ===== NOTIFICATIONS ===== -->
             <div id="page-notifications" class="page-content hidden">
-                <div class="flex items-center justify-between mb-6"><div><h2 class="text-xl font-bold text-white">Notifications</h2><p class="text-sm text-slate-500 mt-0.5">Stay updated on your orders.</p></div><button onclick="markAllRead()" class="btn-secondary text-[12px]"><span class="iconify text-sm" data-icon="mdi:check-all"></span> Mark All Read</button></div>
-                <div class="glass-card-static overflow-hidden" id="notif-list"><div class="empty-state"><p class="text-slate-500 text-sm">No notifications</p></div></div>
+                <div class="flex items-center justify-between mb-5">
+                    <div><h2 class="text-lg font-bold text-white">Notifications</h2><p class="text-xs text-slate-600 mt-0.5">Stay updated on your orders.</p></div>
+                    <button onclick="markAllRead()" class="btn-secondary text-[11px]"><span class="iconify text-sm" data-icon="mdi:check-all"></span> Mark All Read</button>
+                </div>
+                <div class="glass-s overflow-hidden" id="notif-list"><div class="py-12 text-center"><p class="text-slate-700 text-xs">No notifications</p></div></div>
             </div>
 
-            <!-- FAQ -->
+            <!-- ===== FAQ ===== -->
             <div id="page-faq" class="page-content hidden">
-                <div class="max-w-2xl mx-auto"><div class="mb-7"><h2 class="text-xl font-bold text-white">Frequently Asked Questions</h2><p class="text-sm text-slate-500 mt-0.5">Find quick answers.</p></div><div class="space-y-3" id="faq-list"></div></div>
+                <div class="max-w-2xl mx-auto">
+                    <div class="mb-6"><h2 class="text-lg font-bold text-white">Frequently Asked Questions</h2><p class="text-xs text-slate-600 mt-0.5">Find quick answers.</p></div>
+                    <div class="space-y-2" id="faq-list"></div>
+                </div>
             </div>
 
-            <!-- PROFILE -->
-            <div id="page-profile" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-7"><h2 class="text-xl font-bold text-white">Merchant Profile</h2><p class="text-sm text-slate-500 mt-0.5">Manage your business information.</p></div><div class="glass-card-static p-6 lg:p-8"><div class="flex items-center gap-5 mb-8 pb-8 border-b border-white/[0.06]"><div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-400/20 to-cyan-600/20 flex items-center justify-center text-2xl font-extrabold text-cyan-400" id="profile-avatar">?</div><div><p class="text-lg font-bold text-white" id="profile-name">Loading...</p><p class="text-sm text-slate-400" id="profile-email">Loading...</p><div class="flex items-center gap-1.5 mt-2"><span class="w-2 h-2 bg-emerald-400 rounded-full"></span><span class="text-[12px] text-emerald-400 font-semibold">Verified Merchant</span></div></div></div><form id="profile-form" class="space-y-5"><div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">Business Name *</label><input type="text" id="p-business" required class="input-field"></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-5"><div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">Phone Number</label><input type="tel" id="p-phone" class="input-field"></div><div><label class="text-[12px] font-semibold text-slate-400 mb-2 block uppercase tracking-wide">City</label><input type="text" id="p-city" class="input-field"></div></div><button type="submit" class="btn-primary w-full justify-center py-3.5"><span class="iconify text-lg" data-icon="mdi:content-save-outline"></span> Save Changes</button></form></div></div></div>
+            <!-- ===== PROFILE ===== -->
+            <div id="page-profile" class="page-content hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="mb-6"><h2 class="text-lg font-bold text-white">Merchant Profile</h2><p class="text-xs text-slate-600 mt-0.5">Manage your business information.</p></div>
+                    <div class="glass-s p-5 lg:p-7">
+                        <div class="flex items-center gap-4 mb-6 pb-6 border-b border-white/[0.04]">
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400/15 to-cyan-600/15 flex items-center justify-center text-xl font-extrabold text-cyan-400" id="pf-avatar">?</div>
+                            <div>
+                                <p class="text-base font-bold text-white" id="pf-name">Loading...</p>
+                                <p class="text-xs text-slate-500" id="pf-email">Loading...</p>
+                                <div class="flex items-center gap-1.5 mt-1.5"><span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span><span class="text-[10px] text-emerald-400 font-semibold">Verified Merchant</span></div>
+                            </div>
+                        </div>
+                        <form id="profile-form" class="space-y-4">
+                            <div><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Business Name *</label><input type="text" id="p-business" required class="input-field"></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">Phone Number</label><input type="tel" id="p-phone" class="input-field"></div>
+                                <div><label class="text-[10px] font-semibold text-slate-500 mb-1.5 block uppercase tracking-wider">City</label><input type="text" id="p-city" class="input-field"></div>
+                            </div>
+                            <button type="submit" class="btn-primary w-full justify-center py-3 text-[13px]"><span class="iconify text-base" data-icon="mdi:content-save-outline"></span> Save Changes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-            <!-- SETTINGS -->
-            <div id="page-settings" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-7"><h2 class="text-xl font-bold text-white">Settings</h2><p class="text-sm text-slate-500 mt-0.5">Manage your account preferences.</p></div><div class="glass-card-static p-6 lg:p-8 space-y-0"><div class="flex items-center justify-between py-5 border-b border-white/[0.04]"><div><p class="text-[14px] font-semibold text-white">Email Notifications</p><p class="text-[12px] text-slate-500 mt-0.5">Receive order updates via email</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"><div class="w-11 h-6 bg-slate-700 rounded-full peer peer-checked:bg-cyan-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div></label></div><div class="flex items-center justify-between py-5"><div><p class="text-[14px] font-semibold text-white">Delete Account</p><p class="text-[12px] text-red-400/60 mt-0.5">Permanently delete your account and all data</p></div><button id="delete-account-btn" class="btn-danger text-[12px]">Delete</button></div></div></div></div>
+            <!-- ===== SETTINGS ===== -->
+            <div id="page-settings" class="page-content hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="mb-6"><h2 class="text-lg font-bold text-white">Settings</h2><p class="text-xs text-slate-600 mt-0.5">Manage your account preferences.</p></div>
+                    <div class="glass-s divide-y divide-white/[0.03]">
+                        <div class="flex items-center justify-between p-5">
+                            <div><p class="text-[13px] font-semibold text-white">Email Notifications</p><p class="text-[11px] text-slate-600 mt-0.5">Receive order updates via email</p></div>
+                            <div class="toggle-track on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+                        </div>
+                        <div class="flex items-center justify-between p-5">
+                            <div><p class="text-[13px] font-semibold text-white">Push Notifications</p><p class="text-[11px] text-slate-600 mt-0.5">Get notified on status changes</p></div>
+                            <div class="toggle-track on" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+                        </div>
+                        <div class="flex items-center justify-between p-5">
+                            <div><p class="text-[13px] font-semibold text-white">Auto-refresh Dashboard</p><p class="text-[11px] text-slate-600 mt-0.5">Automatically refresh data every 30s</p></div>
+                            <div class="toggle-track" onclick="this.classList.toggle('on')"><div class="toggle-knob"></div></div>
+                        </div>
+                        <div class="flex items-center justify-between p-5">
+                            <div><p class="text-[13px] font-semibold text-red-400">Delete Account</p><p class="text-[11px] text-red-400/40 mt-0.5">Permanently delete your account and all data</p></div>
+                            <button id="delete-account-btn" class="btn-danger text-[11px]">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- HELP -->
-            <div id="page-help" class="page-content hidden"><div class="max-w-2xl mx-auto"><div class="mb-7"><h2 class="text-xl font-bold text-white">Help & Support</h2><p class="text-sm text-slate-500 mt-0.5">Find answers or reach out to us.</p></div><div class="space-y-4"><div class="glass-card-static p-5"><h3 class="text-[14px] font-semibold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> How do I create an order?</h3><p class="text-[13px] text-slate-400 leading-relaxed">Go to "Create Order" from the sidebar menu. Fill in the recipient details and click Submit.</p></div><div class="glass-card-static p-5"><h3 class="text-[14px] font-semibold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> What does COD mean?</h3><p class="text-[13px] text-slate-400 leading-relaxed">Cash On Delivery — the amount the customer pays when they receive their package.</p></div><div class="glass-card-static p-6 border-cyan-500/20"><h3 class="text-[14px] font-semibold text-white mb-1">Still need help?</h3><p class="text-[13px] text-slate-500 mb-4">Contact our support team directly.</p><a href="https://wa.me/255769799110" target="_blank" class="btn-primary text-[13px] inline-flex"><span class="iconify text-lg" data-icon="mdi:whatsapp"></span> WhatsApp Support</a></div></div></div>
+            <!-- ===== HELP ===== -->
+            <div id="page-help" class="page-content hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="mb-6"><h2 class="text-lg font-bold text-white">Help & Support</h2><p class="text-xs text-slate-600 mt-0.5">Find answers or reach out to us.</p></div>
+                    <div class="space-y-3">
+                        <div class="glass-s p-4"><h3 class="text-[13px] font-semibold text-white mb-1.5 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> How do I create an order?</h3><p class="text-[12px] text-slate-500 leading-relaxed">Go to "Create Order" from the sidebar menu. Fill in the recipient details and click Submit.</p></div>
+                        <div class="glass-s p-4"><h3 class="text-[13px] font-semibold text-white mb-1.5 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> What does COD mean?</h3><p class="text-[12px] text-slate-500 leading-relaxed">Cash On Delivery — the amount the customer pays when they receive their package.</p></div>
+                        <div class="glass-s p-4"><h3 class="text-[13px] font-semibold text-white mb-1.5 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:help-circle"></span> How do I track my orders?</h3><p class="text-[12px] text-slate-500 leading-relaxed">Go to "All Orders" to see every order with its current status. You can also filter by status.</p></div>
+                        <div class="glass-s p-5 border-cyan-500/15">
+                            <h3 class="text-[13px] font-semibold text-white mb-1">Still need help?</h3>
+                            <p class="text-[11px] text-slate-600 mb-3">Contact our support team directly.</p>
+                            <a href="https://wa.me/255769799110" target="_blank" class="btn-primary text-[12px] inline-flex"><span class="iconify text-base" data-icon="mdi:whatsapp"></span> WhatsApp Support</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
+        </div>
+
+        <!-- Footer -->
+        <footer class="border-t border-white/[0.03] px-4 lg:px-6 py-3 flex items-center justify-between">
+            <p class="text-[10px] text-slate-700">© 2025 ChapShop Delivery. All rights reserved.</p>
+            <p class="text-[10px] text-slate-700">v2.0</p>
+        </footer>
+    </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div id="order-modal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="p-5 border-b border-white/[0.04] flex items-center justify-between">
+            <h3 class="text-[14px] font-bold text-white">Order Details</h3>
+            <button onclick="closeModal('order-modal')" class="btn-ghost"><span class="iconify text-lg text-slate-500" data-icon="mdi:close"></span></button>
+        </div>
+        <div id="order-modal-body" class="p-5"></div>
+    </div>
+</div>
+
+<div id="status-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:380px">
+        <div class="p-5 border-b border-white/[0.04] flex items-center justify-between">
+            <h3 class="text-[14px] font-bold text-white">Change Status</h3>
+            <button onclick="closeModal('status-modal')" class="btn-ghost"><span class="iconify text-lg text-slate-500" data-icon="mdi:close"></span></button>
+        </div>
+        <div class="p-4 space-y-2" id="status-options"></div>
+    </div>
+</div>
+
+<div id="delete-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width:380px">
+        <div class="p-6 text-center">
+            <div class="w-14 h-14 rounded-full bg-red-500/[0.08] flex items-center justify-center mx-auto mb-4"><span class="iconify text-2xl text-red-400" data-icon="mdi:alert-circle"></span></div>
+            <h3 class="text-base font-bold text-white mb-1.5">Delete Account?</h3>
+            <p class="text-xs text-slate-500 mb-5">This will permanently delete your account and all your orders. This action cannot be undone.</p>
+            <div class="flex gap-2">
+                <button onclick="closeModal('delete-modal')" class="btn-secondary flex-1 justify-center py-2.5 text-[12px]">Cancel</button>
+                <button id="confirm-delete-btn" class="btn-danger flex-1 justify-center py-2.5 text-[12px]">Delete Forever</button>
+            </div>
         </div>
     </div>
 </div>
 
-<div id="order-modal" class="modal-overlay"><div class="modal-content"><div class="p-6 border-b border-white/[0.06] flex items-center justify-between"><h3 class="text-base font-bold text-white">Order Details</h3><button onclick="closeModal()" class="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.1] transition cursor-pointer"><span class="iconify text-lg text-slate-400" data-icon="mdi:close"></span></button></div><div id="modal-body" class="p-6"></div></div></div>
-<div id="status-modal" class="modal-overlay"><div class="modal-content" style="max-width:400px"><div class="p-6 border-b border-white/[0.06] flex items-center justify-between"><h3 class="text-base font-bold text-white">Change Status</h3><button onclick="closeStatusModal()" class="w-8 h-8 rounded-lg bg-white/[0.05] flex items-center justify-center hover:bg-white/[0.1] transition cursor-pointer"><span class="iconify text-lg text-slate-400" data-icon="mdi:close"></span></button></div><div class="p-6 space-y-3" id="status-options"></div></div></div>
-<div id="delete-modal" class="modal-overlay"><div class="modal-content" style="max-width:400px"><div class="p-6 text-center"><div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4"><span class="iconify text-3xl text-red-400" data-icon="mdi:alert-circle"></span></div><h3 class="text-lg font-bold text-white mb-2">Delete Account?</h3><p class="text-sm text-slate-400 mb-6">This will permanently delete your account and all your orders.</p><div class="flex gap-3"><button onclick="document.getElementById('delete-modal').classList.remove('show')" class="btn-secondary flex-1 justify-center py-3">Cancel</button><button id="confirm-delete-btn" class="btn-danger flex-1 justify-center py-3">Delete Forever</button></div></div></div></div>
-
 <script>
-// =============================================
-// NO SUPABASE — Pure Local Storage
-// =============================================
-var currentUser=null,merchantProfile=null,allOrders=[],currentFilter='all',chartInstances={},notifs=[];
+// ============================================================
+// STATE
+// ============================================================
+var currentUser = null, merchantProfile = null, allOrders = [], currentFilter = 'all', charts = {}, notifs = [], currentStep = 1;
 
-var faqs=[
+var FAQS = [
     {q:"How do I create an order?",a:"Go to 'Create Order' from the sidebar. Fill in recipient name, phone, address, city, and optional COD amount. Click Submit."},
     {q:"What is COD?",a:"Cash On Delivery — the amount the customer pays the rider when they receive their package."},
-    {q:"How do I track my orders?",a:"Go to 'All Orders' to see every order with its current status."},
-    {q:"Can I change an order's status?",a:"Yes! In 'All Orders', click the status badge on any order to change it."},
-    {q:"How do I delete an order?",a:"Open the order details by clicking 'View', then click 'Delete Order' at the bottom."},
-    {q:"What does the Sales Report show?",a:"Collected COD, pending COD, delivery rate, returned COD, and revenue by city."},
-    {q:"How do I export my report?",a:"On the Sales Report page, click the 'Export CSV' button to download a CSV file."},
-    {q:"What cities are supported?",a:"All major Tanzanian cities including Dar es Salaam, Dodoma, Mwanza, Arusha, Mbeya, and more."}
+    {q:"How do I track my orders?",a:"Go to 'All Orders' to see every order with its current status. You can filter by status or search by name, phone, or city."},
+    {q:"Can I change an order's status?",a:"Yes! In 'All Orders', click the status badge on any order to change it to Pending, Picked, Delivered, or Returned."},
+    {q:"How do I delete an order?",a:"Open the order details by clicking 'View', then click 'Delete Order' at the bottom of the modal."},
+    {q:"What does the Sales Report show?",a:"Collected COD, pending COD, delivery rate, returned COD, and revenue broken down by city."},
+    {q:"How do I export my report?",a:"On the Sales Report page, click the 'Export CSV' button to download a CSV file of your sales data."},
+    {q:"What cities are supported?",a:"All major Tanzanian cities including Dar es Salaam, Dodoma, Mwanza, Arusha, Mbeya, Morogoro, Tanga, and more."}
 ];
 
-function generateId(){return 'ord-'+Math.random().toString(36).substr(2,9);}
-
-// ---- Local Storage Helpers ----
+// ============================================================
+// LOCAL STORAGE HELPERS
+// ============================================================
+function genId(){return 'ord-'+Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
 function getMerchantOrders(){
     if(!currentUser)return[];
-    var all=JSON.parse(localStorage.getItem('chapshop_orders')||'[]');
+    var all=JSON.parse(localStorage.getItem('cs_orders')||'[]');
     return all.filter(function(o){return o.merchant_id===currentUser.id});
 }
-function saveMerchantOrders(orders){
-    var all=JSON.parse(localStorage.getItem('chapshop_orders')||'[]');
-    var others=all.filter(function(o){return o.merchant_id!==currentUser.id});
-    localStorage.setItem('chapshop_orders',JSON.stringify(others.concat(orders)));
+function saveOrders(orders){
+    var all=JSON.parse(localStorage.getItem('cs_orders')||'[]');
+    var rest=all.filter(function(o){return o.merchant_id!==currentUser.id});
+    localStorage.setItem('cs_orders',JSON.stringify(rest.concat(orders)));
 }
-function getMerchantsList(){return JSON.parse(localStorage.getItem('chapshop_merchants')||'[]');}
-function saveMerchantsList(m){localStorage.setItem('chapshop_merchants',JSON.stringify(m));}
+function getMerchants(){return JSON.parse(localStorage.getItem('cs_merchants')||'[]');}
+function saveMerchants(m){localStorage.setItem('cs_merchants',JSON.stringify(m));}
 
-// =============================================
+// ============================================================
 // INIT
-// =============================================
+// ============================================================
 function init(){
-    var userData=localStorage.getItem('chapshop_logged_in');
-    if(!userData){location.href='merchants.html';return;}
-    currentUser=JSON.parse(userData);
+    var ud=localStorage.getItem('cs_logged_in');
+    if(!ud){location.href='merchants.html';return;}
+    currentUser=JSON.parse(ud);
     loadProfile();
+    renderFAQ();
     showApp();
 }
 
 function loadProfile(){
-    var merchants=getMerchantsList();
-    merchantProfile=merchants.find(function(m){return m.id===currentUser.id});
+    var m=getMerchants();
+    merchantProfile=m.find(function(x){return x.id===currentUser.id});
     if(!merchantProfile){
-        merchantProfile={id:currentUser.id,name:currentUser.name||'Merchant',business:currentUser.business||'My Business',email:currentUser.email||'',phone:currentUser.phone||'',city:currentUser.country||'',platforms:''};
+        merchantProfile={id:currentUser.id,name:currentUser.name||'Merchant',business:currentUser.business||'My Business',email:currentUser.email||'',phone:currentUser.phone||'',city:currentUser.country||''};
     }
-    renderProfile();
+    renderProfileUI();
     loadOrders();
 }
 
-function renderProfile(){
-    if(!merchantProfile)return;
+function renderProfileUI(){
     var n=merchantProfile.name||'Merchant',em=merchantProfile.email||'',ini=n.charAt(0).toUpperCase();
-    document.getElementById('sidebar-avatar').textContent=ini;
-    document.getElementById('sidebar-name').textContent=n;
-    document.getElementById('sidebar-email').textContent=em;
-    document.getElementById('profile-avatar').textContent=ini;
-    document.getElementById('profile-name').textContent=n;
-    document.getElementById('profile-email').textContent=em;
-    document.getElementById('welcome-name').textContent='Welcome back, '+n.split(' ')[0]+'! 👋';
+    document.getElementById('sb-avatar').textContent=ini;
+    document.getElementById('sb-name').textContent=n;
+    document.getElementById('sb-email').textContent=em;
+    document.getElementById('pf-avatar').textContent=ini;
+    document.getElementById('pf-name').textContent=n;
+    document.getElementById('pf-email').textContent=em;
+    document.getElementById('welcome-msg').textContent='Welcome back, '+n.split(' ')[0]+'! 👋';
     document.getElementById('p-business').value=merchantProfile.business||'';
     document.getElementById('p-phone').value=merchantProfile.phone||'';
     document.getElementById('p-city').value=merchantProfile.city||'';
@@ -313,145 +691,357 @@ function renderProfile(){
 
 function loadOrders(){
     allOrders=getMerchantOrders();
+    // Sort by date descending
+    allOrders.sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at)});
     updateStats();
     renderOrdersTable();
     renderRecentOrders();
     renderCharts();
     renderReport();
-    generateNotifs();
-    var badge=document.getElementById('orders-count-badge');
-    if(allOrders.length){badge.textContent=allOrders.length;badge.classList.remove('hidden');}
-    else{badge.classList.add('hidden');}
+    genNotifs();
+    var badge=document.getElementById('orders-badge');
+    if(allOrders.length){badge.textContent=allOrders.length;badge.classList.remove('hidden')}
+    else{badge.classList.add('hidden')}
 }
 
+// ============================================================
+// STATS
+// ============================================================
 function updateStats(){
     var t=allOrders.length,d=0,p=0,cod=0;
-    allOrders.forEach(function(o){if(o.status==='delivered')d++;else p++;if(o.cod_amount)cod+=Number(o.cod_amount)});
-    document.getElementById('stat-total').textContent=t;
-    document.getElementById('stat-delivered').textContent=d;
-    document.getElementById('stat-pending').textContent=p;
-    document.getElementById('stat-cod').textContent='TZS '+cod.toLocaleString();
+    allOrders.forEach(function(o){
+        if(o.status==='delivered')d++;
+        else if(o.status!=='returned')p++;
+        if(o.cod_amount)cod+=Number(o.cod_amount);
+    });
+    animateNumber('s-total',t);
+    animateNumber('s-delivered',d);
+    animateNumber('s-pending',p);
+    document.getElementById('s-cod').textContent='TZS '+cod.toLocaleString();
 }
 
+function animateNumber(id,target){
+    var el=document.getElementById(id);
+    var current=parseInt(el.textContent.replace(/[^0-9]/g,''))||0;
+    if(current===target){el.textContent=target;return;}
+    var diff=target-current;
+    var steps=Math.min(Math.abs(diff),20);
+    var stepVal=diff/steps;
+    var i=0;
+    var timer=setInterval(function(){
+        i++;
+        if(i>=steps){el.textContent=target;clearInterval(timer);}
+        else{el.textContent=Math.round(current+stepVal*i);}
+    },30);
+}
+
+// ============================================================
+// ORDERS TABLE
+// ============================================================
 function renderOrdersTable(){
-    var tbody=document.getElementById('orders-tbody'),noMsg=document.getElementById('no-orders-msg'),container=document.getElementById('orders-table-container');
+    var tbody=document.getElementById('orders-tbody'),noMsg=document.getElementById('no-orders'),wrap=document.getElementById('orders-tbl-wrap');
     var search=(document.getElementById('order-search').value||'').toLowerCase();
     var filtered=allOrders.filter(function(o){
         var mf=currentFilter==='all'||o.status===currentFilter;
-        var ms=!search||(o.recipient_name||'').toLowerCase().includes(search)||(o.recipient_phone||'').includes(search)||(o.city||'').toLowerCase().includes(search);
+        var ms=!search||(o.recipient_name||'').toLowerCase().includes(search)||(o.recipient_phone||'').includes(search)||(o.city||'').toLowerCase().includes(search)||(o.id||'').toLowerCase().includes(search);
         return mf&&ms;
     });
-    if(!filtered.length){container.classList.add('hidden');noMsg.classList.remove('hidden');tbody.innerHTML='';return;}
-    container.classList.remove('hidden');noMsg.classList.add('hidden');
-    var html='';
+    if(!filtered.length){wrap.classList.add('hidden');noMsg.classList.remove('hidden');tbody.innerHTML='';return;}
+    wrap.classList.remove('hidden');noMsg.classList.add('hidden');
+    var h='';
     filtered.forEach(function(o){
-        var oid=o.id.substring(0,8).toUpperCase(),s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'',cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—';
-        html+='<tr class="order-row"><td class="font-mono text-cyan-400 text-[12px] font-semibold">'+oid+'</td><td class="text-white font-medium">'+(o.recipient_name||'')+'</td><td class="text-slate-400">'+(o.recipient_phone||'')+'</td><td class="text-slate-300">'+(o.city||'')+'</td><td class="text-white font-semibold">'+cod+'</td><td><span class="badge badge-'+s+' cursor-pointer" onclick="openStatusModal(\''+o.id+'\',\''+s+'\')">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span></td><td class="text-slate-500 text-[12px]">'+dt+'</td><td><button onclick="openOrderModal(\''+o.id+'\')" class="text-[12px] text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer">View</button></td></tr>';
+        var oid=o.id.substring(0,8).toUpperCase(),s=o.status||'pending';
+        var dt=o.created_at?new Date(o.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'';
+        var cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—';
+        var statusIcons={pending:'mdi:clock-outline',picked:'mdi:truck-delivery',delivered:'mdi:check-circle',returned:'mdi:arrow-u-left-top'};
+        h+='<tr><td class="font-mono text-cyan-400/80 text-[11px] font-semibold">'+oid+'</td><td class="text-white font-medium">'+(o.recipient_name||'')+'</td><td class="text-slate-500">'+(o.recipient_phone||'')+'</td><td class="text-slate-400">'+(o.city||'')+'</td><td class="text-white font-semibold text-[12px]">'+cod+'</td><td><span class="badge badge-'+s+' cursor-pointer" onclick="openStatusModal(\''+o.id+'\',\''+s+'\')"><span class="iconify text-[9px]" data-icon="'+statusIcons[s]+'"></span>'+s.charAt(0).toUpperCase()+s.slice(1)+'</span></td><td class="text-slate-600 text-[11px]">'+dt+'</td><td><button onclick="openOrderModal(\''+o.id+'\')" class="text-[11px] text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer transition">View</button></td></tr>';
     });
-    tbody.innerHTML=html;
+    tbody.innerHTML=h;
 }
 
 function renderRecentOrders(){
-    var el=document.getElementById('recent-orders-list'),recent=allOrders.slice(0,6);
-    if(!recent.length){el.innerHTML='<div class="empty-state"><span class="iconify text-4xl text-slate-700 mb-3" data-icon="mdi:package-variant"></span><p class="text-slate-500 text-sm">No orders yet. Create your first order!</p></div>';return;}
-    var html='';
+    var el=document.getElementById('recent-orders'),recent=allOrders.slice(0,5);
+    if(!recent.length){el.innerHTML='<div class="py-12 text-center"><span class="iconify text-3xl text-slate-700 mb-2" data-icon="mdi:package-variant"></span><p class="text-slate-600 text-xs">No orders yet. Create your first order!</p></div>';return;}
+    var h='';
     recent.forEach(function(o){
-        var s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}):'',cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—';
-        html+='<div class="flex items-center justify-between p-4 hover:bg-white/[0.015] transition cursor-pointer" onclick="openOrderModal(\''+o.id+'\')"><div class="flex items-center gap-3.5"><div class="w-10 h-10 rounded-xl bg-cyan-500/[0.07] flex items-center justify-center"><span class="iconify text-lg text-cyan-400/70" data-icon="mdi:package-variant"></span></div><div><p class="text-[13px] font-semibold text-white">'+(o.recipient_name||'')+'</p><p class="text-[11px] text-slate-500">'+(o.city||'')+(dt?' · '+dt:'')+'</p></div></div><div class="text-right"><p class="text-[13px] font-semibold text-white">'+cod+'</p><span class="badge badge-'+s+' text-[9px] mt-1 inline-block">'+s.toUpperCase()+'</span></div></div>';
+        var s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short'}):'';
+        var cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—';
+        var statusColors={pending:'text-amber-400',picked:'text-blue-400',delivered:'text-emerald-400',returned:'text-red-400'};
+        var statusIcons={pending:'mdi:clock-outline',picked:'mdi:truck-delivery',delivered:'mdi:check-circle',returned:'mdi:arrow-u-left-top'};
+        h+='<div class="flex items-center justify-between px-4 py-3 hover:bg-white/[0.01] transition cursor-pointer border-b border-white/[0.02] last:border-0" onclick="openOrderModal(\''+o.id+'\')"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-cyan-500/[0.06] flex items-center justify-center"><span class="iconify text-sm '+statusColors[s]+'" data-icon="'+statusIcons[s]+'"></span></div><div><p class="text-[12px] font-semibold text-white">'+(o.recipient_name||'')+'</p><p class="text-[10px] text-slate-600">'+(o.city||'')+(dt?' · '+dt:'')+'</p></div></div><div class="text-right"><p class="text-[12px] font-semibold text-white">'+cod+'</p><span class="badge badge-'+s+' text-[8px] mt-0.5">'+s.toUpperCase()+'</span></div></div>';
     });
-    el.innerHTML=html;
+    el.innerHTML=h;
 }
 
+// ============================================================
+// CHARTS
+// ============================================================
 function renderCharts(){
-    if(chartInstances.overview)chartInstances.overview.destroy();
+    // Overview bar chart
+    if(charts.overview)charts.overview.destroy();
     var days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],counts=[0,0,0,0,0,0,0];
     allOrders.forEach(function(o){if(o.created_at){var d=new Date(o.created_at).getDay();counts[d===0?6:d-1]++}});
-    chartInstances.overview=new Chart(document.getElementById('overview-chart'),{type:'bar',data:{labels:days,datasets:[{data:counts,backgroundColor:'rgba(6,182,212,0.3)',borderColor:'rgba(6,182,212,0.8)',borderWidth:1.5,borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#4b5563',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'#4b5563',font:{size:11},stepSize:1},beginAtZero:true}}}});
+    charts.overview=new Chart(document.getElementById('overview-chart'),{type:'bar',data:{labels:days,datasets:[{data:counts,backgroundColor:function(ctx){var g=ctx.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(6,182,212,0.4)');g.addColorStop(1,'rgba(6,182,212,0.05)');return g},borderColor:'rgba(6,182,212,0.6)',borderWidth:1.5,borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#334155',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#334155',font:{size:10},stepSize:1},beginAtZero:true}}}});
 
-    if(chartInstances.status)chartInstances.status.destroy();
+    // Status doughnut
+    if(charts.status)charts.status.destroy();
     var sc={pending:0,picked:0,delivered:0,returned:0};
     allOrders.forEach(function(o){if(sc[o.status]!==undefined)sc[o.status]++});
-    chartInstances.status=new Chart(document.getElementById('status-chart'),{type:'doughnut',data:{labels:['Pending','Picked','Delivered','Returned'],datasets:[{data:[sc.pending,sc.picked,sc.delivered,sc.returned],backgroundColor:['rgba(245,158,11,0.7)','rgba(59,130,246,0.7)','rgba(34,197,94,0.7)','rgba(239,68,68,0.7)'],borderWidth:0,spacing:3}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:11},padding:16,usePointStyle:true,pointStyleWidth:8}}}}});
+    charts.status=new Chart(document.getElementById('status-chart'),{type:'doughnut',data:{labels:['Pending','Picked','Delivered','Returned'],datasets:[{data:[sc.pending,sc.picked,sc.delivered,sc.returned],backgroundColor:['rgba(245,158,11,0.6)','rgba(59,130,246,0.6)','rgba(16,185,129,0.6)','rgba(239,68,68,0.6)'],borderWidth:0,spacing:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom',labels:{color:'#64748b',font:{size:10},padding:14,usePointStyle:true,pointStyleWidth:8}}}}});
 
-    if(chartInstances.cod)chartInstances.cod.destroy();
+    // COD horizontal bar
+    if(charts.cod)charts.cod.destroy();
     var cs={pending:0,picked:0,delivered:0};
     allOrders.forEach(function(o){if(cs[o.status]!==undefined&&o.cod_amount)cs[o.status]+=Number(o.cod_amount)});
-    chartInstances.cod=new Chart(document.getElementById('cod-chart'),{type:'bar',data:{labels:['Pending COD','Picked COD','Delivered COD'],datasets:[{data:[cs.pending,cs.picked,cs.delivered],backgroundColor:['rgba(245,158,11,0.5)','rgba(59,130,246,0.5)','rgba(34,197,94,0.5)'],borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'#4b5563',font:{size:11},callback:function(v){return'TZS '+(v/1000)+'k'}}},y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11}}}}}});
+    charts.cod=new Chart(document.getElementById('cod-chart'),{type:'bar',data:{labels:['Pending COD','Picked COD','Delivered COD'],datasets:[{data:[cs.pending,cs.picked,cs.delivered],backgroundColor:['rgba(245,158,11,0.4)','rgba(59,130,246,0.4)','rgba(16,185,129,0.4)'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#334155',font:{size:10},callback:function(v){return'TZS '+(v/1000)+'k'}}},y:{grid:{display:false},ticks:{color:'#64748b',font:{size:10}}}}}});
 
-    if(chartInstances.timeline)chartInstances.timeline.destroy();
-    var map={};allOrders.forEach(function(o){if(o.created_at){var k=o.created_at.substring(0,10);map[k]=(map[k]||0)+1}});
+    // Timeline line chart
+    if(charts.timeline)charts.timeline.destroy();
+    var map={};
+    allOrders.forEach(function(o){if(o.created_at){var k=o.created_at.substring(0,10);map[k]=(map[k]||0)+1}});
     var keys=Object.keys(map).sort();
-    chartInstances.timeline=new Chart(document.getElementById('timeline-chart'),{type:'line',data:{labels:keys.map(function(k){return new Date(k).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}),datasets:[{data:keys.map(function(k){return map[k]}),borderColor:'rgba(6,182,212,0.9)',backgroundColor:'rgba(6,182,212,0.08)',fill:true,tension:.4,pointBackgroundColor:'#06b6d4',pointRadius:4,pointHoverRadius:6,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#4b5563',font:{size:10},maxRotation:45}},y:{grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:'#4b5563',font:{size:11},stepSize:1},beginAtZero:true}}}});
+    charts.timeline=new Chart(document.getElementById('timeline-chart'),{type:'line',data:{labels:keys.map(function(k){return new Date(k).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}),datasets:[{data:keys.map(function(k){return map[k]}),borderColor:'rgba(6,182,212,0.8)',backgroundColor:function(ctx){var g=ctx.chart.ctx.createLinearGradient(0,0,0,260);g.addColorStop(0,'rgba(6,182,212,0.12)');g.addColorStop(1,'rgba(6,182,212,0)');return g},fill:true,tension:.4,pointBackgroundColor:'#06b6d4',pointRadius:3,pointHoverRadius:6,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#334155',font:{size:9},maxRotation:45}},y:{grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#334155',font:{size:10},stepSize:1},beginAtZero:true}}}});
 }
 
+// ============================================================
+// SALES REPORT
+// ============================================================
 function renderReport(){
     var colCod=0,penCod=0,retCod=0,del=0,ret=0,cityMap={};
-    allOrders.forEach(function(o){var c=o.cod_amount?Number(o.cod_amount):0,city=o.city||'Other';if(!cityMap[city])cityMap[city]={total:0,delivered:0,returned:0,cod:0,collected:0};cityMap[city].total++;cityMap[city].cod+=c;if(o.status==='delivered'){del++;colCod+=c;cityMap[city].delivered++;cityMap[city].collected+=c}else if(o.status==='returned'){ret++;retCod+=c;cityMap[city].returned++}else penCod+=c});
+    allOrders.forEach(function(o){
+        var c=o.cod_amount?Number(o.cod_amount):0,city=o.city||'Other';
+        if(!cityMap[city])cityMap[city]={total:0,delivered:0,returned:0,cod:0,collected:0};
+        cityMap[city].total++;cityMap[city].cod+=c;
+        if(o.status==='delivered'){del++;colCod+=c;cityMap[city].delivered++;cityMap[city].collected+=c}
+        else if(o.status==='returned'){ret++;retCod+=c;cityMap[city].returned++}
+        else{penCod+=c}
+    });
     document.getElementById('r-collected').textContent='TZS '+colCod.toLocaleString();
     document.getElementById('r-pending-cod').textContent='TZS '+penCod.toLocaleString();
     document.getElementById('r-rate').textContent=(allOrders.length?Math.round((del/allOrders.length)*100):0)+'%';
     document.getElementById('r-lost').textContent='TZS '+retCod.toLocaleString();
 
-    if(chartInstances.city)chartInstances.city.destroy();
-    var cL=Object.keys(cityMap),cD=cL.map(function(c){return cityMap[c].collected}),cols=['rgba(6,182,212,0.6)','rgba(34,197,94,0.6)','rgba(245,158,11,0.6)','rgba(139,92,246,0.6)','rgba(236,72,153,0.6)','rgba(59,130,246,0.6)'];
-    chartInstances.city=new Chart(document.getElementById('city-chart'),{type:'bar',data:{labels:cL,datasets:[{data:cD,backgroundColor:cL.map(function(_,i){return cols[i%cols.length]}),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#6b7280',font:{size:9},maxRotation:45}},y:{grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#374151',font:{size:10},callback:function(v){return'TZS '+(v/1000)+'k'}},beginAtZero:true}}}});
+    // City chart
+    if(charts.city)charts.city.destroy();
+    var cL=Object.keys(cityMap),cD=cL.map(function(c){return cityMap[c].collected});
+    var palette=['rgba(6,182,212,0.5)','rgba(16,185,129,0.5)','rgba(245,158,11,0.5)','rgba(139,92,246,0.5)','rgba(236,72,153,0.5)','rgba(59,130,246,0.5)','rgba(239,68,68,0.5)','rgba(34,197,94,0.5)'];
+    charts.city=new Chart(document.getElementById('city-chart'),{type:'bar',data:{labels:cL,datasets:[{data:cD,backgroundColor:cL.map(function(_,i){return palette[i%palette.length]}),borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#334155',font:{size:9},maxRotation:45}},y:{grid:{color:'rgba(255,255,255,0.02)'},ticks:{color:'#1e293b',font:{size:9},callback:function(v){return'TZS '+(v/1000)+'k'}},beginAtZero:true}}}});
 
+    // Table
     var tb=document.getElementById('report-tbody'),h='';
-    cL.forEach(function(c){var d=cityMap[c],r=d.total?Math.round((d.delivered/d.total)*100):0;h+='<tr class="order-row"><td class="text-white font-medium">'+c+'</td><td class="text-slate-400">'+d.total+'</td><td class="text-emerald-400">'+d.delivered+'</td><td class="text-red-400">'+d.returned+'</td><td class="text-blue-400 font-semibold">'+r+'%</td><td class="text-white font-semibold">TZS '+d.collected.toLocaleString()+'</td></tr>'});
-    tb.innerHTML=h||'<tr><td colspan="6" class="text-center py-8 text-slate-600 text-xs">No data</td></tr>';
+    cL.forEach(function(c){
+        var d=cityMap[c],r=d.total?Math.round((d.delivered/d.total)*100):0;
+        var rateColor=r>=70?'text-emerald-400':r>=40?'text-amber-400':'text-red-400';
+        h+='<tr><td class="text-white font-medium">'+c+'</td><td class="text-slate-500">'+d.total+'</td><td class="text-emerald-400">'+d.delivered+'</td><td class="text-red-400">'+d.returned+'</td><td class="'+rateColor+' font-semibold">'+r+'%</td><td class="text-white font-semibold">TZS '+d.collected.toLocaleString()+'</td></tr>';
+    });
+    tb.innerHTML=h||'<tr><td colspan="6" class="text-center py-8 text-slate-700 text-xs">No data available</td></tr>';
 }
 
 function exportReport(){
     var csv='City,Total,Delivered,Returned,Rate,COD Collected\n',cityMap={};
     allOrders.forEach(function(o){var c=o.city||'Other',cod=o.cod_amount?Number(o.cod_amount):0;if(!cityMap[c])cityMap[c]={total:0,delivered:0,returned:0,collected:0};cityMap[c].total++;if(o.status==='delivered'){cityMap[c].delivered++;cityMap[c].collected+=cod}else if(o.status==='returned')cityMap[c].returned++});
-    Object.keys(cityMap).forEach(function(c){var d=cityMap[c],r=d.total?Math.round((d.delivered/d.total)*100):0;csv+=c+','+d.total+','+d.delivered+','+d.returned+','+r+'%,'+d.collected+'\n'});
-    var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chapshop_report.csv';a.click();showToast('Report exported!','success');
+    Object.keys(cityMap).forEach(function(c){var d=cityMap[c],r=d.total?Math.round((d.delivered/d.total)*100):0;csv+='"'+c+'",'+d.total+','+d.delivered+','+d.returned+','+r+'%,'+d.collected+'\n'});
+    var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='chapshop_report_'+new Date().toISOString().split('T')[0]+'.csv';a.click();showToast('Report exported!','success');
 }
 
-function generateNotifs(){
-    notifs=[];allOrders.forEach(function(o){var id=o.id.substring(0,8).toUpperCase(),dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';notifs.push({type:'created',title:'Order Created',msg:'Order '+id+' for '+(o.recipient_name||''),time:dt,read:true});if(o.status==='picked')notifs.push({type:'picked',title:'Picked Up',msg:'Order '+id+' picked up.',time:dt,read:false});if(o.status==='delivered')notifs.push({type:'delivered',title:'Delivered',msg:'Order '+id+' delivered.',time:dt,read:false});if(o.status==='returned')notifs.push({type:'returned',title:'Returned',msg:'Order '+id+' returned.',time:dt,read:false})});
-    notifs.sort(function(a,b){return new Date(b.time)-new Date(a.time)});updateNotifUI();
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+function genNotifs(){
+    notifs=[];
+    allOrders.forEach(function(o){
+        var oid=o.id.substring(0,8).toUpperCase(),dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+        notifs.push({type:'created',title:'Order Created',msg:'Order '+oid+' for '+(o.recipient_name||''),time:dt,read:true});
+        if(o.status==='picked')notifs.push({type:'picked',title:'Picked Up',msg:'Order '+oid+' has been picked up by rider.',time:dt,read:false});
+        if(o.status==='delivered')notifs.push({type:'delivered',title:'Delivered ✓',msg:'Order '+oid+' delivered successfully.',time:dt,read:false});
+        if(o.status==='returned')notifs.push({type:'returned',title:'Returned',msg:'Order '+oid+' was returned.',time:dt,read:false});
+    });
+    notifs.sort(function(a,b){return new Date(b.time)-new Date(a.time)});
+    updateNotifUI();
 }
 
-function updateNotifUI(){var unread=notifs.filter(function(n){return!n.read}).length,dot=document.getElementById('notif-dot'),dot2=document.getElementById('notif-dot2'),cnt=document.getElementById('notif-count');if(unread){dot.classList.remove('hidden');dot2.classList.remove('hidden');cnt.textContent=unread;cnt.classList.remove('hidden')}else{dot.classList.add('hidden');dot2.classList.add('hidden');cnt.classList.add('hidden')}renderNotifs()}
+function updateNotifUI(){
+    var unread=notifs.filter(function(n){return!n.read}).length;
+    var dotSide=document.getElementById('notif-dot-side'),badgeSide=document.getElementById('notif-badge-side'),dotHdr=document.getElementById('notif-dot-hdr');
+    if(unread){
+        dotSide.classList.remove('hidden');dotHdr.classList.remove('hidden');
+        badgeSide.textContent=unread;badgeSide.classList.remove('hidden');
+    }else{
+        dotSide.classList.add('hidden');dotHdr.classList.add('hidden');badgeSide.classList.add('hidden');
+    }
+    renderNotifList();
+}
 
-function renderNotifs(){var el=document.getElementById('notif-list');if(!notifs.length){el.innerHTML='<div class="empty-state"><span class="iconify text-4xl text-slate-700 mb-3" data-icon="mdi:bell-off-outline"></span><p class="text-slate-600 text-xs">No notifications yet</p></div>';return}var icons={created:'mdi:plus-circle',picked:'mdi:truck-delivery',delivered:'mdi:check-circle',returned:'mdi:arrow-u-left-top'},colors={created:'text-cyan-400',picked:'text-blue-400',delivered:'text-emerald-400',returned:'text-red-400'},h='';notifs.forEach(function(n,i){h+='<div class="notif-item'+(n.read?'':' unread')+'" onclick="readNotif('+i+')"><div class="flex items-start gap-3"><span class="iconify text-lg '+colors[n.type]+'" data-icon="'+icons[n.type]+'"></span><div class="flex-1 min-w-0"><p class="text-[12px] font-semibold text-white">'+n.title+'</p><p class="text-[11px] text-slate-500 mt-0.5">'+n.msg+'</p><p class="text-[10px] text-slate-700 mt-1">'+n.time+'</p></div>'+(n.read?'':'<span class="w-2 h-2 bg-cyan-400 rounded-full mt-2 flex-shrink-0"></span>')+'</div></div>'});el.innerHTML=h}
-function readNotif(i){notifs[i].read=true;updateNotifUI()}
+function renderNotifList(){
+    var el=document.getElementById('notif-list');
+    if(!notifs.length){el.innerHTML='<div class="py-12 text-center"><span class="iconify text-3xl text-slate-700 mb-2" data-icon="mdi:bell-off-outline"></span><p class="text-slate-700 text-xs">No notifications yet</p></div>';return}
+    var icons={created:'mdi:plus-circle',picked:'mdi:truck-delivery',delivered:'mdi:check-circle',returned:'mdi:arrow-u-left-top'};
+    var colors={created:'text-cyan-400',picked:'text-blue-400',delivered:'text-emerald-400',returned:'text-red-400'};
+    var h='';
+    notifs.forEach(function(n,i){
+        h+='<div class="notif-item'+(n.read?'':' unread')+'" onclick="readNotif('+i+')"><div class="flex items-start gap-3"><span class="iconify text-base '+colors[n.type]+' mt-0.5" data-icon="'+icons[n.type]+'"></span><div class="flex-1 min-w-0"><p class="text-[11px] font-semibold text-white">'+n.title+'</p><p class="text-[10px] text-slate-600 mt-0.5">'+n.msg+'</p><p class="text-[9px] text-slate-700 mt-1">'+n.time+'</p></div>'+(n.read?'':'<span class="w-1.5 h-1.5 bg-cyan-400 rounded-full mt-2 flex-shrink-0"></span>')+'</div></div>';
+    });
+    el.innerHTML=h;
+}
+
+function readNotif(i){if(notifs[i])notifs[i].read=true;updateNotifUI()}
 function markAllRead(){notifs.forEach(function(n){n.read=true});updateNotifUI();showToast('All marked as read','success')}
 
-function renderFAQ(){var el=document.getElementById('faq-list'),h='';faqs.forEach(function(f,i){h+='<div class="faq-item"><div class="faq-q" onclick="toggleFAQ('+i+')"><span class="flex-1 text-[13px] font-semibold text-white">'+f.q+'</span><span class="iconify faq-icon text-slate-500" data-icon="mdi:chevron-down" id="faq-i'+i+'"></span></div><div class="faq-a text-[12px] text-slate-400 leading-relaxed" id="faq-a'+i+'">'+f.a+'</div></div>'});el.innerHTML=h}
+// ============================================================
+// FAQ
+// ============================================================
+function renderFAQ(){
+    var el=document.getElementById('faq-list'),h='';
+    FAQS.forEach(function(f,i){
+        h+='<div class="faq-item"><div class="faq-q" onclick="toggleFAQ('+i+')"><span class="iconify text-cyan-400/50 text-sm flex-shrink-0" data-icon="mdi:help-circle-outline"></span><span class="flex-1 text-[12px] font-semibold text-white">'+f.q+'</span><span class="iconify faq-chevron text-slate-600 text-base" data-icon="mdi:chevron-down" id="faq-i'+i+'"></span></div><div class="faq-a text-[11px] text-slate-500 leading-relaxed" id="faq-a'+i+'">'+f.a+'</div></div>';
+    });
+    el.innerHTML=h;
+}
 function toggleFAQ(i){document.getElementById('faq-a'+i).classList.toggle('open');document.getElementById('faq-i'+i).classList.toggle('rotated')}
 
-function openOrderModal(id){var o=allOrders.find(function(x){return x.id===id});if(!o)return;var s=o.status||'pending',dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'',cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—',html='<div class="space-y-4"><div class="flex items-center justify-between"><span class="text-[11px] text-slate-500 uppercase font-bold tracking-wider">Order ID</span><span class="font-mono text-cyan-400 text-[13px] font-bold copy-btn" onclick="copyText(\''+o.id.substring(0,8).toUpperCase()+'\')">'+o.id.substring(0,8).toUpperCase()+' <span class="iconify text-[12px]" data-icon="mdi:content-copy"></span></span></div><div class="flex items-center justify-between"><span class="text-[11px] text-slate-500 uppercase font-bold tracking-wider">Status</span><span class="badge badge-'+s+'">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span></div><hr class="border-white/[0.05]"><div class="grid grid-cols-2 gap-4"><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-wider mb-1">Recipient</p><p class="text-[13px] text-white font-medium">'+(o.recipient_name||'')+'</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-wider mb-1">Phone</p><p class="text-[13px] text-white font-medium">'+(o.recipient_phone||'')+'</p></div><div class="col-span-2"><p class="text-[11px] text-slate-500 uppercase font-bold tracking-wider mb-1">Address</p><p class="text-[13px] text-slate-300">'+(o.address||'')+'</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-wider mb-1">City</p><p class="text-[13px] text-white font-medium">'+(o.city||'')+'</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-wider mb-1">COD Amount</p><p class="text-[13px] text-white font-bold">'+cod+'</p></div><div><p class="text-[11px] text-slate-500 uppercase font-bold tracking-wider mb-1">Created</p><p class="text-[13px] text-slate-400">'+dt+'</p></div></div><hr class="border-white/[0.05]"><div class="flex gap-3"><button onclick="closeModal();openStatusModal(\''+o.id+'\',\''+s+'\')" class="btn-secondary flex-1 justify-center text-[12px]"><span class="iconify" data-icon="mdi:swap-horizontal"></span> Change Status</button><button onclick="deleteOrder(\''+o.id+'\')" class="btn-danger flex-1 justify-center text-[12px]"><span class="iconify" data-icon="mdi:delete-outline"></span> Delete Order</button></div></div>';document.getElementById('modal-body').innerHTML=html;document.getElementById('order-modal').classList.add('show')}
-function closeModal(){document.getElementById('order-modal').classList.remove('show')}
+// ============================================================
+// MODALS
+// ============================================================
+function openOrderModal(id){
+    var o=allOrders.find(function(x){return x.id===id});
+    if(!o)return;
+    var s=o.status||'pending';
+    var dt=o.created_at?new Date(o.created_at).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+    var cod=o.cod_amount?'TZS '+Number(o.cod_amount).toLocaleString():'—';
 
-function openStatusModal(id,current){var statuses=['pending','picked','delivered','returned'],html='';statuses.forEach(function(s){var active=s===current;html+='<button onclick="changeStatus(\''+id+'\',\''+s+'\')" class="w-full flex items-center gap-3 p-3.5 rounded-xl transition cursor-pointer '+(active?'bg-cyan-500/10 border border-cyan-500/25':'bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.05]')+'"><span class="iconify text-lg '+(active?'text-amber-400':'text-slate-500')+'" data-icon="mdi:circle-outline"></span><span class="text-[13px] font-semibold '+(active?'text-cyan-400':'text-slate-300')+'">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span>'+(active?'<span class="iconify text-cyan-400 ml-auto" data-icon="mdi:check"></span>':'')+'</button>'});document.getElementById('status-options').innerHTML=html;document.getElementById('status-modal').classList.add('show')}
-function closeStatusModal(){document.getElementById('status-modal').classList.remove('show')}
+    // Build timeline based on status
+    var steps=[
+        {label:'Order Created',done:true,icon:'mdi:plus-circle'},
+        {label:'Picked Up',done:s==='picked'||s==='delivered',active:s==='picked',icon:'mdi:truck-delivery'},
+        {label:'Delivered',done:s==='delivered',active:s==='delivered',icon:'mdi:check-circle'}
+    ];
+    if(s==='returned')steps.push({label:'Returned',done:true,active:true,icon:'mdi:arrow-u-left-top'});
+
+    var timelineH='';
+    steps.forEach(function(st){
+        var dotClass=st.active?'active':st.done?'done':'';
+        timelineH+='<div class="timeline-item"><div class="timeline-dot '+dotClass+'"><span class="iconify text-[8px] '+(st.done?'text-emerald-400':st.active?'text-cyan-400':'text-slate-600')+'" data-icon="'+st.icon+'"></span></div><div><p class="text-[11px] font-semibold '+(st.done||st.active?'text-white':'text-slate-600')+'">'+st.label+'</p>'+(st.done||st.active?'<p class="text-[9px] text-slate-600">'+dt+'</p>':'')+'</div></div>';
+    });
+
+    var html='<div class="space-y-5">'+
+        '<div class="flex items-center justify-between"><span class="text-[9px] text-slate-600 uppercase font-bold tracking-wider">Order ID</span><span class="font-mono text-cyan-400 text-[12px] font-bold cursor-pointer hover:text-cyan-300 transition" onclick="copyText(\''+o.id.substring(0,8).toUpperCase()+'\')">'+o.id.substring(0,8).toUpperCase()+' <span class="iconify text-[10px] inline" data-icon="mdi:content-copy"></span></span></div>'+
+        '<div class="flex items-center justify-between"><span class="text-[9px] text-slate-600 uppercase font-bold tracking-wider">Status</span><span class="badge badge-'+s+'">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span></div>'+
+        '<div class="border-t border-white/[0.04] pt-4 grid grid-cols-2 gap-3">'+
+        '<div><p class="text-[9px] text-slate-600 uppercase font-bold tracking-wider mb-0.5">Recipient</p><p class="text-[12px] text-white font-medium">'+(o.recipient_name||'')+'</p></div>'+
+        '<div><p class="text-[9px] text-slate-600 uppercase font-bold tracking-wider mb-0.5">Phone</p><p class="text-[12px] text-white font-medium">'+(o.recipient_phone||'')+'</p></div>'+
+        '<div class="col-span-2"><p class="text-[9px] text-slate-600 uppercase font-bold tracking-wider mb-0.5">Address</p><p class="text-[12px] text-slate-400">'+(o.address||'')+'</p></div>'+
+        '<div><p class="text-[9px] text-slate-600 uppercase font-bold tracking-wider mb-0.5">City</p><p class="text-[12px] text-white font-medium">'+(o.city||'')+'</p></div>'+
+        '<div><p class="text-[9px] text-slate-600 uppercase font-bold tracking-wider mb-0.5">COD Amount</p><p class="text-[12px] text-white font-bold">'+cod+'</p></div>'+
+        '<div><p class="text-[9px] text-slate-600 uppercase font-bold tracking-wider mb-0.5">Type</p><p class="text-[12px] text-slate-400 capitalize">'+(o.delivery_type||'standard')+'</p></div>'+
+        '<div><p class="text-[9px] text-slate-600 uppercase font-bold tracking-wider mb-0.5">Created</p><p class="text-[12px] text-slate-500">'+dt+'</p></div>'+
+        '</div>'+
+        '<div class="border-t border-white/[0.04] pt-4"><p class="text-[9px] text-slate-600 uppercase font-bold tracking-wider mb-3">Order Timeline</p>'+timelineH+'</div>'+
+        '<div class="border-t border-white/[0.04] pt-4 flex gap-2">'+
+        '<button onclick="closeModal(\'order-modal\');openStatusModal(\''+o.id+'\',\''+s+'\')" class="btn-secondary flex-1 justify-center text-[11px]"><span class="iconify" data-icon="mdi:swap-horizontal"></span> Status</button>'+
+        '<button onclick="deleteOrder(\''+o.id+'\')" class="btn-danger flex-1 justify-center text-[11px]"><span class="iconify" data-icon="mdi:delete-outline"></span> Delete</button>'+
+        '</div></div>';
+    document.getElementById('order-modal-body').innerHTML=html;
+    document.getElementById('order-modal').classList.add('show');
+}
+
+function openStatusModal(id,current){
+    var statuses=['pending','picked','delivered','returned'];
+    var icons={pending:'mdi:clock-outline',picked:'mdi:truck-delivery',delivered:'mdi:check-circle',returned:'mdi:arrow-u-left-top'};
+    var colors={pending:'text-amber-400',picked:'text-blue-400',delivered:'text-emerald-400',returned:'text-red-400'};
+    var h='';
+    statuses.forEach(function(s){
+        var active=s===current;
+        h+='<button onclick="changeStatus(\''+id+'\',\''+s+'\')" class="w-full flex items-center gap-3 p-3 rounded-xl transition cursor-pointer '+(active?'bg-cyan-500/[0.08] border border-cyan-500/20':'bg-white/[0.015] border border-white/[0.04] hover:bg-white/[0.04]')+'"><span class="iconify text-base '+colors[s]+'" data-icon="'+icons[s]+'"></span><span class="text-[12px] font-semibold '+(active?'text-cyan-400':'text-slate-400')+'">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span>'+(active?'<span class="iconify text-cyan-400 ml-auto text-sm" data-icon="mdi:check"></span>':'')+'</button>';
+    });
+    document.getElementById('status-options').innerHTML=h;
+    document.getElementById('status-modal').classList.add('show');
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('show')}
 
 function changeStatus(id,status){
     var order=allOrders.find(function(o){return o.id===id});
     if(order){order.status=status;order.updated_at=new Date().toISOString();}
-    saveMerchantOrders(allOrders);
-    closeStatusModal();closeModal();showToast('Status updated to '+status,'success');loadOrders();
+    saveOrders(allOrders);
+    closeModal('status-modal');closeModal('order-modal');
+    showToast('Status updated to '+status.charAt(0).toUpperCase()+status.slice(1),'success');
+    loadOrders();
 }
 
 function deleteOrder(id){
-    if(!confirm('Delete this order?'))return;
+    if(!confirm('Are you sure you want to delete this order?'))return;
     allOrders=allOrders.filter(function(o){return o.id!==id});
-    saveMerchantOrders(allOrders);
-    closeModal();showToast('Order deleted','success');loadOrders();
+    saveOrders(allOrders);
+    closeModal('order-modal');
+    showToast('Order deleted','success');
+    loadOrders();
 }
 
-function copyText(text){navigator.clipboard.writeText(text).then(function(){showToast('Copied!','info')})}
+function copyText(text){navigator.clipboard.writeText(text).then(function(){showToast('Copied to clipboard!','info')})}
 
-// ---- CREATE ORDER ----
+// ============================================================
+// CREATE ORDER — MULTI-STEP
+// ============================================================
+function goStep(step){
+    // Validate current step
+    if(step>currentStep){
+        if(currentStep===1){
+            if(!document.getElementById('f-name').value.trim()||!document.getElementById('f-phone').value.trim()||!document.getElementById('f-address').value.trim()){
+                showToast('Please fill in all required fields','error');return;
+            }
+        }
+        if(currentStep===2){
+            if(!document.getElementById('f-city').value){
+                showToast('Please select a city','error');return;
+            }
+        }
+    }
+    if(step===3)buildReview();
+    currentStep=step;
+    document.getElementById('form-step-1').classList.add('hidden');
+    document.getElementById('form-step-2').classList.add('hidden');
+    document.getElementById('form-step-3').classList.add('hidden');
+    document.getElementById('form-step-'+step).classList.remove('hidden');
+    // Update step dots
+    for(var i=1;i<=3;i++){
+        var dot=document.getElementById('step'+i+'-dot');
+        dot.classList.remove('active','done');
+        if(i<step)dot.classList.add('done');
+        else if(i===step)dot.classList.add('active');
+    }
+    for(var i=1;i<=2;i++){
+        var line=document.getElementById('step'+i+'-line');
+        line.classList.toggle('done',i<step);
+    }
+}
+
+function buildReview(){
+    var name=document.getElementById('f-name').value.trim();
+    var phone=document.getElementById('f-phone').value.trim();
+    var address=document.getElementById('f-address').value.trim();
+    var city=document.getElementById('f-city').value;
+    var cod=document.getElementById('f-cod').value;
+    var desc=document.getElementById('f-desc').value.trim();
+    var type=document.getElementById('f-type').value;
+    var h='<div class="space-y-2">'+
+        '<div class="flex justify-between py-2 border-b border-white/[0.03]"><span class="text-[10px] text-slate-600 uppercase font-bold">Name</span><span class="text-[12px] text-white font-medium">'+name+'</span></div>'+
+        '<div class="flex justify-between py-2 border-b border-white/[0.03]"><span class="text-[10px] text-slate-600 uppercase font-bold">Phone</span><span class="text-[12px] text-white font-medium">'+phone+'</span></div>'+
+        '<div class="flex justify-between py-2 border-b border-white/[0.03]"><span class="text-[10px] text-slate-600 uppercase font-bold">Address</span><span class="text-[12px] text-slate-400 max-w-[200px] truncate">'+address+'</span></div>'+
+        '<div class="flex justify-between py-2 border-b border-white/[0.03]"><span class="text-[10px] text-slate-600 uppercase font-bold">City</span><span class="text-[12px] text-white font-medium">'+city+'</span></div>'+
+        '<div class="flex justify-between py-2 border-b border-white/[0.03]"><span class="text-[10px] text-slate-600 uppercase font-bold">COD</span><span class="text-[12px] text-white font-bold">'+(cod?'TZS '+parseInt(cod).toLocaleString():'—')+'</span></div>'+
+        (desc?'<div class="flex justify-between py-2 border-b border-white/[0.03]"><span class="text-[10px] text-slate-600 uppercase font-bold">Description</span><span class="text-[12px] text-slate-400">'+desc+'</span></div>':'')+
+        '<div class="flex justify-between py-2"><span class="text-[10px] text-slate-600 uppercase font-bold">Type</span><span class="text-[12px] text-cyan-400 font-semibold capitalize">'+type+'</span></div>'+
+        '</div>';
+    document.getElementById('order-review').innerHTML=h;
+}
+
 document.getElementById('create-order-form').addEventListener('submit',function(e){
     e.preventDefault();
     var btn=document.getElementById('submit-btn');
-    btn.innerHTML='<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Creating...';btn.disabled=true;
+    btn.innerHTML='<div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full anim-spin"></div> Creating...';btn.disabled=true;
 
     var newOrder={
-        id:generateId(),
+        id:genId(),
         merchant_id:currentUser.id,
         recipient_name:document.getElementById('f-name').value.trim(),
         recipient_phone:document.getElementById('f-phone').value.trim(),
@@ -467,68 +1057,124 @@ document.getElementById('create-order-form').addEventListener('submit',function(
     };
 
     allOrders.unshift(newOrder);
-    saveMerchantOrders(allOrders);
+    saveOrders(allOrders);
     document.getElementById('create-order-form').reset();
+    goStep(1);
     showToast('Order created successfully!','success');
     setTimeout(function(){switchPage('orders')},800);
-    btn.innerHTML='<span class="iconify text-lg" data-icon="mdi:check-circle-outline"></span> Submit Order';btn.disabled=false;
+    btn.innerHTML='<span class="iconify text-base" data-icon="mdi:check-circle-outline"></span> Submit Order';btn.disabled=false;
 });
 
-// ---- PROFILE UPDATE ----
+// ============================================================
+// PROFILE
+// ============================================================
 document.getElementById('profile-form').addEventListener('submit',function(e){
     e.preventDefault();
     var btn=this.querySelector('button[type="submit"]'),orig=btn.innerHTML;
-    btn.innerHTML='<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Saving...';btn.disabled=true;
+    btn.innerHTML='<div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full anim-spin"></div> Saving...';btn.disabled=true;
 
     var upd={business:document.getElementById('p-business').value.trim(),phone:document.getElementById('p-phone').value.trim(),city:document.getElementById('p-city').value.trim()};
     merchantProfile=Object.assign({},merchantProfile,upd);
-
-    // Update merchants list
-    var merchants=getMerchantsList();
+    var merchants=getMerchants();
     var idx=merchants.findIndex(function(m){return m.id===currentUser.id});
-    if(idx!==-1){merchants[idx]=Object.assign({},merchants[idx],upd);saveMerchantsList(merchants);}
-
-    // Update logged in session
+    if(idx!==-1){merchants[idx]=Object.assign({},merchants[idx],upd);saveMerchants(merchants);}
     currentUser=Object.assign({},currentUser,upd);
-    localStorage.setItem('chapshop_logged_in',JSON.stringify(currentUser));
-
-    renderProfile();showToast('Profile updated!','success');
+    localStorage.setItem('cs_logged_in',JSON.stringify(currentUser));
+    renderProfileUI();showToast('Profile updated!','success');
     btn.innerHTML=orig;btn.disabled=false;
 });
 
-// ---- LOGOUT ----
+// ============================================================
+// AUTH
+// ============================================================
 document.getElementById('logout-btn').addEventListener('click',function(){
-    localStorage.removeItem('chapshop_logged_in');
-    location.href='merchants.html';
+    localStorage.removeItem('cs_logged_in');location.href='merchants.html';
 });
 
-// ---- DELETE ACCOUNT ----
 document.getElementById('delete-account-btn').addEventListener('click',function(){document.getElementById('delete-modal').classList.add('show')});
 document.getElementById('confirm-delete-btn').addEventListener('click',function(){
-    var merchants=getMerchantsList().filter(function(m){return m.id!==currentUser.id});
-    saveMerchantsList(merchants);
-    allOrders=[];saveMerchantOrders(allOrders);
-    localStorage.removeItem('chapshop_logged_in');
+    var merchants=getMerchants().filter(function(m){return m.id!==currentUser.id});
+    saveMerchants(merchants);
+    allOrders=[];saveOrders(allOrders);
+    localStorage.removeItem('cs_logged_in');
     showToast('Account deleted.','success');
     setTimeout(function(){location.href='merchants.html'},1000);
 });
 
-// ---- FILTERS & SEARCH ----
+// ============================================================
+// FILTERS & SEARCH
+// ============================================================
 document.querySelectorAll('.filter-btn').forEach(function(btn){btn.addEventListener('click',function(){document.querySelectorAll('.filter-btn').forEach(function(b){b.classList.remove('active')});this.classList.add('active');currentFilter=this.dataset.filter;renderOrdersTable()})});
 document.getElementById('order-search').addEventListener('input',function(){renderOrdersTable()});
 
-// ---- PAGE SWITCHING ----
-function switchPage(page){document.querySelectorAll('.page-content').forEach(function(p){p.classList.add('hidden');p.classList.remove('animate-fadeUp')});var target=document.getElementById('page-'+page);if(target){target.classList.remove('hidden');void target.offsetWidth;target.classList.add('animate-fadeUp')}document.querySelectorAll('.sidebar-link').forEach(function(l){l.classList.remove('active');l.classList.add('text-slate-400');l.classList.remove('text-slate-300')});var active=document.querySelector('[data-page="'+page+'"]');if(active){active.classList.add('active');active.classList.remove('text-slate-400');active.classList.add('text-slate-300')}var titles={overview:'Overview',orders:'All Orders','create-order':'Create Order',analytics:'Analytics','sales-report':'Sales Report',notifications:'Notifications',faq:'FAQ',profile:'Profile',settings:'Settings',help:'Help & Support'};document.getElementById('page-title').textContent=titles[page]||'Dashboard';closeSidebar();window.scrollTo({top:0,behavior:'smooth'});if(page==='analytics'&&allOrders.length>0)setTimeout(renderCharts,100);if(page==='sales-report'&&allOrders.length>0)setTimeout(renderReport,100)}
+// ============================================================
+// PAGE SWITCHING
+// ============================================================
+var pageTitles={overview:['Overview','Dashboard overview'],orders:['All Orders','Manage and track deliveries'],'create-order':['Create Order','New delivery request'],analytics:['Analytics','Performance insights'],'sales-report':['Sales Report','Revenue & statistics'],notifications:['Notifications','Updates & alerts'],faq:['FAQ','Frequently asked questions'],profile:['Profile','Business information'],settings:['Settings','Account preferences'],help:['Help & Support','Get assistance']};
+
+function switchPage(page){
+    document.querySelectorAll('.page-content').forEach(function(p){p.classList.add('hidden');p.classList.remove('anim-fadeUp')});
+    var target=document.getElementById('page-'+page);
+    if(target){target.classList.remove('hidden');void target.offsetWidth;target.classList.add('anim-fadeUp')}
+    document.querySelectorAll('.sidebar-link').forEach(function(l){l.classList.remove('active')});
+    var active=document.querySelector('[data-page="'+page+'"]');
+    if(active)active.classList.add('active');
+    var t=pageTitles[page]||['Dashboard',''];
+    document.getElementById('page-title').textContent=t[0];
+    document.getElementById('page-subtitle').textContent=t[1];
+    closeSidebar();
+    window.scrollTo({top:0,behavior:'smooth'});
+    if(page==='analytics')setTimeout(renderCharts,150);
+    if(page==='sales-report')setTimeout(renderReport,150);
+}
 
 document.querySelectorAll('.sidebar-link').forEach(function(link){link.addEventListener('click',function(e){e.preventDefault();switchPage(this.dataset.page)})});
+
+// ============================================================
+// SIDEBAR MOBILE
+// ============================================================
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebar-backdrop').classList.remove('show')}
 document.getElementById('mobile-menu-btn').addEventListener('click',function(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebar-backdrop').classList.add('show')});
 document.getElementById('sidebar-backdrop').addEventListener('click',closeSidebar);
+
+// Close modals on overlay click
 document.querySelectorAll('.modal-overlay').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('show')})});
 
-function showApp(){var ls=document.getElementById('loading-screen');ls.style.opacity='0';ls.style.transition='opacity 0.5s';setTimeout(function(){ls.style.display='none';document.getElementById('app').classList.remove('hidden')},500)}
-function showToast(msg,type){type=type||'success';var icons={success:'mdi:check-circle',error:'mdi:alert-circle',info:'mdi:information'};var t=document.createElement('div');t.className='toast toast-'+type;t.innerHTML='<span class="iconify text-lg" data-icon="'+icons[type]+'"></span><span>'+msg+'</span>';document.getElementById('toast-container').appendChild(t);setTimeout(function(){t.classList.add('show')},10);setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},400)},3500)}
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg,type){
+    type=type||'success';
+    var icons={success:'mdi:check-circle',error:'mdi:alert-circle',info:'mdi:information'};
+    var t=document.createElement('div');t.className='toast toast-'+type;
+    t.innerHTML='<span class="iconify text-base" data-icon="'+icons[type]+'"></span><span>'+msg+'</span>';
+    document.getElementById('toast-wrap').appendChild(t);
+    setTimeout(function(){t.classList.add('show')},10);
+    setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},400)},3500);
+}
 
+// ============================================================
+// SHOW APP
+// ============================================================
+function showApp(){
+    var ls=document.getElementById('loading-screen');
+    ls.style.opacity='0';ls.style.transition='opacity 0.5s';
+    setTimeout(function(){ls.style.display='none';document.getElementById('app').classList.remove('hidden')},500);
+}
+
+// ============================================================
+// KEYBOARD SHORTCUTS
+// ============================================================
+document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+        document.querySelectorAll('.modal-overlay.show').forEach(function(m){m.classList.remove('show')});
+        closeSidebar();
+    }
+});
+
+// ============================================================
+// INIT
+// ============================================================
 init();
 </script>
 </body>
