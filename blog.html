@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog — ChapShop Delivery Insights & Logistics Updates</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2306b6d4'/%3E%3Cpath d='M8 22l4-6h-3l5-8h-4l6-10 6 10h-4l5 8h-3l4 6z' fill='white' transform='translate(0,2)'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        *{font-family:'Plus Jakarta Sans','Noto Sans Arabic','Noto Sans SC',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+        .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .glow-line{background:linear-gradient(to right,transparent,#164e63,transparent);height:1px}
+        .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .blog-card{transition:all .4s cubic-bezier(.16,1,.3,1)}
+        .blog-card:hover{border-color:rgba(6,182,212,.3);background:rgba(255,255,255,.04);transform:translateY(-6px)}
+        .blog-card:hover .blog-thumb{transform:scale(1.05)}
+        .blog-thumb{transition:transform .6s cubic-bezier(.16,1,.3,1)}
+        .category-pill{transition:all .2s ease}
+        .category-pill:hover, .category-pill.active{background:rgba(6,182,212,.15);border-color:rgba(6,182,212,.4);color:#22d3ee}
+        
+        /* RTL Support for Arabic */
+        [data-lang="ar"] *{font-family:'Noto Sans Arabic','Plus Jakarta Sans',sans-serif;direction:rtl}
+        [data-lang="zh"] *{font-family:'Noto Sans SC','Plus Jakarta Sans',sans-serif}
+        
+        /* Language Dropdown */
+        .lang-dropdown{position:absolute;top:calc(100% + 6px);right:0;transform:translateY(6px);opacity:0;visibility:hidden;pointer-events:none;transition:all .25s ease;z-index:100}
+        .lang-dropdown.open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
+        [data-lang="ar"] .lang-dropdown{right:auto;left:0}
+
+        /* WhatsApp Button CSS */
+        .whatsapp-float{position:fixed;bottom:24px;right:24px;z-index:50;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.4);transition:transform .3s ease,box-shadow .3s ease}
+        .whatsapp-float:hover{transform:scale(1.12);box-shadow:0 6px 30px rgba(37,211,102,.55)}
+        .wa-ping-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(37,211,102,.4);animation:waPingRing 2.5s ease-out infinite;pointer-events:none}
+        @keyframes waPingRing{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.8);opacity:0}}
+    </style>
+</head>
+<body class="bg-[#020617] text-white">
+
+    <nav class="fixed top-0 left-0 right-0 z-50 nav-blur bg-[#020617]/80 border-b border-white/[0.08]">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl flex items-center justify-center"><span class="iconify text-white text-xl" data-icon="mdi:truck-fast"></span></div>
+                <div><span class="font-bold text-white text-[17px]">ChapShop</span><span class="text-cyan-400 font-bold text-[17px] ml-0.5">Delivery</span></div>
+            </a>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="index.html" class="text-sm text-slate-400 hover:text-white transition-colors font-medium" data-lang-text="nav_home">Home</a>
+                <a href="index.html#services" class="text-sm text-slate-400 hover:text-white transition-colors font-medium" data-lang-text="nav_services">Services</a>
+                <a href="about.html" class="text-sm text-slate-400 hover:text-white transition-colors font-medium" data-lang-text="nav_about">About</a>
+                <a href="blog.html" class="text-sm text-cyan-400 font-semibold" data-lang-text="nav_blog">Blog</a>
+                <a href="index.html#contact" class="text-sm text-slate-400 hover:text-white transition-colors font-medium" data-lang-text="nav_contact">Contact</a>
+            </div>
+            <div class="hidden md:flex items-center gap-3">
+                <div class="relative" id="lang-wrapper">
+                    <button id="lang-btn" class="flex items-center gap-1.5 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-white/[0.08] transition-all cursor-pointer font-medium" aria-label="Select language">
+                        <span class="iconify text-base" data-icon="mdi:translate"></span>
+                        <span id="lang-label">EN</span>
+                        <span class="iconify text-xs" data-icon="mdi:chevron-down"></span>
+                    </button>
+                    <div id="lang-dropdown" class="lang-dropdown bg-[#0f172a] border border-white/[0.1] rounded-xl shadow-2xl shadow-black/40 p-1.5 min-w-[160px]" role="menu">
+                        <button onclick="setLang('en')" class="lang-opt w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer font-medium" data-lang-code="en" role="menuitem"><span class="text-base">🇬🇧</span> English</button>
+                        <button onclick="setLang('ar')" class="lang-opt w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer font-medium" data-lang-code="ar" role="menuitem"><span class="text-base">🇸🇦</span> العربية</button>
+                        <button onclick="setLang('fr')" class="lang-opt w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer font-medium" data-lang-code="fr" role="menuitem"><span class="text-base">🇫🇷</span> Français</button>
+                        <button onclick="setLang('zh')" class="lang-opt w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-white/[0.05] hover:text-white transition-colors cursor-pointer font-medium" data-lang-code="zh" role="menuitem"><span class="text-base">🇨🇳</span> 中文</button>
+                    </div>
+                </div>
+                <a href="merchants.html" class="bg-cyan-500 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors items-center gap-2 flex">
+                    <span class="iconify" data-icon="mdi:storefront"></span> <span data-lang-text="nav_join">Join as Merchant</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="pt-32 pb-12 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="glow-line mb-12"></div>
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-widest text-cyan-400 mb-3" data-lang-text="blog_subtitle">ChapShop Insights</p>
+                    <h1 class="text-4xl md:text-5xl font-bold tracking-tight gradient-text" data-lang-text="blog_title">Logistics & E-commerce<br>Playbook</h1>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button class="category-pill active text-xs font-semibold px-4 py-2 rounded-full border border-white/10 bg-white/5 text-slate-300 cursor-pointer" data-lang-text="cat_all">All Posts</button>
+                    <button class="category-pill text-xs font-semibold px-4 py-2 rounded-full border border-white/10 bg-white/5 text-slate-400 cursor-pointer" data-lang-text="cat_cod">COD</button>
+                    <button class="category-pill text-xs font-semibold px-4 py-2 rounded-full border border-white/10 bg-white/5 text-slate-400 cursor-pointer" data-lang-text="cat_fulfillment">Fulfillment</button>
+                    <button class="category-pill text-xs font-semibold px-4 py-2 rounded-full border border-white/10 bg-white/5 text-slate-400 cursor-pointer" data-lang-text="cat_company">Company</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pb-16 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <a href="article-platform.html" class="group block relative bg-[#0f172a] border border-white/[0.08] rounded-2xl overflow-hidden hover:border-cyan-500/30 transition-all duration-500">
+                <div class="grid grid-cols-1 lg:grid-cols-2">
+                    <div class="h-64 lg:h-auto bg-gradient-to-br from-cyan-500/10 to-[#0f172a] flex items-center justify-center relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[url('https://z-cdn-media.chatglm.cn/files/d1aa0dd1-58d5-4d01-9422-a4e4785ecf57.png?auth_key=1878871473-139b74042f5346c9a04a0d148427dd4e-0-acb0a70074d635d5b4a1fbb64287886e')] bg-cover bg-center opacity-30 group-hover:opacity-40 transition-opacity duration-500 group-hover:scale-105"></div>
+                        <span class="iconify text-8xl text-cyan-500/30 relative z-10" data-icon="mdi:monitor-dashboard"></span>
+                    </div>
+                    <div class="p-8 md:p-12 flex flex-col justify-center">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded" data-lang-text="lbl_featured">Featured</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-white bg-white/10 px-2.5 py-1 rounded" data-lang-text="lbl_platform">Platform</span>
+                            <span class="text-xs text-slate-500 ms-auto" data-lang-text="date_dec15">Dec 15, 2024</span>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight group-hover:text-cyan-50 transition-colors" data-lang-text="feat_title">One ChapShop Account - All Delivery Options: Introducing ChapShop Platform</h2>
+                        <p class="text-slate-400 mb-6 leading-relaxed" data-lang-text="feat_desc">Manage standard courier, warehousing, and medical shipments from a single, unified dashboard designed for scale.</p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-sm font-bold">CS</div>
+                            <div>
+                                <p class="text-sm font-semibold text-white" data-lang-text="author_team">ChapShop Team</p>
+                                <p class="text-xs text-slate-500" data-lang-text="read_time">5 min read</p>
+                            </div>
+                            <span class="ms-auto text-cyan-400 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_article"><span class="iconify" data-icon="mdi:arrow-right"></span></span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <section class="pb-24 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- 1. Strategic Warehousing -->
+                <a href="article-strategic-warehousing.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:home-city"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="lbl_warehousing">Warehousing</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_apr12">Apr 12</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art6_title">The Ultimate Guide to Strategic Warehousing in East Africa</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art6_desc">How leveraging fulfillment centers can slash delivery times and scale your business.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 2. Pick and Pack -->
+                <a href="article-pick-and-pack-guide.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:package-variant-closed"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="cat_fulfillment">Fulfillment</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_apr5">Apr 5</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art7_title">The Ultimate Guide to Pick-and-Pack Fulfillment</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art7_desc">Streamlining your order fulfillment process to reduce errors and cut costs.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 3. Tanzania 3PL Market -->
+                <a href="article-tanzania-3pl-market.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:earth"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="lbl_industry">Industry</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_mar22">Mar 22</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art8_title">Why Tanzania is a Prime Market for 3PL Services</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art8_desc">The demographic and infrastructural forces turning Tanzania into a logistics hub.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 4. Dominates Tanzania -->
+                <a href="article-dominates-tanzania.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:map-marker-radius"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="lbl_industry">Industry</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_mar15">Mar 15</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art12_title">How ChapShop Dominates eCommerce & Order Fulfilment</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art12_desc">Discover the infrastructure and technology making ChapShop the leader in Tanzania.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 5. Fulfilment Loyalty -->
+                <a href="article-fulfilment-loyalty.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:package-variant-closed-check"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="lbl_loyalty">Loyalty</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_feb28">Feb 28</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art9_title">Order Fulfilment Secrets: How Fast & Accurate Delivery Boosts Customer Loyalty</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art9_desc">The hidden connection between delivery performance and repeat purchases.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 6. Future Logistics -->
+                <a href="article-future-logistics.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:chart-timeline-variant-shimmer"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="lbl_logistics">Logistics</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_feb10">Feb 10</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art10_title">The Future of E-commerce Logistics in East Africa</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art10_desc">Trends and innovations shaping the next decade of regional logistics.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 7. COD East Africa -->
+                <a href="article-cod-east-africa.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:cash-multiple"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="cat_cod">COD</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_jan22">Jan 22</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art11_title">Boost Your E-Commerce Success with Cash on Delivery</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art11_desc">Why COD is a game-changer for East African markets and how to manage it.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 8. Guide -->
+                <a href="article-guide.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:format-list-numbered"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="lbl_tutorial">Tutorial</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_dec15">Dec 15</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art3_title">Your Step-by-Step Guide to Understanding ChapShop Delivery Services</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art3_desc">From signup to your first successful delivery.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 9. Choose Delivery Company -->
+                <a href="article-choose.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:lightbulb-outline"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="lbl_guide">Guide</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_dec20">Dec 20</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art1_title">How To Choose The Right Delivery Company For Your Business</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art1_desc">The ultimate checklist for selecting a logistics partner that scales with you.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 10. Reasons -->
+                <a href="article-reasons.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:star-four-points"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="lbl_why">Why Us</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_dec18">Dec 18</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art2_title">4 Reasons CHAPSHOP Delivery Services Are The Best in Tanzania</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art2_desc">Discover why 500+ merchants trust us with their logistics.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 11. Advantage -->
+                <a href="article-advantage.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:rocket-launch-outline"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="lbl_advantage">Advantage</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_nov28">Nov 28</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art5_title">Speed Meets Simplicity: The ChapShop Delivery Advantage</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art5_desc">How we combine rapid delivery with an easy-to-use interface.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+                <!-- 12. Platform Grid -->
+                <a href="article-platform.html" class="blog-card bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="h-48 bg-[#0f172a] flex items-center justify-center relative overflow-hidden"><div class="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div><span class="iconify text-6xl text-cyan-500/20 blog-thumb" data-icon="mdi:monitor-dashboard"></span></div>
+                    <div class="p-6 flex flex-col flex-grow"><div class="flex items-center gap-2 mb-3"><span class="text-[10px] font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded" data-lang-text="lbl_platform">Platform</span><span class="text-[11px] text-slate-500 ms-auto" data-lang-text="date_dec10">Dec 10</span></div><h3 class="text-lg font-semibold text-white mb-2 leading-snug group-hover:text-cyan-50 transition-colors" data-lang-text="art4_title">One ChapShop Account - All Delivery Options</h3><p class="text-sm text-slate-400 mb-5 flex-grow leading-relaxed" data-lang-text="art4_desc">Unified dashboard for all your logistics needs.</p><span class="text-sm text-cyan-400 font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" data-lang-text="read_more">Read More <span class="iconify" data-icon="mdi:arrow-right"></span></span></div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-white/[0.05] pt-12 pb-8">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="glow-line mb-8"></div>
+            <p class="text-xs text-slate-500" data-lang-text="footer_rights">© 2025 ChapShop Delivery. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/255768799110" target="_blank" class="whatsapp-float" title="Chat on WhatsApp" aria-label="Chat with us on WhatsApp">
+        <span class="wa-ping-ring"></span>
+        <span class="wa-ping-ring" style="animation-delay:1s"></span>
+        <span class="iconify text-white text-3xl relative z-10" data-icon="mdi:whatsapp"></span>
+    </a>
+
+    <script>
+        var T = {
+            en: {
+                nav_home: "Home", nav_services: "Services", nav_about: "About", nav_blog: "Blog", nav_contact: "Contact", nav_join: "Join as Merchant",
+                blog_subtitle: "ChapShop Insights", blog_title: "Logistics & E-commerce<br>Playbook",
+                cat_all: "All Posts", cat_cod: "COD", cat_fulfillment: "Fulfillment", cat_company: "Company",
+                lbl_featured: "Featured", lbl_platform: "Platform", date_dec15: "Dec 15, 2024",
+                feat_title: "One ChapShop Account - All Delivery Options: Introducing ChapShop Platform",
+                feat_desc: "Manage standard courier, warehousing, and medical shipments from a single, unified dashboard designed for scale.",
+                author_team: "ChapShop Team", read_time: "5 min read", read_article: "Read Article",
+                lbl_tutorial: "Tutorial", date_dec15: "Dec 15",
+                art3_title: "Your Step-by-Step Guide to Understanding ChapShop Delivery Services",
+                art3_desc: "From signup to your first successful delivery.",
+                lbl_guide: "Guide", date_dec20: "Dec 20", 
+                art1_title: "How To Choose The Right Delivery Company For Your Business",
+                art1_desc: "The ultimate checklist for selecting a logistics partner that scales with you.",
+                lbl_why: "Why Us", date_dec18: "Dec 18",
+                art2_title: "4 Reasons CHAPSHOP Delivery Services Are The Best in Tanzania",
+                art2_desc: "Discover why 500+ merchants trust us with their logistics.",
+                date_dec10: "Dec 10",
+                art4_title: "One ChapShop Account - All Delivery Options",
+                art4_desc: "Unified dashboard for all your logistics needs.",
+                lbl_advantage: "Advantage", date_nov28: "Nov 28",
+                art5_title: "Speed Meets Simplicity: The ChapShop Delivery Advantage",
+                art5_desc: "How we combine rapid delivery with an easy-to-use interface.",
+                lbl_warehousing: "Warehousing", date_apr12: "Apr 12",
+                art6_title: "The Ultimate Guide to Strategic Warehousing in East Africa",
+                art6_desc: "How leveraging fulfillment centers can slash delivery times and scale your business.",
+                date_apr5: "Apr 5",
+                art7_title: "The Ultimate Guide to Pick-and-Pack Fulfillment",
+                art7_desc: "Streamlining your order fulfillment process to reduce errors and cut costs.",
+                lbl_industry: "Industry", date_mar22: "Mar 22",
+                art8_title: "Why Tanzania is a Prime Market for 3PL Services",
+                art8_desc: "The demographic and infrastructural forces turning Tanzania into a logistics hub.",
+                lbl_loyalty: "Loyalty", date_feb28: "Feb 28",
+                art9_title: "Order Fulfilment Secrets: How Fast & Accurate Delivery Boosts Customer Loyalty",
+                art9_desc: "The hidden connection between delivery performance and repeat purchases.",
+                lbl_logistics: "Logistics", date_feb10: "Feb 10",
+                art10_title: "The Future of E-commerce Logistics in East Africa",
+                art10_desc: "Trends and innovations shaping the next decade of regional logistics.",
+                date_jan22: "Jan 22",
+                art11_title: "Boost Your E-Commerce Success with Cash on Delivery",
+                art11_desc: "Why COD is a game-changer for East African markets and how to manage it.",
+                date_mar15: "Mar 15",
+                art12_title: "How ChapShop Dominates eCommerce & Order Fulfilment",
+                art12_desc: "Discover the infrastructure and technology making ChapShop the leader in Tanzania.",
+                read_more: "Read More",
+                footer_rights: "© 2025 ChapShop Delivery. All rights reserved."
+            },
+            ar: {
+                nav_home: "الرئيسية", nav_services: "الخدمات", nav_about: "من نحن", nav_blog: "المدونة", nav_contact: "اتصل بنا", nav_join: "انضم كتاجر",
+                blog_subtitle: "رؤى ChapShop", blog_title: "دليل الخدمات اللوجستية<br>والتجارة الإلكترونية",
+                cat_all: "كل المقالات", cat_cod: "الدفع عند الاستلام", cat_fulfillment: "التنفيذ", cat_company: "الشركة",
+                lbl_featured: "مميز", lbl_platform: "المنصة", date_dec15: "15 ديسمبر 2024",
+                feat_title: "حساب ChapShop واحد - جميع خيارات التوصيل: نقدم منصة ChapShop",
+                feat_desc: "إدارة التوصيل القياسي، المستودعات، والشحنات الطبية من لوحة تحكم موحدة مصممة للتوسع.",
+                author_team: "فريق ChapShop", read_time: "5 دقائق قراءة", read_article: "اقرأ المقال",
+                lbl_tutorial: "تعليمي",
+                art3_title: "دليلك خطوة بخطوة لفهم خدمات ChapShop للتوصيل",
+                art3_desc: "من التسجيل إلى أول عملية توصيل ناجحة.",
+                lbl_guide: "دليل", date_dec20: "20 ديسمبر",
+                art1_title: "كيفية اختيار شركة التوصيل المناسبة لعملك",
+                art1_desc: "قائمة المراجعة النهائية لاختيار شريك لوجستيات ينمو معك.",
+                lbl_why: "لماذا نحن", date_dec18: "18 ديسمبر",
+                art2_title: "4 أسباب تجعل خدمات ChapShop التوصيل هي الأفضل في تنزانيا",
+                art2_desc: "اكتشف لماذا يثق بنا أكثر من 500 تاجر في لوجستياتهم.",
+                date_dec10: "10 ديسمبر",
+                art4_title: "حساب ChapShop واحد - جميع خيارات التوصيل",
+                art4_desc: "لوحة تحكم موحدة لجميع احتياجاتك اللوجستية.",
+                lbl_advantage: "ميزة", date_nov28: "28 نوفمبر",
+                art5_title: "السرعة تلتقي بالبساطة: ميزة ChapShop للتوصيل",
+                art5_desc: "كيف نجمع بين التوصيل السريع وواجهة سهلة الاستخدام.",
+                lbl_warehousing: "التخزين", date_apr12: "12 أبريل",
+                art6_title: "الدليل الشامل للتخزين الاستراتيجي في شرق أفريقيا",
+                art6_desc: "كيف يمكن للاستفادة من مراكز التنفيذ تقليل أوقات التوصيل وتوسيع نطاق عملك.",
+                date_apr5: "5 أبريل",
+                art7_title: "الدليل الشامل لتنفيذ الانتقاء والتعبئة",
+                art7_desc: "تبسيط عملية تنفيذ الطلبات لتقليل الأخطاء وخفض التكاليف.",
+                lbl_industry: "الصناعة", date_mar22: "22 مارس",
+                art8_title: "لماذا تعتبر تنزانيا سوقًا رئيسيًا لخدمات الطرف الثالث",
+                art8_desc: "القوى الديموغرافية والبنية التحتية التي تحول تنزانيا إلى مركز لوجستي.",
+                lbl_loyalty: "الولاء", date_feb28: "28 فبراير",
+                art9_title: "أسرار تنفيذ الطلبات: كيف يعزز التوصيل السريع والدقيق ولاء العملاء",
+                art9_desc: "العلاقة الخفية بين أداء التوصيل والمشتريات المتكررة.",
+                lbl_logistics: "اللوجستيات", date_feb10: "10 فبراير",
+                art10_title: "مستقبل لوجستيات التجارة الإلكترونية في شرق أفريقيا",
+                art10_desc: "الاتجاهات والابتكارات التي تشكل العقد القادم من اللوجستيات الإقليمية.",
+                date_jan22: "22 يناير",
+                art11_title: "عزز نجاح تجارتك الإلكترونية بالدفع عند الاستلام",
+                art11_desc: "لماذا يعد الدفع عند الاستلام نقطة تحول في أسواق شرق أفريقيا وكيفية إدارته.",
+                date_mar15: "15 مارس",
+                art12_title: "كيف تهيمن ChapShop على التجارة الإلكترونية وتنفيذ الطلبات",
+                art12_desc: "اكتشف البنية التحتية والتكنولوجيا التي تجعل ChapShop الرائد في تنزانيا.",
+                read_more: "اقرأ المزيد",
+                footer_rights: "© 2025 ChapShop Delivery. جميع الحقوق محفوظة."
+            },
+            fr: {
+                nav_home: "Accueil", nav_services: "Services", nav_about: "À propos", nav_blog: "Blog", nav_contact: "Contact", nav_join: "Rejoindre",
+                blog_subtitle: "Perspectives ChapShop", blog_title: "Guide Logistique &<br>E-commerce",
+                cat_all: "Tous les articles", cat_cod: "Paiement à la livraison", cat_fulfillment: "Exécution", cat_company: "Entreprise",
+                lbl_featured: "En vedette", lbl_platform: "Plateforme", date_dec15: "15 déc. 2024",
+                feat_title: "Un compte ChapShop - Toutes les options de livraison : Présentation de la plateforme",
+                feat_desc: "Gérez le coursier standard, l'entreposage et les livraisons médicales à partir d'un tableau de bord unifié.",
+                author_team: "Équipe ChapShop", read_time: "5 min de lecture", read_article: "Lire l'article",
+                lbl_tutorial: "Tutoriel",
+                art3_title: "Votre guide étape par étape pour comprendre les services de livraison ChapShop",
+                art3_desc: "De l'inscription à votre première livraison réussite.",
+                lbl_guide: "Guide", date_dec20: "20 déc.",
+                art1_title: "Comment choisir le bon transporteur pour votre entreprise",
+                art1_desc: "La checklist ultime pour choisir un partenaire logistique qui évolue avec vous.",
+                lbl_why: "Pourquoi nous", date_dec18: "18 déc.",
+                art2_title: "4 raisons pour lesquelles les services de livraison ChapShop sont les meilleurs en Tanzanie",
+                art2_desc: "Découvrez pourquoi plus de 500 marchands nous font confiance pour leur logistique.",
+                date_dec10: "10 déc.",
+                art4_title: "Un compte ChapShop - Toutes les options de livraison",
+                art4_desc: "Tableau de bord unifié pour tous vos besoins logistiques.",
+                lbl_advantage: "Avantage", date_nov28: "28 nov.",
+                art5_title: "La vitesse rencontre la simplicité : L'avantage ChapShop",
+                art5_desc: "Comment nous combinons une livraison rapide avec une interface facile à utiliser.",
+                lbl_warehousing: "Entreposage", date_apr12: "12 avr.",
+                art6_title: "Le Guide Ultime de l'Entreposage Stratégique en Afrique de l'Est",
+                art6_desc: "Comment l'entreposage stratégique peut réduire les délais et développer votre activité.",
+                date_apr5: "5 avr.",
+                art7_title: "Le Guide Ultime de la Préparation et de l'Emballage",
+                art7_desc: "Rationalisez votre processus d'exécution pour réduire les erreurs et les coûts.",
+                lbl_industry: "Industrie", date_mar22: "22 mars",
+                art8_title: "Pourquoi la Tanzanie est un marché de choix pour les services 3PL",
+                art8_desc: "Les forces démographiques et infrastructurelles qui font de la Tanzanie un hub logistique.",
+                lbl_loyalty: "Fidélité", date_feb28: "28 févr.",
+                art9_title: "Secrets d'exécution : Comment la livraison rapide et précise booste la fidélité",
+                art9_desc: "Le lien caché entre la performance de livraison et les achats répétés.",
+                lbl_logistics: "Logistique", date_feb10: "10 févr.",
+                art10_title: "L'avenir de la logistique e-commerce en Afrique de l'Est",
+                art10_desc: "Tendances et innovations façonnant la prochaine décennie de la logistique régionale.",
+                date_jan22: "22 janv.",
+                art11_title: "Boostez votre succès e-commerce avec le paiement à la livraison",
+                art11_desc: "Pourquoi le PAI est un game-changer en Afrique de l'Est et comment le gérer.",
+                date_mar15: "15 mars",
+                art12_title: "Comment ChapShop domine l'e-commerce et l'exécution des commandes",
+                art12_desc: "Découvrez l'infrastructure et la technologie qui font de ChapShop le leader en Tanzanie.",
+                read_more: "Lire la suite",
+                footer_rights: "© 2025 ChapShop Delivery. Tous droits réservés."
+            },
+            zh: {
+                nav_home: "首页", nav_services: "服务", nav_about: "关于我们", nav_blog: "博客", nav_contact: "联系", nav_join: "加入商户",
+                blog_subtitle: "ChapShop 见解", blog_title: "物流与电商<br>运营手册",
+                cat_all: "所有文章", cat_cod: "货到付款", cat_fulfillment: "履约服务", cat_company: "公司",
+                lbl_featured: "精选", lbl_platform: "平台", date_dec15: "2024年12月15日",
+                feat_title: "一个 ChapShop 账户 - 所有配送选项：ChapShop 平台介绍",
+                feat_desc: "通过专为规模设计的单一统一仪表板，管理标准快递、仓储和医疗运输。",
+                author_team: "ChapShop 团队", read_time: "阅读 5 分钟", read_article: "阅读文章",
+                lbl_tutorial: "教程",
+                art3_title: "分步了解 ChapShop 配送服务指南",
+                art3_desc: "从注册到您的第一次成功配送。",
+                lbl_guide: "指南", date_dec20: "12月20日",
+                art1_title: "如何为企业选择合适的物流公司",
+                art1_desc: "选择与您共同成长的物流合作伙伴的终极清单。",
+                lbl_why: "选择我们", date_dec18: "12月18日",
+                art2_title: "ChapShop 配送服务是坦桑尼亚最好的 4 个原因",
+                art2_desc: "了解为什么 500 多家商户信任我们处理他们的物流。",
+                date_dec10: "12月10日",
+                art4_title: "一个 ChapShop 账户 - 所有配送选项",
+                art4_desc: "满足您所有物流需求的统一仪表板。",
+                lbl_advantage: "优势", date_nov28: "11月28日",
+                art5_title: "速度与简约的结合：ChapShop 配送优势",
+                art5_desc: "我们如何结合快速配送和易于使用的界面。",
+                lbl_warehousing: "仓储", date_apr12: "4月12日",
+                art6_title: "东非战略仓储终极指南",
+                art6_desc: "如何利用履约中心缩短交货时间并扩展业务。",
+                date_apr5: "4月5日",
+                art7_title: "拣货与包装履约终极指南",
+                art7_desc: "精简订单履约流程以减少错误和降低成本。",
+                lbl_industry: "行业", date_mar22: "3月22日",
+                art8_title: "为什么坦桑尼亚是3PL服务的首选市场",
+                art8_desc: "将坦桑尼亚变成物流中心的人口和基础设施力量。",
+                lbl_loyalty: "忠诚度", date_feb28: "2月28日",
+                art9_title: "订单履约秘诀：快速准确的配送如何提升客户忠诚度",
+                art9_desc: "配送性能与重复购买之间的隐藏联系。",
+                lbl_logistics: "物流", date_feb10: "2月10日",
+                art10_title: "东非电子商务物流的未来",
+                art10_desc: "塑造区域物流下一个十年的趋势和创新。",
+                date_jan22: "1月22日",
+                art11_title: "通过货到付款提升您的电商成功",
+                art11_desc: "为什么货到付款是东非市场的游戏规则改变者以及如何管理它。",
+                date_mar15: "3月15日",
+                art12_title: "ChapShop如何主导电子商务和订单履约",
+                art12_desc: "探索使ChapShop成为坦桑尼亚领导者的基础设施和技术。",
+                read_more: "阅读更多",
+                footer_rights: "© 2025 ChapShop Delivery. 版权所有。"
+            }
+        };
+
+        var currentLang = localStorage.getItem('chapshop-lang') || 'en';
+
+        function applyTranslations() {
+            document.documentElement.setAttribute('data-lang', currentLang);
+            const labels = { en: 'EN', ar: 'عربي', fr: 'FR', zh: '中文' };
+            document.getElementById('lang-label').textContent = labels[currentLang];
+
+            const d = T[currentLang];
+            if (!d) return;
+
+            document.querySelectorAll('[data-lang-text]').forEach(function(e) {
+                const k = e.getAttribute('data-lang-text');
+                if (d[k]) e.innerHTML = d[k];
+            });
+
+            document.querySelectorAll('.lang-opt').forEach(function(o) {
+                o.style.background = o.getAttribute('data-lang-code') === currentLang ? 'rgba(6,182,212,.15)' : 'transparent';
+                o.style.color = o.getAttribute('data-lang-code') === currentLang ? '#06b6d4' : '#94a3b8';
+            });
+        }
+
+        function setLang(l) {
+            currentLang = l;
+            localStorage.setItem('chapshop-lang', l);
+            applyTranslations();
+            document.getElementById('lang-dropdown').classList.remove('open');
+        }
+
+        applyTranslations();
+
+        document.getElementById('lang-btn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('lang-dropdown').classList.toggle('open');
+        });
+
+        document.addEventListener('click', function() {
+            document.getElementById('lang-dropdown').classList.remove('open');
+        });
+    </script>
+</body>
+</html>

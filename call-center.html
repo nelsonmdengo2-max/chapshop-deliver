@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Center — ChapShop Delivery</title>
+    <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEwaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="core.js"></script>
+    <style>
+        *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+        .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .toast{bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.16,1,.3,1);white-space:nowrap}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+        .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem}
+        .sidebar-link:hover,.sidebar-link.active{background:rgba(6,182,212,0.1);color:#22d3ee}
+        select option { background-color: #0f172a; color: #e2e8f0; }
+        textarea { font-family: inherit; }
+        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:1rem;padding:1rem;transition:all 0.2s}
+        .stat-card:hover{border-color:rgba(6,182,212,0.3)}
+        .ws-tab{padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600; color: #94a3b8; transition: all 0.2s;}
+        .ws-tab.active{background: rgba(6,182,212,0.2); color: #22d3ee;}
+        .quick-tag{padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; cursor: pointer; transition: all 0.2s;}
+        .quick-tag:hover{border-color: #06b6d4; color: #22d3ee;}
+    </style>
+</head>
+<body class="bg-[#020617] text-white min-h-screen">
+
+    <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-[#0f172a] border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+        <span id="toast-icon" class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
+        <span id="toast-msg" class="text-sm font-medium">Success</span>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-[#020617]">
+        <div class="w-full max-w-md px-6">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20"><span class="iconify text-white text-3xl" data-icon="mdi:headset"></span></div>
+                <h1 class="text-2xl font-bold gradient-text">Call Center Portal</h1>
+                <p class="text-slate-400 text-sm mt-1">ChapShop Delivery System</p>
+            </div>
+            <form method="POST" onsubmit="handleLogin(event)" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Email</label><input type="email" name="email" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="staff@chapshop.com"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Password</label><input type="password" name="password" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="••••••••"></div>
+                <button type="submit" class="w-full bg-cyan-500 text-white font-semibold py-3 rounded-xl hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20">Sign In</button>
+            </form>
+            <div class="text-center mt-6"><a href="index.html" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors">← Back to Website</a></div>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app-screen" class="hidden h-screen flex overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
+            <div class="p-6 border-b border-white/[0.08]">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:headset"></span></div>
+                    <span class="font-bold text-white text-sm">ChapShop<span class="text-cyan-400 ml-1">Call Center</span></span>
+                </div>
+            </div>
+            <nav class="p-4 space-y-1">
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2">Main</div>
+                <button onclick="switchTab('dashboard')" class="sidebar-link active w-full text-left" id="nav-dashboard"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</button>
+                <button onclick="switchTab('workspace')" class="sidebar-link w-full text-left" id="nav-workspace"><span class="iconify text-lg" data-icon="mdi:phone-message-outline"></span> Workspace</button>
+                
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Tracking</div>
+                <button onclick="switchTab('shipping')" class="sidebar-link w-full text-left" id="nav-shipping"><span class="iconify text-lg" data-icon="mdi:truck-fast-outline"></span> Shipping Tracking</button>
+
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Insights</div>
+                <button onclick="switchTab('performance')" class="sidebar-link w-full text-left" id="nav-performance"><span class="iconify text-lg" data-icon="mdi:chart-line"></span> My Performance</button>
+            </nav>
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.08] space-y-1">
+                <button onclick="switchTab('profile')" class="sidebar-link w-full text-left" id="nav-profile"><span class="iconify text-lg" data-icon="mdi:account-cog-outline"></span> Settings</button>
+                <button onclick="handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 lg:ml-64 flex flex-col min-h-0">
+            <header class="nav-blur bg-[#020617]/80 border-b border-white/[0.08] px-6 py-3 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-white p-1"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
+                    <span class="font-bold text-white text-sm hidden lg:block">ChapShop<span class="text-cyan-400 ml-1">Call Center</span></span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleBreak()" id="break-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/30 text-xs font-bold text-green-400 transition-all">
+                        <span id="break-dot" class="w-2 h-2 rounded-full bg-green-400"></span> <span id="break-text">Online</span>
+                    </button>
+                    <div class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs" id="header-avatar">A</div>
+                    <span id="header-name" class="text-sm font-semibold text-white hidden sm:block">Agent</span>
+                </div>
+            </header> 
+            
+            <div class="p-6 md:p-8 flex-1 overflow-y-auto min-h-0">
+
+                <!-- DASHBOARD -->
+                <div id="panel-dashboard" class="tab-panel">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                        <h2 class="text-xl font-bold text-white">Agent Dashboard</h2>
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="filterDash('all')" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">All Time</button>
+                            <button onclick="filterDash('today')" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Today</button>
+                            <button onclick="filterDash('week')" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Week</button>
+                            <button onclick="filterDash('month')" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Month</button>
+                            <button onclick="filterDash('year')" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Year</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+                        <div class="stat-card border-blue-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-blue-400 uppercase">New Orders</span><span class="iconify text-blue-400" data-icon="mdi:cart-plus"></span></div><div id="d-new" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card border-green-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-green-400 uppercase">Confirmed</span><span class="iconify text-green-400" data-icon="mdi:check-circle"></span></div><div id="d-confirmed" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card border-red-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-red-400 uppercase">Cancelled</span><span class="iconify text-red-400" data-icon="mdi:close-circle"></span></div><div id="d-cancelled" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card border-orange-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-orange-400 uppercase">No Reply</span><span class="iconify text-orange-400" data-icon="mdi:phone-missed"></span></div><div id="d-noreply" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card border-indigo-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-indigo-400 uppercase">Scheduled</span><span class="iconify text-indigo-400" data-icon="mdi:calendar-clock"></span></div><div id="d-scheduled" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card border-gray-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-gray-400 uppercase">Out of Region</span><span class="iconify text-gray-400" data-icon="mdi:map-marker-off"></span></div><div id="d-outregion" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card border-pink-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-pink-400 uppercase">Wrong Number</span><span class="iconify text-pink-400" data-icon="mdi:phone-off"></span></div><div id="d-wrong" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card border-violet-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-violet-400 uppercase">Delivered</span><span class="iconify text-violet-400" data-icon="mdi:truck-check"></span></div><div id="d-delivered" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card border-slate-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-slate-400 uppercase">Returned</span><span class="iconify text-slate-400" data-icon="mdi:package-variant-remove"></span></div><div id="d-returned" class="text-2xl font-bold text-white">0</div></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 max-w-2xl">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-white">Daily Confirmation Target</h3>
+                            <span id="target-text" class="text-sm text-cyan-400 font-bold">0/20</span>
+                        </div>
+                        <div class="w-full bg-white/[0.05] rounded-full h-3">
+                            <div id="target-bar" class="bg-gradient-to-r from-cyan-500 to-green-400 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WORKSPACE -->
+                <div id="panel-workspace" class="tab-panel hidden">
+                    <div class="mb-6 bg-white/[0.02] border border-white/[0.08] rounded-xl p-3 flex flex-col sm:flex-row gap-3">
+                        <div class="relative flex-1">
+                            <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
+                            <input type="text" id="ws-search" oninput="renderWorkspace()" placeholder="Search by Order ID, Phone, or Name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50">
+                        </div>
+                        <div class="flex gap-2 bg-black/20 p-1.5 rounded-lg w-fit">
+                            <button onclick="switchWs('new')" class="ws-tab active" id="ws-tab-new">New</button>
+                            <button onclick="switchWs('retry')" class="ws-tab" id="ws-tab-retry">Retry</button>
+                            <button onclick="switchWs('scheduled')" class="ws-tab" id="ws-tab-scheduled">Scheduled</button>
+                        </div>
+                    </div>
+                    <div id="ws-content" class="space-y-4"></div>
+                </div>
+
+                <!-- SHIPPING TRACKING -->
+                <div id="panel-shipping" class="tab-panel hidden">
+                    <div class="flex gap-2 mb-4 flex-wrap">
+                        <button onclick="filterShipping('all')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">All</button>
+                        <button onclick="filterShipping('confirmed')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Received</button>
+                        <button onclick="filterShipping('preparing')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Preparing</button>
+                        <button onclick="filterShipping('out_for_delivery')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">In Transit</button>
+                        <button onclick="filterShipping('delivered')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Delivered</button>
+                        <button onclick="filterShipping('returned')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Returned</button>
+                        <button onclick="filterShipping('cancelled')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Cancelled</button>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
+                        <table class="w-full text-sm text-left min-w-[800px]">
+                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Item</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3">Shipping Status</th><th class="px-4 py-3">Updated</th></tr></thead>
+                            <tbody id="shipping-table" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PERFORMANCE -->
+                <div id="panel-performance" class="tab-panel hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="stat-card text-center"><div class="text-slate-400 text-xs font-bold uppercase mb-2">Total Calls Handled</div><div id="p-total" class="text-4xl font-bold text-white">0</div></div>
+                        <div class="stat-card text-center border-cyan-500/20"><div class="text-cyan-400 text-xs font-bold uppercase mb-2">Confirmation Rate</div><div id="p-rate" class="text-4xl font-bold text-cyan-400">0%</div></div>
+                        <div class="stat-card text-center border-green-500/20"><div class="text-green-400 text-xs font-bold uppercase mb-2">Avg Call Time</div><div id="p-time" class="text-4xl font-bold text-green-400">0s</div></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="font-bold text-white mb-4">Recent Call History</h3>
+                        <div id="p-history" class="space-y-2 max-h-[500px] overflow-y-auto"></div>
+                    </div>
+                </div>
+
+                <!-- SETTINGS -->
+                <div id="panel-profile" class="tab-panel hidden">
+                    <div class="max-w-lg space-y-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Profile Settings</h3>
+                            <div class="space-y-4">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Agent Name</label><input type="text" id="set-name" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Email (Locked)</label><input type="email" id="set-email" disabled class="w-full mt-1 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-slate-500 cursor-not-allowed"></div>
+                                <button onclick="saveProfile()" class="bg-cyan-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-cyan-400">Save Profile</button>
+                            </div>
+                        </div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Change Password</h3>
+                            <form id="pw-form" class="space-y-4">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Current Password</label><input type="password" id="pw-current" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">New Password</label><input type="password" id="pw-new" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Confirm New Password</label><input type="password" id="pw-confirm" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <button type="submit" class="bg-red-500/20 text-red-400 border border-red-500/30 font-semibold px-6 py-3 rounded-xl hover:bg-red-500/30">Update Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+        
+        <!-- IMAGE LIGHTBOX -->
+        <div id="img-lightbox" class="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 hidden cursor-pointer" onclick="this.classList.add('hidden')">
+            <img id="lightbox-img" class="max-w-full max-h-full rounded-2xl shadow-2xl object-contain">
+        </div>
+    </div>
+
+    <script>
+        let allOrders = [], dashFilter = 'all', currentWsTab = 'new';
+        let timerInterval = null, timerSeconds = 0, activeTimerId = null;
+        let knownOrderIds = new Set(), audioCtx, isOnBreak = false;
+        const myId = () => window.currentUser.uid;
+        const DAILY_TARGET = 20;
+
+        function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        function playDing() {
+            if(!audioCtx) return;
+            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            o.connect(g); g.connect(audioCtx.destination);
+            o.type = 'sine'; o.frequency.setValueAtTime(880, audioCtx.currentTime); o.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.1);
+            g.gain.setValueAtTime(0.3, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.4);
+        }
+
+        function toggleBreak() {
+            isOnBreak = !isOnBreak;
+            const btn = document.getElementById('break-btn'), dot = document.getElementById('break-dot'), txt = document.getElementById('break-text');
+            if(isOnBreak) {
+                btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-xs font-bold text-yellow-400 transition-all';
+                dot.className = 'w-2 h-2 rounded-full bg-yellow-400'; txt.textContent = 'On Break';
+            } else {
+                btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/30 text-xs font-bold text-green-400 transition-all';
+                dot.className = 'w-2 h-2 rounded-full bg-green-400'; txt.textContent = 'Online';
+            }
+            db.collection('users').doc(myId()).update({ agentStatus: isOnBreak ? 'break' : 'online' }).catch(()=>{});
+        }
+
+        function onAppLoaded() {
+            if (window.currentUser.role !== 'call_center') { showT("Access Denied.", "error"); auth.signOut(); return; }
+            document.getElementById('header-name').textContent = window.currentUser.name || 'Agent';
+            document.getElementById('header-avatar').textContent = (window.currentUser.name || 'A').charAt(0).toUpperCase();
+            document.getElementById('set-name').value = window.currentUser.name || '';
+            document.getElementById('set-email').value = window.currentUser.email || '';
+            initAudio();
+            
+            db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snap => {
+                allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                allOrders.forEach(o => { if(o.status === 'accepted' && !knownOrderIds.has(o.id)) playDing(); });
+                knownOrderIds = new Set(allOrders.map(o => o.id));
+                updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance();
+            });
+        }
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
+        function switchTab(t) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden')); document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active')); document.getElementById(`panel-${t}`).classList.remove('hidden'); document.getElementById(`nav-${t}`).classList.add('active'); if(window.innerWidth < 1024) toggleSidebar(); }
+
+        function getDateFilter(filter) {
+            const now = new Date(); let s = null;
+            if(filter === 'today') s = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            if(filter === 'week') { const d = now.getDay(); s = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (d===0?6:d-1)); }
+            if(filter === 'month') s = new Date(now.getFullYear(), now.getMonth(), 1);
+            if(filter === 'year') s = new Date(now.getFullYear(), 0, 1);
+            return s;
+        }
+
+        function filterDash(f) {
+            dashFilter = f;
+            document.querySelectorAll('.dash-btn').forEach(b => b.className = 'dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]');
+            event.target.className = 'dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            const start = getDateFilter(dashFilter);
+            const my = allOrders.filter(o => o.processedBy === myId() && (!start || (o.updatedAt && o.updatedAt.toDate() >= start)));
+            document.getElementById('d-new').textContent = allOrders.filter(o => o.status === 'accepted').length;
+            document.getElementById('d-confirmed').textContent = my.filter(o => o.status === 'confirmed').length;
+            document.getElementById('d-cancelled').textContent = my.filter(o => o.status === 'cancelled').length;
+            document.getElementById('d-noreply').textContent = my.filter(o => o.status === 'no_answer').length;
+            document.getElementById('d-scheduled').textContent = my.filter(o => o.status === 'callback_requested').length;
+            document.getElementById('d-outregion').textContent = my.filter(o => o.status === 'out_of_region').length;
+            document.getElementById('d-wrong').textContent = my.filter(o => o.status === 'wrong_number').length;
+            document.getElementById('d-delivered').textContent = my.filter(o => o.status === 'delivered').length;
+            document.getElementById('d-returned').textContent = my.filter(o => o.status === 'returned').length;
+            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+            const todayConfirmed = allOrders.filter(o => o.processedBy === myId() && o.status === 'confirmed' && o.updatedAt && o.updatedAt.toDate() >= todayStart).length;
+            document.getElementById('target-text').textContent = `${todayConfirmed}/${DAILY_TARGET}`;
+            document.getElementById('target-bar').style.width = `${Math.min(100, (todayConfirmed/DAILY_TARGET)*100)}%`;
+        }
+
+        function switchWs(tab) {
+            currentWsTab = tab;
+            document.querySelectorAll('.ws-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`ws-tab-${tab}`).classList.add('active');
+            renderWorkspace();
+        }
+
+        function getCustomerHistory(phone) { return allOrders.filter(o => o.customerPhone === phone && o.processedBy); }
+
+        function renderWorkspace() {
+            const c = document.getElementById('ws-content');
+            const now = new Date();
+            const search = (document.getElementById('ws-search').value || '').toLowerCase();
+            let list = [];
+
+            if(currentWsTab === 'new') {
+                list = allOrders.filter(o => o.status === 'accepted');
+                if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No new orders to confirm.</p>'; return; }
+            } else if(currentWsTab === 'retry') {
+                list = allOrders.filter(o => (o.status === 'no_answer' || o.status === 'busy') || (o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() <= now));
+                if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No retry orders right now.</p>'; return; }
+            } else if(currentWsTab === 'scheduled') {
+                list = allOrders.filter(o => o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() > now);
+                if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No scheduled callbacks.</p>'; return; }
+            }
+
+            if(search) {
+                list = list.filter(o => o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)));
+                if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No orders match your search.</p>'; return; }
+            }
+
+            c.innerHTML = list.map(o => {
+                const history = getCustomerHistory(o.customerPhone);
+                const histText = history.length > 1 ? `<div class="mt-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-300"><span class="iconify inline-block mr-1" data-icon="mdi:history"></span>Customer ordered ${history.length} times. ${history.filter(h=>h.status==='delivered').length} delivered, ${history.filter(h=>h.status==='cancelled').length} cancelled.</div>` : '';
+                return `
+                <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-5 hover:border-cyan-500/30 transition-colors">
+                    <div class="flex flex-col md:flex-row justify-between gap-4 mb-4">
+                        <div>
+                            <div class="flex items-center gap-3 mb-1">
+                                <span class="font-mono text-cyan-400 font-bold">#${o.id.slice(-6).toUpperCase()}</span>
+                                ${getStatusBadge(o.status)}
+                                ${o.scheduledDate ? `<span class="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">📅 ${o.scheduledDate.toDate().toLocaleDateString()}</span>` : ''}
+                            </div>
+                            <div class="text-slate-400 text-sm">${o.merchantName || 'Merchant'} • ${formatDate(o.createdAt)}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-white">TZS ${Number(o.totalAmount).toLocaleString()}</div>
+                            <div class="text-xs text-slate-500">${o.itemName} x${o.qty}</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-3 bg-black/20 rounded-xl">
+                        <div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Customer</div><div class="text-white text-sm font-medium">${o.customerName}</div></div>
+                        <div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Phone</div><a href="tel:${o.customerPhone}" class="text-cyan-400 text-sm font-medium hover:underline">${o.customerPhone}</a></div>
+                        <div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">City / Address</div><div class="text-slate-300 text-sm">${o.customerCity || 'N/A'}, ${o.customerAddress || 'N/A'}</div></div>
+                    </div>
+                    <div class="flex gap-4 mb-4 p-3 bg-cyan-500/5 border border-cyan-500/10 rounded-xl items-start">
+                        ${o.productImage ? `<div onclick="viewImg('${o.productImage}')" class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 overflow-hidden border border-white/10 cursor-pointer hover:border-cyan-500/50 transition-all"><img src="${o.productImage}" class="w-full h-full object-cover"></div>` : '<div class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 flex items-center justify-center border border-white/10"><span class="iconify text-4xl text-slate-600" data-icon="mdi:package-variant"></span></div>'}
+                        <div class="flex-1">
+                            <div class="text-[10px] text-cyan-400 uppercase font-bold mb-1">Product Ordered</div>
+                            <div class="text-white text-sm font-bold">${o.itemName || o.productName || 'Unknown'}</div>
+                            <div class="text-xs text-slate-400 mt-1 line-clamp-2">${o.productDesc || 'No description provided.'}</div>
+                        </div>
+                    </div>
+                    ${o.timeline && o.timeline.length ? `<div class="mt-4 border-t border-white/[0.05] pt-4"><div class="text-[10px] text-slate-500 uppercase font-bold mb-3">Order Timeline</div><div class="space-y-3 max-h-48 overflow-y-auto pr-2">${o.timeline.slice().reverse().map(t => `<div class="flex gap-3 text-xs"><div class="flex flex-col items-center"><div class="w-2 h-2 rounded-full bg-cyan-400 mt-1.5"></div><div class="w-px h-full bg-white/[0.05] mt-1"></div></div><div class="pb-3"><div class="text-slate-400">${formatDate(t.at)}</div><div class="text-white font-semibold mt-0.5">${t.status.replace(/_/g,' ').toUpperCase()}</div>${t.by ? `<div class="text-slate-500">by ${t.by}</div>` : ''}${t.note ? `<div class="text-slate-500 italic mt-1">"${t.note}"</div>` : ''}</div></div>`).join('')}</div></div>` : ''}
+                    ${histText}
+                    <form class="space-y-3 pt-4 border-t border-white/[0.05]">
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button type="button" onclick="startTimer('${o.id}')" id="timer-btn-${o.id}" class="flex-1 bg-green-500/20 text-green-400 border border-green-500/30 font-semibold py-2.5 rounded-xl hover:bg-green-500/30 transition-colors flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:phone"></span> <span id="timer-label-${o.id}">Start Call</span></button>
+                            <div id="timer-display-${o.id}" class="hidden sm:flex items-center justify-center w-24 bg-black/30 border border-white/[0.1] rounded-xl text-cyan-400 font-mono font-bold text-sm">00:00</div>
+                            <select id="outcome-${o.id}" onchange="toggleSchedule(this.value, '${o.id}')" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"><option value="" disabled selected>-- Select Outcome --</option><option value="confirmed">✅ Confirmed</option><option value="no_answer">📞 No Reply</option><option value="wrong_number">❌ Wrong Number</option><option value="out_of_region">🗺️ Out of Region</option><option value="cancelled">❌ Customer Cancelled</option><option value="callback_requested">📅 Schedule Callback</option></select>
+                        </div>
+                        <div id="schedule-box-${o.id}" class="hidden bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl">
+                            <label class="text-xs font-bold text-indigo-400 uppercase">Callback Date (e.g. Customer pressed by mistake)</label>
+                            <input type="date" id="date-${o.id}" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500/50">
+                        </div>
+                        <div class="flex flex-wrap gap-2"><span class="text-xs text-slate-500 py-1">Quick Tags:</span><span type="button" onclick="addTag(this, 'Wants refund')" class="quick-tag">Wants refund</span><span type="button" onclick="addTag(this, 'Pay on delivery')" class="quick-tag">Pay on delivery</span><span type="button" onclick="addTag(this, 'Not interested')" class="quick-tag">Not interested</span><span type="button" onclick="addTag(this, 'Wrong item ordered')" class="quick-tag">Wrong item ordered</span><span type="button" onclick="addTag(this, 'Pressed by mistake')" class="quick-tag">Pressed by mistake</span></div>
+                        <textarea id="notes-${o.id}" rows="2" placeholder="Add call notes here..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 resize-none">${o.callNotes || ''}</textarea>
+                        <button type="button" onclick="handleFormSubmit('${o.id}', this)" class="w-full sm:w-auto sm:ml-auto bg-cyan-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 text-sm cursor-pointer active:scale-95 transition-transform"><span class="iconify" data-icon="mdi:check"></span> Update Order</button>
+                    </form>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
+        function addTag(el, text) { const ta = el.closest('form').querySelector('textarea'); if(ta.value.includes(text)) { ta.value = ta.value.replace(text+', ', ''); el.style.borderColor=''; el.style.color=''; } else { ta.value += text + ', '; el.style.borderColor='#06b6d4'; el.style.color='#22d3ee'; } }
+        function viewImg(src) { document.getElementById('lightbox-img').src = src; document.getElementById('img-lightbox').classList.remove('hidden'); }
+
+        function startTimer(id) {
+            if(timerInterval) { showT("Finish current call first", "error"); return; }
+            activeTimerId = id; timerSeconds = 0;
+            const btn = document.getElementById('timer-btn-'+id), label = document.getElementById('timer-label-'+id), display = document.getElementById('timer-display-'+id);
+            btn.classList.remove('bg-green-500/20', 'text-green-400', 'border-green-500/30'); btn.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/30'); label.textContent = 'End Call';
+            display.classList.remove('hidden'); display.classList.add('sm:flex');
+            timerInterval = setInterval(() => { timerSeconds++; const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0'); const s = (timerSeconds % 60).toString().padStart(2, '0'); display.textContent = `${m}:${s}`; }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval); timerInterval = null; const duration = timerSeconds; timerSeconds = 0; 
+            if(activeTimerId) {
+                const btn = document.getElementById('timer-btn-'+activeTimerId), label = document.getElementById('timer-label-'+activeTimerId), display = document.getElementById('timer-display-'+activeTimerId);
+                if(btn) { btn.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/30'); btn.classList.remove('bg-red-500/20', 'text-red-400', 'border-red-500/30'); label.textContent = 'Start Call'; }
+                if(display) { display.classList.add('hidden'); display.classList.remove('sm:flex'); }
+            }
+            activeTimerId = null; return duration;
+        }
+
+        function handleFormSubmit(id, btn) {
+            try {
+                var outcome = document.getElementById('outcome-'+id).value;
+                var notes = document.getElementById('notes-'+id).value;
+                var dateVal = document.getElementById('date-'+id) ? document.getElementById('date-'+id).value : null;
+                if(!outcome) { showT("Select outcome", "error"); return; }
+                if(outcome === 'callback_requested' && !dateVal) { showT("Pick a date", "error"); return; }
+                btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Updating...'; btn.disabled = true; 
+                var updateData = { status: outcome, callOutcome: outcome, callNotes: notes, processedBy: myId(), processedByName: window.currentUser.name, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+                if(outcome === 'callback_requested' && dateVal) { updateData.scheduledDate = firebase.firestore.Timestamp.fromDate(new Date(dateVal + "T12:00:00")); }
+                db.collection('orders').doc(id).update(updateData).then(function() { showT("Order updated!"); btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order'; btn.disabled = false; }).catch(function(err) { showT("Error: " + err.message, "error"); btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order'; btn.disabled = false; });
+            } catch(e) { showT("Error: " + e.message, "error"); btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order'; btn.disabled = false; }
+        }
+
+        let shipFilter = 'all';
+        function filterShipping(f) {
+            shipFilter = f;
+            document.querySelectorAll('.ship-btn').forEach(b => b.className = 'ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]');
+            event.target.className = 'ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
+            renderShipping();
+        }
+
+        function renderShipping() {
+            const tb = document.getElementById('shipping-table');
+            let shipped = allOrders.filter(o => o.processedBy === myId() && ['confirmed', 'preparing', 'out_for_delivery', 'delivered', 'returned', 'cancelled'].includes(o.status));
+            if(shipFilter !== 'all') { shipped = shipped.filter(o => o.status === shipFilter); }
+            if(!shipped.length) { tb.innerHTML = '<tr><td colspan="6" class="text-center text-slate-500 py-8">No orders in this category.</td></tr>'; return; }
+            tb.innerHTML = shipped.map(o => `<tr class="hover:bg-white/[0.02]"><td class="px-4 py-3 font-mono text-cyan-400 text-xs">#${o.id.slice(-6).toUpperCase()}</td><td class="px-4 py-3 text-sm">${o.customerName}</td><td class="px-4 py-3 text-xs text-slate-300">${o.itemName} x${o.qty}</td><td class="px-4 py-3 text-sm font-semibold">TZS ${Number(o.totalAmount).toLocaleString()}</td><td class="px-4 py-3">${getStatusBadge(o.status)}</td><td class="px-4 py-3 text-xs text-slate-500">${formatDate(o.updatedAt)}</td></tr>`).join('');
+        }
+
+        function renderPerformance() {
+            const my = allOrders.filter(o => o.processedBy === myId());
+            const confirmed = my.filter(o => o.status === 'confirmed').length;
+            const totalProcessed = my.length;
+            const rate = totalProcessed > 0 ? Math.round((confirmed / totalProcessed) * 100) : 0;
+            const totalSeconds = my.reduce((s, o) => s + (o.callDuration || 0), 0);
+            const avgTime = totalProcessed > 0 ? Math.round(totalSeconds / totalProcessed) : 0;
+            document.getElementById('p-total').textContent = totalProcessed;
+            document.getElementById('p-rate').textContent = `${rate}%`;
+            document.getElementById('p-time').textContent = avgTime > 60 ? `${Math.floor(avgTime/60)}m ${avgTime%60}s` : `${avgTime}s`;
+            const c = document.getElementById('p-history');
+            const recent = my.filter(o => o.updatedAt).sort((a,b) => (b.updatedAt.seconds||0) - (a.updatedAt.seconds||0)).slice(0, 30);
+            if(!recent.length) { c.innerHTML = '<p class="text-slate-500 text-center">No history yet.</p>'; return; }
+            c.innerHTML = recent.map(o => `<div class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl"><div class="flex items-center gap-3"><span class="font-mono text-cyan-400 text-xs">#${o.id.slice(-6).toUpperCase()}</span><span class="text-sm text-slate-300">${o.customerName}</span></div><div class="flex items-center gap-3"><span class="text-xs text-slate-500">${o.callDuration || 0}s</span>${getStatusBadge(o.status)}</div></div>`).join('');
+        }
+
+        async function saveProfile() { try { await db.collection('users').doc(myId()).update({ name: document.getElementById('set-name').value }); document.getElementById('header-name').textContent = document.getElementById('set-name').value; showT("Profile Saved!"); } catch(e) { showT(e.message, "error"); } }
+
+        document.getElementById('pw-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const curr = document.getElementById('pw-current').value, newPw = document.getElementById('pw-new').value, conf = document.getElementById('pw-confirm').value;
+            if(newPw !== conf) return showT("New passwords do not match", "error");
+            const user = firebase.auth().currentUser, cred = firebase.auth.EmailAuthProvider.credential(user.email, curr);
+            try { await user.reauthenticateWithCredential(cred); await user.updatePassword(newPw); showT("Password updated!"); this.reset(); } catch(err) { showT("Current password is incorrect.", "error"); }
+        });
+    </script>
+</body>
+</html>

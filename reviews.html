@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merchant Reviews — ChapShop Delivery</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2306b6d4'/%3E%3Cpath d='M8 22l4-6h-3l5-8h-4l6-10 6 10h-4l5 8h-3l4 6z' fill='white' transform='translate(0,2)'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}body{background:#020617;color:#fff}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}.gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.form-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 16px;font-size:14px;color:#fff;transition:all .25s ease;font-family:inherit;outline:none}.form-input:focus{border-color:rgba(6,182,212,.5)}select.form-input{appearance:none;cursor:pointer;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%2394a3b8" d="M6 8L1 3h10z"/></svg>');background-repeat:no-repeat;background-position:right 16px center}select.form-input option{background-color:#0f172a;color:#e2e8f0}.review-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:24px;transition:all .3s ease}.review-card:hover{border-color:rgba(6,182,212,.2);background:rgba(255,255,255,.03)}.verified-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#34d399;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px}.avatar-0{background:linear-gradient(135deg,#06b6d4,#0e7490)}.avatar-1{background:linear-gradient(135deg,#10b981,#047857)}.avatar-2{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}.avatar-3{background:linear-gradient(135deg,#f59e0b,#d97706)}.avatar-4{background:linear-gradient(135deg,#ef4444,#b91c1c)}
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <nav class="border-b border-white/[0.08] bg-[#020617]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl flex items-center justify-center"><span class="iconify text-white text-xl" data-icon="mdi:truck-fast"></span></div>
+                <div><span class="font-bold text-white text-[17px] tracking-tight">ChapShop</span><span class="text-cyan-400 font-bold text-[17px] ml-0.5 tracking-tight">Delivery</span></div>
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="https://g.page/r/CQLcWurf9sDhEBM/review" class="hidden sm:inline-flex bg-cyan-500 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors items-center gap-2"><span class="iconify text-base" data-icon="mdi:pencil"></span> Write Review</a>
+                <a href="index.html" class="text-sm text-slate-400 hover:text-white transition-colors font-medium flex items-center gap-1.5"><span class="iconify" data-icon="mdi:arrow-left"></span> Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 py-20">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h1 class="text-3xl md:text-4xl font-bold tracking-tight gradient-text mb-4">Merchant Reviews</h1>
+                <p class="text-slate-400 font-normal text-lg max-w-xl mx-auto">Real feedback from businesses using ChapShop Delivery across Tanzania.</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-[#0f172a] border border-white/[0.08] rounded-xl p-4">
+                <div class="flex items-center gap-2 text-sm text-slate-400 w-full sm:w-auto">
+                    <span class="iconify text-cyan-400" data-icon="mdi:filter-outline"></span>
+                    <span class="font-medium whitespace-nowrap">Filter by:</span>
+                    <select id="serviceFilter" class="form-input py-2 text-sm flex-1 sm:w-48" onchange="filterReviews()">
+                        <option value="all">All Services</option>
+                        <option value="Cash On Delivery">Cash On Delivery</option>
+                        <option value="Courier & Delivery">Courier & Delivery</option>
+                        <option value="Warehouse Solutions">Warehouse</option>
+                        <option value="Order Fulfillment">Fulfillment</option>
+                        <option value="Medical Courier">Medical</option>
+                    </select>
+                </div>
+                <a href="https://g.page/r/CQLcWurf9sDhEBM/review" class="sm:hidden w-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-sm font-semibold px-5 py-2.5 rounded-lg text-center hover:bg-cyan-500/20 transition-colors flex items-center justify-center gap-2"><span class="iconify" data-icon="mdi:pencil"></span> Write a Review</a>
+                <div class="hidden sm:flex items-center gap-2 text-sm text-slate-500">
+                    <span class="iconify" data-icon="mdi:sort"></span>
+                    <span id="reviewCount">0 Reviews</span>
+                </div>
+            </div>
+
+            <div id="reviewsList" class="space-y-6">
+                <!-- Reviews load here -->
+            </div>
+
+            <div id="loadMoreContainer" class="text-center mt-10 hidden">
+                <button onclick="loadMore()" class="inline-flex items-center gap-2 bg-white/[0.05] border border-white/[0.1] text-white font-semibold text-sm px-7 py-3.5 rounded-xl hover:bg-white/[0.1] transition-all cursor-pointer">
+                    <span class="iconify text-lg" data-icon="mdi:comment-text-multiple-outline"></span> Load More Reviews
+                </button>
+            </div>
+            
+            <div id="emptyState" class="text-center py-16 hidden">
+                <span class="iconify text-5xl text-slate-700 mb-4 block mx-auto" data-icon="mdi:comment-off-outline"></span>
+                <h3 class="text-xl font-semibold text-white mb-2">No Reviews Found</h3>
+                <p class="text-slate-400 text-sm mb-6">Be the first to share your experience!</p>
+                <a href="https://g.page/r/CQLcWurf9sDhEBM/review" class="bg-cyan-500 text-white font-semibold text-sm px-6 py-3 rounded-xl hover:bg-cyan-400 transition-colors inline-flex items-center gap-2"><span class="iconify" data-icon="mdi:pencil"></span> Write a Review</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-t border-white/[0.05] py-8">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-xs text-slate-500">© 2025 ChapShop Delivery. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const mockReviews = [
+            { id: "M-001", name: "Amina Kimaro", company: "ZanzibarStyle Online", service: "Cash On Delivery", rating: 5, text: "ChapShop Delivery transformed our e-commerce business. Their COD success rate is unmatched, and we get paid faster than any other provider we've tried. The dashboard is intuitive and support is excellent.", date: "Jan 12, 2025", verified: true },
+            { id: "M-002", name: "Joseph Mtega", company: "TechHub TZ", service: "Warehouse Solutions", rating: 5, text: "Their warehouse solution saved us so much. We moved to ChapShop's 3PL, and our fulfillment speed increased by 3x. Highly recommended for any scaling business.", date: "Jan 10, 2025", verified: true },
+            { id: "M-003", name: "Fatma Nassoro", company: "DawaCare Pharmacies", service: "Medical Courier", rating: 4.5, text: "As a pharmacy chain, we needed reliable medical courier services. ChapShop delivers our temperature-sensitive shipments on time every time. Great cold chain management.", date: "Jan 8, 2025", verified: true },
+            { id: "M-004", name: "David Rweyemamu", company: "Kilimanjaro Teas", service: "Order Fulfillment", rating: 5, text: "The order fulfillment service is seamless. We just send them the orders and they handle the rest. Our customers are happier with the faster delivery times.", date: "Jan 5, 2025", verified: true },
+            { id: "M-005", name: "Sarah Mollel", company: "ArushaCrafts", service: "Cash On Delivery", rating: 4, text: "Good COD service. The remittance is fast, usually within 24 hours as promised. Would love to see more coverage in rural areas, but overall very solid.", date: "Dec 28, 2024", verified: true },
+            { id: "M-006", name: "Hassan Juma", company: "Simba Electronics", service: "Courier & Delivery", rating: 5, text: "Next-day delivery to Mwanza is a game changer for our electronics business. Customers trust ChapShop's delivery personnel with high-value items.", date: "Dec 22, 2024", verified: true },
+            { id: "M-007", name: "Grace Mushi", company: "TzBooks", service: "Order Fulfillment", rating: 4.5, text: "Switching to ChapShop for fulfillment was the best decision we made this year. Inventory management is precise and we've had zero lost packages.", date: "Dec 15, 2024", verified: true },
+            { id: "M-008", name: "Peter Mahinda", company: "DarFresh Groceries", service: "Courier & Delivery", rating: 4, text: "Same-day delivery in Dar es Salaam is reliable. Our fresh produce gets to customers in perfect condition. Just wish the cutoff time was later in the day.", date: "Dec 10, 2024", verified: true },
+            { id: "M-009", name: "Lucy Kawembe", company: "MbeyaFashions", service: "Reverse Logistics", rating: 5, text: "Their returns management is excellent. We used to struggle with reverse logistics but ChapShop handles everything from pickup to restocking seamlessly.", date: "Dec 5, 2024", verified: true }
+        ];
+
+        let allReviews = [];
+        let filteredReviews = [];
+        let displayCount = 6;
+
+        function init() {
+            const userReviews = JSON.parse(localStorage.getItem('chapshop_reviews') || '[]');
+            allReviews = [...userReviews, ...mockReviews];
+            filterReviews();
+        }
+
+        function filterReviews() {
+            const service = document.getElementById('serviceFilter').value;
+            filteredReviews = service === 'all' ? allReviews : allReviews.filter(r => r.service === service);
+            displayCount = 6;
+            renderReviews();
+        }
+
+        function renderReviews() {
+            const container = document.getElementById('reviewsList');
+            const emptyState = document.getElementById('emptyState');
+            const loadMoreBtn = document.getElementById('loadMoreContainer');
+            const countEl = document.getElementById('reviewCount');
+            
+            countEl.textContent = `${filteredReviews.length} Reviews`;
+
+            if (filteredReviews.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                loadMoreBtn.classList.add('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            const reviewsToShow = filteredReviews.slice(0, displayCount);
+            
+            if (displayCount >= filteredReviews.length) {
+                loadMoreBtn.classList.add('hidden');
+            } else {
+                loadMoreBtn.classList.remove('hidden');
+            }
+
+            container.innerHTML = reviewsToShow.map(review => {
+                const stars = renderStars(review.rating);
+                const initial = review.name.charAt(0).toUpperCase();
+                const avatarClass = `avatar-${review.name.length % 5}`;
+                const verifiedBadge = review.verified ? `<span class="verified-badge"><span class="iconify text-xs" data-icon="mdi:check-decagram"></span> Verified Merchant</span>` : '';
+
+                return `
+                    <div class="review-card">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full ${avatarClass} flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-lg">${initial}</div>
+                                <div>
+                                    <div class="text-sm font-semibold text-white flex items-center gap-2">${review.name} ${verifiedBadge}</div>
+                                    <div class="text-xs text-slate-500 font-medium">${review.company}</div>
+                                </div>
+                            </div>
+                            <div class="text-xs text-slate-600 whitespace-nowrap">${review.date}</div>
+                        </div>
+                        <div class="flex items-center gap-1 mb-4">${stars}</div>
+                        <p class="text-[15px] text-slate-300 leading-relaxed mb-4">"${review.text}"</p>
+                        <div class="flex items-center gap-2 pt-4 border-t border-white/[0.06]">
+                            <span class="iconify text-cyan-400 text-xs" data-icon="mdi:package-variant-closed"></span>
+                            <span class="text-xs text-slate-500 font-medium">Service: ${review.service}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderStars(rating) {
+            let html = '';
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 !== 0;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+            for (let i = 0; i < fullStars; i++) {
+                html += `<span class="iconify text-amber-400 text-sm" data-icon="mdi:star"></span>`;
+            }
+            if (halfStar) {
+                html += `<span class="iconify text-amber-400 text-sm" data-icon="mdi:star-half-full"></span>`;
+            }
+            for (let i = 0; i < emptyStars; i++) {
+                html += `<span class="iconify text-slate-700 text-sm" data-icon="mdi:star"></span>`;
+            }
+            return html;
+        }
+
+        function loadMore() {
+            displayCount += 6;
+            renderReviews();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

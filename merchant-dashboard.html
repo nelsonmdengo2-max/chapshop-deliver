@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merchant Dashboard — ChapShop Delivery</title>
+    <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEwaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="core.js"></script>
+  <style>
+        *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+        .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .toast{bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.16,1,.3,1);white-space:nowrap}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+        .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem}
+        .sidebar-link:hover,.sidebar-link.active{background:rgba(6,182,212,0.1);color:#22d3ee}
+        select option { background-color: #0f172a; color: #e2e8f0; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:1rem;padding:1rem;transition:all 0.2s}
+        .stat-card:hover{border-color:rgba(6,182,212,0.3)}
+        .chat-bubble{max-width:75%;padding:0.75rem 1rem;border-radius:1rem;font-size:0.875rem;line-height:1.4;box-shadow:0 2px 5px rgba(0,0,0,0.05)}
+        .cat-btn{padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:#94a3b8;cursor:pointer;transition:all .2s;white-space:nowrap}.cat-btn:hover{background:rgba(255,255,255,0.06);color:#e2e8f0}.cat-btn.active{background:rgba(6,182,212,0.15);color:#22d3ee;border-color:rgba(6,182,212,0.3)}
+        @keyframes pulse-border{0%,100%{border-color:rgba(234,179,8,0.15)}50%{border-color:rgba(234,179,8,0.8)}}
+        @keyframes pulse-border-red{0%,100%{border-color:rgba(239,68,68,0.15)}50%{border-color:rgba(239,68,68,0.8)}}
+        .stock-critical{animation:pulse-border 2s ease-in-out infinite}
+        .stock-empty{animation:pulse-border-red 1.5s ease-in-out infinite}
+        .zone-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.3);color:#22d3ee;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600}.zone-tag button{background:none;border:none;color:#22d3ee;cursor:pointer;font-size:16px;line-height:1;padding:0 0 0 2px}.zone-tag button:hover{color:#f87171}
+        .reorder-btn{padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;border:1px solid rgba(34,211,238,0.3);background:rgba(34,211,238,0.08);color:#22d3ee;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}.reorder-btn:hover{background:rgba(34,211,238,0.2);border-color:rgba(34,211,238,0.5)}
+        .order-toast{position:fixed;top:16px;right:16px;background:#0f172a;border:1px solid rgba(34,211,238,0.3);color:#fff;padding:14px 20px;border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,0.4);z-index:300;display:flex;align-items:center;gap:10px;transform:translateX(120%);transition:transform .4s cubic-bezier(.16,1,.3,1);font-size:14px}
+        .order-toast.show{transform:translateX(0)}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+        .modal-box{background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto}
+        .tl-step{display:flex;gap:16px}.tl-dot{width:16px;height:16px;border-radius:50%;border:2px solid #334155;display:flex;align-items:center;justify-content:center;flex-shrink:0}.tl-dot.done{background:#06b6d4;border-color:#06b6d4}.tl-line{width:2px;min-height:40px;background:#1e293b;flex-shrink:0}
+        .print-slip{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:150;display:flex;align-items:center;justify-content:center;padding:20px}
+        .print-slip-box{background:#fff;color:#111;border-radius:8px;padding:32px;max-width:400px;width:100%;font-family:'Plus Jakarta Sans',sans-serif}
+        .print-slip-box h2{font-size:18px;font-weight:800;margin:0 0 4px}
+        .print-slip-box .ps-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dotted #ddd;font-size:13px}
+        .print-slip-box .ps-label{color:#666}.print-slip-box .ps-val{font-weight:700;text-align:right}
+        .print-slip-box .ps-big{font-size:28px;font-weight:800;color:#06b6d4;margin-bottom:4px;font-family:monospace}
+        .print-slip-box .ps-total{font-size:16px;font-weight:800}
+        .print-slip-box .ps-footer{margin-top:20px;padding-top:12px;border-top:1px dashed #ccc;text-align:center;font-size:11px;color:#999}
+        .print-actions{position:absolute;top:12px;right:12px;display:flex;gap:8px}
+        @media print{body *{visibility:hidden}.print-slip,.print-slip *{visibility:visible}.print-slip{position:fixed;top:0;left:0;width:100%;height:100%;background:#fff;padding:0;display:flex;align-items:flex-start;justify-content:center}.print-actions{display:none !important}}
+		
+		 @keyframes pulse-text { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .pulse-text { animation: pulse-text 1.5s ease-in-out infinite; }
+    </style>
+	
+</head>
+<body class="bg-[#020617] text-white min-h-screen">
+
+    <!-- BEAUTIFUL AUTH LOADER -->
+    <div id="auth-loader" class="fixed inset-0 z-[9999] bg-[#020617] hidden flex-col items-center justify-center">
+        <div class="relative w-16 h-16">
+            <div class="absolute inset-0 border-4 border-cyan-500/20 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin"></div>
+        </div>
+        <p id="auth-loader-text" class="mt-5 text-slate-400 text-sm font-semibold tracking-wide pulse-text">Loading...</p>
+    </div>
+
+    <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-[#0f172a] border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+        <span id="toast-icon" class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
+        <span id="toast-msg" class="text-sm font-medium">Success</span>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-[#020617]">
+        <div class="w-full max-w-md px-6">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20"><span class="iconify text-white text-3xl" data-icon="mdi:storefront"></span></div>
+                <h1 class="text-2xl font-bold gradient-text">Merchant Portal</h1>
+                <p class="text-slate-400 text-sm mt-1">ChapShop Delivery System</p>
+            </div>
+            <form method="POST" onsubmit="handleLogin(event)" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Email</label><input type="email" name="email" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="merchant@email.com"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Password</label><input type="password" name="password" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="••••••••"></div>
+                <button type="submit" class="w-full bg-cyan-500 text-white font-semibold py-3 rounded-xl hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20">Sign In</button>
+            </form>
+            <div class="text-center mt-6">
+                <button type="button" onclick="handleForgotPassword()" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors block mb-3">Forgot Password?</button>
+                <a href="index.html" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors">← Back to Website</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app-screen" class="hidden min-h-screen flex">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="fixed top-0 left-0 h-screen w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
+            
+            <!-- 1. STICKY HEADER -->
+                        <!-- 1. STICKY HEADER -->
+            <div class="p-4 border-b border-white/[0.08] flex-shrink-0 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center">
+                        <span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span>
+                    </div>
+                    <span class="font-bold text-white text-sm">ChapShop<span class="text-cyan-400 ml-1">Merchant</span></span>
+                </div>
+                <button onclick="switchTab('notifications')" class="relative p-2 rounded-lg hover:bg-white/[0.05] transition-colors">
+                    <span class="iconify text-slate-400 text-lg" data-icon="mdi:bell-outline"></span>
+                    <span id="header-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+                </button>
+            </div>
+            
+            <!-- 2. SCROLLABLE MIDDLE LINKS -->
+            <nav class="p-4 space-y-1 flex-1 overflow-y-auto">
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2" data-i18n="main">Main</div>
+                <button onclick="switchTab('dashboard')" class="sidebar-link active w-full text-left" id="nav-dashboard"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> <span data-i18n="dashboard">Dashboard</span></button>
+                <button onclick="switchTab('upload')" class="sidebar-link w-full text-left" id="nav-upload"><span class="iconify text-lg" data-icon="mdi:plus-circle-outline"></span> New Order</button>
+                <button onclick="switchTab('orders')" class="sidebar-link w-full text-left" id="nav-orders"><span class="iconify text-lg" data-icon="mdi:package-variant-closed"></span> <span data-i18n="orders">All Orders</span></button>
+                
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]" data-i18n="catalog_menu">Catalog</div>
+                <button onclick="switchTab('products')" class="sidebar-link w-full text-left" id="nav-products"><span class="iconify text-lg" data-icon="mdi:shape-outline"></span> <span data-i18n="products">Products</span></button>
+                <button onclick="switchTab('catalog')" class="sidebar-link w-full text-left" id="nav-catalog"><span class="iconify text-lg" data-icon="mdi:format-list-bulleted"></span> <span data-i18n="catalog">All Products</span></button>
+                <button onclick="switchTab('inventory')" class="sidebar-link w-full text-left" id="nav-inventory"><span class="iconify text-lg" data-icon="mdi:archive-outline"></span> <span data-i18n="inventory">Inventory</span></button>
+
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]" data-i18n="insights">Insights</div>
+                <button onclick="switchTab('trend')" class="sidebar-link w-full text-left" id="nav-trend"><span class="iconify text-lg" data-icon="mdi:chart-timeline-variant"></span> <span data-i18n="trend">Sales Trend</span></button>
+                <button onclick="switchTab('reports')" class="sidebar-link w-full text-left" id="nav-reports"><span class="iconify text-lg" data-icon="mdi:chart-bar"></span> <span data-i18n="reports">Reports</span></button>
+                <button onclick="switchTab('settlements')" class="sidebar-link w-full text-left" id="nav-settlements"><span class="iconify text-lg" data-icon="mdi:cash-check"></span> <span data-i18n="settlements">Settlements</span></button>
+                <button onclick="switchTab('notifications')" class="sidebar-link w-full text-left relative" id="nav-notifications"><span class="iconify text-lg" data-icon="mdi:bell-outline"></span> <span data-i18n="notifications">Notifications</span> <span id="notif-badge" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span></button>
+
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]" data-i18n="system">System</div>
+                <button onclick="switchTab('integration')" class="sidebar-link w-full text-left" id="nav-integration"><span class="iconify text-lg" data-icon="mdi:link-variant"></span> <span data-i18n="integration">Integrations</span></button>
+                <button onclick="switchTab('profile')" class="sidebar-link w-full text-left" id="nav-profile"><span class="iconify text-lg" data-icon="mdi:account-cog-outline"></span> <span data-i18n="profile">Settings</span></button>
+                
+                <div class="h-4"></div>
+            </nav>
+            
+            <!-- 3. STICKY LOGOUT BUTTON -->
+            <div class="p-4 border-t border-white/[0.08] bg-[#0f172a] flex-shrink-0">
+                <button onclick="handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> <span data-i18n="logout">Logout</span></button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 lg:ml-64 flex flex-col">
+                           <!-- TOP HEADER BAR -->
+            <header class="sticky top-0 z-30 nav-blur bg-[#020617]/80 border-b border-white/[0.08] px-6 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-white p-1"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span id="header-name" class="text-sm font-semibold text-white hidden sm:block">My Shop</span>
+                    <div class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs" id="header-avatar">M</div>
+                </div>
+            </header>
+            <div class="p-6 md:p-8 flex-1">
+                
+                <!-- DASHBOARD -->
+                <div id="panel-dashboard" class="tab-panel">
+                    <div class="flex flex-col md:flex-row gap-3 mb-6 items-start md:items-center justify-between">
+                        <div class="flex gap-2 flex-wrap" id="dash-period-btns">
+                            <button onclick="setDashPeriod('today')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">Today</button>
+                            <button onclick="setDashPeriod('week')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Week</button>
+                            <button onclick="setDashPeriod('month')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Month</button>
+                            <button onclick="setDashPeriod('year')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Year</button>
+                            <button onclick="setDashPeriod('all')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">All Time</button>
+                        </div>
+                        <div class="flex gap-2 items-center flex-wrap">
+                            <input type="date" id="dash-from" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500/50" style="max-width:150px" onchange="setDashPeriod('custom',this.value,$('dash-to').value)">
+                            <span class="text-slate-500 text-sm">→</span>
+                            <input type="date" id="dash-to" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500/50" style="max-width:150px" onchange="setDashPeriod('custom',$('dash-from').value,this.value)">
+                        </div>
+                    </div>
+                    
+                    <!-- REVENUE BREAKDOWN -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-green-400 uppercase" data-i18n="gross_rev">Gross Revenue</span><span class="iconify text-green-400" data-icon="mdi:cash-multiple"></span></div><div id="st-gross-rev" class="text-xl font-bold text-white">TZS 0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-red-400 uppercase" data-i18n="commission">Commission (10%)</span><span class="iconify text-red-400" data-icon="mdi:percent"></span></div><div id="st-commission" class="text-xl font-bold text-red-400">-TZS 0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-cyan-400 uppercase" data-i18n="net_earn">Net Earnings</span><span class="iconify text-cyan-400" data-icon="mdi:wallet"></span></div><div id="st-net-rev" class="text-xl font-bold text-cyan-400">TZS 0</div></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-4 mb-6">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <div class="relative flex-1 max-w-xs"><span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:phone-search"></span><input type="tel" id="phone-lookup" oninput="lookupPhone()" placeholder="Look up customer by phone..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                        </div>
+                        <div id="phone-lookup-results" class="space-y-2"></div>
+                    </div>
+                    
+                    <!-- ROW 1: MAIN STATUS CARDS -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-slate-400 uppercase" data-i18n="total_orders">Total Orders</span><span class="iconify text-blue-400" data-icon="mdi:package-variant-closed"></span></div><div id="stat-total" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-green-400 uppercase" data-i18n="delivered">Delivery Orders</span><span class="iconify text-green-400" data-icon="mdi:truck-check"></span></div><div id="stat-delivered" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-yellow-400 uppercase" data-i18n="pending">Pending Orders</span><span class="iconify text-yellow-400" data-icon="mdi:clock-outline"></span></div><div id="stat-pending" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-red-400 uppercase" data-i18n="cancelled">Cancelled Orders</span><span class="iconify text-red-400" data-icon="mdi:close-circle"></span></div><div id="stat-cancelled" class="text-2xl font-bold text-white">0</div></div>
+                    </div>
+
+                    <!-- ROW 2: CALL CENTER / SPECIAL STATUS CARDS -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-indigo-400 uppercase">Scheduled</span><span class="iconify text-indigo-400" data-icon="mdi:calendar-clock"></span></div><div id="stat-scheduled" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-orange-400 uppercase">No Reply</span><span class="iconify text-orange-400" data-icon="mdi:phone-missed"></span></div><div id="stat-noreply" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-pink-400 uppercase">Wrong Numbers</span><span class="iconify text-pink-400" data-icon="mdi:phone-off"></span></div><div id="stat-wrong" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-slate-400 uppercase">Out of Region</span><span class="iconify text-slate-400" data-icon="mdi:map-marker-off"></span></div><div id="stat-outregion" class="text-2xl font-bold text-white">0</div></div>
+                    </div>
+
+                    <!-- ROW 3: STOCK & FINANCIALS -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-slate-400 uppercase">Available Stock</span><span class="iconify text-cyan-400" data-icon="mdi:package-variant"></span></div><div id="stat-stock" class="text-xl font-bold text-white">0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-slate-400 uppercase">Sales Today</span><span class="iconify text-green-400" data-icon="mdi:cash-multiple"></span></div><div id="stat-sales-today" class="text-xl font-bold text-white">TZS 0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-slate-400 uppercase">Today Orders</span><span class="iconify text-blue-400" data-icon="mdi:cart-plus"></span></div><div id="stat-orders-today" class="text-xl font-bold text-white">0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-slate-400 uppercase">Monthly Sales</span><span class="iconify text-violet-400" data-icon="mdi:calendar-month"></span></div><div id="stat-sales-month" class="text-xl font-bold text-white">TZS 0</div></div>
+                        <div class="stat-card" id="card-low-stock"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-yellow-400 uppercase">Low Stock</span><span class="iconify text-yellow-400" data-icon="mdi:alert-circle"></span></div><div id="stat-low-stock" class="text-xl font-bold text-yellow-400">0</div></div>
+                        <div class="stat-card" id="card-out-stock"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-red-400 uppercase">Out of Stock</span><span class="iconify text-red-400" data-icon="mdi:cancel"></span></div><div id="stat-out-stock" class="text-xl font-bold text-red-400">0</div></div>
+                    </div>
+
+                    <!-- PENDING REVIEW LIST -->
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4">Pending Review</h3>
+                        <div id="review-list" class="space-y-4"><p class="text-slate-500 text-center py-8">No orders need reviewing.</p></div>
+                    </div>
+                </div>
+
+                <!-- NEW ORDER -->
+                <div id="panel-upload" class="tab-panel hidden">
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 max-w-2xl">
+                        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:package-variant-closed-plus"></span> Upload Order</h3>
+                        <form id="order-form" class="space-y-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Product</label><select id="order-product" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"><option value="">Select...</option></select></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Quantity</label><input type="number" id="order-qty" min="1" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="1"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Order Date</label><input type="date" id="order-date" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name</label><input type="text" id="order-cust-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Juma"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><input type="tel" id="order-cust-phone" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="+255..."></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">City</label><input type="text" id="order-city" required list="zone-datalist" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Dar es Salaam"><datalist id="zone-datalist"></datalist></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Address</label><input type="text" id="order-address" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Street 12"></div>
+                            </div>
+                            <button type="submit" class="w-full bg-cyan-500 text-white font-semibold py-3 rounded-xl hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20">Submit to Review</button>
+                        </form>
+                    </div>
+                </div> 
+                
+                <!-- ALL ORDERS -->
+                <div id="panel-orders" class="tab-panel hidden">
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-4 mb-4 space-y-3">
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <div class="relative flex-1 max-w-xs"><span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="order-search" oninput="filterOrders()" placeholder="Search ID, phone, name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <select id="order-status-filter" onchange="filterOrders()" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50" style="width:auto;max-width:180px"><option value="">All Statuses</option><option value="pending">Pending</option><option value="accepted">Accepted</option><option value="confirmed">Confirmed</option><option value="no_answer">No Answer</option><option value="out_for_delivery">Out for Delivery</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option><option value="returned">Returned</option><option value="wrong_number">Wrong Number</option><option value="callback_requested">Callback Requested</option><option value="out_of_region">Out of Region</option></select>
+                        </div>
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="filterByDate('all')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">All</button>
+                            <button onclick="filterByDate('today')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Today</button>
+                            <button onclick="filterByDate('week')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Week</button>
+                            <button onclick="filterByDate('month')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Month</button>
+                            <button onclick="exportCSV()" class="bg-green-500/20 text-green-400 border border-green-500/30 px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-green-500/30 flex items-center gap-2"><span class="iconify" data-icon="mdi:download"></span> CSV</button>
+                        </div>
+                    </div>
+                                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
+                        <table class="w-full text-sm text-left min-w-[900px]">
+                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">City</th><th class="px-4 py-3">Product/SKU</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Agent</th><th class="px-4 py-3">Rider</th><th class="px-4 py-3">Date</th><th class="px-4 py-3">Actions</th></tr></thead>
+                            <tbody id="orders-table-body" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- PAGINATION FOOTER -->
+                    <div class="flex flex-col md:flex-row gap-3 mt-4 items-center justify-between text-xs text-slate-400">
+                        <div class="flex items-center gap-2">
+                            <span>Rows per page:</span>
+                            <select id="orders-page-size" onchange="changePageSize(this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-white focus:outline-none">
+                                <option value="15">15</option>
+                                <option value="10">10</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div id="orders-pagination-info" class="text-slate-500">Showing 0 to 0 of 0</div>
+                        <div class="flex gap-2">
+                            <button id="orders-prev-btn" onclick="prevPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed">Previous</button>
+                            <button id="orders-next-btn" onclick="nextPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed">Next</button>
+                        </div>
+                    </div>
+                </div>  
+                
+                <!-- PRODUCTS -->
+                <div id="panel-products" class="tab-panel hidden">
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <h3 class="text-lg font-bold text-white mb-6">Add New Product</h3>
+                        <form id="product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Name *</label><input type="text" id="prod-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Category</label><input type="text" id="prod-cat" list="cat-datalist" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Electronics"><datalist id="cat-datalist"></datalist></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Price (TZS) *</label><input type="number" id="prod-price" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">SKU</label><input type="text" id="prod-sku" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="WE-001"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Initial Stock *</label><input type="number" id="prod-stock" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Min Stock</label><input type="number" id="prod-min" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="5"></div>
+                            <div class="md:col-span-2">
+                                <label class="text-xs font-semibold text-slate-400 uppercase">Variants</label>
+                                <div id="variant-options-container" class="mt-2 space-y-3"></div>
+                                <button type="button" onclick="addVariantOption()" class="mt-2 text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1"><span class="iconify" data-icon="mdi:plus-circle-outline"></span> Add another option</button>
+                            </div>
+                            <div class="md:col-span-2"><label class="text-xs font-semibold text-slate-400 uppercase">Description</label><textarea id="prod-desc" rows="2" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 resize-none"></textarea></div>
+                            <div class="md:col-span-2"><label class="text-xs font-semibold text-slate-400 uppercase">Product Image</label><input type="file" id="prod-img" accept="image/*" class="w-full mt-1 text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/20 file:text-cyan-400 hover:file:bg-cyan-500/30 cursor-pointer"></div>
+                            <div class="md:col-span-2 flex justify-end"><button type="submit" class="bg-cyan-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20">Save Product</button></div>
+                        </form>
+                    </div>
+                   <div id="category-filter" class="flex gap-2 flex-wrap mb-4"></div>
+                    <div id="products-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+
+                <!-- ALL PRODUCTS CATALOG -->
+                <div id="panel-catalog" class="tab-panel hidden">
+                    <div class="flex flex-col md:flex-row gap-3 mb-6 items-start md:items-center justify-between">
+                        <h2 class="text-lg font-bold text-white">All Products</h2>
+                        <div class="relative max-w-xs w-full"><span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="catalog-search" oninput="renderCatalog()" placeholder="Search name, SKU, category..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
+                        <table class="w-full text-sm text-left min-w-[1100px]">
+                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]">
+                                <tr>
+                                    <th class="px-4 py-3 w-16">Image</th>
+                                    <th class="px-4 py-3">Name</th>
+                                    <th class="px-4 py-3">Category</th>
+                                    <th class="px-4 py-3 text-right">Price</th>
+                                    <th class="px-4 py-3">SKU</th>
+                                    <th class="px-4 py-3 text-right">Stock</th>
+                                    <th class="px-4 py-3 text-right">Min Stock</th>
+                                    <th class="px-4 py-3">Description</th>
+                                    <th class="px-4 py-3 text-center">Barcode</th>
+                                </tr>
+                            </thead>
+                            <tbody id="catalog-table-body" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                    <div id="catalog-empty" class="hidden text-center py-16 text-slate-500">
+                        <span class="iconify text-4xl text-slate-700 mx-auto block mb-3" data-icon="mdi:package-variant"></span>
+                        <div class="font-semibold">No products yet</div>
+                        <div class="text-xs mt-1">Go to Products tab to add your first product</div>
+                    </div>
+                </div>
+
+                <!-- INVENTORY -->
+                <div id="panel-inventory" class="tab-panel hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-lg font-bold text-white mb-4">Stock Levels</h3><div id="stock-table-list" class="space-y-3"></div></div>
+                        <div class="space-y-6">
+                            <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                                <h4 class="font-bold text-white mb-4">Stock Adjustment</h4>
+                                <form id="adjust-form" class="space-y-3">
+                                    <select id="adj-product" required class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"><option value="">Select...</option></select>
+                                    <select id="adj-type" required class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"><option value="in">Stock In</option><option value="out">Stock Out</option></select>
+                                    <input type="number" id="adj-qty" min="1" required class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Qty">
+                                    <button type="submit" class="w-full bg-cyan-500 text-white font-semibold py-3 rounded-xl hover:bg-cyan-400">Apply</button>
+                                </form>
+                            </div>
+                            <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h4 class="font-bold text-white mb-4">History</h4><div id="stock-history-list" class="space-y-2 max-h-64 overflow-y-auto text-xs"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SETTLEMENTS -->
+                <div id="panel-settlements" class="tab-panel hidden">
+                    <div class="flex gap-2 mb-5 flex-wrap" id="settle-btns">
+                        <button onclick="setSettlePeriod('all',this)" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">All Time</button>
+                        <button onclick="setSettlePeriod('today',this)" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Today</button>
+                        <button onclick="setSettlePeriod('week',this)" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Week</button>
+                        <button onclick="setSettlePeriod('month',this)" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Month</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="stat-card"><div class="text-[10px] font-bold text-cyan-400/70 uppercase mb-1">Gross Revenue</div><div id="st-gross" class="text-2xl font-bold text-white">TZS 0</div></div>
+                        <div class="stat-card"><div class="text-[10px] font-bold text-red-400/70 uppercase mb-1">Commission (10%)</div><div id="st-comm" class="text-2xl font-bold text-red-400">-TZS 0</div></div>
+                        <div class="stat-card"><div class="text-[10px] font-bold text-green-400/70 uppercase mb-1">Net Payout</div><div id="st-payout" class="text-2xl font-bold text-green-400">TZS 0</div></div>
+                    </div>
+                    <div id="settle-list" class="space-y-2"></div>
+                </div>
+
+               <!-- SALES TREND -->
+                <div id="panel-trend" class="tab-panel hidden">
+                    <div class="flex flex-col md:flex-row gap-3 mb-6 items-start md:items-center justify-between">
+                        <h2 class="text-lg font-bold text-white">Sales Trend</h2>
+                        <div class="flex gap-2 flex-wrap" id="trend-period-btns">
+                            <button onclick="setTrendPeriod('today')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">Today</button>
+                            <button onclick="setTrendPeriod('week')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Week</button>
+                            <button onclick="setTrendPeriod('month')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Month</button>
+                            <button onclick="setTrendPeriod('year')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Year</button>
+                            <button onclick="setTrendPeriod('all')" class="date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">All Time</button>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 items-center mb-6">
+                        <input type="date" id="trend-from" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500/50" style="max-width:150px" onchange="setTrendPeriod('custom',this.value,$('trend-to').value)">
+                        <span class="text-slate-500 text-sm">→</span>
+                        <input type="date" id="trend-to" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500/50" style="max-width:150px" onchange="setTrendPeriod('custom',$('trend-from').value,this.value)">
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-5 mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:chart-bar"></span> Revenue Over Time</h3>
+                            <span id="chart-period-label" class="text-xs text-slate-500">Today (Hourly)</span>
+                        </div>
+                        <div style="position:relative;height:300px"><canvas id="sales-chart"></canvas></div>
+                        <div id="chart-empty" class="hidden text-center py-12 text-slate-500 text-sm"><span class="iconify text-4xl text-slate-700 mx-auto block mb-2" data-icon="mdi:chart-line-variant"></span>No sales data for this period</div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="stat-card"><div class="text-[10px] font-bold text-green-400 uppercase mb-1">Period Revenue</div><div id="trend-revenue" class="text-2xl font-bold text-white">TZS 0</div></div>
+                        <div class="stat-card"><div class="text-[10px] font-bold text-blue-400 uppercase mb-1">Orders Delivered</div><div id="trend-orders" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card"><div class="text-[10px] font-bold text-cyan-400 uppercase mb-1">Average Order</div><div id="trend-avg" class="text-2xl font-bold text-white">TZS 0</div></div>
+                    </div>
+                </div>
+
+                <!-- REPORTS -->
+                <div id="panel-reports" class="tab-panel hidden">
+                    <div class="flex gap-2 mb-6 flex-wrap">
+                        <button onclick="loadReport('fast')" class="px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-sm hover:bg-white/[0.1]">Fast Moving</button>
+                        <button onclick="loadReport('slow')" class="px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-sm hover:bg-white/[0.1]">Slow Moving</button>
+                        <button onclick="loadReport('stock')" class="px-4 py-2 bg-white/[0.05] border border-white/[0.1] rounded-lg text-sm hover:bg-white/[0.1]">Stock Valuation</button>
+                    </div>
+                    <div id="report-content" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><p class="text-slate-500 text-center">Select a report above.</p></div>
+                </div>
+
+                <!-- NOTIFICATIONS -->
+                <div id="panel-notifications" class="tab-panel hidden"><div id="notif-list" class="space-y-4"></div></div>
+
+                               <!-- INTEGRATIONS -->
+                <div id="panel-integration" class="tab-panel hidden">
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:file-delimited"></span> Import Orders from CSV</h3>
+                        <p class="text-slate-400 text-sm mb-5">Upload orders from Shopify, WooCommerce, or any platform in seconds.</p>
+                        <div class="space-y-4 mb-6">
+                            <div class="flex gap-3 items-start"><div class="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs flex-shrink-0">1</div><div><div class="text-sm font-semibold text-white">Download Template</div><div class="text-xs text-slate-500">Click below to get the CSV format ChapShop expects</div></div></div>
+                            <div class="flex gap-3 items-start"><div class="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs flex-shrink-0">2</div><div><div class="text-sm font-semibold text-white">Fill In Your Orders</div><div class="text-xs text-slate-500">Open the template in Excel, paste your orders, match the columns</div></div></div>
+                            <div class="flex gap-3 items-start"><div class="w-7 h-7 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs flex-shrink-0">3</div><div><div class="text-sm font-semibold text-white">Upload & Import</div><div class="text-xs text-slate-500">Choose your file, preview it, then click Import</div></div></div>
+                        </div>
+                        <div class="flex gap-3 mb-4 flex-wrap">
+                            <label class="bg-cyan-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-cyan-400 cursor-pointer flex items-center gap-2"><span class="iconify" data-icon="mdi:upload"></span> Choose CSV File<input type="file" id="csv-input" accept=".csv" class="hidden" onchange="previewCSV(this)"></label>
+                            <button onclick="downloadCSVTemplate()" class="bg-white/[0.05] border border-white/[0.1] text-slate-300 px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-white/[0.1] flex items-center gap-2"><span class="iconify" data-icon="mdi:download"></span> Download Template</button>
+                        </div>
+                        <div id="csv-preview" class="hidden">
+                            <div class="flex items-center justify-between mb-3"><span id="csv-count" class="text-sm text-slate-400"></span><button onclick="importCSV()" id="csv-import-btn" class="bg-green-500/20 text-green-400 border border-green-500/30 px-5 py-2 rounded-lg text-xs font-bold hover:bg-green-500/30"><span class="iconify inline mr-1" data-icon="mdi:check-circle"></span> Import All</button></div>
+                            <div class="bg-black/30 border border-white/[0.08] rounded-xl overflow-x-auto max-h-64 overflow-y-auto">
+                                <table class="w-full text-xs text-left min-w-[600px]">
+                                    <thead class="text-[10px] text-slate-500 uppercase bg-white/[0.02] sticky top-0"><tr><th class="px-3 py-2">Customer</th><th class="px-3 py-2">Phone</th><th class="px-3 py-2">City</th><th class="px-3 py-2">Product</th><th class="px-3 py-2">Qty</th><th class="px-3 py-2">Amount</th><th class="px-3 py-2">Status</th></tr></thead>
+                                    <tbody id="csv-rows" class="divide-y divide-white/[0.05]"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="csv-result" class="hidden mt-4 p-4 rounded-xl text-sm font-semibold"></div>
+                    </div>
+                    
+                    <!-- API KEY SECTION -->
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <button onclick="document.getElementById('api-docs').classList.toggle('hidden')" class="w-full flex items-center justify-between text-left">
+                            <div class="flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:key-variant"></span><h3 class="text-lg font-bold text-white">API Key <span class="text-[10px] font-normal text-slate-500 ml-2">For Developers</span></h3></div>
+                            <span class="iconify text-slate-500" data-icon="mdi:chevron-down"></span>
+                        </button>
+                        <div id="api-docs" class="hidden mt-5 space-y-4">
+                            <p class="text-slate-400 text-sm">Give this key to your developer to connect your store automatically.</p>
+                            <div class="bg-black/30 border border-white/[0.08] rounded-xl px-4 py-3 font-mono text-sm text-cyan-400 truncate mb-2"><span id="api-key-display">No key generated yet</span></div>
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="generateApiKey()" class="bg-cyan-500 text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-cyan-400"><span class="iconify inline mr-1" data-icon="mdi:refresh"></span> Generate</button>
+                                <button onclick="copyApiKey()" class="bg-slate-700 text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-slate-600"><span class="iconify inline mr-1" data-icon="mdi:content-copy"></span> Copy</button>
+                                <button onclick="toggleKeyVisibility()" class="bg-slate-700 text-white px-4 py-2 rounded-xl text-xs font-semibold hover:bg-slate-600"><span id="key-eye-icon" class="iconify inline mr-1" data-icon="mdi:eye-off"></span> Show</button>
+                            </div>
+                            <div class="bg-black/30 border border-white/[0.08] rounded-xl p-4">
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-3">Endpoint</div>
+                                <div class="text-sm text-slate-300 mb-3"><span class="text-green-400 font-bold">POST</span> <code class="bg-black/40 px-2 py-0.5 rounded text-cyan-400 text-xs">https://chapshop-api.nelsonmdengo2-141.workers.dev/createOrder</code></div>
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-2">Headers</div>
+                                <pre class="bg-black/40 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto mb-3">Authorization: Bearer YOUR_KEY
+Content-Type: application/json</pre>
+                                <div class="text-xs font-bold text-slate-400 uppercase mb-2">Body</div>
+                                <pre class="bg-black/40 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto">{"customer_name":"Juma","customer_phone":"+255123456789","customer_city":"Dar es Salaam","customer_address":"Kinondoni St 12","product_name":"iPhone 15","product_sku":"IP-001","qty":1,"price":1500000}</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                                       <!-- NEW: STORE INTEGRATIONS -->
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:connection"></span> Store Integrations</h3>
+                        <p class="text-slate-400 text-sm mb-6">Connect your store to automatically import orders. Click "Connect" and follow the instructions.</p>
+                        
+                        <div class="space-y-4">
+                            <!-- Shopify -->
+                            <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <span class="iconify text-2xl" data-icon="simple-icons:shopify" style="color: #95BF47;"></span>
+                                    <div>
+                                        <div class="font-bold text-white text-sm">Shopify</div>
+                                        <div class="text-xs text-slate-500">Automatic order sync</div>
+                                    </div>
+                                </div>
+                                <button onclick="openWebhookModal('Shopify')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-500/30 flex items-center gap-2"><span class="iconify" data-icon="mdi:connection"></span> Connect</button>
+                            </div>
+
+                            <!-- YouCan -->
+                            <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <span class="iconify text-2xl" data-icon="mdi:store" style="color: #6259FA;"></span>
+                                    <div>
+                                        <div class="font-bold text-white text-sm">YouCan</div>
+                                        <div class="text-xs text-slate-500">Automatic order sync</div>
+                                    </div>
+                                </div>
+                                <button onclick="openWebhookModal('YouCan')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-500/30 flex items-center gap-2"><span class="iconify" data-icon="mdi:connection"></span> Connect</button>
+                            </div>
+
+                            <!-- Lightfunnels -->
+                            <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <span class="iconify text-2xl" data-icon="mdi:rocket-launch" style="color: #FDB913;"></span>
+                                    <div>
+                                        <div class="font-bold text-white text-sm">Lightfunnels</div>
+                                        <div class="text-xs text-slate-500">Automatic order sync</div>
+                                    </div>
+                                </div>
+                                <button onclick="openWebhookModal('Lightfunnels')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-500/30 flex items-center gap-2"><span class="iconify" data-icon="mdi:connection"></span> Connect</button>
+                            </div>
+
+                            <!-- WooCommerce -->
+                            <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <span class="iconify text-2xl" data-icon="simple-icons:woocommerce" style="color: #96588A;"></span>
+                                    <div>
+                                        <div class="font-bold text-white text-sm">WooCommerce</div>
+                                        <div class="text-xs text-slate-500">Automatic order sync</div>
+                                    </div>
+                                </div>
+                                <button onclick="openWebhookModal('WooCommerce')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-500/30 flex items-center gap-2"><span class="iconify" data-icon="mdi:connection"></span> Connect</button>
+                            </div>
+
+                            <!-- Google Sheets -->
+                            <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <span class="iconify text-2xl" data-icon="simple-icons:googlesheets" style="color: #34A853;"></span>
+                                    <div>
+                                        <div class="font-bold text-white text-sm">Google Sheets</div>
+                                        <div class="text-xs text-slate-500">Sync orders from a spreadsheet</div>
+                                    </div>
+                                </div>
+                                <button onclick="openGoogleSheetsModal()" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-4 py-2 rounded-lg text-xs font-bold hover:bg-cyan-500/30 flex items-center gap-2"><span class="iconify" data-icon="mdi:code-braces"></span> Get Script</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- This closes the Integrations panel -->
+
+                <!-- PROFILE/SETTINGS -->
+                <div id="panel-profile" class="tab-panel hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Profile Settings</h3>
+                            <div class="space-y-4">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Business / Shop Name</label><input type="text" id="set-shop" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Contact Name</label><input type="text" id="set-name" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Email (Cannot Change)</label><input type="email" id="set-email" disabled class="w-full mt-1 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-slate-500 cursor-not-allowed"></div>
+                                <button onclick="saveProfile()" class="bg-cyan-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-cyan-400">Save Profile</button>
+                            </div>
+                        </div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-6">Change Password</h3>
+                            <form id="pw-form" class="space-y-4">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Current Password</label><input type="password" id="pw-current" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">New Password</label><input type="password" id="pw-new" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Confirm New Password</label><input type="password" id="pw-confirm" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <button type="submit" class="bg-red-500/20 text-red-400 border border-red-500/30 font-semibold px-6 py-3 rounded-xl hover:bg-red-500/30">Update Password</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:map-marker-radius-outline"></span> Delivery Zones</h3>
+                        <p class="text-slate-400 text-sm mb-4">Set your delivery areas. Used for routing and city suggestions on orders.</p>
+                        <div id="zone-tags" class="flex flex-wrap gap-2 mb-4"></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="zone-input" placeholder="e.g. Dar es Salaam" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50" onkeydown="if(event.key==='Enter'){event.preventDefault();addZone()}">
+                            <button onclick="addZone()" class="bg-cyan-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-cyan-400">Add</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:message-text-outline"></span> Auto Notifications</h3>
+                        <p class="text-slate-400 text-sm mb-5">Control automatic messages sent to customers when orders are processed.</p>
+                        <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl mb-3">
+                            <div><div class="text-sm font-semibold text-white">Send Confirmation SMS</div><div class="text-xs text-slate-500 mt-0.5">Auto-send SMS when order is confirmed by call center</div></div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="sms-toggle" onchange="toggleSMS(this.checked)" class="sr-only peer">
+                                <div class="w-10 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.05] rounded-xl">
+                            <div><div class="text-sm font-semibold text-white">Send WhatsApp Updates</div><div class="text-xs text-slate-500 mt-0.5">Send delivery status updates via WhatsApp automatically</div></div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="wa-toggle" onchange="toggleWA(this.checked)" class="sr-only peer">
+                                <div class="w-10 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-500"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+        <!-- HELP CENTER CHAT WIDGET -->
+        <div id="chat-widget" class="fixed bottom-6 right-6 z-50">
+            <div id="chat-window" class="hidden mb-4 w-80 sm:w-96 bg-white border border-slate-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden relative" style="height: 450px;">
+                
+                <!-- Header -->
+                <div class="bg-cyan-500 p-4 flex items-center justify-between flex-shrink-0">
+                    <div class="flex items-center gap-3 text-white"><span class="iconify text-2xl" data-icon="mdi:headset"></span><div><div class="font-bold text-sm">ChapShop Support</div><div class="text-xs text-cyan-100">Typically replies instantly</div></div></div>
+                    <button onclick="toggleChat()" class="text-white hover:text-cyan-200"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
+                </div>
+                
+                <!-- Messages Area -->
+                <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50">
+                    <div class="flex justify-start"><div class="chat-bubble text-black">Hello! 👋 How can we help you today?</div></div>
+                </div>
+                
+                <!-- CHAT INPUT FORM -->
+                <form onsubmit="sendChat(event)" class="p-3 pb-1 border-t border-slate-200 flex gap-2 bg-white flex-shrink-0">
+                    <input type="text" id="chat-input" placeholder="Type a message..." required class="flex-1 bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-cyan-500/50">
+                    <button type="submit" class="bg-cyan-500 text-white p-2.5 rounded-xl hover:bg-cyan-400 transition-colors"><span class="iconify text-lg" data-icon="mdi:send"></span></button>
+                </form>
+
+                <!-- ACTION ICONS BAR -->
+                <div class="px-3 pb-3 pt-1 flex items-center justify-around bg-white flex-shrink-0 relative">
+                    <input type="file" id="chat-file-input" class="hidden" onchange="handleChatFile(event)">
+                    <button type="button" onclick="document.getElementById('chat-file-input').click()" class="text-slate-400 hover:text-cyan-500 transition-colors" title="Upload Image/Document">
+                        <span class="iconify text-xl" data-icon="mdi:paperclip"></span>
+                    </button>
+                    <button type="button" onclick="toggleSupportPopup()" class="text-slate-400 hover:text-cyan-500 transition-colors" title="Reach Us">
+                        <span class="iconify text-xl" data-icon="mdi:headset"></span>
+                    </button>
+                    <button type="button" onclick="fillChatInput('I have a suggestion: ')" class="text-slate-400 hover:text-cyan-500 transition-colors" title="I have a suggestion">
+                        <span class="iconify text-xl" data-icon="mdi:lightbulb-on-outline"></span>
+                    </button>
+                    <button type="button" onclick="fillChatInput('I want to report an issue/complaint: ')" class="text-slate-400 hover:text-red-500 transition-colors" title="Report an Issue">
+                        <span class="iconify text-xl" data-icon="mdi:alert-circle-outline"></span>
+                    </button>
+                </div>
+
+                <!-- SUPPORT POPUP -->
+                <div id="support-popup" class="hidden absolute bottom-16 right-4 bg-white border border-slate-200 shadow-xl rounded-xl p-4 w-64 z-20">
+                    <h4 class="font-bold text-sm text-slate-800 mb-3">Reach us on:</h4>
+                    <a href="https://wa.me/255768799110" target="_blank" class="flex items-center gap-2 text-green-500 hover:text-green-600 mb-3 text-sm font-medium">
+                        <span class="iconify text-xl" data-icon="mdi:whatsapp"></span> WhatsApp: 0768799110
+                    </a>
+                    <a href="https://facebook.com" target="_blank" class="flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        <span class="iconify text-xl" data-icon="mdi:facebook"></span> Facebook
+                    </a>
+                </div>
+            </div>
+
+            <!-- Floating Chat Button -->
+                        <button onclick="toggleChat()" id="chat-btn" class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-full flex items-center justify-center shadow-xl shadow-cyan-500/40 hover:from-cyan-400 hover:to-cyan-600 transition-all duration-300 hover:scale-110 active:scale-95 relative">
+                <span class="iconify text-white text-3xl" data-icon="solar:chat-round-line-bold"></span>
+                <span id="chat-notif-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-[20px] h-5 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-[#020617] animate-bounce">!</span>
+            </button>
+        </div>
+    </div> <!-- This closes the <div id="app-screen"> -->
+
+    <script>
+        let myOrders = [], myProducts = [], filteredOrders = [], lastOrderCount = 0, settlePeriod = 'all', salesChart = null, selectedCategory = 'all', localZones = [];
+let currentPage = 1, pageSize = 15;
+                     const uid = () => window.currentUser.uid;
+
+        // ===== AUTH LOADER LOGIC =====
+                // ===== AUTH LOADER LOGIC =====
+        function showAuthLoader(text) {
+            var loader = document.getElementById('auth-loader');
+            if(!loader) return;
+            document.getElementById('auth-loader-text').innerText = text;
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+        }
+
+        function hideAuthLoader() {
+            var loader = document.getElementById('auth-loader');
+            if(!loader) return;
+            loader.classList.add('hidden');
+            loader.classList.remove('flex');
+        }
+
+        // Show loader when Login form is submitted
+        var loginForm = document.querySelector('form[onsubmit="handleLogin(event)"]');
+        if(loginForm) {
+            loginForm.addEventListener('submit', function() {
+                showAuthLoader('Signing in...');
+            });
+        }
+
+        // Show loader when Logout button is clicked
+        var logoutBtn = document.querySelector('button[onclick="handleLogout()"]');
+        if(logoutBtn) {
+            logoutBtn.addEventListener('click', function() {
+                showAuthLoader('Logging out...');
+                // Fallback to hide loader after 3 seconds just in case
+                setTimeout(hideAuthLoader, 3000); 
+            });
+        }
+
+        // Hide loader if an error toast appears (e.g., wrong password)
+        var toastEl = document.getElementById('toast');
+        if(toastEl) {
+            var observer = new MutationObserver(function() {
+                if (toastEl.classList.contains('show')) {
+                    hideAuthLoader();
+                }
+            });
+            observer.observe(toastEl, { attributes: true });
+        }
+        // TRANSLATION DICTIONARY
+                const translations = {
+            en: {
+                dashboard: "Dashboard", upload: "New Order", orders: "All Orders", products: "Products",
+                catalog: "All Products", inventory: "Inventory", trend: "Sales Trend", reports: "Reports",
+                settlements: "Settlements", notifications: "Notifications", integration: "Integrations",
+                profile: "Settings", logout: "Logout", save_profile: "Save Profile",
+                total_orders: "Total Orders", delivered: "Delivery Orders", pending: "Pending Orders", cancelled: "Cancelled Orders",
+                gross_rev: "Gross Revenue", commission: "Commission (10%)", net_earn: "Net Earnings",
+                main: "Main", catalog_menu: "Catalog", insights: "Insights", system: "System"
+            },
+            fr: {
+                dashboard: "Tableau de bord", upload: "Nouvelle Commande", orders: "Toutes les Commandes", products: "Produits",
+                catalog: "Tous les Produits", inventory: "Inventaire", trend: "Tendance des Ventes", reports: "Rapports",
+                settlements: "Paiements", notifications: "Notifications", integration: "Intégrations",
+                profile: "Paramètres", logout: "Déconnexion", save_profile: "Enregistrer le Profil",
+                total_orders: "Commandes Totales", delivered: "Livraisons", pending: "En Attente", cancelled: "Annulées",
+                gross_rev: "Revenu Brut", commission: "Commission (10%)", net_earn: "Bénéfices Nets",
+                main: "Principal", catalog_menu: "Catalogue", insights: "Analyse", system: "Système"
+            },
+            ar: {
+                dashboard: "لوحة التحكم", upload: "طلب جديد", orders: "كل الطلبات", products: "المنتجات",
+                catalog: "كل المنتجات", inventory: "المخزون", trend: "اتجاه المبيعات", reports: "التقارير",
+                settlements: "التسويات", notifications: "الإشعارات", integration: "التكاملات",
+                profile: "الإعدادات", logout: "تسجيل الخروج", save_profile: "حفظ الملف الشخصي",
+                total_orders: "إجمالي الطلبات", delivered: "الطلبات المسلمة", pending: "الطلبات المعلقة", cancelled: "الطلبات الملغاة",
+                gross_rev: "إجمالي الإيرادات", commission: "العمولة (10%)", net_earn: "صافي الأرباح",
+                main: "الرئيسية", catalog_menu: "الكتالوج", insights: "الرؤى", system: "النظام"
+            }
+        };
+        function changeLang(lang) {
+            localStorage.setItem('chapshop_lang', lang);
+            
+            // Update buttons active state
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if(btn.textContent === lang.toUpperCase()) {
+                    btn.className = 'lang-btn px-2 py-1 text-xs font-bold rounded-md text-cyan-400 bg-cyan-500/20';
+                } else {
+                    btn.className = 'lang-btn px-2 py-1 text-xs font-bold rounded-md text-slate-400 hover:text-white';
+                }
+            });
+
+            // Flip layout for Arabic (RTL)
+            if(lang === 'ar') {
+                document.documentElement.dir = 'rtl';
+            } else {
+                document.documentElement.dir = 'ltr';
+            }
+
+            // Replace text for all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+        }
+		        function handleForgotPassword() {
+            var email = prompt("Please enter your email address to reset your password:");
+            if (!email) return; // If they click cancel, do nothing
+            
+            firebase.auth().sendPasswordResetEmail(email).then(function() {
+                showT("Password reset email sent! Check your inbox.", "success");
+            }).catch(function(err) {
+                showT(err.message, "error");
+            });
+        }
+        function showOrderToast(count){var el=document.createElement('div');el.className='order-toast';el.innerHTML='<span class="iconify text-cyan-400 text-xl" data-icon="mdi:package-variant-closed"></span><div><div style="font-weight:700">'+count+' New Order'+(count>1?'s':'')+'</div><div style="font-size:12px;color:#64748b">Click to view</div></div>';document.body.appendChild(el);setTimeout(function(){el.classList.add('show')},50);el.onclick=function(){el.classList.remove('show');setTimeout(function(){el.remove()},400);switchTab('orders')};setTimeout(function(){el.classList.remove('show');setTimeout(function(){el.remove()},400)},5000)}
+        document.addEventListener('DOMContentLoaded', () => { 
+            const d = document.getElementById('order-date'); 
+            if(d) d.value = new Date().toISOString().split('T')[0]; 
+            
+            // Apply saved language on page load
+            const savedLang = localStorage.getItem('chapshop_lang') || 'en';
+            if(savedLang !== 'en') changeLang(savedLang);
+        });
+
+                   function onAppLoaded() {
+            hideAuthLoader(); // Tells the spinner to stop!
+            if (window.currentUser.role !== 'merchant') { showT("Access Denied.", "error"); auth.signOut(); return; }
+
+            // Listen for Admin Chat Replies
+            db.collection('chats').doc(uid()).onSnapshot(function(doc) {
+                var badge = document.getElementById('chat-notif-badge');
+                if(!badge) return;
+                
+                if(doc.exists && doc.data().unreadByMerchant) {
+                    // Only show toast and bounce if it was previously hidden
+                    if(badge.classList.contains('hidden')) {
+                        showT("New message from ChapShop Support!", "success");
+                    }
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            });
+            const shopName = window.currentUser.shopName || 'My Shop';
+            const userName = window.currentUser.name || 'Merchant';
+            document.getElementById('header-name').textContent = shopName;
+            document.getElementById('header-avatar').textContent = shopName.charAt(0).toUpperCase();
+            document.getElementById('set-shop').value = shopName;
+            document.getElementById('set-name').value = userName;
+            document.getElementById('set-email').value = window.currentUser.email || '';
+              
+            localZones = window.currentUser.deliveryZones || [];
+            renderZones(); renderZoneDatalist(); renderApiKey();
+            loadData();
+        }
+
+        function renderZones(){var c=document.getElementById('zone-tags');if(!c)return;if(!localZones.length){c.innerHTML='<span class="text-slate-500 text-xs">No zones added yet.</span>';return}c.innerHTML=localZones.map(function(z,i){return'<span class="zone-tag">'+z+'<button onclick="removeZone('+i+')">×</button></span>'}).join('')}
+        function renderZoneDatalist(){var dl=document.getElementById('zone-datalist');if(dl)dl.innerHTML=localZones.map(function(z){return'<option value="'+z+'">'}).join('')}
+        function addZone(){var input=document.getElementById('zone-input'),val=input.value.trim();if(!val)return showT("Enter a city name","error");if(localZones.map(function(z){return z.toLowerCase()}).indexOf(val.toLowerCase())!==-1)return showT("Zone already exists","error");localZones.push(val);input.value='';renderZones();renderZoneDatalist();db.collection('users').doc(uid()).update({deliveryZones:localZones}).then(function(){showT("Zone added!")}).catch(function(e){showT(e.message,"error")})}
+        function removeZone(i){localZones.splice(i,1);renderZones();renderZoneDatalist();db.collection('users').doc(uid()).update({deliveryZones:localZones}).catch(function(e){showT(e.message,"error")})}
+        function loadData() {
+            db.collection('products').where('merchantId', '==', uid()).onSnapshot(snap => { myProducts = snap.docs.map(d => ({id: d.id, ...d.data()})); updateDashboard(); populateDropdowns(); renderProducts(); renderInventory(); renderNotifications(); renderCatalog(); });
+            db.collection('orders').where('merchantId', '==', uid()).orderBy('createdAt', 'desc').onSnapshot(snap => { myOrders = snap.docs.map(d => ({id: d.id, ...d.data()})); if(myOrders.length>lastOrderCount&&lastOrderCount>0){showOrderToast(myOrders.length-lastOrderCount)} lastOrderCount=myOrders.length; filteredOrders = [...myOrders]; updateDashboard(); renderReviewList(); renderOrdersTable(); renderNotifications(); renderSettlements(); });
+        }
+function renderSalesChart(){if(typeof Chart==='undefined')return;var canvas=document.getElementById('sales-chart'),empty=document.getElementById('chart-empty'),label=document.getElementById('chart-period-label');if(!canvas)return;var delivered=filterTrend(myOrders.filter(function(o){return o.status==='delivered'}),'createdAt'),labels=[],data=[],now=new Date();if(trendPeriod==='today'){label.textContent='Today (Hourly)';for(var h=0;h<=now.getHours();h++){labels.push(h+':00');data.push(delivered.filter(function(o){return o.createdAt.toDate().getHours()===h}).reduce(function(s,o){return s+(o.totalAmount||0)},0))}}else if(trendPeriod==='week'){label.textContent='This Week (Daily)';var dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],weekStart=new Date(now),dow=now.getDay();weekStart.setDate(now.getDate()-(dow===0?6:dow-1));weekStart.setHours(0,0,0,0);for(var i=0;i<7;i++){var dd=new Date(weekStart);dd.setDate(weekStart.getDate()+i);labels.push(dayNames[i]);if(dd>now){data.push(0);continue}var key=dd.toISOString().split('T')[0];data.push(delivered.filter(function(o){return o.createdAt.toDate().toISOString().split('T')[0]===key}).reduce(function(s,o){return s+(o.totalAmount||0)},0))}}else if(trendPeriod==='month'){label.textContent='This Month (Daily)';var daysInMonth=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();for(var i=1;i<=Math.min(daysInMonth,now.getDate());i++){labels.push(i);var key=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(i).padStart(2,'0');data.push(delivered.filter(function(o){return o.createdAt.toDate().toISOString().split('T')[0]===key}).reduce(function(s,o){return s+(o.totalAmount||0)},0))}}else if(trendPeriod==='year'){label.textContent='This Year (Monthly)';var mNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];for(var i=0;i<=now.getMonth();i++){labels.push(mNames[i]);data.push(delivered.filter(function(o){var d=o.createdAt.toDate();return d.getMonth()===i&&d.getFullYear()===now.getFullYear()}).reduce(function(s,o){return s+(o.totalAmount||0)},0))}}else if(trendPeriod==='all'){label.textContent='All Time (Monthly)';var months={};delivered.forEach(function(o){var d=o.createdAt.toDate(),k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');months[k]=(months[k]||0)+(o.totalAmount||0)});Object.keys(months).sort().forEach(function(k){labels.push(k);data.push(months[k])})}else if(trendPeriod==='custom'&&trendFrom&&trendTo){label.textContent='Custom Range (Daily)';var from=new Date(trendFrom+'T00:00:00'),to=new Date(trendTo+'T00:00:00');for(var d=new Date(from);d<=to;d.setDate(d.getDate()+1)){labels.push(d.toISOString().split('T')[0].slice(5));var dk=d.toISOString().split('T')[0];data.push(delivered.filter(function(o){return o.createdAt.toDate().toISOString().split('T')[0]===dk}).reduce(function(s,o){return s+(o.totalAmount||0)},0))}}var hasData=data.some(function(v){return v>0});canvas.style.display=hasData?'block':'none';empty.classList.toggle('hidden',hasData);var tr=document.getElementById('trend-revenue'),to2=document.getElementById('trend-orders'),ta=document.getElementById('trend-avg');if(tr)tr.textContent='TZS '+delivered.reduce(function(s,o){return s+(o.totalAmount||0)},0).toLocaleString();if(to2)to2.textContent=delivered.length;if(ta)ta.textContent=delivered.length?'TZS '+Math.round(delivered.reduce(function(s,o){return s+(o.totalAmount||0)},0)/delivered.length).toLocaleString():'TZS 0';if(!hasData)return;if(salesChart)salesChart.destroy();salesChart=new Chart(canvas,{type:'bar',data:{labels:labels,datasets:[{data:data,backgroundColor:'rgba(6,182,212,0.4)',hoverBackgroundColor:'rgba(6,182,212,0.7)',borderColor:'rgb(6,182,212)',borderWidth:1,borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f172a',titleColor:'#e2e8f0',bodyColor:'#22d3ee',borderColor:'rgba(6,182,212,0.3)',borderWidth:1,padding:10,displayColors:false,callbacks:{label:function(ctx){return'TZS '+Number(ctx.raw).toLocaleString()}}}},scales:{x:{ticks:{color:'#475569',font:{size:10},maxRotation:45},grid:{display:false},border:{display:false}},y:{ticks:{color:'#475569',font:{size:10},callback:function(v){if(v>=1e6)return(v/1e6).toFixed(1)+'M';if(v>=1e3)return(v/1e3).toFixed(0)+'K';return v}},grid:{color:'rgba(255,255,255,0.04)'},border:{display:false}}}}})}
+function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value||'';p=p.trim();var c=document.getElementById('phone-lookup-results');if(!p){c.innerHTML='';return}var found=myOrders.filter(function(o){return(o.customerPhone||'').indexOf(p)!==-1});if(!found.length){c.innerHTML='<p class="text-slate-500 text-center text-sm py-4">No orders found for '+p+'</p>';return}c.innerHTML=found.map(function(o){return'<div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center justify-between cursor-pointer hover:border-cyan-500/20" onclick="viewOrder(\''+o.id+'\')"><div><div class="font-mono text-cyan-400 font-bold text-xs">#'+o.id.slice(-6).toUpperCase()+'</div><div class="text-white text-sm font-medium mt-0.5">'+(o.customerName||'')+'</div></div><div class="text-right"><div class="text-sm font-bold text-white">'+fmtM(o.totalAmount)+'</div>'+getStatusBadge(o.status)+'<div class="text-xs text-slate-500 mt-1">'+fmtDate(o.createdAt)+'</div></div></div>'}).join('')}
+ var trendPeriod='today',trendFrom=null,trendTo=null;
+        function setTrendPeriod(val,from,to){trendPeriod=val;trendFrom=from||null;trendTo=to||null;var c=document.getElementById('trend-period-btns');if(c)c.querySelectorAll('.date-btn').forEach(function(b){b.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'});if(event&&event.target)event.target.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';renderSalesChart()}
+        function filterTrend(arr,f){if(!arr)return[];if(trendPeriod==='custom'&&trendFrom&&trendTo){return arr.filter(function(o){if(!o[f])return false;try{var d=o[f].toDate(),a=new Date(trendFrom+'T00:00:00'),b=new Date(trendTo+'T23:59:59');return d>=a&&d<=b}catch(e){return false}})}if(trendPeriod==='all')return arr;var now=new Date(),s,e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59);if(trendPeriod==='today')s=new Date(now.getFullYear(),now.getMonth(),now.getDate());if(trendPeriod==='week'){var d=now.getDay();s=new Date(now.getFullYear(),now.getMonth(),now.getDate()-(d===0?6:d-1))}if(trendPeriod==='month')s=new Date(now.getFullYear(),now.getMonth(),1);if(trendPeriod==='year')s=new Date(now.getFullYear(),0,1);return arr.filter(function(o){return o[f]&&o[f].toDate()>=s&&o[f].toDate()<=e})}
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
+        function switchTab(t) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden')); document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active')); document.getElementById('panel-'+t).classList.remove('hidden'); document.getElementById('nav-'+t).classList.add('active'); if(window.innerWidth < 1024) toggleSidebar(); if(t==='trend') renderSalesChart(); if(t==='catalog') renderCatalog(); }
+
+        var dashPeriod='today',dashFrom=null,dashTo=null;
+        function setDashPeriod(val,from,to){dashPeriod=val;dashFrom=from||null;dashTo=to||null;var c=document.getElementById('dash-period-btns');if(c)c.querySelectorAll('.date-btn').forEach(function(b){b.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'});if(event&&event.target)event.target.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';updateDashboard()}
+        function filterDash(arr,f){if(!arr)return[];if(dashPeriod==='custom'&&dashFrom&&dashTo){return arr.filter(function(o){if(!o[f])return false;try{var d=o[f].toDate(),a=new Date(dashFrom+'T00:00:00'),b=new Date(dashTo+'T23:59:59');return d>=a&&d<=b}catch(e){return false}})}if(dashPeriod==='all')return arr;var now=new Date();var s,e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59);if(dashPeriod==='today')s=new Date(now.getFullYear(),now.getMonth(),now.getDate());if(dashPeriod==='week'){var d=now.getDay();s=new Date(now.getFullYear(),now.getMonth(),now.getDate()-(d===0?6:d-1))}if(dashPeriod==='month')s=new Date(now.getFullYear(),now.getMonth(),1);if(dashPeriod==='year')s=new Date(now.getFullYear(),0,1);return arr.filter(function(o){return o[f]&&o[f].toDate()>=s&&o[f].toDate()<=e})}
+        function updateDashboard() {
+            var dp=filterDash(myOrders,'createdAt');
+            const today = new Date(); today.setHours(0,0,0,0);
+            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1); 
+            document.getElementById('stat-total').textContent = dp.length;
+            document.getElementById('stat-delivered').textContent = myOrders.filter(o => o.status === 'delivered').length;
+            document.getElementById('stat-pending').textContent = myOrders.filter(o => o.status === 'pending').length;
+           document.getElementById('stat-cancelled').textContent = myOrders.filter(o => o.status === 'cancelled').length;
+            document.getElementById('stat-scheduled').textContent = myOrders.filter(o => o.status === 'callback_requested').length;
+            document.getElementById('stat-noreply').textContent = myOrders.filter(o => ['no_answer','busy'].includes(o.status)).length;
+            document.getElementById('stat-wrong').textContent = myOrders.filter(o => o.status === 'wrong_number').length;
+            document.getElementById('stat-outregion').textContent = myOrders.filter(o => o.status === 'out_of_region').length;
+
+            var totalStock = myProducts.reduce((s,p) => s + (p.stock||0), 0);
+            var lowStockCount = myProducts.filter(p => p.minStock && p.stock > 0 && p.stock <= p.minStock).length;
+            var outStockCount = myProducts.filter(p => p.stock === 0).length;
+            document.getElementById('stat-stock').textContent = totalStock;
+            document.getElementById('stat-low-stock').textContent = lowStockCount;
+            document.getElementById('stat-out-stock').textContent = outStockCount;
+            document.getElementById('card-low-stock').classList.toggle('stock-critical', lowStockCount > 0);
+            document.getElementById('card-out-stock').classList.toggle('stock-empty', outStockCount > 0);
+            var salesToday = dp.filter(o => o.status === 'delivered').reduce((s,o) => s + (o.totalAmount||0), 0);
+            document.getElementById('stat-sales-today').textContent = `TZS ${Number(salesToday).toLocaleString()}`;
+            document.getElementById('stat-orders-today').textContent = dp.length;
+            var monthOrders = myOrders.filter(o => o.status === 'delivered' && o.createdAt && o.createdAt.toDate() >= monthStart);
+            document.getElementById('stat-sales-month').textContent = `TZS ${Number(monthOrders.reduce((s,o) => s + (o.totalAmount||0), 0)).toLocaleString()}`;
+            var dpDelivered=dp.filter(function(o){return o.status==='delivered'});
+            var grossRev=dpDelivered.reduce(function(s,o){return s+(o.totalAmount||0)},0);
+            var commRev=Math.round(grossRev*0.1);
+            var netRev=grossRev-commRev;
+            document.getElementById('st-gross-rev').textContent='TZS '+grossRev.toLocaleString();
+            document.getElementById('st-commission').textContent='-TZS '+commRev.toLocaleString();
+            document.getElementById('st-net-rev').textContent='TZS '+netRev.toLocaleString();
+            const alertCount = myProducts.filter(p => p.minStock && p.stock <= p.minStock).length + myProducts.filter(p => p.stock === 0).length + myOrders.filter(o => o.status === 'pending').length;
+            var hb = document.getElementById('header-badge');
+            if(alertCount > 0) { if(hb){hb.textContent=alertCount>99?'99+':alertCount;hb.classList.remove('hidden')} }
+            var nb = document.getElementById('notif-badge');
+            if(nb){if(alertCount > 0){nb.textContent=alertCount>99?'99+':alertCount;nb.classList.remove('hidden')}else{nb.classList.add('hidden')}}
+        }
+
+        function renderNotifications() {
+            const c = document.getElementById('notif-list'); let html = '';
+            myProducts.filter(p => p.stock === 0).forEach(p => { html += `<div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-red-400" data-icon="mdi:cancel"></span><div><div class="font-bold text-red-400 text-sm">OUT OF STOCK: ${p.name}</div></div></div>`; });
+            myProducts.filter(p => p.minStock && p.stock <= p.minStock && p.stock > 0).forEach(p => { html += `<div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-yellow-400" data-icon="mdi:alert"></span><div><div class="font-bold text-yellow-400 text-sm">LOW STOCK: ${p.name}</div><div class="text-xs text-slate-400">Only ${p.stock} left</div></div></div>`; });
+            myOrders.filter(o => o.status === 'pending').forEach(o => { html += `<div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-blue-400" data-icon="mdi:cart-plus"></span><div><div class="font-bold text-blue-400 text-sm">NEW ORDER: #${o.id.slice(-6).toUpperCase()}</div></div></div>`; });
+            c.innerHTML = html || '<p class="text-slate-500 text-center py-12">All caught up!</p>';
+        }
+
+        function renderReviewList() {
+            const c = document.getElementById('review-list'); const pending = myOrders.filter(o => o.status === 'pending');
+            if (!pending.length) { c.innerHTML = '<p class="text-slate-500 text-center py-8">No orders need reviewing.</p>'; return; }
+            c.innerHTML = pending.map(o => `<div class="bg-white/[0.02] border border-yellow-500/20 rounded-xl p-4 flex flex-col md:flex-row justify-between gap-4"><div><div class="flex items-center gap-2 mb-1"><span class="font-mono text-cyan-400 font-bold text-sm">#${o.id.slice(-6).toUpperCase()}</span>${getStatusBadge(o.status)}</div><div class="text-sm text-slate-400">${o.customerName} • ${o.customerCity||'N/A'}</div><div class="text-xs text-slate-500">${o.itemName} x${o.qty} - TZS ${Number(o.totalAmount).toLocaleString()}</div></div><div class="flex gap-2"><button onclick="acceptOrder('${o.id}')" class="px-4 py-2 bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-lg text-xs font-bold hover:bg-cyan-500/30">Accept</button><button onclick="rejectOrder('${o.id}', '${o.productId}', ${o.qty})" class="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold hover:bg-red-500/30">Reject</button></div></div>`).join('');
+        }
+
+        async function acceptOrder(id) { try { await db.collection('orders').doc(id).update({ status: 'accepted' }); showT("Accepted!"); } catch(e) { showT(e.message, "error"); } }
+        async function rejectOrder(id, pid, qty) { try { await db.collection('orders').doc(id).update({ status: 'rejected' }); if(pid) await db.collection('products').doc(pid).update({ stock: firebase.firestore.FieldValue.increment(qty) }); showT("Rejected."); } catch(e) { showT(e.message, "error"); } }
+
+        function filterOrders(){applyOrderFilters()}
+        function applyOrderFilters(){var s=(document.getElementById('order-search')||{}).value||'';s=s.toLowerCase();var sf=(document.getElementById('order-status-filter')||{}).value||'';filteredOrders=myOrders.filter(function(o){if(sf&&o.status!==sf)return false;if(s){if(o.id.toLowerCase().indexOf(s)===-1&&(o.customerName||'').toLowerCase().indexOf(s)===-1&&(o.customerPhone||'').indexOf(s)===-1&&(o.itemName||'').toLowerCase().indexOf(s)===-1)return false}return true});currentPage=1;renderOrdersTable()}
+        function filterByDate(p){
+            document.querySelectorAll('.date-btn').forEach(b => b.className = 'date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]');
+            if(event&&event.target) event.target.className = 'date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
+            if(p==='all') { applyOrderFilters(); return; }
+            var now=new Date(),s,e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59);
+            if(p==='today') s=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+            if(p==='week') { var d=now.getDay(); s=new Date(now.getFullYear(),now.getMonth(),now.getDate()-(d===0?6:d-1)); }
+            if(p==='month') s=new Date(now.getFullYear(),now.getMonth(),1);
+            var saved=filteredOrders;filteredOrders=myOrders.filter(function(o){return o.createdAt&&o.createdAt.toDate()>=s&&o.createdAt.toDate()<=e});applyOrderFilters();filteredOrders=saved;
+        }
+
+        function exportCSV(){if(!filteredOrders.length)return showT("No data","error");var csv='ID,Customer Name,Customer Phone,City,Address,SKU,Product,Qty,Unit Price,Amount,Currency,Status,Agent Name,Rider Name,Merchant,Placed At,Accepted At,Confirmed At,Out for Delivery At,Delivered At\n';filteredOrders.forEach(function(o){csv+=['#'+o.id.slice(-6).toUpperCase(),'"'+(o.customerName||'').replace(/"/g,'""')+'"','"'+(o.customerPhone||'')+'"','"'+(o.customerCity||'')+'"','"'+(o.customerAddress||'').replace(/"/g,'""')+'"',o.productSku||'','"'+(o.itemName||'').replace(/"/g,'""')+'"',o.qty||1,o.productPrice||0,o.totalAmount||0,o.currency||'TZS',o.status||'','"'+(o.processedByName||'')+'"','"'+(o.riderName||'')+'"','"'+(o.merchantName||'')+'"',o.createdAt?fmtDate(o.createdAt):'',o.acceptedAt?fmtDate(o.acceptedAt):'',o.confirmedAt?fmtDate(o.confirmedAt):'',o.outForDeliveryAt?fmtDate(o.outForDeliveryAt):'',o.deliveredAt?fmtDate(o.deliveredAt):''].join(',')+'\n'});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='chapshop_orders_'+new Date().toISOString().slice(0,10)+'.csv';a.click();showT("CSV exported with full details!")}
+
+        function renderOrdersTable() {
+            const tb = document.getElementById('orders-table-body');
+            if(!filteredOrders.length) { 
+                tb.innerHTML='<tr><td colspan="10" class="text-center text-slate-500 py-8">No orders found.</td></tr>'; 
+                updatePaginationUI(0);
+                return; 
+            }
+
+            const totalPages = Math.ceil(filteredOrders.length / pageSize);
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const paginatedItems = filteredOrders.slice(start, end);
+
+            tb.innerHTML = paginatedItems.map(o=>{
+                var showBtns=['pending','accepted','confirmed','out_for_delivery'].indexOf(o.status)!==-1;
+                return '<tr class="hover:bg-white/[0.02]">'+
+                    '<td class="px-4 py-3 font-mono text-cyan-400 text-xs">#'+o.id.slice(-6).toUpperCase()+'</td>'+
+                    '<td class="px-4 py-3 text-sm">'+o.customerName+'</td>'+
+                    '<td class="px-4 py-3 text-xs text-slate-400">'+(o.customerCity||'N/A')+'</td>'+
+                    '<td class="px-4 py-3 text-xs text-slate-300">'+o.itemName+' <span class="text-slate-500">('+(o.productSku||'')+')</span></td>'+
+                    '<td class="px-4 py-3 text-sm font-semibold">TZS '+Number(o.totalAmount).toLocaleString()+'</td>'+
+                    '<td class="px-4 py-3">'+getStatusBadge(o.status)+'</td>'+
+                    '<td class="px-4 py-3 text-xs text-orange-400">'+(o.processedByName||'—')+'</td>'+
+                    '<td class="px-4 py-3 text-xs text-violet-400">'+(o.riderName||'—')+'</td>'+
+                    '<td class="px-4 py-3 text-xs text-slate-500">'+formatDate(o.createdAt)+'</td>'+
+                    '<td class="px-4 py-3"><div class="flex gap-1">'+
+                        '<button onclick="viewOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400" title="View"><span class="iconify text-sm" data-icon="mdi:eye"></span></button>'+
+                        '<button onclick="editMerchantOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-yellow-400" title="Edit"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button>'+
+                        '<button onclick="archiveMerchantOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-indigo-400" title="Archive"><span class="iconify text-sm" data-icon="mdi:archive-arrow-down-outline"></span></button>'+
+                        '<button onclick="deleteMerchantOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Delete"><span class="iconify text-sm" data-icon="mdi:delete"></span></button>'+
+                        (showBtns?'<button onclick="requestCancel(\''+o.id+'\')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Request Cancel"><span class="iconify text-sm" data-icon="mdi:close-circle"></span></button>':'')+
+                    '</div></td></tr>';
+            }).join('');
+            
+            updatePaginationUI(filteredOrders.length, start, end);
+        }
+
+        function updatePaginationUI(totalCount, start, end) {
+            const info = document.getElementById('orders-pagination-info');
+            const prevBtn = document.getElementById('orders-prev-btn');
+            const nextBtn = document.getElementById('orders-next-btn');
+            const sizeSelect = document.getElementById('orders-page-size');
+            
+            if(sizeSelect) sizeSelect.value = pageSize;
+            if(totalCount === 0) {
+                if(info) info.textContent = 'Showing 0 to 0 of 0';
+                if(prevBtn) prevBtn.disabled = true;
+                if(nextBtn) nextBtn.disabled = true;
+                return;
+            }
+            
+            const actualEnd = Math.min(end, totalCount);
+            if(info) info.textContent = 'Showing ' + (start + 1) + ' to ' + actualEnd + ' of ' + totalCount;
+            
+            const totalPages = Math.ceil(totalCount / pageSize);
+            if(prevBtn) prevBtn.disabled = (currentPage === 1);
+            if(nextBtn) nextBtn.disabled = (currentPage >= totalPages);
+        }
+
+        function changePageSize(size) {
+            pageSize = parseInt(size);
+            currentPage = 1;
+            renderOrdersTable();
+        }
+
+        function nextPage() {
+            currentPage++;
+            renderOrdersTable();
+        }
+
+        function prevPage() {
+            currentPage--;
+            renderOrdersTable();
+        }
+
+        // --- MERCHANT ORDER ACTIONS ---
+        function deleteMerchantOrder(id) {
+            if(!confirm('Are you sure you want to permanently delete this order? This cannot be undone.')) return;
+            db.collection('orders').doc(id).delete().then(function(){
+                showT("Order deleted successfully!");
+            }).catch(function(e){
+                showT(e.message, "error");
+            });
+        }
+
+        function archiveMerchantOrder(id) {
+            if(!confirm('Archive this order? It will be marked as archived.')) return;
+            db.collection('orders').doc(id).update({ status: 'archived' }).then(function(){
+                showT("Order archived!");
+            }).catch(function(e){
+                showT(e.message, "error");
+            });
+        }
+
+        function editMerchantOrder(id) {
+            var o = myOrders.find(function(x){ return x.id === id });
+            if(!o) return;
+
+            var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
+            h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Order #'+o.id.slice(-6).toUpperCase()+'</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
+            h += '<form id="edit-merchant-order-form" class="space-y-4">';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name</label><input type="text" id="emo-cname" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerName||'')+'"></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><input type="tel" id="emo-cphone" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerPhone||'')+'"></div>';
+            h += '<div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">City</label><input type="text" id="emo-ccity" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerCity||'')+'"></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Qty</label><input type="number" id="emo-qty" min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.qty||1)+'"></div></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Address</label><input type="text" id="emo-caddress" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerAddress||'')+'"></div>';
+            h += '<button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 text-sm mt-2">Save Changes</button>';
+            h += '</form></div></div>';
+
+            document.body.insertAdjacentHTML('beforeend', h);
+
+            document.getElementById('edit-merchant-order-form').addEventListener('submit', function(e){
+                e.preventDefault();
+                var updateData = {
+                    customerName: document.getElementById('emo-cname').value,
+                    customerPhone: document.getElementById('emo-cphone').value,
+                    customerCity: document.getElementById('emo-ccity').value,
+                    qty: parseInt(document.getElementById('emo-qty').value) || 1,
+                    customerAddress: document.getElementById('emo-caddress').value
+                };
+                
+                if(o.productPrice) {
+                    updateData.totalAmount = o.productPrice * updateData.qty;
+                }
+
+                db.collection('orders').doc(id).update(updateData).then(function(){
+                    showT("Order updated successfully!");
+                    var modal = document.querySelector('.modal-overlay');
+                    if(modal) modal.remove();
+                }).catch(function(err){
+                    showT(err.message, "error");
+                });
+            });
+        }
+        function populateDropdowns() {
+            const s1 = document.getElementById('order-product'); s1.innerHTML = '<option value="">Select...</option>' + myProducts.map(p=>`<option value="${p.id}">${p.name} (${p.sku||'No SKU'}) - Stock: ${p.stock}</option>`).join('');
+            const s2 = document.getElementById('adj-product'); s2.innerHTML = '<option value="">Select...</option>' + myProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+        }
+
+       function renderProducts(){renderCategoryFilter();var c=document.getElementById('products-list');var list=selectedCategory==='all'?myProducts:myProducts.filter(function(p){return p.category===selectedCategory});if(!list.length){c.innerHTML='<p class="text-slate-500 col-span-3 text-center py-8">No products'+(selectedCategory!=='all'?' in this category':'')+'.</p>';return}c.innerHTML=list.map(function(p){return'<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><div class="h-32 bg-slate-800 flex items-center justify-center overflow-hidden">'+(p.image?'<img src="'+p.image+'" class="w-full h-full object-cover">':'<span class="iconify text-4xl text-slate-600" data-icon="mdi:image-off-outline"></span>')+'</div><div class="p-4"><div class="flex justify-between items-start mb-2"><div><div class="font-bold text-white">'+p.name+'</div><div class="text-xs text-slate-500">'+(p.category||'No Category')+' · '+(p.sku||'No SKU')+'</div></div><div class="flex gap-1"><button onclick="editProduct(\''+p.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button><button onclick="if(confirm(\'Delete?\'))db.collection(\'products\').doc(\''+p.id+'\').delete().then(()=>showT(\'Deleted\')).catch(e=>showT(e.message,\'error\'))" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-red-400"><span class="iconify text-sm" data-icon="mdi:delete"></span></button></div></div><div class="text-xs text-slate-400 line-clamp-2 mb-3">'+(p.description||'No description')+'</div><div class="flex justify-between text-xs font-bold"><span class="text-cyan-400">TZS '+Number(p.price).toLocaleString()+'</span><span class="'+(p.stock<=0?'text-red-400':p.minStock&&p.stock<=p.minStock?'text-yellow-400':'text-green-400')+'">'+p.stock+' in stock</span></div></div></div>'}).join('')}
+        function renderCategoryFilter(){var c=document.getElementById('category-filter');if(!c)return;var cats=[];myProducts.forEach(function(p){if(p.category&&cats.indexOf(p.category)===-1)cats.push(p.category)});cats.sort();var html='<button onclick="filterCategory(\'all\')" class="cat-btn '+(selectedCategory==='all'?'active':'')+'">All ('+myProducts.length+')</button>';cats.forEach(function(cat){var count=myProducts.filter(function(p){return p.category===cat}).length;html+='<button onclick="filterCategory(\''+cat.replace(/'/g,"\\'")+'\')" class="cat-btn '+(selectedCategory===cat?'active':'')+'">'+cat+' ('+count+')</button>'});c.innerHTML=html;var dl=document.getElementById('cat-datalist');if(dl)dl.innerHTML=cats.map(function(c){return'<option value="'+c+'">'}).join('')}
+        function filterCategory(cat){selectedCategory=cat;renderProducts()}
+
+        function editProduct(id) {
+            var p = myProducts.find(x => x.id === id);
+            if(!p) return;
+
+            var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:600px">';
+            h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Product</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
+            
+            h += '<form id="edit-product-form" class="space-y-4">';
+            
+            // Name & Category
+            h += '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Product Name</label><input type="text" id="ep-name" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" value="'+(p.name||'')+'"></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Category</label><input type="text" id="ep-cat" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" value="'+(p.category||'')+'"></div>';
+            h += '</div>';
+
+            // Price & SKU
+            h += '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Price (TZS)</label><input type="number" id="ep-price" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" value="'+(p.price||0)+'"></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">SKU</label><input type="text" id="ep-sku" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" value="'+(p.sku||'')+'"></div>';
+            h += '</div>';
+
+            // Stock & Min Stock
+            h += '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Current Stock</label><input type="number" id="ep-stock" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" value="'+(p.stock||0)+'"></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Min Stock Alert</label><input type="number" id="ep-min" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" value="'+(p.minStock||0)+'"></div>';
+            h += '</div>';
+
+            // Description
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Description</label><textarea id="ep-desc" rows="3" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 resize-none">'+(p.description||'')+'</textarea></div>';
+
+            // Submit Button
+            h += '<button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3.5 rounded-xl hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20 text-sm mt-2">Save Changes</button>';
+            
+            h += '</form></div></div>';
+
+            document.body.insertAdjacentHTML('beforeend', h);
+
+            document.getElementById('edit-product-form').addEventListener('submit', function(e){
+                e.preventDefault();
+                
+                var updateData = {
+                    name: document.getElementById('ep-name').value.trim(),
+                    category: document.getElementById('ep-cat').value.trim(),
+                    price: parseInt(document.getElementById('ep-price').value) || 0,
+                    sku: document.getElementById('ep-sku').value.trim(),
+                    stock: parseInt(document.getElementById('ep-stock').value) || 0,
+                    minStock: parseInt(document.getElementById('ep-min').value) || 0,
+                    description: document.getElementById('ep-desc').value.trim()
+                };
+
+                db.collection('products').doc(id).update(updateData).then(function(){
+                    showT("Product updated successfully!");
+                    var modal = document.querySelector('.modal-overlay');
+                    if(modal) modal.remove();
+                }).catch(function(err){
+                    showT(err.message, "error");
+                });
+            });
+        }
+        function quickReorder(pid,qty){var p=myProducts.find(function(x){return x.id===pid});if(!p)return;db.collection('products').doc(pid).update({stock:firebase.firestore.FieldValue.increment(qty),stockLog:firebase.firestore.FieldValue.arrayUnion({type:'in',qty:qty,note:'Quick Reorder',at:new Date()})}).then(function(){showT('+'+qty+' added to '+p.name+'!')}).catch(function(e){showT(e.message,'error')})}
+
+     function renderCatalog(){var tb=document.getElementById('catalog-table-body'),empty=document.getElementById('catalog-empty'),table=tb?tb.closest('table'):null;var s=(document.getElementById('catalog-search')||{}).value||'';s=s.toLowerCase();var list=myProducts.filter(function(p){if(!s)return true;return(p.name||'').toLowerCase().indexOf(s)!==-1||(p.sku||'').toLowerCase().indexOf(s)!==-1||(p.category||'').toLowerCase().indexOf(s)!==-1});if(!list.length){if(table)table.classList.add('hidden');empty.classList.remove('hidden');return}if(table)table.classList.remove('hidden');empty.classList.add('hidden');tb.innerHTML=list.map(function(p){var barcodeVal=p.sku||'NO-SKU';var bid='bc-'+p.id.replace(/\//g,'_');return'<tr class="hover:bg-white/[0.02]"><td class="px-4 py-3"><div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">'+(p.image?'<img src="'+p.image+'" class="w-full h-full object-cover">':'<span class="iconify text-slate-600" data-icon="mdi:image-off-outline"></span>')+'</div></td><td class="px-4 py-3 font-semibold text-white">'+p.name+'</td><td class="px-4 py-3 text-slate-400 text-xs">'+(p.category||'—')+'</td><td class="px-4 py-3 text-right font-bold text-cyan-400">TZS '+Number(p.price).toLocaleString()+'</td><td class="px-4 py-3 font-mono text-xs text-slate-300">'+(p.sku||'—')+'</td><td class="px-4 py-3 text-right font-bold '+(p.stock<=0?'text-red-400':p.minStock&&p.stock<=p.minStock?'text-yellow-400':'text-green-400')+'">'+p.stock+'</td><td class="px-4 py-3 text-right text-slate-400">'+(p.minStock||0)+'</td><td class="px-4 py-3 text-xs text-slate-500 max-w-[200px] truncate">'+(p.description||'—')+'</td><td class="px-4 py-3 text-center"><svg id="'+bid+'" class="inline-block"></svg></td></tr>'}).join('');setTimeout(function(){list.forEach(function(p){var bid='bc-'+p.id.replace(/\//g,'_');var el=document.getElementById(bid);if(el&&typeof JsBarcode!=='undefined'){try{JsBarcode(el,p.sku||'NO-SKU',{format:'CODE128',width:1.2,height:30,displayValue:true,fontSize:9,margin:2,lineColor:'#e2e8f0',background:'transparent',font:'Plus Jakarta Sans'})}catch(e){}}})},100)}
+
+        function renderInventory() {
+            const c = document.getElementById('stock-table-list');
+            if(!myProducts.length) { c.innerHTML='<p class="text-slate-500 text-center py-8">No products.</p>'; return; }
+            c.innerHTML = myProducts.map(p=>`<div class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl gap-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : '<span class="iconify text-slate-600" data-icon="mdi:box"></span>'}</div><div><div class="text-sm font-semibold">${p.name}</div><div class="text-[10px] text-slate-500">Min: ${p.minStock||0}</div></div></div><button onclick="quickReorder('${p.id}',${Math.max(p.minStock?p.minStock*2:20,10)})" class="reorder-btn" title="Quick reorder"><span class="iconify text-xs" data-icon="mdi:lightning-bolt"></span> +${Math.max(p.minStock?p.minStock*2:20,10)}</button><div class="text-right"><div class="font-bold ${p.stock<=0?'text-red-400':p.minStock&&p.stock<=p.minStock?'text-yellow-400':'text-cyan-400'}">${p.stock}</div><div class="text-[10px] text-slate-500 uppercase">Current</div></div></div>`).join('');
+            const h = document.getElementById('stock-history-list'); let logs = [];
+            myProducts.forEach(p => { if(p.stockLog) p.stockLog.forEach(l => logs.push({...l, productName: p.name})); });
+            logs.sort((a,b) => (b.at?.seconds||0) - (a.at?.seconds||0));
+            h.innerHTML = logs.length ? logs.slice(0,20).map(l=>`<div class="flex justify-between items-center p-2 bg-black/20 rounded"><div><span class="font-semibold text-white">${l.productName}</span><span class="ml-2 ${l.type==='in'?'text-green-400':'text-red-400'} uppercase font-bold">(${l.type})</span></div><div class="text-right"><div class="text-slate-300">${l.qty} pcs</div></div></div>`).join('') : '<p class="text-slate-500">No history yet.</p>';
+        } // FORM SUBMISSIONS
+                function addVariantOption() {
+            const container = document.getElementById('variant-options-container');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 items-center';
+            div.innerHTML = `
+                <input type="text" placeholder="Option name (e.g. Size)" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 variant-name">
+                <input type="text" placeholder="Values (e.g. Small, Medium, Large)" class="flex-[2] bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 variant-values">
+                <button type="button" onclick="this.parentElement.remove()" class="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20"><span class="iconify text-lg" data-icon="mdi:close"></span></button>
+            `;
+            container.appendChild(div);
+        }
+
+        document.getElementById('product-form').addEventListener('submit', async function(e) {
+            e.preventDefault(); const btn = this.querySelector('button[type="submit"]'); const orig = btn.innerHTML; btn.innerHTML = 'Saving...'; btn.disabled = true;
+            const fileInput = document.getElementById('prod-img'); let imageData = '';
+            if (fileInput.files[0]) { imageData = await compressImage(fileInput.files[0]); }
+
+            // Capture Variants
+            var variants = [];
+            document.querySelectorAll('#variant-options-container > div').forEach(div => {
+                var vName = div.querySelector('.variant-name').value.trim();
+                var vValues = div.querySelector('.variant-values').value.trim();
+                if(vName && vValues) {
+                    variants.push({ name: vName, values: vValues.split(',').map(v => v.trim()) });
+                }
+            });
+
+            try { 
+                await db.collection('products').add({ 
+                    merchantId: uid(), 
+                    name: document.getElementById('prod-name').value, 
+                    category: document.getElementById('prod-cat').value, 
+                    price: parseInt(document.getElementById('prod-price').value), 
+                    sku: document.getElementById('prod-sku').value, 
+                    stock: parseInt(document.getElementById('prod-stock').value), 
+                    minStock: parseInt(document.getElementById('prod-min').value) || 0, 
+                    description: document.getElementById('prod-desc').value, 
+                    image: imageData, 
+                    variants: variants, // Save the variants array
+                    stockLog: [{type: 'in', qty: parseInt(document.getElementById('prod-stock').value), note: 'Initial Stock', at: new Date()}], 
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+                }); 
+                showT("Product Added!"); 
+                this.reset(); 
+                document.getElementById('variant-options-container').innerHTML = ''; // Clear variants on save
+            } catch(e) { 
+                showT(e.message, "error"); 
+            } finally { 
+                btn.innerHTML = orig; 
+                btn.disabled = false; 
+            }
+        });('submit', async function(e) {
+            e.preventDefault(); const btn = this.querySelector('button[type="submit"]'); const orig = btn.innerHTML; btn.innerHTML = 'Saving...'; btn.disabled = true;
+            const fileInput = document.getElementById('prod-img'); let imageData = '';
+            if (fileInput.files[0]) { imageData = await compressImage(fileInput.files[0]); }
+            try { await db.collection('products').add({ merchantId: uid(), name: document.getElementById('prod-name').value, category: document.getElementById('prod-cat').value, price: parseInt(document.getElementById('prod-price').value), sku: document.getElementById('prod-sku').value, stock: parseInt(document.getElementById('prod-stock').value), minStock: parseInt(document.getElementById('prod-min').value) || 0, description: document.getElementById('prod-desc').value, image: imageData, stockLog: [{type: 'in', qty: parseInt(document.getElementById('prod-stock').value), note: 'Initial Stock', at: new Date()}], createdAt: firebase.firestore.FieldValue.serverTimestamp() }); showT("Product Added!"); this.reset(); } catch(e) { showT(e.message, "error"); } finally { btn.innerHTML = orig; btn.disabled = false; }
+        });   document.getElementById('order-form').addEventListener('submit', async function(e) {
+            e.preventDefault(); const btn = this.querySelector('button[type="submit"]'); const orig = btn.innerHTML; btn.innerHTML = 'Submitting...'; btn.disabled = true;
+            const pid = document.getElementById('order-product').value; const qty = parseInt(document.getElementById('order-qty').value); const product = myProducts.find(p => p.id === pid);
+            if (!product) { showT("Select product", "error"); btn.innerHTML=orig; btn.disabled=false; return; }
+            if (product.stock < qty) { showT(`Only ${product.stock} in stock!`, "error"); btn.innerHTML=orig; btn.disabled=false; return; }
+            try { await db.collection('orders').add({ merchantId: uid(), merchantName: window.currentUser.shopName, customerName: document.getElementById('order-cust-name').value, customerPhone: document.getElementById('order-cust-phone').value, customerCity: document.getElementById('order-city').value, customerAddress: document.getElementById('order-address').value, orderDate: new Date(document.getElementById('order-date').value), productId: pid, productSku: product.sku||'', productName: product.name, productDesc: product.description||'', productImage: product.image||'', productPrice: product.price, itemName: product.name, qty: qty, totalAmount: product.price * qty, currency: 'TZS', status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp() }); const newStock = Math.max(0, product.stock - qty); await db.collection('products').doc(pid).update({ stock: newStock, stockLog: firebase.firestore.FieldValue.arrayUnion({type: 'out', qty: qty, note: 'Order #Pending', at: new Date()}) }); showT("Order Submitted!"); this.reset(); document.getElementById('order-date').value = new Date().toISOString().split('T')[0]; } catch(e) { showT(e.message, "error"); } finally { btn.innerHTML = orig; btn.disabled = false; }
+        });
+
+        document.getElementById('adjust-form').addEventListener('submit', async function(e) {
+            e.preventDefault(); const pid = document.getElementById('adj-product').value; const type = document.getElementById('adj-type').value; const qty = parseInt(document.getElementById('adj-qty').value);
+            if(!pid || !qty) return showT("Fill all fields", "error");
+            try { const increment = type === 'in' ? qty : -qty; await db.collection('products').doc(pid).update({ stock: firebase.firestore.FieldValue.increment(increment), stockLog: firebase.firestore.FieldValue.arrayUnion({type, qty, note: 'Manual', at: new Date()}) }); showT(`Stock ${type} successful!`); this.reset(); } catch(e) { showT(e.message, "error"); }
+        });
+
+        // SETTINGS & PASSWORD
+        async function saveProfile() {
+            try { await db.collection('users').doc(uid()).update({ shopName: document.getElementById('set-shop').value, name: document.getElementById('set-name').value }); document.getElementById('header-name').textContent = document.getElementById('set-shop').value; showT("Profile Saved!"); } catch(e) { showT(e.message, "error"); }
+        }
+
+        document.getElementById('pw-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const curr = document.getElementById('pw-current').value;
+            const newPw = document.getElementById('pw-new').value;
+            const conf = document.getElementById('pw-confirm').value;
+            if(newPw !== conf) return showT("New passwords do not match", "error");
+            const user = firebase.auth().currentUser;
+            const cred = firebase.auth.EmailAuthProvider.credential(user.email, curr);
+            try {
+                await user.reauthenticateWithCredential(cred);
+                await user.updatePassword(newPw);
+                showT("Password updated successfully!");
+                this.reset();
+            } catch(err) { showT("Current password is incorrect.", "error"); }
+        });
+
+               // CHAT SYSTEM (FIREBASE REAL-TIME)
+        let chatUnsub = null;
+
+                function toggleChat() {
+            const chatWindow = document.getElementById('chat-window');
+            const isCurrentlyHidden = chatWindow.classList.contains('hidden');
+            chatWindow.classList.toggle('hidden');
+            
+            if (isCurrentlyHidden) {
+                loadChat();
+                // Hide the red badge and mark as read in database
+                var badge = document.getElementById('chat-notif-badge');
+                if(badge) badge.classList.add('hidden');
+                db.collection('chats').doc(uid()).update({ unreadByMerchant: false }).catch(()=>{});
+            } else {
+                if (chatUnsub) {
+                    chatUnsub();
+                    chatUnsub = null;
+                }
+            }
+        }
+                function loadChat() {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '<div class="flex justify-center"><span class="iconify animate-spin text-cyan-400 text-2xl" data-icon="mdi:loading"></span></div>';
+            
+            const messagesRef = db.collection('chats').doc(uid()).collection('messages');
+            
+            chatUnsub = messagesRef.orderBy('createdAt', 'asc').limitToLast(50).onSnapshot(snap => {
+                if (snap.empty) {
+                    container.innerHTML = `
+                        <div class="flex justify-start items-end gap-2">
+                            <div class="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center flex-shrink-0 shadow-md"><span class="iconify text-white text-lg" data-icon="mdi:headset"></span></div>
+                            <div class="chat-bubble bg-slate-200 text-slate-800 rounded-bl-none">Hello! 👋 How can we help you today?</div>
+                        </div>`;
+                    return;
+                }
+                
+                let html = '';
+                snap.docs.forEach(doc => {
+                    const msg = doc.data();
+                    const isMe = msg.senderId === uid();
+                    
+                                       if (isMe) {
+                        // Merchant Message (Right side, Dark Grey background)
+                        html += `
+                        <div class="flex justify-end items-end gap-2">
+                            <div class="chat-bubble bg-slate-400 text-white rounded-br-none">${escapeHtml(msg.text)}</div>
+                            <div class="w-8 h-8 rounded-full bg-slate-300 flex items-center justify-center flex-shrink-0 text-slate-700 font-bold text-xs shadow-md">M</div>
+                        </div>`;
+                    } else {
+                        // Admin/Support Message (Left side, Light Grey background)
+                        html += `
+                        <div class="flex justify-start items-end gap-2">
+                            <div class="w-8 h-8 rounded-full bg-slate-400 flex items-center justify-center flex-shrink-0 shadow-md"><span class="iconify text-white text-lg" data-icon="mdi:headset"></span></div>
+                            <div class="chat-bubble bg-slate-200 text-slate-800 rounded-bl-none">${escapeHtml(msg.text)}</div>
+                        </div>`;
+                    }
+                });
+                
+                container.innerHTML = html;
+                container.scrollTop = container.scrollHeight;
+            }, err => {
+                container.innerHTML = '<p class="text-red-400 text-center text-sm">Error loading chat.</p>';
+            });
+        }
+
+        async function sendChat(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = ''; // Clear input immediately
+
+            try {
+                const chatRef = db.collection('chats').doc(uid());
+                const messagesRef = chatRef.collection('messages');
+                
+                // 1. Add message to subcollection
+                await messagesRef.add({
+                    text: msg,
+                    senderId: uid(),
+                    senderRole: 'merchant',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // 2. Update parent doc so Admin dashboard can see latest message easily
+                    await chatRef.set({
+                    lastMessage: msg,
+                    lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'answered_by_admin',
+                    unreadByAdmin: false,
+                    unreadByMerchant: true // <--- ADD THIS LINE IN THE ADMIN FILE
+                }, { merge: true });
+                
+            } catch(err) {
+                showT("Failed to send message.", "error");
+                console.error("Chat error:", err);
+            }
+        }
+
+        // Helper to send messages (used by both text input and file uploads)
+        async function sendMessage(text) {
+            if (!text.trim()) return;
+            try {
+                const chatRef = db.collection('chats').doc(uid());
+                const messagesRef = chatRef.collection('messages');
+                await messagesRef.add({ text: text, senderId: uid(), senderRole: 'merchant', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                await chatRef.set({ merchantId: uid(), merchantName: window.currentUser.shopName || 'Unknown Merchant', lastMessage: text, lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(), status: 'waiting_for_admin', unreadByAdmin: true }, { merge: true });
+            } catch(err) { showT("Failed to send message.", "error"); }
+        }
+
+        // Show/Hide the Support Popup
+        function toggleSupportPopup() { document.getElementById('support-popup').classList.toggle('hidden'); }
+
+        // Pre-fill the chat input box for suggestions/complaints
+        function fillChatInput(text) { const input = document.getElementById('chat-input'); input.value = text; input.focus(); }
+
+        // Handle File Uploads (Sends the file name as an attachment message)
+        async function handleChatFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const msg = "📎 Attachment: " + file.name;
+            await sendMessage(msg);
+            event.target.value = '';
+        }
+
+        // Helper to prevent XSS attacks in chat
+        function escapeHtml(text) {
+            if(!text) return '';
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        /* ===== INTEGRATIONS: API KEY ===== */
+        var apiKeyVisible = false;
+        function renderApiKey(){var key=window.currentUser.apiKey||'';var d=document.getElementById('api-key-display');var ic=document.getElementById('key-eye-icon');if(!d)return;if(!key){d.textContent='No key generated yet';return}d.textContent=apiKeyVisible?key:key.substring(0,8)+'••••••••••••••••';if(ic)ic.setAttribute('data-icon',apiKeyVisible?'mdi:eye':'mdi:eye-off')}
+        function toggleKeyVisibility(){apiKeyVisible=!apiKeyVisible;renderApiKey()}
+        function copyApiKey(){var key=window.currentUser.apiKey;if(!key)return showT('Generate a key first','error');navigator.clipboard.writeText(key).then(function(){showT('API key copied!')}).catch(function(){showT('Copy failed','error')})}
+        function generateApiKey(){if(!confirm('Generating a new key will invalidate the old one. Continue?'))return;var c='abcdefghijklmnopqrstuvwxyz0123456789',k='cs_live_';for(var i=0;i<32;i++)k+=c.charAt(Math.floor(Math.random()*c.length));db.collection('users').doc(uid()).update({apiKey:k}).then(function(){window.currentUser.apiKey=k;apiKeyVisible=false;renderApiKey();showT('New API key generated!')}).catch(function(e){showT(e.message,'error')})}
+
+        /* ===== INTEGRATIONS: CSV IMPORT ===== */
+        var pendingCSV=[];
+        function downloadCSVTemplate(){var csv='customer_name,customer_phone,city,address,product_name,sku,qty,price\nJuma,+255123456789,Dar es Salaam,Kinondoni Street 12,iPhone 15,IP-001,1,1500000\nAisha,+255987654321,Dodoma,Majengo Road 5,Titan Gel,TG-002,3,25000\n';var b=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='chapshop_order_template.csv';a.click();showT('Template downloaded!')}
+        function parseCSVLine(line){var r=[],c='',q=false;for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"')q=!q;else if(ch===','&&!q){r.push(c);c=''}else c+=ch}r.push(c);return r}
+        function previewCSV(input){if(!input.files[0])return;var reader=new FileReader();reader.onload=function(e){var lines=e.target.result.split('\n').filter(function(l){return l.trim()});if(lines.length<2){showT('CSV is empty','error');return}var h=lines[0].split(',').map(function(x){return x.trim().toLowerCase().replace(/"/g,'')});var ni=h.indexOf('customer_name'),pi=h.indexOf('customer_phone'),ci=h.indexOf('city'),ai=h.indexOf('address'),pri=h.indexOf('product_name'),si=h.indexOf('sku'),qi=h.indexOf('qty'),ri=h.indexOf('price');if(ni===-1||pi===-1){showT('CSV must have customer_name and customer_phone columns','error');return}pendingCSV=[];for(var i=1;i<lines.length;i++){var cols=parseCSVLine(lines[i]);var name=(cols[ni]||'').replace(/"/g,'').trim();var phone=(cols[pi]||'').replace(/"/g,'').trim();if(!name||!phone)continue;pendingCSV.push({name:name,phone:phone,city:(cols[ci]||'').replace(/"/g,'').trim(),address:(cols[ai]||'').replace(/"/g,'').trim(),product:(cols[pri]||'').replace(/"/g,'').trim(),sku:(cols[si]||'').replace(/"/g,'').trim(),qty:parseInt(cols[qi])||1,price:parseInt(cols[ri])||0})}renderCSVPreview()};reader.readAsText(input.files[0])}
+        function renderCSVPreview(){var c=document.getElementById('csv-preview'),rows=document.getElementById('csv-rows'),cnt=document.getElementById('csv-count');if(!pendingCSV.length){showT('No valid rows found','error');return}c.classList.remove('hidden');cnt.textContent=pendingCSV.length+' orders ready to import';rows.innerHTML=pendingCSV.map(function(r){return'<tr><td class="px-3 py-2 text-white">'+r.name+'</td><td class="px-3 py-2 text-slate-400">'+r.phone+'</td><td class="px-3 py-2 text-slate-400">'+(r.city||'—')+'</td><td class="px-3 py-2 text-slate-300">'+(r.product||'—')+'</td><td class="px-3 py-2 text-white">'+r.qty+'</td><td class="px-3 py-2 text-cyan-400 font-bold">TZS '+(r.price*r.qty).toLocaleString()+'</td><td class="px-3 py-2"><span class="text-green-400 text-[10px] font-bold">✓ Valid</span></td></tr>'}).join('')}
+        async function importCSV(){if(!pendingCSV.length)return;var btn=document.getElementById('csv-import-btn'),res=document.getElementById('csv-result');btn.disabled=true;btn.innerHTML='<span class="iconify inline animate-spin" data-icon="mdi:loading"></span> Importing...';var ok=0,fail=0;for(var i=0;i<pendingCSV.length;i++){var r=pendingCSV[i];try{await db.collection('orders').add({merchantId:uid(),merchantName:window.currentUser.shopName,customerName:r.name,customerPhone:r.phone,customerCity:r.city,customerAddress:r.address,orderDate:new Date(),productId:'',productSku:r.sku,productName:r.product,productDesc:'',productImage:'',productPrice:r.price,itemName:r.product||'Imported Product',qty:r.qty,totalAmount:r.price*r.qty,currency:'TZS',status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});ok++}catch(e){fail++}}btn.disabled=false;btn.innerHTML='<span class="iconify inline mr-1" data-icon="mdi:check-circle"></span> Import All';res.classList.remove('hidden');res.className='mt-4 p-4 rounded-xl text-sm font-semibold '+(fail===0?'bg-green-500/10 text-green-400 border border-green-500/20':'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20');res.innerHTML='<span class="iconify inline mr-1" data-icon="mdi:check-circle"></span> '+ok+' orders imported successfully'+(fail>0?', '+fail+' failed':'');pendingCSV=[];document.getElementById('csv-input').value=''}
+        function viewOrder(id){var o=myOrders.find(function(x){return x.id===id});if(!o)return;var steps=[{l:'Order Placed',done:true,t:o.createdAt},{l:'Accepted',done:['accepted','confirmed','no_answer','cancelled','out_for_delivery','delivered','returned'].indexOf(o.status)!==-1,t:o.acceptedAt},{l:'Confirmed',done:['confirmed','out_for_delivery','delivered','returned'].indexOf(o.status)!==-1,t:o.confirmedAt},{l:'Out for Delivery',done:['out_for_delivery','delivered','returned'].indexOf(o.status)!==-1,t:o.outForDeliveryAt},{l:o.status==='returned'?'Returned':'Delivered',done:o.status==='delivered'||o.status==='returned',t:o.deliveredAt||o.returnedAt}];var h='<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Order #'+o.id.slice(-6).toUpperCase()+'</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white p-1"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><div class="flex items-center gap-3 mb-5">'+getStatusBadge(o.status)+'</div><div class="space-y-4"><div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Customer</div><div class="text-white text-sm">'+(o.customerName||'')+'</div><div class="text-slate-400 text-sm">'+(o.customerPhone||'')+(o.customerCity?' · '+o.customerCity:'')+'</div>'+(o.customerAddress?'<div class="text-slate-500 text-xs">'+o.customerAddress+'</div>':'')+'</div><div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Order Details</div><div class="text-white text-sm">'+(o.itemName||'')+' x'+(o.qty||1)+'</div><div class="text-cyan-400 font-bold text-lg">TZS '+Number(o.totalAmount||0).toLocaleString()+'</div></div>'+(o.processedByName?'<div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Agent</div><div class="text-orange-400 text-sm">'+o.processedByName+'</div></div>':'')+(o.riderName?'<div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Rider</div><div class="text-violet-400 text-sm">'+o.riderName+'</div></div>':'')+'</div><div class="mt-5 pt-5 border-t border-white/[0.08]"><div class="text-xs font-bold text-slate-500 uppercase mb-4">Tracking</div><div class="space-y-0">'+steps.map(function(st,i){var last=i===steps.length-1;return'<div class="tl-step"><div class="flex flex-col items-center"><div class="tl-dot '+(st.done?'done':'')+'"></div>'+(!last?'<div class="tl-line"></div>':'')+'</div><div class="pb-6"><div class="text-sm font-semibold '+(st.done?'text-white':'text-slate-600')+'">'+st.l+'</div><div class="text-xs text-slate-600">'+(st.t?formatDate(st.t):'—')+'</div></div></div>'}).join('')+'</div></div></div></div>';document.body.insertAdjacentHTML('beforeend',h)}
+        function printOrder(id){var o=myOrders.find(function(x){return x.id===id});if(!o)return;var h='<div class="print-slip" id="print-slip"><div class="print-slip-box"><div class="print-actions"><button type="button" onclick="document.getElementById(\'print-slip\').remove();window.print()" style="padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:#06b6d4;color:#fff">Print</button><button type="button" onclick="document.getElementById(\'print-slip\').remove()" style="padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:#e2e8f0;color:#333">Close</button></div><div style="text-align:center;margin-bottom:16px"><h2>ChapShop Delivery</h2><div style="font-size:12px;color:#666">Delivery Slip</div></div><div class="ps-big">#'+o.id.slice(-6).toUpperCase()+'</div><div class="ps-row"><span class="ps-label">Date</span><span class="ps-val">'+formatDate(o.createdAt)+'</span></div><div class="ps-row"><span class="ps-label">Status</span><span class="ps-val" style="color:#06b6d4;text-transform:uppercase;font-weight:800">'+(o.status||'').replace(/_/g,' ')+'</span></div><div style="border-top:2px solid #111;margin:12px 0"></div><div style="font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Customer</div><div class="ps-row"><span class="ps-label">Name</span><span class="ps-val">'+(o.customerName||'—')+'</span></div><div class="ps-row"><span class="ps-label">Phone</span><span class="ps-val" style="font-size:15px">'+(o.customerPhone||'—')+'</span></div>'+(o.customerCity?'<div class="ps-row"><span class="ps-label">City</span><span class="ps-val">'+o.customerCity+'</span></div>':'')+(o.customerAddress?'<div class="ps-row"><span class="ps-label">Address</span><span class="ps-val">'+o.customerAddress+'</span></div>':'')+'<div style="border-top:2px solid #111;margin:12px 0"></div><div class="ps-row"><span class="ps-label">Item</span><span class="ps-val">'+(o.itemName||'—')+'</span></div><div class="ps-row"><span class="ps-label">Quantity</span><span class="ps-val">'+(o.qty||1)+'</span></div>'+(o.productPrice?'<div class="ps-row"><span class="ps-label">Unit Price</span><span class="ps-val">TZS '+Number(o.productPrice).toLocaleString()+'</span></div>':'')+'<div style="border-top:2px solid #111;margin:12px 0"></div><div class="ps-row ps-total"><span class="ps-label">Total Amount</span><span class="ps-val">TZS '+Number(o.totalAmount||0).toLocaleString()+'</span></div>'+(o.merchantName?'<div style="border-top:2px solid #111;margin:12px 0"></div><div class="ps-row"><span class="ps-label">Merchant</span><span class="ps-val">'+o.merchantName+'</span></div>':'')+(o.riderName?'<div class="ps-row"><span class="ps-label">Rider</span><span class="ps-val">'+o.riderName+'</span></div>':'')+'<div class="ps-footer">ChapShop Delivery System<br>Computer-generated delivery slip</div></div></div>';document.body.insertAdjacentHTML('beforeend',h)}
+        function setSettlePeriod(p,btn){settlePeriod=p;document.querySelectorAll('#settle-btns .date-btn').forEach(function(b){b.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'});if(btn)btn.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';renderSettlements()}
+        function renderSettlements(){var c=document.getElementById('settle-list');if(!c)return;var list=myOrders;var now=new Date(),s,e;if(settlePeriod==='today'){s=new Date(now.getFullYear(),now.getMonth(),now.getDate());e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59)}else if(settlePeriod==='week'){var d=now.getDay();s=new Date(now.getFullYear(),now.getMonth(),now.getDate()-(d===0?6:d-1));e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59)}else if(settlePeriod==='month'){s=new Date(now.getFullYear(),now.getMonth(),1);e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59)}if(s)list=list.filter(function(o){return o.createdAt&&o.createdAt.toDate()>=s&&o.createdAt.toDate()<=e});var del=list.filter(function(o){return o.status==='delivered'});var gross=del.reduce(function(s,o){return s+(o.totalAmount||0)},0);var comm=Math.round(gross*0.1);var net=gross-comm;document.getElementById('st-gross').textContent='TZS '+gross.toLocaleString();document.getElementById('st-comm').textContent='-TZS '+comm.toLocaleString();var pel=document.getElementById('st-payout');pel.textContent='TZS '+net.toLocaleString();pel.className='text-2xl font-bold '+(net>=0?'text-green-400':'text-red-400');if(!del.length){c.innerHTML='<p class="text-slate-500 text-center py-8">No delivered orders for this period.</p>';return}c.innerHTML=del.map(function(o){return'<div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center justify-between"><div><span class="font-mono text-cyan-400 font-bold text-sm">#'+o.id.slice(-6).toUpperCase()+'</span><div class="text-slate-400 text-sm mt-0.5">'+(o.customerName||'')+' · '+(o.itemName||'')+' x'+(o.qty||1)+'</div></div><div class="text-right"><div class="text-white font-bold">TZS '+(o.totalAmount||0).toLocaleString()+'</div><div class="text-slate-500 text-xs">'+formatDate(o.createdAt)+'</div></div></div>'}).join('')}
+        function requestCancel(id){if(!confirm('Request cancellation for this order?'))return;db.collection('orders').doc(id).update({status:'cancel_requested'}).then(function(){showT('Cancellation requested — admin will review');renderOrdersTable()}).catch(function(e){showT(e.message,'error')})}
+        function requestRefund(id){if(!confirm('Request refund for this order?'))return;db.collection('orders').doc(id).update({status:'refund_requested'}).then(function(){showT('Refund requested — admin will review');renderOrdersTable()}).catch(function(e){showT(e.message,'error')})}
+           function openGoogleSheetsModal() {
+            var key = window.currentUser.apiKey;
+            if(!key) return showT('Generate an API key first', 'error');
+            var url = 'https://chapshop-api.nelsonmdengo2-141.workers.dev/webhook/gsheets?key=' + key;
+
+            // We embed their URL directly into the script so they don't have to!
+            var scriptCode = `function syncToChapShop() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0];
+  var orders = [];
+
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    var order = {};
+    for (var j = 0; j < headers.length; j++) {
+      order[headers[j]] = row[j];
+    }
+    if(order.customer_name && order.customer_phone) {
+      orders.push(order);
+    }
+  }
+
+  var webhookUrl = "${url}"; 
+
+  var options = {
+    "method": "post",
+    "contentType": "application/json",
+    "payload": JSON.stringify(orders)
+  };
+
+  try {
+    UrlFetchApp.fetch(webhookUrl, options);
+    SpreadsheetApp.getUi().alert("Successfully synced " + orders.length + " orders to ChapShop!");
+  } catch (e) {
+    SpreadsheetApp.getUi().alert("Error syncing: " + e.toString());
+  }
+}
+
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('ChapShop')
+    .addItem('Sync Orders', 'syncToChapShop')
+    .addToUi();
+}`;
+
+            var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:600px">';
+            h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Google Sheets Integration</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
+            h += '<div class="space-y-4 text-sm text-slate-300">';
+            h += '<p><strong>Step 1:</strong> Open your Google Sheet, click <strong>Extensions > Apps Script</strong>.</p>';
+            h += '<p><strong>Step 2:</strong> Delete any code there, and paste the code below.</p>';
+            h += '<p><strong>Step 3:</strong> Click the "Save" icon, then click "Run". Refresh your Google Sheet to see the ChapShop menu!</p>';
+            h += '<div class="relative bg-black/40 rounded-lg p-3 mt-2 border border-white/[0.08]">';
+            h += '<button onclick="copyGsheetsCode()" class="absolute top-2 right-2 bg-cyan-500 text-white px-3 py-1 rounded-md text-xs font-bold hover:bg-cyan-400">Copy Code</button>';
+            h += '<pre id="gsheets-code" class="text-xs text-cyan-400 overflow-x-auto max-h-60 overflow-y-auto whitespace-pre-wrap">'+scriptCode.replace(/</g, '&lt;').replace(/>/g, '&gt;')+'</pre>';
+            h += '</div>';
+            h += '<p class="text-xs text-slate-500 mt-2">Note: Your unique ChapShop Webhook URL is already embedded in this script!</p>';
+            h += '</div></div></div>';
+
+            document.body.insertAdjacentHTML('beforeend', h);
+        }
+
+        function copyGsheetsCode() {
+            var code = document.getElementById('gsheets-code').innerText;
+            navigator.clipboard.writeText(code).then(function() {
+                showT('Script copied to clipboard!');
+            }).catch(function() {
+                showT('Copy failed', 'error');
+            });
+        }
+
+                function openWebhookModal(platform) {
+            var key = window.currentUser.apiKey;
+            if(!key) return showT('Generate an API key first', 'error');
+            
+            var pLower = platform.toLowerCase();
+            var url = 'https://chapshop-api.nelsonmdengo2-141.workers.dev/webhook/' + pLower + '?key=' + key;
+            var instructions = '';
+
+            if(platform === 'Shopify') {
+                instructions = '<p>1. Log into your Shopify Admin dashboard.</p><p>2. Go to Settings &gt; Notifications &gt; Webhooks.</p><p>3. Click "Create a webhook".</p><p>4. For Event, select "Order creation".</p><p>5. Paste this URL and click Save webhook.</p>';
+            } else if(platform === 'WooCommerce') {
+                instructions = '<div class="space-y-2 mb-3"><div class="flex items-center justify-between bg-white/[0.02] p-2 rounded"><span class="text-slate-400 text-xs">Consumer key</span><span class="text-slate-500 text-xs italic">Enter in WooCommerce</span></div><div class="flex items-center justify-between bg-white/[0.02] p-2 rounded"><span class="text-slate-400 text-xs">Consumer secret</span><span class="text-slate-500 text-xs italic">Enter in WooCommerce</span></div><div class="flex items-center justify-between bg-white/[0.02] p-2 rounded"><span class="text-slate-400 text-xs">Store URL</span><span class="text-slate-500 text-xs italic">Enter in WooCommerce</span></div></div><p>1. Log into your WordPress Admin.</p><p>2. Go to WooCommerce &gt; Settings &gt; Advanced &gt; Webhooks.</p><p>3. Click "Add webhook" and select Topic "Order created".</p><p>4. Paste this Delivery URL and click Save.</p>';
+            } else if(platform === 'YouCan') {
+                instructions = '<p>1. Please install the ChapShop app on YouCan.</p><p>2. Log into your YouCan Store Admin.</p><p>3. Go to Settings &gt; Webhooks (or Apps).</p><p>4. Create a new webhook for "Order Created".</p><p>5. Paste this URL and save.</p>';
+            } else if(platform === 'Lightfunnels') {
+                instructions = '<p>1. Please install the ChapShop app on Lightfunnels.</p><p>2. Log into your Lightfunnels dashboard.</p><p>3. Go to Settings &gt; Integrations &gt; Webhooks.</p><p>4. Add a new webhook for "Order Created".</p><p>5. Paste this URL and save.</p>';
+            }
+
+            var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
+            h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Connecting ' + platform + ' Webhooks</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
+            h += '<div class="space-y-4 text-sm text-slate-300">';
+            h += '<p>Please configure your webhook using the URL below:</p>';
+            h += '<div class="bg-black/30 border border-white/[0.08] rounded-xl p-4 space-y-3">';
+            h += '<div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-400 uppercase">Select App</span><span class="bg-cyan-500/20 text-cyan-400 px-3 py-1 rounded-full text-xs font-bold">' + platform + '</span></div>';
+            h += '<div><div class="text-xs font-bold text-slate-400 uppercase mb-1">Webhook URL</div><div class="flex gap-2"><input type="text" readonly value="'+url+'" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-cyan-400 font-mono outline-none"><button onclick="copyModalUrl(this,\''+url+'\')" class="bg-cyan-500 text-white px-3 rounded-lg text-xs font-bold hover:bg-cyan-400">Copy</button></div></div>';
+            h += '</div>';
+            h += '<div class="text-xs text-slate-500 mt-3 space-y-1">';
+            h += '<p><strong class="text-slate-400">Next steps:</strong></p>';
+            h += instructions;
+            h += '</div>';
+            h += '</div></div></div>';
+
+            document.body.insertAdjacentHTML('beforeend', h);
+        }
+
+        function copyModalUrl(btn, url) {
+            navigator.clipboard.writeText(url).then(function() {
+                showT('Webhook URL copied!');
+                btn.innerText = 'Copied!';
+                setTimeout(function(){ btn.innerText = 'Copy'; }, 2000);
+            }).catch(function() {
+                showT('Copy failed', 'error');
+            });
+        }
+
+        function loadReport(type) {
+            const c = document.getElementById('report-content');
+            if(type === 'fast' || type === 'slow') {
+                const counts = {}; myOrders.filter(o=>o.status==='delivered').forEach(o => { counts[o.itemName] = (counts[o.itemName]||0) + o.qty; });
+                let sorted = Object.entries(counts).sort((a,b) => type==='fast' ? b[1]-a[1] : a[1]-b[1]);
+                if(!sorted.length) { c.innerHTML = '<p class="text-slate-500 text-center">No data.</p>'; return; }
+                c.innerHTML = `<h4 class="font-bold text-white mb-4">${type==='fast'?'Fast':'Slow'} Moving Products</h4><table class="w-full text-sm"><thead class="text-xs text-slate-400 uppercase border-b border-white/[0.05]"><tr><th class="pb-2 text-left">Product</th><th class="pb-2 text-right">Qty Sold</th></tr></thead><tbody>${sorted.map(s=>`<tr class="border-b border-white/[0.02]"><td class="py-2 text-white">${s[0]}</td><td class="py-2 text-right text-cyan-400 font-bold">${s[1]}</td></tr>`).join('')}</tbody></table>`;
+            } else if(type === 'stock') {
+                const totalVal = myProducts.reduce((s,p) => s + (p.price * p.stock), 0);
+                c.innerHTML = `<h4 class="font-bold text-white mb-4">Stock Valuation</h4><div class="text-3xl font-bold text-cyan-400 mb-2">TZS ${Number(totalVal).toLocaleString()}</div><p class="text-slate-400 text-sm">Total value of current inventory.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

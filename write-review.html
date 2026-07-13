@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merchant Reviews — ChapShop Delivery</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2306b6d4'/%3E%3Cpath d='M8 22l4-6h-3l5-8h-4l6-10 6 10h-4l5 8h-3l4 6z' fill='white' transform='translate(0,2)'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <style>
+        *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}body{background:#020617;color:#fff}::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}.gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.form-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 16px;font-size:14px;color:#fff;transition:all .25s ease;font-family:inherit;outline:none}.form-input::placeholder{color:#64748b}.form-input:focus{border-color:rgba(6,182,212,.5);box-shadow:0 0 0 3px rgba(6,182,212,.08);background:rgba(255,255,255,.07)}select.form-input{appearance:none;cursor:pointer;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12"><path fill="%2394a3b8" d="M6 8L1 3h10z"/></svg>');background-repeat:no-repeat;background-position:right 16px center}select.form-input option{background-color:#0f172a;color:#e2e8f0}textarea.form-input{min-height:140px;resize:vertical}.review-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:24px;transition:all .3s ease}.review-card:hover{border-color:rgba(6,182,212,.2);background:rgba(255,255,255,.03)}.review-card.new-review{border-color:rgba(6,182,212,.3);background:rgba(6,182,212,.03);animation:slideIn .5s cubic-bezier(.16,1,.3,1)}@keyframes slideIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}.verified-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:#34d399;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px}.av0{background:linear-gradient(135deg,#06b6d4,#0e7490)}.av1{background:linear-gradient(135deg,#10b981,#047857)}.av2{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}.av3{background:linear-gradient(135deg,#f59e0b,#d97706)}.av4{background:linear-gradient(135deg,#ef4444,#b91c1c)}.av5{background:linear-gradient(135deg,#ec4899,#be185d)}.av6{background:linear-gradient(135deg,#3b82f6,#1d4ed8)}.av7{background:linear-gradient(135deg,#14b8a6,#0d9488)}.av8{background:linear-gradient(135deg,#a855f7,#7c3aed)}.av9{background:linear-gradient(135deg,#f97316,#c2410c)}.stat-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.05);overflow:hidden}.stat-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#06b6d4,#0891b2);transition:width .8s ease}.star-rating{display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:6px}.star-rating input{display:none}.star-rating label{cursor:pointer;font-size:32px;color:#334155;transition:color .2s ease}.star-rating input:checked~label,.star-rating label:hover,.star-rating label:hover~label{color:#f59e0b}.form-error{color:#f87171;font-size:12px;margin-top:4px;display:none}.form-input.error{border-color:rgba(248,113,113,.5)}.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-100px);opacity:0;transition:all .4s cubic-bezier(.16,1,.3,1);z-index:1100;background:#0f172a;border:1px solid rgba(16,185,129,.3);color:#fff;padding:16px 24px;border-radius:14px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 10px 40px rgba(0,0,0,.5)}.toast.show{transform:translateX(-50%) translateY(0);opacity:1}.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:100;opacity:0;pointer-events:none;transition:opacity .3s ease}.modal-overlay.active{opacity:1;pointer-events:auto}.modal-panel{position:fixed;top:0;right:0;bottom:0;width:100%;max-width:560px;background:#0a0f1e;border-left:1px solid rgba(255,255,255,.08);z-index:101;transform:translateX(100%);transition:transform .4s cubic-bezier(.16,1,.3,1);overflow-y:auto}.modal-panel.active{transform:translateX(0)}@media(max-width:640px){.modal-panel{max-width:100%}}
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Toast -->
+    <div id="toast" class="toast"><span class="iconify text-green-400 text-xl" data-icon="mdi:check-circle"></span><span id="toastMsg">Review submitted successfully!</span></div>
+
+    <!-- Modal Overlay -->
+    <div id="modalOverlay" class="modal-overlay" onclick="closeModal()"></div>
+
+    <!-- Write Review Modal Panel -->
+    <div id="modalPanel" class="modal-panel">
+        <div class="sticky top-0 bg-[#0a0f1e]/90 backdrop-blur-md border-b border-white/[0.08] z-10 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-cyan-500/10 border border-cyan-500/20 rounded-lg flex items-center justify-center">
+                    <span class="iconify text-cyan-400" data-icon="mdi:pencil-box-outline"></span>
+                </div>
+                <div>
+                    <h2 class="font-bold text-white text-base">Write a Review</h2>
+                    <p class="text-[11px] text-slate-500">Share your experience with ChapShop</p>
+                </div>
+            </div>
+            <button onclick="closeModal()" class="w-9 h-9 rounded-lg bg-white/[0.05] border border-white/[0.08] flex items-center justify-center hover:bg-white/[0.1] transition-colors cursor-pointer">
+                <span class="iconify text-slate-400 text-lg" data-icon="mdi:close"></span>
+            </button>
+        </div>
+
+        <div class="p-6">
+            <form id="reviewForm" class="space-y-5" novalidate>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 mb-2 block">Full Name *</label>
+                    <input type="text" name="name" required placeholder="e.g. Amina Kimaro" class="form-input" id="inputName">
+                    <div class="form-error" id="errorName">Please enter your name</div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 mb-2 block">Company Name</label>
+                    <input type="text" name="company" placeholder="e.g. ZanzibarStyle Online" class="form-input">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 mb-2 block">Service Used *</label>
+                    <select name="service" required class="form-input" id="inputService">
+                        <option value="" disabled selected>Select a service</option>
+                        <option>Cash On Delivery</option>
+                        <option>Courier & Delivery</option>
+                        <option>Warehouse Solutions</option>
+                        <option>Call Center</option>
+                        <option>Order Fulfillment</option>
+                        <option>Medical Courier</option>
+                        <option>Reverse Logistics</option>
+                        <option>3PL Services</option>
+                        <option>Multiple Services</option>
+                    </select>
+                    <div class="form-error" id="errorService">Please select a service</div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 mb-3 block">Rating *</label>
+                    <div class="star-rating" id="starRating">
+                        <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars">★</label>
+                        <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars">★</label>
+                        <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars">★</label>
+                        <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars">★</label>
+                        <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star">★</label>
+                    </div>
+                    <div class="form-error" id="errorRating">Please select a rating</div>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-slate-400 mb-2 block">Your Review *</label>
+                    <textarea name="review" required placeholder="Tell us about your experience with ChapShop Delivery..." class="form-input" id="inputReview"></textarea>
+                    <div class="form-error" id="errorReview">Please write a review (at least 20 characters)</div>
+                </div>
+                <div class="pt-2 space-y-3">
+                    <button type="submit" class="w-full bg-cyan-500 text-white font-bold text-sm py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-cyan-500/20">
+                        <span class="iconify text-lg" data-icon="mdi:send"></span> Submit Review
+                    </button>
+                    <button type="button" onclick="closeModal()" class="w-full bg-white/[0.03] border border-white/[0.08] text-slate-400 font-semibold text-sm py-3 rounded-xl hover:bg-white/[0.06] transition-colors cursor-pointer">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="border-b border-white/[0.08] bg-[#020617]/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-3"><div class="w-11 h-11 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-xl flex items-center justify-center"><span class="iconify text-white text-xl" data-icon="mdi:truck-fast"></span></div><div><span class="font-bold text-white text-[17px] tracking-tight">ChapShop</span><span class="text-cyan-400 font-bold text-[17px] ml-0.5 tracking-tight">Delivery</span></div></a>
+            <div class="flex items-center gap-4">
+                <button onclick="openModal()" class="hidden sm:inline-flex bg-cyan-500 text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-cyan-400 transition-colors items-center gap-2 cursor-pointer">
+                    <span class="iconify text-base" data-icon="mdi:pencil"></span> Write Review
+                </button>
+                <a href="index.html" class="text-sm text-slate-400 hover:text-white transition-colors font-medium flex items-center gap-1.5"><span class="iconify" data-icon="mdi:arrow-left"></span> Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 py-20">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h1 class="text-3xl md:text-4xl font-bold tracking-tight gradient-text mb-4">Merchant Reviews</h1>
+                <p class="text-slate-400 font-normal text-lg max-w-xl mx-auto">Real feedback from businesses using ChapShop Delivery across Tanzania.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                <div class="bg-[#0f172a] border border-white/[0.08] rounded-2xl p-6 text-center">
+                    <div class="text-4xl font-extrabold text-white mb-1" id="avgRating">4.8</div>
+                    <div class="flex items-center justify-center gap-1 mb-2" id="avgStars"></div>
+                    <div class="text-xs text-slate-500 font-medium" id="totalReviewCount">Based on 0 reviews</div>
+                </div>
+                <div class="lg:col-span-2 bg-[#0f172a] border border-white/[0.08] rounded-2xl p-6">
+                    <h3 class="text-sm font-bold text-white mb-4">Rating Distribution</h3>
+                    <div class="space-y-3" id="ratingBars"></div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-[#0f172a] border border-white/[0.08] rounded-xl p-4">
+                <div class="flex items-center gap-2 text-sm text-slate-400 w-full sm:w-auto">
+                    <span class="iconify text-cyan-400" data-icon="mdi:filter-outline"></span>
+                    <select id="serviceFilter" class="form-input py-2 text-sm flex-1 sm:w-52" onchange="filterReviews()">
+                        <option value="all">All Services</option>
+                        <option value="Cash On Delivery">Cash On Delivery</option>
+                        <option value="Courier & Delivery">Courier & Delivery</option>
+                        <option value="Warehouse Solutions">Warehouse</option>
+                        <option value="Order Fulfillment">Fulfillment</option>
+                        <option value="Medical Courier">Medical</option>
+                        <option value="Reverse Logistics">Reverse Logistics</option>
+                        <option value="3PL Services">3PL Services</option>
+                        <option value="Call Center">Call Center</option>
+                        <option value="Multiple Services">Multiple Services</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                    <button onclick="openModal()" class="sm:hidden bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1 cursor-pointer"><span class="iconify" data-icon="mdi:pencil"></span> Write</button>
+                    <span class="text-xs text-slate-500 font-medium" id="reviewCount">0 Reviews</span>
+                </div>
+            </div>
+
+            <div id="reviewsList" class="space-y-6"></div>
+            <div id="loadMoreContainer" class="text-center mt-10 hidden"><button onclick="loadMore()" class="inline-flex items-center gap-2 bg-white/[0.05] border border-white/[0.1] text-white font-semibold text-sm px-7 py-3.5 rounded-xl hover:bg-white/[0.1] transition-all cursor-pointer"><span class="iconify text-lg" data-icon="mdi:comment-text-multiple-outline"></span> Load More Reviews</button></div>
+            <div id="emptyState" class="text-center py-16 hidden"><span class="iconify text-5xl text-slate-700 mb-4 block mx-auto" data-icon="mdi:comment-off-outline"></span><h3 class="text-xl font-semibold text-white mb-2">No Reviews Found</h3><p class="text-slate-400 text-sm mb-6">Be the first to share your experience!</p><button onclick="openModal()" class="bg-cyan-500 text-white font-semibold text-sm px-6 py-3 rounded-xl hover:bg-cyan-400 transition-colors inline-flex items-center gap-2 cursor-pointer"><span class="iconify" data-icon="mdi:pencil"></span> Write a Review</button></div>
+        </div>
+    </main>
+
+    <footer class="border-t border-white/[0.05] py-8"><div class="max-w-7xl mx-auto px-6 text-center"><p class="text-xs text-slate-500">© 2025 ChapShop Delivery. All rights reserved.</p></div></footer>
+
+<script>
+var mockReviews=[
+{n:"Amina Kimaro",c:"ZanzibarStyle Online",s:"Cash On Delivery",r:5,t:"ChapShop Delivery transformed our e-commerce business. Their COD success rate is unmatched, and we get paid faster than any other provider we've tried. The dashboard is intuitive and support is excellent.",d:"Jan 12, 2025",v:1},
+{n:"Joseph Mtega",c:"TechHub TZ",s:"Warehouse Solutions",r:5,t:"Their warehouse solution saved us so much. We moved to ChapShop's 3PL, and our fulfillment speed increased by 3x. Highly recommended for any scaling business.",d:"Jan 10, 2025",v:1},
+{n:"Fatma Nassoro",c:"DawaCare Pharmacies",s:"Medical Courier",r:4.5,t:"As a pharmacy chain, we needed reliable medical courier services. ChapShop delivers our temperature-sensitive shipments on time every time. Great cold chain management.",d:"Jan 8, 2025",v:1},
+{n:"David Rweyemamu",c:"Kilimanjaro Teas",s:"Order Fulfillment",r:5,t:"The order fulfillment service is seamless. We just send them the orders and they handle the rest. Our customers are happier with the faster delivery times.",d:"Jan 5, 2025",v:1},
+{n:"Sarah Mollel",c:"ArushaCrafts",s:"Cash On Delivery",r:4,t:"Good COD service. The remittance is fast, usually within 24 hours as promised. Would love to see more coverage in rural areas, but overall very solid.",d:"Dec 28, 2024",v:1},
+{n:"Hassan Juma",c:"Simba Electronics",s:"Courier & Delivery",r:5,t:"Next-day delivery to Mwanza is a game changer for our electronics business. Customers trust ChapShop's delivery personnel with high-value items.",d:"Dec 22, 2024",v:1},
+{n:"Grace Mushi",c:"TzBooks",s:"Order Fulfillment",r:4.5,t:"Switching to ChapShop for fulfillment was the best decision we made this year. Inventory management is precise and we've had zero lost packages.",d:"Dec 15, 2024",v:1},
+{n:"Peter Mahinda",c:"DarFresh Groceries",s:"Courier & Delivery",r:4,t:"Same-day delivery in Dar es Salaam is reliable. Our fresh produce gets to customers in perfect condition. Just wish the cutoff time was later.",d:"Dec 10, 2024",v:1},
+{n:"Lucy Kawembe",c:"MbeyaFashions",s:"Reverse Logistics",r:5,t:"Their returns management is excellent. We used to struggle with reverse logistics but ChapShop handles everything from pickup to restocking seamlessly.",d:"Dec 5, 2024",v:1},
+{n:"Omar Said",c:"Zanzibar Spice Co.",s:"Cash On Delivery",r:5,t:"We ship expensive spice packages nationwide and ChapShop's COD collection is flawless. Every payment accounted for, every delivery confirmed. Outstanding!",d:"Nov 30, 2024",v:1},
+{n:"Rehema Mtove",c:"MamaAfrica Boutique",s:"Cash On Delivery",r:4.5,t:"ChapShop's COD service has been a lifeline for our boutique. Most of our customers prefer paying on delivery and the success rate is over 95%. Remittance is always on time.",d:"Nov 25, 2024",v:1},
+{n:"James Moshi",c:"KiliGear Outdoor",s:"3PL Services",r:5,t:"We outsourced our entire logistics to ChapShop's 3PL team and it was the best business decision we made. They handle storage, packing, shipping — everything. We just focus on growing our brand.",d:"Nov 20, 2024",v:1},
+{n:"Halima Abdallah",c:"PembaHerbs Natural",s:"Medical Courier",r:4,t:"The medical courier service is professional and compliant. Our herbal products arrive fresh and on schedule. Only giving 4 stars because we had one delay during rainy season.",d:"Nov 15, 2024",v:1},
+{n:"Eric Shijo",c:"DodomaTech Supplies",s:"Warehouse Solutions",r:5,t:"ChapShop's warehouse in Dar is clean, secure, and well-organized. Real-time inventory tracking gives us peace of mind. The team there is incredibly responsive.",d:"Nov 10, 2024",v:1},
+{n:"Mwanaisha Khamis",c:"SwahiliTrendz",s:"Cash On Delivery",r:4,t:"COD collections are solid. We process over 200 orders daily and ChapShop handles it effortlessly. Would appreciate weekend delivery options though.",d:"Nov 5, 2024",v:1},
+{n:"Felix Mrosso",c:"TangaFarm Produce",s:"Courier & Delivery",r:4.5,t:"Reliable courier for our agricultural shipments. Our mangoes and cashews reach buyers in Dar in top condition. The cold storage option during transit is a huge plus.",d:"Oct 30, 2024",v:1},
+{n:"Neema Lekule",c:"Serengeti Skincare",s:"Order Fulfillment",r:5,t:"Since partnering with ChapShop for fulfillment, our order accuracy has reached 99.8%. Customers receive their skincare products within 48 hours. It's been incredible for our brand reputation.",d:"Oct 25, 2024",v:1},
+{n:"Ibrahim Rajab",c:"MombasaImports TZ",s:"3PL Services",r:4,t:"Good 3PL service overall. The integration with our Shopify store was smooth. Sometimes there are minor delays during peak festive season, but nothing major.",d:"Oct 20, 2024",v:1},
+{n:"Anna Mdachi",c:"MorogoroOrganics",s:"Courier & Delivery",r:5,t:"ChapShop delivers our organic produce across the Morogoro-Dar corridor faster than anyone else. Their same-day express option is perfect for perishable goods.",d:"Oct 15, 2024",v:1},
+{n:"Thomas Kadogo",c:"IringsTech Hub",s:"Reverse Logistics",r:4.5,t:"Returns processing used to be our biggest headache. ChapShop's reverse logistics team picks up returned items promptly and gets them back to our warehouse within 2 days. Fantastic turnaround.",d:"Oct 10, 2024",v:1},
+{n:"Zainab Mwinyi",c:"Coastal Couture",s:"Cash On Delivery",r:5,t:"As a fashion brand dealing in high-value items, trust is everything. ChapShop's COD agents are professional, polite to our customers, and every shilling is accounted for.",d:"Oct 5, 2024",v:1},
+{n:"Patrick Mallya",c:"Bongo Gadgets",s:"3PL Services",r:4,t:"Switched from self-fulfillment to ChapShop 3PL and haven't looked back. Order processing is faster and shipping costs are lower. Just wish their API documentation was more detailed.",d:"Sep 30, 2024",v:1},
+{n:"Khadija Omari",c:"Spice Island Sweets",s:"Order Fulfillment",r:5,t:"Our artisan sweets business has grown 4x since using ChapShop fulfillment. They package our delicate products with care and customers receive them in perfect condition every time.",d:"Sep 25, 2024",v:1},
+{n:"Robert Mapunda",c:"LakeZone Fishing Co.",s:"Courier & Delivery",r:3.5,t:"Delivery to Mwanza and surrounding areas is decent. However, delivery to more remote lakeside communities can take 3-4 days. Would appreciate expanded rural coverage.",d:"Sep 20, 2024",v:0},
+{n:"Sauda Baraka",c:"DarEsSalaam Diapers",s:"Warehouse Solutions",r:4.5,t:"ChapShop's warehouse management system is a game-changer. We can track stock levels in real-time and get automatic alerts when inventory is low. Saved us from multiple stockouts.",d:"Sep 15, 2024",v:1},
+{n:"Michael Mrema",c:"Arusha Coffee Roasters",s:"Courier & Delivery",r:5,t:"We ship freshly roasted coffee across Tanzania and ChapShop ensures it arrives aromatic and intact. Their handling of fragile packages is top-notch. Truly professional.",d:"Sep 10, 2024",v:1},
+{n:"Aisha Khamisi",c:"Nungwi Crafts",s:"Cash On Delivery",r:4,t:"COD works great for our Zanzibar-based craft business. Delivery agents are respectful with our customers. Only issue — sometimes the daily collection report arrives late.",d:"Sep 5, 2024",v:1},
+{n:"Godfrey Tesha",c:"Tanzania Auto Parts",s:"3PL Services",r:4.5,t:"ChapShop handles our bulky auto parts shipments without any issues. Their 3PL solution integrates perfectly with our WooCommerce store. Real game-changer for our operations.",d:"Aug 30, 2024",v:1},
+{n:"Mariam Halfani",c:"KidiWorld Toys",s:"Order Fulfillment",r:5,t:"The fulfillment center staff handle our products with great care. Zero damaged shipments in 6 months. Our customer satisfaction scores have gone up significantly since switching.",d:"Aug 25, 2024",v:1},
+{n:"Daniel Nkya",c:"Moshi Print House",s:"Courier & Delivery",r:3.5,t:"Delivery is generally good in major cities. Rural delivery in the Kilimanjaro region could be improved. But for urban deliveries, ChapShop is among the best.",d:"Aug 20, 2024",v:0},
+{n:"Tupu Mtey",c:"Bagamoyo Seafood",s:"Courier & Delivery",r:4,t:"Same-day delivery from Bagamoyo to Dar is reliable. Our seafood arrives fresh. The insulated packaging option they offer makes a real difference for perishable items.",d:"Aug 15, 2024",v:1},
+{n:"Rashid Chengula",c:"Singida Honey Co.",s:"Warehouse Solutions",r:5,t:"ChapShop's warehouse in Dodoma has been perfect for our growing honey business. Climate-controlled storage keeps our products at the right temperature. Security is excellent too.",d:"Aug 10, 2024",v:1},
+{n:"Flora Malulu",c:"Tabora Textiles",s:"Reverse Logistics",r:4,t:"Returns used to cost us a fortune. ChapShop's reverse logistics has reduced our return processing costs by 40%. Items come back in good condition and are quickly restocked.",d:"Aug 5, 2024",v:1},
+{n:"Abdul Kondo",c:"Mtwara Building Supplies",s:"3PL Services",r:4.5,t:"ChapShop manages our entire supply chain from warehouse to customer. Their reporting tools give us visibility into every step. Couldn't ask for a better logistics partner.",d:"Jul 30, 2024",v:1},
+{n:"Stella Kimambo",c:"Ushindi Shoes",s:"Cash On Delivery",r:5,t:"We sell shoes online and COD is essential for our business model. ChapShop collects payments efficiently and we receive our money within 24 hours. The API integration was smooth too.",d:"Jul 25, 2024",v:1},
+{n:"Hamisi Mchuma",c:"Kigoma Fresh Fish",s:"Medical Courier",r:4,t:"We use the medical courier service for our fish sampling and lab testing shipments. Temperature-controlled transport ensures our samples arrive intact. Very reliable for sensitive shipments.",d:"Jul 20, 2024",v:1},
+{n:"Nuru Mwakalinga",c:"Lindi Handicrafts",s:"Courier & Delivery",r:3.5,t:"Delivery within major cities is excellent. Coverage in southern Tanzania towns like Lindi and Mtwara could be better. When delivery works, it works great though.",d:"Jul 15, 2024",v:0},
+{n:"Clement Mroso",c:"Bukoba Bookstore",s:"Order Fulfillment",r:4.5,t:"ChapShop fulfills our book orders across the country with impressive accuracy. Wrong shipments are extremely rare and when they happen, ChapShop corrects them immediately at no extra cost.",d:"Jul 10, 2024",v:1},
+{n:"Zena Saidi",c:"PembaCloth Traditions",s:"Cash On Delivery",r:5,t:"Our traditional kanga and kitenge business relies heavily on COD. ChapShop's agents are trusted in the community and customers feel comfortable paying them. Our sales have grown 60% since partnering with them.",d:"Jul 5, 2024",v:1},
+{n:"Edward Luhanga",c:"MaraSolar Energy",s:"3PL Services",r:4,t:"ChapShop handles our solar panel deliveries across rural Tanzania. Their logistics network reaches areas other providers can't. Only suggestion: improve tracking updates for rural deliveries.",d:"Jun 30, 2024",v:1},
+{n:"Salma Vuai",c:"Unguja Beauty",s:"Warehouse Solutions",r:4.5,t:"Storing our beauty products in ChapShop's climate-controlled warehouse has eliminated our spoilage issues. The inventory system sends low-stock alerts automatically. Very professional operation.",d:"Jun 25, 2024",v:1},
+{n:"Victor Masanja",c:"Shinyanga Agri-Traders",s:"Courier & Delivery",r:4,t:"ChapShop delivers our agricultural inputs across the Lake Zone efficiently. The bulk delivery pricing is competitive. Would love to see more frequent pickup schedules in Shinyanga.",d:"Jun 20, 2024",v:1},
+{n:"Riziki Juma",c:"Mombasa Mama Kitchen",s:"Cash On Delivery",r:5,t:"Running a food delivery business requires speed and reliability. ChapShop delivers both. Our customers in Dar always receive their meal kits fresh and on time. The COD collection is 100% transparent.",d:"Jun 15, 2024",v:1},
+{n:"Augustino Kessy",c:"Tanga Cement Distributors",s:"3PL Services",r:3.5,t:"ChapShop handles heavy industrial deliveries reasonably well. The 3PL pricing for bulky items is fair. However, occasional delays during the long rainy season. Good but room for improvement.",d:"Jun 10, 2024",v:0},
+{n:"Hawa Mussa",c:"DarBaby Essentials",s:"Order Fulfillment",r:5,t:"As a baby products company, safety and care in handling is our top priority. ChapShop treats every package as if it's fragile. Our customers constantly praise the delivery quality.",d:"Jun 5, 2024",v:1},
+{n:"Norman Mwampamba",c:"Ruaha Safari Gear",s:"Reverse Logistics",r:4.5,t:"ChapShop manages our rental gear returns flawlessly. Tents, sleeping bags, and equipment come back to us on time and in good condition. The tracking system for returns is excellent.",d:"May 30, 2024",v:1},
+{n:"Sidi Makame",c:"Stone Town Souvenirs",s:"Cash On Delivery",r:4,t:"COD service from Zanzibar to mainland Tanzania works well. Collections are accurate. I'd like to see faster bank transfers though — sometimes it takes 2 days instead of 1.",d:"May 25, 2024",v:1},
+{n:"Frank Lyimo",c:"Arusha Medical Supplies",s:"Medical Courier",r:5,t:"When it comes to medical deliveries, there's no room for error. ChapShop understands this completely. Their cold chain logistics for vaccines and medicines meet international standards.",d:"May 20, 2024",v:1},
+{n:"Evelyn Moshi",c:"KiliCoffee Export",s:"Warehouse Solutions",r:5,t:"ChapShop's warehouse near Kilimanjaro Airport is strategically located for our export business. Coffee beans are stored in optimal conditions and shipment preparation is incredibly fast.",d:"May 15, 2024",v:1},
+{n:"Baraka Mussa",c:"Tanga Fresh Dairy",s:"Medical Courier",r:4.5,t:"We use ChapShop's temperature-controlled courier for our dairy samples and lab testing. Their cold chain management is reliable and the delivery team understands the urgency of medical shipments.",d:"May 10, 2024",v:1},
+{n:"Gertrude Mbilinyi",c:"WomenCraft Tanzania",s:"Reverse Logistics",r:5,t:"Our cooperative sells handmade crafts online and returns happen. ChapShop makes returns painless for our customers and for us. Items come back in sellable condition. Really impressed!",d:"May 5, 2024",v:1}
+];
+
+var PAGE_SIZE=8;
+var currentPage=0;
+var filteredReviews=[];
+var allReviews=[];
+
+/* ---- localStorage user reviews ---- */
+function getUserReviews(){
+    try{return JSON.parse(localStorage.getItem('chapshop_reviews')||'[]')}catch(e){return[]}
+}
+function saveUserReview(rv){
+    var list=getUserReviews();
+    list.unshift(rv);
+    localStorage.setItem('chapshop_reviews',JSON.stringify(list));
+}
+
+/* ---- Build combined list (user reviews first) ---- */
+function buildAllReviews(){
+    var user=getUserReviews();
+    allReviews=user.map(function(u){
+        return{n:u.name,c:u.company||'Business Partner',s:u.service,r:u.rating,t:u.text,d:u.date,v:1,isNew:true}
+    }).concat(mockReviews);
+}
+
+/* ---- Helpers ---- */
+function getInitials(n){return n.split(' ').map(function(w){return w[0]}).join('')}
+function getAvClass(n){var h=0;for(var i=0;i<n.length;i++){h=n.charCodeAt(i)+((h<<5)-h)}return'av'+(Math.abs(h)%10)}
+function renderStars(r,sz){
+    var s=sz||16;var h='';var f=Math.floor(r);var half=r%1>=0.25&&r%1<0.75;
+    for(var i=0;i<5;i++){
+        if(i<f){h+='<span class="iconify text-amber-400" data-icon="mdi:star" style="font-size:'+s+'px"></span>'}
+        else if(i===f&&half){h+='<span class="iconify text-amber-400" data-icon="mdi:star-half-full" style="font-size:'+s+'px"></span>'}
+        else if(i===f&&r%1>=0.75){h+='<span class="iconify text-amber-400" data-icon="mdi:star" style="font-size:'+s+'px"></span>'}
+        else{h+='<span class="iconify text-slate-600" data-icon="mdi:star-outline" style="font-size:'+s+'px"></span>'}
+    }
+    return h
+}
+
+/* ---- Stats ---- */
+function renderStats(){
+    var total=allReviews.length;
+    var sum=0;var counts={5:0,4:0,3:0,2:0,1:0};
+    allReviews.forEach(function(rv){
+        sum+=rv.r;var fl=Math.floor(rv.r);if(rv.r%1>=0.75)fl++;if(fl>=5)fl=5;if(fl<=1)fl=1;counts[fl]=(counts[fl]||0)+1
+    });
+    var avg=total>0?(sum/total).toFixed(1):'0.0';
+    document.getElementById('avgRating').textContent=avg;
+    document.getElementById('avgStars').innerHTML=renderStars(parseFloat(avg),20);
+    document.getElementById('totalReviewCount').textContent='Based on '+total+' reviews';
+    var barsHtml='';
+    for(var i=5;i>=1;i--){
+        var pct=total>0?((counts[i]||0)/total*100).toFixed(0):0;
+        barsHtml+='<div class="flex items-center gap-3"><span class="text-xs text-slate-400 w-4 text-right">'+i+'</span><span class="iconify text-amber-400 text-xs" data-icon="mdi:star"></span><div class="flex-1 stat-bar"><div class="stat-bar-fill" style="width:'+pct+'%"></div></div><span class="text-xs text-slate-500 w-8">'+(counts[i]||0)+'</span></div>'
+    }
+    document.getElementById('ratingBars').innerHTML=barsHtml
+}
+
+/* ---- Render single review card ---- */
+function renderReview(rv){
+    var badge=rv.v?'<span class="verified-badge"><span class="iconify" data-icon="mdi:check-decagram" style="font-size:10px"></span>Verified</span>':'';
+    var newClass=rv.isNew?' new-review':'';
+    var newTag=rv.isNew?'<span class="inline-flex items-center gap-1 text-[10px] font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded-md ml-2"><span class="iconify" data-icon="mdi:sparkles" style="font-size:10px"></span>NEW</span>':'';
+    return'<div class="review-card'+newClass+'"><div class="flex items-start gap-4 mb-4"><div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 '+getAvClass(rv.n)+'">'+getInitials(rv.n)+'</div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 flex-wrap"><h4 class="font-semibold text-white text-[15px]">'+rv.n+'</h4>'+badge+newTag+'</div><p class="text-xs text-slate-500 mt-0.5">'+rv.c+'</p></div><div class="text-right shrink-0"><div class="flex items-center gap-0.5">'+renderStars(rv.r)+'</div><p class="text-[11px] text-slate-600 mt-1">'+rv.d+'</p></div></div><div class="mb-3"><span class="inline-flex items-center gap-1 text-[11px] font-semibold text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-1 rounded-md"><span class="iconify" data-icon="mdi:package-variant-closed" style="font-size:12px"></span>'+rv.s+'</span></div><p class="text-sm text-slate-300 leading-relaxed">'+rv.t+'</p></div>'
+}
+
+/* ---- Filter & display ---- */
+function filterReviews(){
+    var filter=document.getElementById('serviceFilter').value;
+    filteredReviews=filter==='all'?allReviews.slice():allReviews.filter(function(rv){return rv.s===filter});
+    currentPage=0;
+    document.getElementById('reviewsList').innerHTML='';
+    loadReviews()
+}
+
+function loadReviews(){
+    var start=currentPage*PAGE_SIZE;
+    var end=start+PAGE_SIZE;
+    var batch=filteredReviews.slice(start,end);
+    var container=document.getElementById('reviewsList');
+    batch.forEach(function(rv){container.insertAdjacentHTML('beforeend',renderReview(rv))});
+    document.getElementById('reviewCount').textContent=filteredReviews.length+' Reviews';
+    var more=end<filteredReviews.length;
+    document.getElementById('loadMoreContainer').classList.toggle('hidden',!more);
+    document.getElementById('emptyState').classList.toggle('hidden',filteredReviews.length>0);
+    if(filteredReviews.length===0){document.getElementById('reviewsList').innerHTML=''}
+}
+
+function loadMore(){currentPage++;loadReviews()}
+
+/* ---- Modal ---- */
+function openModal(){
+    document.getElementById('modalOverlay').classList.add('active');
+    document.getElementById('modalPanel').classList.add('active');
+    document.body.style.overflow='hidden';
+}
+function closeModal(){
+    document.getElementById('modalOverlay').classList.remove('active');
+    document.getElementById('modalPanel').classList.remove('active');
+    document.body.style.overflow='';
+}
+
+/* ---- Form handling ---- */
+function clearErrors(){
+    document.querySelectorAll('.form-error').forEach(function(el){el.style.display='none'});
+    document.querySelectorAll('.form-input').forEach(function(el){el.classList.remove('error')});
+}
+
+function showToast(msg){
+    var t=document.getElementById('toast');
+    document.getElementById('toastMsg').textContent=msg;
+    t.classList.add('show');
+    setTimeout(function(){t.classList.remove('show')},3500);
+}
+
+document.getElementById('reviewForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    clearErrors();
+    var valid=true;
+    var nameVal=this.elements.name.value.trim();
+    var serviceVal=this.elements.service.value;
+    var ratingVal=this.elements.rating.value;
+    var reviewVal=this.elements.review.value.trim();
+
+    if(!nameVal){document.getElementById('errorName').style.display='block';document.getElementById('inputName').classList.add('error');valid=false}
+    if(!serviceVal){document.getElementById('errorService').style.display='block';document.getElementById('inputService').classList.add('error');valid=false}
+    if(!ratingVal){document.getElementById('errorRating').style.display='block';valid=false}
+    if(!reviewVal||reviewVal.length<20){document.getElementById('errorReview').style.display='block';document.getElementById('inputReview').classList.add('error');valid=false}
+
+    if(!valid)return;
+
+    var reviewData={
+        name:nameVal,
+        company:this.elements.company.value.trim()||'Business Partner',
+        service:serviceVal,
+        rating:parseInt(ratingVal),
+        text:reviewVal,
+        date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+        verified:true
+    };
+
+    saveUserReview(reviewData);
+
+    /* Rebuild and re-render */
+    buildAllReviews();
+    renderStats();
+    filterReviews();
+
+    /* Reset form and close modal */
+    this.reset();
+    closeModal();
+    showToast('Review submitted successfully! Thank you for your feedback.');
+
+    /* Scroll to top of reviews */
+    setTimeout(function(){document.getElementById('reviewsList').scrollIntoView({behavior:'smooth',block:'start'})},300);
+});
+
+/* Close modal on Escape key */
+document.addEventListener('keydown',function(e){
+    if(e.key==='Escape')closeModal();
+});
+
+/* ---- Init ---- */
+buildAllReviews();
+renderStats();
+filteredReviews=allReviews.slice();
+loadReviews();
+</script>
+</body>
+</html>
