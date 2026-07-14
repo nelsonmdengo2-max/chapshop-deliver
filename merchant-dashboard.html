@@ -658,8 +658,40 @@ Content-Type: application/json</pre>
     <script>
         let myOrders = [], myProducts = [], filteredOrders = [], lastOrderCount = 0, settlePeriod = 'all', salesChart = null, selectedCategory = 'all', localZones = [];
 let currentPage = 1, pageSize = 15;
-                     const uid = () => window.currentUser.uid;
+                     
+					 
+	const uid = () => window.currentUser.uid;
+        // Helper function to translate Firebase errors into professional text
+        function getFriendlyAuthError(err) {
+            var code = err.code || '';
+            if (code === 'auth/wrong-password' || code === 'auth/invalid-credential' || code === 'auth/user-not-found') {
+                return "Incorrect email or password. Please try again.";
+            }
+            if (code === 'auth/invalid-email') {
+                return "Please enter a valid email address.";
+            }
+            if (code === 'auth/too-many-requests') {
+                return "Access temporarily disabled due to too many failed attempts. Please try again later or reset your password.";
+            }
+            if (code === 'auth/user-disabled') {
+                return "This account has been disabled. Please contact support.";
+            }
+            return "Something went wrong. Please check your details and try again.";
+        }
 
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Signing in...';
+            btn.disabled = true;
+            
+            auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value)
+                .catch(err => {
+                    showT(getFriendlyAuthError(err), "error");
+                    btn.innerHTML = 'Sign In';
+                    btn.disabled = false;
+                });
+        }
         // ===== AUTH LOADER LOGIC =====
                 // ===== AUTH LOADER LOGIC =====
         function showAuthLoader(text) {
@@ -1002,18 +1034,29 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             });
         }
 
-        function editMerchantOrder(id) {
+                function editMerchantOrder(id) {
             var o = myOrders.find(function(x){ return x.id === id });
             if(!o) return;
 
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
             h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Order #'+o.id.slice(-6).toUpperCase()+'</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
+            
             h += '<form id="edit-merchant-order-form" class="space-y-4">';
+            
+            // Customer Details
             h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name</label><input type="text" id="emo-cname" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerName||'')+'"></div>';
             h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><input type="tel" id="emo-cphone" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerPhone||'')+'"></div>';
             h += '<div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">City</label><input type="text" id="emo-ccity" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerCity||'')+'"></div>';
-            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Qty</label><input type="number" id="emo-qty" min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.qty||1)+'"></div></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Qty</label><input type="number" id="emo-qty" min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.qty||1)+'" oninput="calcEditTotal()"></div></div>';
             h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Address</label><input type="text" id="emo-caddress" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerAddress||'')+'"></div>';
+            
+            // Order Details (Item & Pricing)
+            h += '<div class="border-t border-white/[0.08] pt-4 mt-4 space-y-4">';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Item Name</label><input type="text" id="emo-item" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.itemName||'')+'"></div>';
+            h += '<div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">Unit Price (TZS)</label><input type="number" id="emo-price" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.productPrice||0)+'" oninput="calcEditTotal()"></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Total Amount (TZS)</label><input type="number" id="emo-total" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-cyan-400 font-bold" value="'+(o.totalAmount||0)+'"></div></div>';
+            h += '</div>';
+
             h += '<button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 text-sm mt-2">Save Changes</button>';
             h += '</form></div></div>';
 
@@ -1022,16 +1065,15 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             document.getElementById('edit-merchant-order-form').addEventListener('submit', function(e){
                 e.preventDefault();
                 var updateData = {
-                    customerName: document.getElementById('emo-cname').value,
-                    customerPhone: document.getElementById('emo-cphone').value,
-                    customerCity: document.getElementById('emo-ccity').value,
+                    customerName: document.getElementById('emo-cname').value.trim(),
+                    customerPhone: document.getElementById('emo-cphone').value.trim(),
+                    customerCity: document.getElementById('emo-ccity').value.trim(),
                     qty: parseInt(document.getElementById('emo-qty').value) || 1,
-                    customerAddress: document.getElementById('emo-caddress').value
+                    customerAddress: document.getElementById('emo-caddress').value.trim(),
+                    itemName: document.getElementById('emo-item').value.trim(),
+                    productPrice: parseInt(document.getElementById('emo-price').value) || 0,
+                    totalAmount: parseInt(document.getElementById('emo-total').value) || 0
                 };
-                
-                if(o.productPrice) {
-                    updateData.totalAmount = o.productPrice * updateData.qty;
-                }
 
                 db.collection('orders').doc(id).update(updateData).then(function(){
                     showT("Order updated successfully!");
@@ -1041,6 +1083,13 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                     showT(err.message, "error");
                 });
             });
+        }
+
+        // Helper to auto-calculate total when editing
+        function calcEditTotal() {
+            var qty = parseInt(document.getElementById('emo-qty').value) || 0;
+            var price = parseInt(document.getElementById('emo-price').value) || 0;
+            document.getElementById('emo-total').value = (qty * price);
         }
         function populateDropdowns() {
             const s1 = document.getElementById('order-product'); s1.innerHTML = '<option value="">Select...</option>' + myProducts.map(p=>`<option value="${p.id}">${p.name} (${p.sku||'No SKU'}) - Stock: ${p.stock}</option>`).join('');

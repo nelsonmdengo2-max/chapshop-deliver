@@ -66,6 +66,7 @@
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Management</div>
                 <button onclick="switchTab('orders')" class="sidebar-link w-full text-left" id="nav-orders"><span class="iconify text-lg" data-icon="mdi:package-variant-closed"></span> Orders</button>
                 <button onclick="switchTab('shipments')" class="sidebar-link w-full text-left" id="nav-shipments"><span class="iconify text-lg" data-icon="mdi:cube-send"></span> Shipments</button>
+                <button onclick="switchTab('cash')" class="sidebar-link w-full text-left" id="nav-cash"><span class="iconify text-lg" data-icon="mdi:cash-check"></span> Cash Settlement</button>
                 <button onclick="switchTab('returns')" class="sidebar-link w-full text-left" id="nav-returns"><span class="iconify text-lg" data-icon="mdi:keyboard-return"></span> Return Items</button>
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Insights</div>
                 <button onclick="switchTab('reports')" class="sidebar-link w-full text-left" id="nav-reports"><span class="iconify text-lg" data-icon="mdi:chart-box-outline"></span> Reports</button>
@@ -143,6 +144,13 @@
                     </div>
                 </div>
 
+                               <!-- CASH SETTLEMENT -->
+                <div id="panel-cash" class="tab-panel hidden">
+                    <h2 class="text-xl font-bold text-white mb-6">Rider Cash Collection (CoD)</h2>
+                    <p class="text-slate-400 text-sm mb-6">Track physical cash collected by riders. When riders return to the warehouse, click "Settle Cash" to balance their account.</p>
+                    <div id="cash-content" class="space-y-4">Loading...</div>
+                </div>
+
                 <!-- REPORTS -->
                 <div id="panel-reports" class="tab-panel hidden">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -190,7 +198,7 @@
     </div>
 
     <script>
-        let allOrders = [], subStates = { orders: 'pending', shipments: 'create', reports: 'shipping' };
+        let allOrders = [], allRiders = [], subStates = { orders: 'pending', shipments: 'create', reports: 'shipping' };
         const myId = () => window.currentUser.uid;
 
         function onAppLoaded() {
@@ -199,10 +207,18 @@
             document.getElementById('header-avatar').textContent = (window.currentUser.name || 'S').charAt(0).toUpperCase();
             document.getElementById('set-name').value = window.currentUser.name || '';
             document.getElementById('set-email').value = window.currentUser.email || '';
+            
+            // Load Active Riders for the Dropdown
+            db.collection('users').where('role', 'in', ['shipping', 'shipping_manager']).where('active', '==', true).onSnapshot(snap => {
+                allRiders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderAll();
+            });
+
+            // Load Orders
             db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snap => { allOrders = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll(); });
         }
 
-        function renderAll() { updateDashboard(); renderOrders(); renderShipments(); renderReturns(); renderReports(); }
+        function renderAll() { updateDashboard(); renderOrders(); renderShipments(); renderReturns(); renderReports(); renderCash(); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
         function switchTab(t) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden')); document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active')); document.getElementById('panel-'+t).classList.remove('hidden'); document.getElementById('nav-'+t).classList.add('active'); if(window.innerWidth < 1024) toggleSidebar(); }
         function switchSub(panel, tab) { subStates[panel] = tab; document.querySelectorAll(`[id^="${panel}-tab-"]`).forEach(t => t.classList.remove('active')); document.getElementById(`${panel}-tab-${tab}`).classList.add('active'); if(panel==='orders')renderOrders(); if(panel==='shipments')renderShipments(); if(panel==='reports')renderReports(); }
@@ -243,8 +259,8 @@
             if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No orders here.</p>'; return; }
             
             // COMPACT CARDS FOR PENDING / PACKING
-            if(s === 'pending' || s === 'packing') {
-                c.innerHTML = list.map(o => `
+                        if(s === 'pending' || s === 'packing') {
+                c.innerHTML = `<button onclick="autoDispatch()" class="mb-4 w-full bg-violet-500/20 text-violet-400 border border-violet-500/30 font-bold py-3 rounded-xl hover:bg-violet-500/30 transition-colors flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:rocket-launch"></span> Auto-Dispatch Next Order</button>` + list.map(o => `
                 <div class="bg-white/[0.02] border border-cyan-500/20 rounded-xl p-3 flex flex-col lg:flex-row gap-3 items-start">
                     <div class="flex gap-3 items-start flex-1 min-w-0">
                         ${o.productImage ? `<img src="${o.productImage}" onclick="viewImg('${o.productImage}')" class="w-10 h-10 rounded-lg bg-slate-800 object-cover flex-shrink-0 cursor-pointer">` : '<div class="w-10 h-10 rounded-lg bg-slate-800 flex-shrink-0 flex items-center justify-center"><span class="iconify text-lg text-slate-600" data-icon="mdi:package-variant"></span></div>'}
@@ -263,7 +279,10 @@
                         </div>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-                        <input type="text" id="rider-${o.id}" placeholder="Rider" class="w-full lg:w-28 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                        <select id="rider-${o.id}" class="w-full lg:w-32 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                            <option value="">Select Rider</option>
+                            ${allRiders.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+                        </select>
                         <input type="number" id="fee-${o.id}" placeholder="Fee" class="w-full lg:w-24 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
                         <button type="button" onclick="shipWithRider('${o.id}')" class="bg-cyan-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-cyan-400 text-xs whitespace-nowrap cursor-pointer active:scale-95 transition-transform">Ship</button>
                     </div>
@@ -333,23 +352,58 @@
                 </div>`;
             }
         }
-        async function shipWithRider(orderId) {
-            const riderInput = document.getElementById('rider-' + orderId);
+                async function shipWithRider(orderId) {
+            const riderSelect = document.getElementById('rider-' + orderId);
             const feeInput = document.getElementById('fee-' + orderId);
-            const riderName = riderInput ? riderInput.value.trim() : '';
+            const riderId = riderSelect ? riderSelect.value : '';
+            const riderObj = allRiders.find(r => r.id === riderId);
+            const riderName = riderObj ? riderObj.name : '';
             const fee = feeInput ? parseInt(feeInput.value) || 0 : 0;
-            if(!riderName) { showT("Enter Rider Name", "error"); riderInput.focus(); return; }
-            await updateStatus(orderId, 'out_for_delivery', riderName, fee);
+            
+            if(!riderId) { showT("Please select a rider", "error"); if(riderSelect) riderSelect.focus(); return; }
+            await updateStatus(orderId, 'out_for_delivery', riderName, fee, riderId);
         }
 
-        async function updateStatus(orderId, newStatus, riderName, deliveryFee) {
+        async function autoDispatch() {
+            // Find the oldest confirmed order
+            const pending = allOrders.filter(o => o.status === 'confirmed').sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0));
+            if(!pending.length) return showT("No pending orders to dispatch", "error");
+            if(!allRiders.length) return showT("No active riders available", "error");
+            
+            // Count active deliveries per rider
+            const counts = {};
+            allRiders.forEach(r => counts[r.id] = 0);
+            allOrders.filter(o => o.status === 'out_for_delivery' && o.riderId).forEach(o => {
+                if(counts[o.riderId] !== undefined) counts[o.riderId]++;
+            });
+            
+            // Find the rider with the lowest count (least busy)
+            let bestRiderId = allRiders[0].id;
+            let minCount = Infinity;
+            allRiders.forEach(r => {
+                if(counts[r.id] < minCount) {
+                    minCount = counts[r.id];
+                    bestRiderId = r.id;
+                }
+            });
+            
+            const riderObj = allRiders.find(r => r.id === bestRiderId);
+            const order = pending[0];
+            
+            if(confirm(`Assign Order #${order.id.slice(-6).toUpperCase()} to ${riderObj.name}? (They currently have ${minCount} active deliveries)`)) {
+                await updateStatus(order.id, 'out_for_delivery', riderObj.name, 0, riderObj.id);
+            }
+        }
+
+        async function updateStatus(orderId, newStatus, riderName, deliveryFee, riderId) {
             try {
                 const order = allOrders.find(o => o.id === orderId);
                 const timelineEntry = { status: newStatus, by: window.currentUser.name, at: new Date() };
                 const updateData = { status: newStatus, shippedBy: myId(), shippedByName: window.currentUser.name, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), timeline: firebase.firestore.FieldValue.arrayUnion(timelineEntry) };
-                if(newStatus === 'out_for_delivery') { 
+                    if(newStatus === 'out_for_delivery') { 
                     updateData.shippedAt = firebase.firestore.FieldValue.serverTimestamp(); 
                     if(riderName) updateData.riderName = riderName;
+                    if(riderId) updateData.riderId = riderId; // Crucial for the Rider App!
                     if(deliveryFee && deliveryFee > 0) updateData.deliveryFee = deliveryFee;
                 }
                 await db.collection('orders').doc(orderId).update(updateData);
@@ -435,6 +489,102 @@
             const user = firebase.auth().currentUser, cred = firebase.auth.EmailAuthProvider.credential(user.email, curr);
             try { await user.reauthenticateWithCredential(cred); await user.updatePassword(newPw); showT("Password updated!"); this.reset(); } catch(err) { showT("Current password is incorrect.", "error"); }
         });
+		
+		        // ===== 1. CASH SETTLEMENT LOGIC =====
+        function renderCash() {
+            const c = document.getElementById('cash-content');
+            if(!c) return;
+            if(!allRiders.length) { c.innerHTML = '<p class="text-slate-500 text-center py-8">No active riders.</p>'; return; }
+            
+            c.innerHTML = allRiders.map(r => {
+                const delivered = allOrders.filter(o => o.riderId === r.id && o.status === 'delivered');
+                const codCollected = delivered.reduce((s, o) => s + (o.totalAmount||0), 0);
+                const settled = r.cashSettled || 0;
+                const pending = codCollected - settled;
+                
+                return `<div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400 font-bold">${r.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <div class="font-bold text-white">${r.name}</div>
+                            <div class="text-xs text-slate-400">${delivered.length} Delivered Orders</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-6 text-center">
+                        <div><div class="text-[10px] text-slate-500 uppercase">Collected</div><div class="text-green-400 font-bold text-sm">TZS ${codCollected.toLocaleString()}</div></div>
+                        <div><div class="text-[10px] text-slate-500 uppercase">Settled</div><div class="text-cyan-400 font-bold text-sm">TZS ${settled.toLocaleString()}</div></div>
+                        <div><div class="text-[10px] text-slate-500 uppercase">Pending</div><div class="text-red-400 font-bold text-sm">TZS ${pending.toLocaleString()}</div></div>
+                    </div>
+                    <button onclick="settleCash('${r.id}', '${r.name}', ${pending})" class="bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-4 py-2 rounded-lg text-xs hover:bg-green-500/30 whitespace-nowrap">Settle Cash</button>
+                </div>`;
+            }).join('');
+        }
+
+        async function settleCash(riderId, riderName, pendingAmount) {
+            if(pendingAmount <= 0) return showT("This rider has no pending cash", "error");
+            const amountStr = prompt(`Enter cash amount received from ${riderName}:`, pendingAmount);
+            if(!amountStr) return;
+            const amount = parseInt(amountStr);
+            if(isNaN(amount) || amount <= 0) return showT("Invalid amount", "error");
+            
+            try {
+                await db.collection('users').doc(riderId).update({
+                    cashSettled: firebase.firestore.FieldValue.increment(amount)
+                });
+                showT(`TZS ${amount.toLocaleString()} settled for ${riderName}!`);
+            } catch(e) { showT(e.message, "error"); }
+        }
+
+        // ===== 2. BULK ASSIGN LOGIC =====
+        function bulkAssign() {
+            const riderId = document.getElementById('bulk-rider-select').value;
+            if(!riderId) return showT("Select a rider first", "error");
+            const checked = document.querySelectorAll('.bulk-check:checked');
+            if(checked.length === 0) return showT("Select at least one order", "error");
+            
+            const riderObj = allRiders.find(r => r.id === riderId);
+            let count = 0;
+            
+            checked.forEach(cb => {
+                updateStatus(cb.value, 'out_for_delivery', riderObj.name, 0, riderObj.id);
+                count++;
+            });
+            
+            // Uncheck boxes
+            checked.forEach(cb => cb.checked = false);
+            document.getElementById('bulk-rider-select').value = '';
+            showT(`${count} orders assigned to ${riderObj.name}!`);
+        }
+
+        // ===== 3. PRINT MANIFEST LOGIC =====
+        function printManifest() {
+            const riderId = document.getElementById('bulk-rider-select').value;
+            if(!riderId) return showT("Select a rider to print manifest", "error");
+            const riderObj = allRiders.find(r => r.id === riderId);
+            const riderOrders = allOrders.filter(o => o.riderId === riderId && o.status === 'out_for_delivery');
+            
+            if(riderOrders.length === 0) return showT("This rider has no active deliveries", "error");
+            
+            let printWindow = window.open('', '_blank');
+            let html = `<html><head><title>Manifest - ${riderObj.name}</title><style>body{font-family:Arial,sans-serif;padding:20px;color:#111}h1{text-align:center}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#f3f4f6}.total{margin-top:20px;font-size:18px;font-weight:bold;text-align:right}</style></head><body>`;
+            html += `<h1>Delivery Manifest</h1>`;
+            html += `<p><strong>Rider:</strong> ${riderObj.name} | <strong>Date:</strong> ${new Date().toLocaleDateString()}</p>`;
+            html += `<table><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Address</th><th>Amount (TZS)</th></tr></thead><tbody>`;
+            
+            let total = 0;
+            riderOrders.forEach((o, i) => {
+                html += `<tr><td>${i+1}</td><td>${o.customerName}</td><td>${o.customerPhone}</td><td>${o.customerAddress || ''}, ${o.customerCity || ''}</td><td>${Number(o.totalAmount).toLocaleString()}</td></tr>`;
+                total += o.totalAmount;
+            });
+            
+            html += `</tbody></table>`;
+            html += `<div class="total">Total Cash to Collect: TZS ${total.toLocaleString()}</div>`;
+            html += `</body></html>`;
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.print();
+        }
     </script>
 
     <!-- IMAGE LIGHTBOX (ALSO OUTSIDE APP-SCREEN) -->
