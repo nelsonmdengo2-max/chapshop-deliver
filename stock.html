@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Management — ChapShop Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="core.js"></script>
+    <style>
+        *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+        body{background:#020617;}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+        .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.16,1,.3,1);white-space:nowrap;z-index:200}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+        .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem;cursor:pointer}
+        .sidebar-link:hover,.sidebar-link.active{background:rgba(6,182,212,0.1);color:#22d3ee}
+        .sb-header{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;padding:0 1rem;margin-top:1rem}
+    </style>
+</head>
+<body class="bg-[#020617] text-white min-h-screen">
+
+    <div id="toast" class="toast bg-[#0f172a] border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+        <span id="toast-icon" class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
+        <span id="toast-msg" class="text-sm font-medium">Success</span>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center">
+        <div class="w-full max-w-md px-6">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20"><span class="iconify text-white text-3xl" data-icon="mdi:warehouse"></span></div>
+                <h1 class="text-2xl font-bold gradient-text">Stock Manager</h1>
+            </div>
+            <form method="POST" onsubmit="handleLogin(event)" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Email</label><input type="email" name="email" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="admin@chapshop.com"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Password</label><input type="password" name="password" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="••••••••"></div>
+                <button type="submit" class="w-full bg-cyan-500 text-white font-semibold py-3 rounded-xl hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app-screen" class="hidden h-screen flex overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 flex flex-col overflow-y-auto">
+            <div class="p-4 border-b border-white/[0.08] flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:warehouse"></span></div>
+                    <span class="font-bold text-white text-sm">ChapShop<span class="text-cyan-400 ml-1">WMS</span></span>
+                </div>
+            </div>
+            <nav class="p-2 flex-1">
+                <div class="sidebar-link active" onclick="switchView('dash')"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</div>
+                
+                <div class="sb-header">Orders</div>
+                <div class="sidebar-link" onclick="window.location.href='admin-dashboard.html'"><span class="iconify text-lg" data-icon="mdi:package-variant-closed"></span> All Orders</div>
+                
+                <div class="sb-header">Stock Management</div>
+                <div class="sidebar-link" onclick="switchView('stock')"><span class="iconify text-lg" data-icon="mdi:archive-outline"></span> Current Stock</div>
+                <div class="sidebar-link" onclick="switchView('stock')"><span class="iconify text-lg" data-icon="mdi:arrow-down-bold"></span> Stock In</div>
+                <div class="sidebar-link" onclick="switchView('stock')"><span class="iconify text-lg" data-icon="mdi:arrow-up-bold"></span> Stock Out</div>
+                <div class="sidebar-link" onclick="switchView('stock')"><span class="iconify text-lg" data-icon="mdi:swap-horizontal"></span> Stock Adjustment</div>
+                <div class="sidebar-link" onclick="switchView('stock')"><span class="iconify text-lg" data-icon="mdi:alert-circle-outline"></span> Low Stock</div>
+                
+                <div class="sb-header">Products</div>
+                <div class="sidebar-link" onclick="window.location.href='merchant-dashboard.html'"><span class="iconify text-lg" data-icon="mdi:shape-outline"></span> Product List</div>
+                
+                <div class="sb-header">System</div>
+                <div class="sidebar-link" onclick="window.location.href='admin-dashboard.html'"><span class="iconify text-lg" data-icon="mdi:chart-bar"></span> Reports</div>
+                <div class="sidebar-link" onclick="window.location.href='admin-dashboard.html'"><span class="iconify text-lg" data-icon="mdi:cog-outline"></span> Settings</div>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 lg:ml-64 flex flex-col h-full">
+            <header class="nav-blur bg-[#020617]/80 border-b border-white/[0.08] px-6 py-3 flex items-center justify-between flex-shrink-0">
+                <h1 id="page-title" class="font-bold text-white text-sm">Stock Dashboard</h1>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs" id="header-avatar">A</div>
+                    <span id="header-name" class="text-sm font-semibold text-white hidden sm:block">Admin</span>
+                </div>
+            </header> 
+            
+            <div class="p-6 flex-1 overflow-y-auto">
+
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dash">
+                    <!-- STOCK FILTERS -->
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 mb-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                        <input type="text" placeholder="Search Product" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                        <input type="text" placeholder="SKU" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                        <input type="text" placeholder="Barcode" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                        <select class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50"><option>Category</option></select>
+                        <select class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50"><option>Warehouse</option></select>
+                        <select class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50"><option>Status</option></select>
+                        <input type="date" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                    </div>
+
+                    <!-- CHARTS GRID -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <!-- Line Chart -->
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4">Stock Movement (In vs Out)</h3>
+                            <div style="position:relative; height:250px;"><canvas id="movement-chart"></canvas></div>
+                        </div>
+                        <!-- Bar Chart -->
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4">Inventory Distribution</h3>
+                            <div style="position:relative; height:250px;"><canvas id="distribution-chart"></canvas></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pie Chart -->
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-sm font-bold text-white mb-4">Inventory Status</h3>
+                        <div style="position:relative; height:300px;"><canvas id="status-chart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- STOCK VIEW (Placeholder for now) -->
+                <div id="view-stock" class="hidden">
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 text-center text-slate-500">
+                        <p>Stock Table will go here.</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let allProducts = [];
+        const myId = () => window.currentUser.uid;
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Signing in...';
+            btn.disabled = true;
+            auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value).catch(err => {
+                showT(err.message, "error");
+                btn.innerHTML = 'Sign In';
+                btn.disabled = false;
+            });
+        }
+
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists && doc.data().active) {
+                    window.currentUser = { uid: user.uid, ...doc.data() };
+                    document.getElementById('header-name').textContent = doc.data().name || 'User';
+                    document.getElementById('header-avatar').textContent = (doc.data().name || 'U').charAt(0).toUpperCase();
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app-screen').classList.remove('hidden');
+                    loadData();
+                } else { auth.signOut(); }
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+            }
+        });
+
+        function loadData() {
+            db.collection('products').onSnapshot(snap => {
+                allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderCharts();
+            });
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + view).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            event.target.closest('.sidebar-link').classList.add('active');
+        }
+
+        // CHARTS LOGIC
+        let movChart, distChart, statChart;
+
+        function renderCharts() {
+            if (typeof Chart === 'undefined' || !allProducts.length) return;
+
+            // 1. Movement Chart (Simulated Data for visual)
+            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const inData = [15, 22, 10, 30, 18, 25, 12];
+            const outData = [10, 18, 15, 20, 10, 15, 8];
+            if(movChart) movChart.destroy();
+            movChart = new Chart(document.getElementById('movement-chart'), {
+                type: 'line',
+                data: { labels: labels, datasets: [
+                    { label: 'Stock In', data: inData, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true },
+                    { label: 'Stock Out', data: outData, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', fill: true }
+                ]},
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+
+            // 2. Distribution Chart (By Category)
+            const catCounts = {};
+            allProducts.forEach(p => { const c = p.category || 'Uncategorized'; catCounts[c] = (catCounts[c] || 0) + (p.stock || 0); });
+            if(distChart) distChart.destroy();
+            distChart = new Chart(document.getElementById('distribution-chart'), {
+                type: 'bar',
+                data: { labels: Object.keys(catCounts), datasets: [{ label: 'Units', data: Object.values(catCounts), backgroundColor: '#06b6d4' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+
+            // 3. Status Chart (Pie)
+            const avail = allProducts.filter(p => p.stock > (p.minStock || 0)).length;
+            const low = allProducts.filter(p => p.stock > 0 && p.stock <= (p.minStock || 0)).length;
+            const out = allProducts.filter(p => p.stock <= 0).length;
+            if(statChart) statChart.destroy();
+            statChart = new Chart(document.getElementById('status-chart'), {
+                type: 'pie',
+                data: { labels: ['Available', 'Low Stock', 'Out of Stock'], datasets: [{ data: [avail, low, out], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderColor: '#0f172a', borderWidth: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20 } } } }
+            });
+        }
+
+        function showT(m, t) {
+            t = t || "success";
+            var el = document.getElementById('toast'), ic = document.getElementById('toast-icon'), ms = document.getElementById('toast-msg');
+            ms.textContent = m;
+            ic.setAttribute('data-icon', t === 'error' ? 'mdi:alert-circle' : 'mdi:check-circle');
+            ic.className = 'iconify text-xl ' + (t === 'error' ? 'text-red-400' : 'text-cyan-400');
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+</html>

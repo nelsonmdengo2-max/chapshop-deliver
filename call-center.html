@@ -482,15 +482,21 @@
         function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
         function addTag(el, text) { var ta = el.closest('form').querySelector('textarea'); if(ta.value.includes(text)) { ta.value = ta.value.replace(text+', ', ''); el.style.borderColor=''; el.style.color=''; } else { ta.value += text + ', '; el.style.borderColor='#06b6d4'; el.style.color='#22d3ee'; } }
 
-        function startTimer(id) {
+            function startTimer(id) {
             if(timerInterval) { showT("Finish current call first", "error"); return; }
             activeTimerId = id; timerSeconds = 0;
-            var order = allOrders.find(function(o) { return o.id === id; });
-            if(order && order.customerPhone) { window.open('tel:' + order.customerPhone, '_blank'); }
-            var btn = document.getElementById('timer-btn-'+id), label = document.getElementById('timer-label-'+id), display = document.getElementById('timer-display-'+id);
+            
+            // NEW: Increment the call attempts in Firebase
+            db.collection('orders').doc(id).update({ callAttempts: firebase.firestore.FieldValue.increment(1) });
+
+            var order = allOrders.find(o => o.id === id);
+            if(order && order.customerPhone) { window.open('tel:' + order.customerPhone, '_blank');
+            }
+            
+            const btn = document.getElementById('timer-btn-'+id), label = document.getElementById('timer-label-'+id), display = document.getElementById('timer-display-'+id);
             btn.classList.remove('bg-green-500/20', 'text-green-400', 'border-green-500/30'); btn.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/30'); label.textContent = 'End Call';
             display.classList.remove('hidden'); display.classList.add('sm:flex');
-            timerInterval = setInterval(function() { timerSeconds++; var m = Math.floor(timerSeconds / 60).toString().padStart(2, '0'); var s = (timerSeconds % 60).toString().padStart(2, '0'); display.textContent = m + ':' + s; }, 1000);
+            timerInterval = setInterval(() => { timerSeconds++; const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0'); const s = (timerSeconds % 60).toString().padStart(2, '0'); display.textContent = `${m}:${s}`; }, 1000);
         }
 
         function stopTimer() {
@@ -754,7 +760,7 @@
                     '<td class="px-4 py-3">' + getStatusBadge(o.status) + '</td>' +
                     '<td class="px-4 py-3 text-xs text-slate-400 max-w-[200px] truncate" title="' + (o.callNotes || '') + '">' + (o.callNotes || '—') + '</td>' +
                     '<td class="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">' + formatDate(o.updatedAt) + '</td>' +
-                    '<td class="px-4 py-3 text-center"><button onclick="openEditCallStatus(\'' + o.id + '\')" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-yellow-500/30 cursor-pointer">Edit Status</button></td>' +
+                    '<td class="px-4 py-3 text-center"><div class="flex gap-1 justify-center"><button onclick="openCcEditOrder(\'' + o.id + '\')" class="bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-blue-500/30 cursor-pointer">Edit</button><button onclick="openEditCallStatus(\'' + o.id + '\')" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-yellow-500/30 cursor-pointer">Status</button></div></td>' +
                 '</tr>';
             }).join('');
             
