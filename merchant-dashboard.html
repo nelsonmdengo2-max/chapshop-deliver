@@ -226,8 +226,12 @@
                         <form id="order-form" class="space-y-4">
                             <div><label class="text-xs font-semibold text-slate-400 uppercase">Product</label><select id="order-product" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"><option value="">Select...</option></select></div>
                             <div class="grid grid-cols-2 gap-4">
-                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Quantity</label><input type="number" id="order-qty" min="1" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="1"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Quantity</label><input type="number" id="order-qty" min="1" value="1" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" oninput="calcMerchantTotal()"></div>
                                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Order Date</label><input type="date" id="order-date" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Unit Price (TZS)</label><input type="number" id="order-price" min="0" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" oninput="calcMerchantTotal()" placeholder="0"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Total Amount (TZS)</label><input type="number" id="order-total" min="0" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-cyan-400 font-bold focus:outline-none focus:border-cyan-500/50" placeholder="0"></div>
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name</label><input type="text" id="order-cust-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Juma"></div>
@@ -1091,9 +1095,24 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             var price = parseInt(document.getElementById('emo-price').value) || 0;
             document.getElementById('emo-total').value = (qty * price);
         }
-        function populateDropdowns() {
-            const s1 = document.getElementById('order-product'); s1.innerHTML = '<option value="">Select...</option>' + myProducts.map(p=>`<option value="${p.id}">${p.name} (${p.sku||'No SKU'}) - Stock: ${p.stock}</option>`).join('');
+                function populateDropdowns() {
+            const s1 = document.getElementById('order-product'); 
+            s1.innerHTML = '<option value="">Select...</option>' + myProducts.map(p=>`<option value="${p.id}" data-price="${p.price}">${p.name} (${p.sku||'No SKU'}) - Stock: ${p.stock}</option>`).join('');
+            
+            s1.onchange = function() {
+                var selected = s1.options[s1.selectedIndex];
+                var price = selected.getAttribute('data-price') || 0;
+                document.getElementById('order-price').value = price;
+                calcMerchantTotal();
+            };
+            
             const s2 = document.getElementById('adj-product'); s2.innerHTML = '<option value="">Select...</option>' + myProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+        }
+
+        function calcMerchantTotal() {
+            var qty = parseInt(document.getElementById('order-qty').value) || 0;
+            var price = parseInt(document.getElementById('order-price').value) || 0;
+            document.getElementById('order-total').value = qty * price;
         }
 
        function renderProducts(){renderCategoryFilter();var c=document.getElementById('products-list');var list=selectedCategory==='all'?myProducts:myProducts.filter(function(p){return p.category===selectedCategory});if(!list.length){c.innerHTML='<p class="text-slate-500 col-span-3 text-center py-8">No products'+(selectedCategory!=='all'?' in this category':'')+'.</p>';return}c.innerHTML=list.map(function(p){return'<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><div class="h-32 bg-slate-800 flex items-center justify-center overflow-hidden">'+(p.image?'<img src="'+p.image+'" class="w-full h-full object-cover">':'<span class="iconify text-4xl text-slate-600" data-icon="mdi:image-off-outline"></span>')+'</div><div class="p-4"><div class="flex justify-between items-start mb-2"><div><div class="font-bold text-white">'+p.name+'</div><div class="text-xs text-slate-500">'+(p.category||'No Category')+' · '+(p.sku||'No SKU')+'</div></div><div class="flex gap-1"><button onclick="editProduct(\''+p.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button><button onclick="if(confirm(\'Delete?\'))db.collection(\'products\').doc(\''+p.id+'\').delete().then(()=>showT(\'Deleted\')).catch(e=>showT(e.message,\'error\'))" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-red-400"><span class="iconify text-sm" data-icon="mdi:delete"></span></button></div></div><div class="text-xs text-slate-400 line-clamp-2 mb-3">'+(p.description||'No description')+'</div><div class="flex justify-between text-xs font-bold"><span class="text-cyan-400">TZS '+Number(p.price).toLocaleString()+'</span><span class="'+(p.stock<=0?'text-red-400':p.minStock&&p.stock<=p.minStock?'text-yellow-400':'text-green-400')+'">'+p.stock+' in stock</span></div></div></div>'}).join('')}
@@ -1228,12 +1247,42 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             const fileInput = document.getElementById('prod-img'); let imageData = '';
             if (fileInput.files[0]) { imageData = await compressImage(fileInput.files[0]); }
             try { await db.collection('products').add({ merchantId: uid(), name: document.getElementById('prod-name').value, category: document.getElementById('prod-cat').value, price: parseInt(document.getElementById('prod-price').value), sku: document.getElementById('prod-sku').value, stock: parseInt(document.getElementById('prod-stock').value), minStock: parseInt(document.getElementById('prod-min').value) || 0, description: document.getElementById('prod-desc').value, image: imageData, stockLog: [{type: 'in', qty: parseInt(document.getElementById('prod-stock').value), note: 'Initial Stock', at: new Date()}], createdAt: firebase.firestore.FieldValue.serverTimestamp() }); showT("Product Added!"); this.reset(); } catch(e) { showT(e.message, "error"); } finally { btn.innerHTML = orig; btn.disabled = false; }
-        });   document.getElementById('order-form').addEventListener('submit', async function(e) {
+        });           document.getElementById('order-form').addEventListener('submit', async function(e) {
             e.preventDefault(); const btn = this.querySelector('button[type="submit"]'); const orig = btn.innerHTML; btn.innerHTML = 'Submitting...'; btn.disabled = true;
             const pid = document.getElementById('order-product').value; const qty = parseInt(document.getElementById('order-qty').value); const product = myProducts.find(p => p.id === pid);
+            const customPrice = parseInt(document.getElementById('order-price').value) || 0;
+            const customTotal = parseInt(document.getElementById('order-total').value) || 0;
+            
             if (!product) { showT("Select product", "error"); btn.innerHTML=orig; btn.disabled=false; return; }
             if (product.stock < qty) { showT(`Only ${product.stock} in stock!`, "error"); btn.innerHTML=orig; btn.disabled=false; return; }
-            try { await db.collection('orders').add({ merchantId: uid(), merchantName: window.currentUser.shopName, customerName: document.getElementById('order-cust-name').value, customerPhone: document.getElementById('order-cust-phone').value, customerCity: document.getElementById('order-city').value, customerAddress: document.getElementById('order-address').value, orderDate: new Date(document.getElementById('order-date').value), productId: pid, productSku: product.sku||'', productName: product.name, productDesc: product.description||'', productImage: product.image||'', productPrice: product.price, itemName: product.name, qty: qty, totalAmount: product.price * qty, currency: 'TZS', status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp() }); const newStock = Math.max(0, product.stock - qty); await db.collection('products').doc(pid).update({ stock: newStock, stockLog: firebase.firestore.FieldValue.arrayUnion({type: 'out', qty: qty, note: 'Order #Pending', at: new Date()}) }); showT("Order Submitted!"); this.reset(); document.getElementById('order-date').value = new Date().toISOString().split('T')[0]; } catch(e) { showT(e.message, "error"); } finally { btn.innerHTML = orig; btn.disabled = false; }
+            try { 
+                await db.collection('orders').add({ 
+                    merchantId: uid(), 
+                    merchantName: window.currentUser.shopName, 
+                    customerName: document.getElementById('order-cust-name').value, 
+                    customerPhone: document.getElementById('order-cust-phone').value, 
+                    customerCity: document.getElementById('order-city').value, 
+                    customerAddress: document.getElementById('order-address').value, 
+                    orderDate: new Date(document.getElementById('order-date').value), 
+                    productId: pid, 
+                    productSku: product.sku||'', 
+                    productName: product.name, 
+                    productDesc: product.description||'', 
+                    productImage: product.image||'', 
+                    productPrice: customPrice, // Uses the custom unit price
+                    itemName: product.name, 
+                    qty: qty, 
+                    totalAmount: customTotal, // Uses the custom total amount
+                    currency: 'TZS', 
+                    status: 'pending', 
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+                }); 
+                const newStock = Math.max(0, product.stock - qty); 
+                await db.collection('products').doc(pid).update({ stock: newStock, stockLog: firebase.firestore.FieldValue.arrayUnion({type: 'out', qty: qty, note: 'Order #Pending', at: new Date()}) }); 
+                showT("Order Submitted!"); 
+                this.reset(); 
+                document.getElementById('order-date').value = new Date().toISOString().split('T')[0]; 
+            } catch(e) { showT(e.message, "error"); } finally { btn.innerHTML = orig; btn.disabled = false; }
         });
 
         document.getElementById('adjust-form').addEventListener('submit', async function(e) {

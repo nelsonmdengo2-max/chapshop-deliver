@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <script src="core.js"></script>
     <style>
         *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
@@ -23,6 +25,10 @@
         .stat-card:hover{border-color:rgba(6,182,212,0.3)}
         .sub-tab{padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600; color: #94a3b8; transition: all 0.2s; cursor: pointer;}
         .sub-tab.active{background: rgba(6,182,212,0.2); color: #22d3ee;}
+        
+        /* HIDE SIDEBAR SCROLLBAR */
+        .sidebar-scroll::-webkit-scrollbar { display: none; }
+        .sidebar-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-[#020617] text-white min-h-screen">
@@ -53,25 +59,50 @@
     <div id="app-screen" class="hidden h-screen flex overflow-hidden">
         
         <!-- SIDEBAR -->
-        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto pointer-events-auto">
-            <div class="p-6 border-b border-white/[0.08]">
+        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col pointer-events-auto">
+            <div class="p-6 border-b border-white/[0.08] flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
                     <span class="font-bold text-white text-sm">ChapShop<span class="text-cyan-400 ml-1">Shipping</span></span>
                 </div>
             </div>
-            <nav class="p-4 space-y-1">
+            
+            <nav class="p-4 space-y-1 flex-1 overflow-y-auto sidebar-scroll">
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2">Main</div>
                 <button onclick="switchTab('dashboard')" class="sidebar-link active w-full text-left" id="nav-dashboard"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</button>
+                
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Management</div>
                 <button onclick="switchTab('orders')" class="sidebar-link w-full text-left" id="nav-orders"><span class="iconify text-lg" data-icon="mdi:package-variant-closed"></span> Orders</button>
-                <button onclick="switchTab('shipments')" class="sidebar-link w-full text-left" id="nav-shipments"><span class="iconify text-lg" data-icon="mdi:cube-send"></span> Shipments</button>
-                <button onclick="switchTab('cash')" class="sidebar-link w-full text-left" id="nav-cash"><span class="iconify text-lg" data-icon="mdi:cash-check"></span> Cash Settlement</button>
-                <button onclick="switchTab('returns')" class="sidebar-link w-full text-left" id="nav-returns"><span class="iconify text-lg" data-icon="mdi:keyboard-return"></span> Return Items</button>
+                
+                <div>
+                    <button onclick="toggleAccordion('ship-acc')" class="sidebar-link w-full text-left">
+                        <span class="iconify text-lg" data-icon="mdi:cube-send"></span> Shipments
+                        <span class="iconify ml-auto transition-transform" id="ship-acc-icon" data-icon="mdi:chevron-down"></span>
+                    </button>
+                    <div id="ship-acc" class="hidden pl-8 space-y-1 mt-1">
+                        <button onclick="switchTab('shipments', 'create')" class="sidebar-link w-full text-left text-xs">Create Shipment</button>
+                        <button onclick="switchTab('orders', 'pending')" class="sidebar-link w-full text-left text-xs">Shipping Labels</button>
+                        <button onclick="switchTab('orders', 'shipped')" class="sidebar-link w-full text-left text-xs">Dispatch Queue</button>
+                        <button onclick="switchTab('shipments', 'list')" class="sidebar-link w-full text-left text-xs">Tracking</button>
+                        <button onclick="switchTab('orders', 'delivered')" class="sidebar-link w-full text-left text-xs">Delivery Status</button>
+                        <button onclick="switchTab('returns')" class="sidebar-link w-full text-left text-xs">Return Shipments</button>
+                    </div>
+                </div>
+                
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Warehouse</div>
+                <button onclick="switchTab('products')" class="sidebar-link w-full text-left" id="nav-products"><span class="iconify text-lg" data-icon="mdi:warehouse"></span> Stock & Locations</button>
+                
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Finance</div>
+                <button onclick="switchTab('invoices')" class="sidebar-link w-full text-left" id="nav-invoices"><span class="iconify text-lg" data-icon="mdi:file-document-outline"></span> Invoices</button>
+                
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">System</div>
+                <button onclick="switchTab('notifications')" class="sidebar-link w-full text-left relative" id="nav-notifications"><span class="iconify text-lg" data-icon="mdi:bell-outline"></span> Notifications <span id="ship-notif-badge" class="hidden absolute right-3 top-1/2 -translate-y-1/2 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span></button>
+                
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Insights</div>
                 <button onclick="switchTab('reports')" class="sidebar-link w-full text-left" id="nav-reports"><span class="iconify text-lg" data-icon="mdi:chart-box-outline"></span> Reports</button>
             </nav>
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.08] space-y-1">
+            
+            <div class="p-4 border-t border-white/[0.08] space-y-1 flex-shrink-0">
                 <button onclick="switchTab('profile')" class="sidebar-link w-full text-left" id="nav-profile"><span class="iconify text-lg" data-icon="mdi:account-cog-outline"></span> Settings</button>
                 <button onclick="handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</button>
             </div>
@@ -107,6 +138,18 @@
                         <div class="stat-card border-yellow-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-yellow-400 uppercase">Avg Delivery Time</span><span class="iconify text-yellow-400" data-icon="mdi:clock-fast"></span></div><div id="d-time" class="text-2xl font-bold text-white">0m</div></div>
                         <div class="stat-card border-cyan-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-cyan-400 uppercase">Total Processed</span><span class="iconify text-cyan-400" data-icon="mdi:package-variant"></span></div><div id="d-total" class="text-2xl font-bold text-white">0</div></div>
                     </div>
+                    
+                    <!-- CHARTS -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:chart-line"></span> Shipments per Day</h3>
+                            <div style="position:relative; height:300px;"><canvas id="shipments-chart"></canvas></div>
+                        </div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:chart-pie"></span> Delivery Status</h3>
+                            <div style="position:relative; height:300px;"><canvas id="status-chart"></canvas></div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- ORDERS -->
@@ -118,7 +161,7 @@
                     <div class="mb-6 bg-white/[0.02] border border-white/[0.08] rounded-xl p-1.5 flex gap-1 flex-wrap w-fit">
                         <div onclick="switchSub('orders', 'pending')" class="sub-tab active" id="orders-tab-pending">Pending Orders</div>
                         <div onclick="switchSub('orders', 'packing')" class="sub-tab" id="orders-tab-packing">Packing</div>
-                        <div onclick="switchSub('orders', 'shipped')" class="sub-tab" id="orders-tab-shipped">Shipped</div>
+                        <div onclick="switchSub('orders', 'shipped')" class="sub-tab" id="orders-tab-shipped">In Process</div>
                         <div onclick="switchSub('orders', 'delivered')" class="sub-tab" id="orders-tab-delivered">Delivered</div>
                         <div onclick="switchSub('orders', 'returned')" class="sub-tab" id="orders-tab-returned">Returned</div>
                     </div>
@@ -138,13 +181,13 @@
                 <div id="panel-returns" class="tab-panel hidden">
                     <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
                         <table class="w-full text-sm text-left min-w-[900px]">
-                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Phone</th><th class="px-4 py-3">Item</th><th class="px-4 py-3">Merchant</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Date</th></tr></thead>
+                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Phone</th><th class="px-4 py-3">Item</th><th class="px-4 py-3">Rider</th><th class="px-4 py-3">Status</th><th class="px-4 py-3 text-center">Action</th></tr></thead>
                             <tbody id="returns-table" class="divide-y divide-white/[0.05]"></tbody>
                         </table>
                     </div>
                 </div>
 
-                               <!-- CASH SETTLEMENT -->
+                <!-- CASH SETTLEMENT -->
                 <div id="panel-cash" class="tab-panel hidden">
                     <h2 class="text-xl font-bold text-white mb-6">Rider Cash Collection (CoD)</h2>
                     <p class="text-slate-400 text-sm mb-6">Track physical cash collected by riders. When riders return to the warehouse, click "Settle Cash" to balance their account.</p>
@@ -162,6 +205,34 @@
                         <button onclick="downloadReport()" class="bg-green-500/20 text-green-400 border border-green-500/30 px-4 py-2 rounded-lg text-xs font-bold hover:bg-green-500/30 flex items-center gap-2"><span class="iconify" data-icon="mdi:download"></span> Download CSV</button>
                     </div>
                     <div id="reports-content" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"></div>
+                </div>
+
+                <!-- WAREHOUSE / PRODUCTS -->
+                <div id="panel-products" class="tab-panel hidden">
+                    <h2 class="text-xl font-bold text-white mb-6">Warehouse & Stock</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
+                        <table class="w-full text-sm text-left min-w-[900px]">
+                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">Image</th><th class="px-4 py-3">Product Name</th><th class="px-4 py-3">SKU</th><th class="px-4 py-3">Merchant</th><th class="px-4 py-3">Current Stock</th><th class="px-4 py-3">Location</th></tr></thead>
+                            <tbody id="warehouse-table" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- INVOICES & PAYMENTS -->
+                <div id="panel-invoices" class="tab-panel hidden">
+                    <h2 class="text-xl font-bold text-white mb-6">Invoices & Delivery Fees</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
+                        <table class="w-full text-sm text-left min-w-[900px]">
+                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">Order ID</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Rider</th><th class="px-4 py-3 text-right">Order Amount</th><th class="px-4 py-3 text-right">Delivery Fee</th><th class="px-4 py-3 text-center">Action</th></tr></thead>
+                            <tbody id="invoices-table" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- NOTIFICATIONS -->
+                <div id="panel-notifications" class="tab-panel hidden">
+                    <h2 class="text-xl font-bold text-white mb-6">System Notifications</h2>
+                    <div id="notif-list" class="space-y-3">Loading...</div>
                 </div>
 
                 <!-- SETTINGS -->
@@ -198,7 +269,7 @@
     </div>
 
     <script>
-        let allOrders = [], allRiders = [], subStates = { orders: 'pending', shipments: 'create', reports: 'shipping' };
+        let allOrders = [], allRiders = [], allProducts = [], subStates = { orders: 'pending', shipments: 'create', reports: 'shipping' }, groupByZone = false;
         const myId = () => window.currentUser.uid;
 
         function onAppLoaded() {
@@ -208,19 +279,50 @@
             document.getElementById('set-name').value = window.currentUser.name || '';
             document.getElementById('set-email').value = window.currentUser.email || '';
             
-            // Load Active Riders for the Dropdown
             db.collection('users').where('role', 'in', ['shipping', 'shipping_manager']).where('active', '==', true).onSnapshot(snap => {
                 allRiders = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 renderAll();
-            });
+            }, function(err) { console.error(err); });
 
-            // Load Orders
-            db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snap => { allOrders = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll(); });
+            db.collection('products').onSnapshot(snap => {
+                allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderAll();
+            }, function(err) { console.error(err); });
+
+            db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snap => { 
+                allOrders = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+                renderAll(); 
+            }, function(err) { console.error(err); });
         }
 
-        function renderAll() { updateDashboard(); renderOrders(); renderShipments(); renderReturns(); renderReports(); renderCash(); }
+        function renderAll() { updateDashboard(); renderOrders(); renderShipments(); renderReturns(); renderReports(); renderCash(); renderWarehouse(); renderInvoices(); renderNotifications(); renderCharts(); }
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
-        function switchTab(t) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden')); document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active')); document.getElementById('panel-'+t).classList.remove('hidden'); document.getElementById('nav-'+t).classList.add('active'); if(window.innerWidth < 1024) toggleSidebar(); }
+        
+        function switchTab(t, sub) { 
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden')); 
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active')); 
+            document.getElementById('panel-'+t).classList.remove('hidden'); 
+            
+            if(event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                var navBtn = document.getElementById('nav-'+t);
+                if(navBtn) navBtn.classList.add('active');
+            }
+
+            if(sub) {
+                switchSub(t, sub);
+            }
+            if(window.innerWidth < 1024) toggleSidebar(); 
+        }
+        
+        function toggleAccordion(id) {
+            var el = document.getElementById(id);
+            var icon = document.getElementById(id + '-icon');
+            if(!el) return;
+            el.classList.toggle('hidden');
+            if(icon) icon.style.transform = el.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
         function switchSub(panel, tab) { subStates[panel] = tab; document.querySelectorAll(`[id^="${panel}-tab-"]`).forEach(t => t.classList.remove('active')); document.getElementById(`${panel}-tab-${tab}`).classList.add('active'); if(panel==='orders')renderOrders(); if(panel==='shipments')renderShipments(); if(panel==='reports')renderReports(); }
 
         function updateDashboard() {
@@ -245,7 +347,7 @@
             } else { document.getElementById('d-time').textContent = '0m'; }
         }
 
-                function renderOrders() {
+        function renderOrders() {
             const c = document.getElementById('orders-content'); let list = [];
             const s = subStates.orders;
             const search = (document.getElementById('order-search').value || '').toLowerCase();
@@ -258,38 +360,53 @@
             if(search) { list = list.filter(o => o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search))); }
             if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No orders here.</p>'; return; }
             
-            // COMPACT CARDS FOR PENDING / PACKING
-                        if(s === 'pending' || s === 'packing') {
-                c.innerHTML = `<button onclick="autoDispatch()" class="mb-4 w-full bg-violet-500/20 text-violet-400 border border-violet-500/30 font-bold py-3 rounded-xl hover:bg-violet-500/30 transition-colors flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:rocket-launch"></span> Auto-Dispatch Next Order</button>` + list.map(o => `
-                <div class="bg-white/[0.02] border border-cyan-500/20 rounded-xl p-3 flex flex-col lg:flex-row gap-3 items-start">
-                    <div class="flex gap-3 items-start flex-1 min-w-0">
-                        ${o.productImage ? `<img src="${o.productImage}" onclick="viewImg('${o.productImage}')" class="w-10 h-10 rounded-lg bg-slate-800 object-cover flex-shrink-0 cursor-pointer">` : '<div class="w-10 h-10 rounded-lg bg-slate-800 flex-shrink-0 flex items-center justify-center"><span class="iconify text-lg text-slate-600" data-icon="mdi:package-variant"></span></div>'}
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1 flex-wrap">
-                                <span class="font-mono text-cyan-400 font-bold text-xs">#${o.id.slice(-6).toUpperCase()}</span>
-                                ${getStatusBadge(o.status)}
-                                <span class="text-white text-sm font-semibold truncate">${o.itemName} x${o.qty}</span>
-                                <span class="text-slate-400 text-xs font-bold whitespace-nowrap">TZS ${Number(o.totalAmount).toLocaleString()}</span>
-                            </div>
-                            <div class="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-500">
-                                <span><span class="text-slate-400">👤</span> ${o.customerName} • ${o.customerPhone}</span>
-                                <span><span class="text-slate-400">📍</span> ${o.customerCity || 'N/A'}, ${o.customerAddress || 'N/A'}</span>
-                                <span><span class="text-orange-400">🎧</span> ${o.processedByName || 'N/A'}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
-                        <select id="rider-${o.id}" class="w-full lg:w-32 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+            if(s === 'pending' || s === 'packing') {
+                const bulkBar = `<div class="mb-4 flex flex-col gap-3">
+                    <button onclick="toggleZoneGroup()" class="w-full bg-slate-700 text-white font-bold py-2 rounded-lg text-xs hover:bg-slate-600">${groupByZone ? 'Show Flat List' : 'Group by City (Zones)'}</button>
+                    <div class="bg-[#0f172a] border border-cyan-500/20 p-3 rounded-xl flex flex-wrap items-center gap-3">
+                        <span class="text-xs font-bold text-slate-400 uppercase mr-2">Bulk Actions:</span>
+                        <select id="bulk-rider-select" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                             <option value="">Select Rider</option>
                             ${allRiders.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
                         </select>
-                        <input type="number" id="fee-${o.id}" placeholder="Fee" class="w-full lg:w-24 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
-                        <button type="button" onclick="shipWithRider('${o.id}')" class="bg-cyan-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-cyan-400 text-xs whitespace-nowrap cursor-pointer active:scale-95 transition-transform">Ship</button>
+                        <button onclick="bulkAssign()" class="bg-violet-500 text-white font-bold px-4 py-2 rounded-lg text-xs hover:bg-violet-400">Bulk Assign</button>
+                        <button onclick="printManifest()" class="bg-slate-700 text-white font-bold px-4 py-2 rounded-lg text-xs hover:bg-slate-600 ml-auto flex items-center gap-1"><span class="iconify" data-icon="mdi:printer"></span> Print Manifest</button>
                     </div>
-                </div>`).join('');
-            } 
-            
-            // COMPACT CARDS FOR SHIPPED
+                </div>`;
+
+                let ordersHtml = '';
+                if(groupByZone) {
+                    const grouped = {};
+                    list.forEach(o => {
+                        const city = o.customerCity || 'Unknown';
+                        if(!grouped[city]) grouped[city] = [];
+                        grouped[city].push(o);
+                    });
+                    
+                    for(const city in grouped) {
+                        const safeCity = city.replace(/[^a-zA-Z0-9]/g, '');
+                        ordersHtml += `<div class="mb-6 border border-cyan-500/10 rounded-xl p-4">
+                            <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                                <h3 class="font-bold text-white">📍 ${city} (${grouped[city].length} orders)</h3>
+                                <div class="flex gap-2">
+                                    <select id="zone-rider-${safeCity}" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                                        <option value="">Select Rider</option>
+                                        ${allRiders.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+                                    </select>
+                                    <button onclick="bulkAssignZone('${safeCity}', '${city}')" class="bg-violet-500 text-white font-bold px-4 py-2 rounded-lg text-xs hover:bg-violet-400">Assign Zone</button>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                ${grouped[city].map(o => generateCard(o)).join('')}
+                            </div>
+                        </div>`;
+                    }
+                } else {
+                    ordersHtml = list.map(o => generateCard(o)).join('');
+                }
+
+                c.innerHTML = bulkBar + `<button onclick="autoDispatch()" class="mb-4 w-full bg-violet-500/20 text-violet-400 border border-violet-500/30 font-bold py-3 rounded-xl hover:bg-violet-500/30 transition-colors flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:rocket-launch"></span> Auto-Dispatch Next Order</button>` + ordersHtml;
+            }
             else if(s === 'shipped') {
                 c.innerHTML = list.map(o => `
                 <div class="bg-white/[0.02] border border-violet-500/20 rounded-xl p-3 flex flex-col lg:flex-row gap-3 items-start">
@@ -301,22 +418,22 @@
                                 ${getStatusBadge(o.status)}
                                 <span class="text-white text-sm font-semibold truncate">${o.itemName} x${o.qty}</span>
                             </div>
-                            <div class="flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-500">
+                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mt-1">
+                                <span class="text-cyan-300 font-medium">🏪 ${o.merchantName || 'N/A'}</span>
                                 <span><span class="text-slate-400">👤</span> ${o.customerName} • ${o.customerPhone}</span>
-                                <span><span class="text-orange-400">🎧</span> ${o.processedByName || 'N/A'}</span>
-                                <span><span class="text-violet-400">🛵</span> ${o.riderName || 'Unassigned'}</span>
+                                <span class="text-orange-400 font-medium">🎧 ${o.processedByName || 'N/A'}</span>
+                                <span class="text-violet-300 font-medium">🛵 ${o.riderName || 'Unassigned'}</span>
                             </div>
                         </div>
                     </div>
                     <div class="flex gap-2 w-full lg:w-auto">
+                        <button type="button" onclick="notifyCustomerWhatsApp('${o.id}')" class="bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-3 py-2 rounded-lg hover:bg-green-500/30 text-xs cursor-pointer flex items-center gap-1"><span class="iconify" data-icon="mdi:whatsapp"></span> Notify</button>
                         <button type="button" onclick="updateStatus('${o.id}', 'delivered')" class="flex-1 bg-green-500/20 text-green-400 border border-green-500/30 font-bold py-2 rounded-lg hover:bg-green-500/30 text-xs cursor-pointer">Delivered</button>
                         <button type="button" onclick="updateStatus('${o.id}', 'returned')" class="flex-1 bg-pink-500/20 text-pink-400 border border-pink-500/30 font-bold py-2 rounded-lg hover:bg-pink-500/30 text-xs cursor-pointer">Returned</button>
                         <button type="button" onclick="printInvoice('${o.id}')" class="bg-white/[0.05] text-slate-300 border border-white/[0.1] font-bold px-3 py-2 rounded-lg hover:bg-white/[0.1] text-xs cursor-pointer">Invoice</button>
                     </div>
                 </div>`).join('');
             } 
-            
-            // DENSE TABLE FOR DELIVERED / RETURNED (Best for 1000+ orders)
             else {
                 c.innerHTML = `
                 <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl overflow-x-auto">
@@ -324,6 +441,7 @@
                         <thead class="text-[10px] text-slate-400 uppercase bg-white/[0.02] border-b border-white/[0.05]">
                             <tr>
                                 <th class="px-3 py-2">Order</th>
+                                <th class="px-3 py-2">Merchant</th>
                                 <th class="px-3 py-2">Customer / Phone</th>
                                 <th class="px-3 py-2">Address</th>
                                 <th class="px-3 py-2">Product</th>
@@ -338,6 +456,7 @@
                             ${list.map(o => `
                             <tr class="hover:bg-white/[0.02] text-xs">
                                 <td class="px-3 py-2 font-mono text-cyan-400 font-bold whitespace-nowrap">#${o.id.slice(-6).toUpperCase()}</td>
+                                <td class="px-3 py-2 text-cyan-300 font-medium whitespace-nowrap">${o.merchantName || 'N/A'}</td>
                                 <td class="px-3 py-2 whitespace-nowrap">${o.customerName}<br><span class="text-cyan-400">${o.customerPhone}</span></td>
                                 <td class="px-3 py-2 text-slate-400">${o.customerCity || 'N/A'}, ${o.customerAddress || 'N/A'}</td>
                                 <td class="px-3 py-2 text-white font-medium">${o.itemName} x${o.qty}</td>
@@ -352,7 +471,42 @@
                 </div>`;
             }
         }
-                async function shipWithRider(orderId) {
+
+        function generateCard(o) {
+            return `
+                <div class="bg-white/[0.02] border border-cyan-500/20 rounded-xl p-3 flex flex-col lg:flex-row gap-3 items-start">
+                    <div class="flex gap-3 items-start flex-1 min-w-0">
+                        <input type="checkbox" class="bulk-check accent-cyan-500 w-4 h-4 mt-1 flex-shrink-0" value="${o.id}">
+                        ${o.productImage ? `<img src="${o.productImage}" onclick="viewImg('${o.productImage}')" class="w-10 h-10 rounded-lg bg-slate-800 object-cover flex-shrink-0 cursor-pointer">` : '<div class="w-10 h-10 rounded-lg bg-slate-800 flex-shrink-0 flex items-center justify-center"><span class="iconify text-lg text-slate-600" data-icon="mdi:package-variant"></span></div>'}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-2 flex-wrap">
+                                <span class="font-mono text-cyan-400 font-bold text-sm">#${o.id.slice(-6).toUpperCase()}</span>
+                                ${getStatusBadge(o.status)}
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                                <div class="flex items-center gap-1.5"><span class="text-slate-500">🏪 Merchant:</span> <span class="text-cyan-300 font-medium">${o.merchantName || 'N/A'}</span></div>
+                                <div class="flex items-center gap-1.5"><span class="text-slate-500">🎧 Call Agent:</span> <span class="text-orange-400 font-medium">${o.processedByName || 'N/A'}</span></div>
+                                <div class="flex items-center gap-1.5"><span class="text-slate-500">📦 Product:</span> <span class="text-white font-medium">${o.itemName || 'N/A'} (x${o.qty})</span></div>
+                                <div class="flex items-center gap-1.5"><span class="text-slate-500">💰 Price:</span> <span class="text-white font-medium">TZS ${Number(o.totalAmount).toLocaleString()}</span></div>
+                                <div class="flex items-center gap-1.5"><span class="text-slate-500">👤 Customer:</span> <span class="text-white font-medium">${o.customerName} (${o.customerPhone})</span></div>
+                                <div class="flex items-center gap-1.5"><span class="text-slate-500">📍 Address:</span> <span class="text-slate-300">${o.customerCity || 'N/A'}, ${o.customerAddress || 'N/A'}</span></div>
+                            </div>
+                            ${o.callNotes ? `<div class="mt-2 text-xs text-yellow-400 bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-2 flex items-start gap-2"><span class="iconify mt-0.5" data-icon="mdi:comment-alert"></span> <span class="font-medium">CC Note: ${o.callNotes}</span></div>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+                        <button type="button" onclick="printLabel('${o.id}')" class="bg-slate-700 text-white font-bold px-3 py-2 rounded-lg text-xs hover:bg-slate-600 cursor-pointer flex items-center justify-center gap-1 whitespace-nowrap"><span class="iconify" data-icon="mdi:label"></span> Label</button>
+                        <select id="rider-${o.id}" class="w-full lg:w-32 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                            <option value="">Select Rider</option>
+                            ${allRiders.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+                        </select>
+                        <input type="number" id="fee-${o.id}" placeholder="Fee" class="w-full lg:w-24 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                        <button type="button" onclick="shipWithRider('${o.id}')" class="bg-cyan-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-cyan-400 text-xs whitespace-nowrap cursor-pointer active:scale-95 transition-transform">Ship</button>
+                    </div>
+                </div>`;
+        }
+
+        async function shipWithRider(orderId) {
             const riderSelect = document.getElementById('rider-' + orderId);
             const feeInput = document.getElementById('fee-' + orderId);
             const riderId = riderSelect ? riderSelect.value : '';
@@ -365,19 +519,16 @@
         }
 
         async function autoDispatch() {
-            // Find the oldest confirmed order
             const pending = allOrders.filter(o => o.status === 'confirmed').sort((a,b) => (a.createdAt?.seconds||0) - (b.createdAt?.seconds||0));
             if(!pending.length) return showT("No pending orders to dispatch", "error");
             if(!allRiders.length) return showT("No active riders available", "error");
             
-            // Count active deliveries per rider
             const counts = {};
             allRiders.forEach(r => counts[r.id] = 0);
             allOrders.filter(o => o.status === 'out_for_delivery' && o.riderId).forEach(o => {
                 if(counts[o.riderId] !== undefined) counts[o.riderId]++;
             });
             
-            // Find the rider with the lowest count (least busy)
             let bestRiderId = allRiders[0].id;
             let minCount = Infinity;
             allRiders.forEach(r => {
@@ -403,7 +554,7 @@
                     if(newStatus === 'out_for_delivery') { 
                     updateData.shippedAt = firebase.firestore.FieldValue.serverTimestamp(); 
                     if(riderName) updateData.riderName = riderName;
-                    if(riderId) updateData.riderId = riderId; // Crucial for the Rider App!
+                    if(riderId) updateData.riderId = riderId;
                     if(deliveryFee && deliveryFee > 0) updateData.deliveryFee = deliveryFee;
                 }
                 await db.collection('orders').doc(orderId).update(updateData);
@@ -429,7 +580,31 @@
             const tb = document.getElementById('returns-table');
             const returned = allOrders.filter(o => o.status === 'returned');
             if(!returned.length) { tb.innerHTML = '<tr><td colspan="7" class="text-center text-slate-500 py-8">No returned items.</td></tr>'; return; }
-            tb.innerHTML = returned.map(o => `<tr class="hover:bg-white/[0.02]"><td class="px-4 py-3 font-mono text-cyan-400 text-xs">#${o.id.slice(-6).toUpperCase()}</td><td class="px-4 py-3 text-sm">${o.customerName}</td><td class="px-4 py-3 text-sm text-cyan-400">${o.customerPhone}</td><td class="px-4 py-3 text-xs text-slate-300">${o.itemName} x${o.qty}</td><td class="px-4 py-3 text-xs text-slate-400">${o.merchantName||'N/A'}</td><td class="px-4 py-3">${getStatusBadge(o.status)}</td><td class="px-4 py-3 text-xs text-slate-500">${formatDate(o.updatedAt)}</td></tr>`).join('');
+            tb.innerHTML = returned.map(o => `<tr class="hover:bg-white/[0.02]">
+                <td class="px-4 py-3 font-mono text-cyan-400 text-xs">#${o.id.slice(-6).toUpperCase()}</td>
+                <td class="px-4 py-3 text-sm">${o.customerName}</td>
+                <td class="px-4 py-3 text-sm text-cyan-400">${o.customerPhone}</td>
+                <td class="px-4 py-3 text-xs text-slate-300">${o.itemName} x${o.qty}</td>
+                <td class="px-4 py-3 text-xs text-violet-400">${o.riderName || 'N/A'}</td>
+                <td class="px-4 py-3">${getStatusBadge(o.status)}</td>
+                <td class="px-4 py-3 text-center">
+                    <button onclick="reAttemptOrder('${o.id}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-cyan-500/30 cursor-pointer">Re-Attempt</button>
+                </td>
+            </tr>`).join('');
+        }
+
+        async function reAttemptOrder(orderId) {
+            try {
+                const timelineEntry = { status: 're_attempt_scheduled', by: window.currentUser.name, at: new Date() };
+                await db.collection('orders').doc(orderId).update({
+                    status: 'confirmed', 
+                    riderId: firebase.firestore.FieldValue.delete(), 
+                    riderName: firebase.firestore.FieldValue.delete(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    timeline: firebase.firestore.FieldValue.arrayUnion(timelineEntry)
+                });
+                showT("Order moved back to Dispatch Queue for re-attempt!");
+            } catch(e) { showT(e.message, "error"); }
         }
 
         function renderReports() {
@@ -489,8 +664,8 @@
             const user = firebase.auth().currentUser, cred = firebase.auth.EmailAuthProvider.credential(user.email, curr);
             try { await user.reauthenticateWithCredential(cred); await user.updatePassword(newPw); showT("Password updated!"); this.reset(); } catch(err) { showT("Current password is incorrect.", "error"); }
         });
-		
-		        // ===== 1. CASH SETTLEMENT LOGIC =====
+
+        // ===== 1. CASH SETTLEMENT LOGIC =====
         function renderCash() {
             const c = document.getElementById('cash-content');
             if(!c) return;
@@ -550,7 +725,6 @@
                 count++;
             });
             
-            // Uncheck boxes
             checked.forEach(cb => cb.checked = false);
             document.getElementById('bulk-rider-select').value = '';
             showT(`${count} orders assigned to ${riderObj.name}!`);
@@ -584,6 +758,343 @@
             printWindow.document.write(html);
             printWindow.document.close();
             printWindow.print();
+        }
+
+        // ===== WAREHOUSE LOGIC =====
+        function renderWarehouse() {
+            const tb = document.getElementById('warehouse-table');
+            if(!tb) return;
+            if(!allProducts.length) { tb.innerHTML = '<tr><td colspan="6" class="text-center text-slate-500 py-8">No products in warehouse.</td></tr>'; return; }
+            
+            tb.innerHTML = allProducts.map(p => {
+                const stockColor = p.stock <= 0 ? 'text-red-400' : (p.minStock && p.stock <= p.minStock ? 'text-yellow-400' : 'text-green-400');
+                return '<tr class="hover:bg-white/[0.02]">' +
+                    '<td class="px-4 py-3"><div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">' + (p.image ? '<img src="'+p.image+'" class="w-full h-full object-cover">' : '<span class="iconify text-slate-600" data-icon="mdi:package-variant"></span>') + '</div></td>' +
+                    '<td class="px-4 py-3 text-sm text-white font-medium">' + p.name + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-400">' + (p.sku || 'N/A') + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-400">' + (p.merchantName || 'N/A') + '</td>' +
+                    '<td class="px-4 py-3 text-sm font-bold ' + stockColor + '">' + (p.stock || 0) + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-300"><input type="text" value="' + (p.location || 'A1') + '" onchange="updateLocation(\'' + p.id + '\', this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-xs text-white w-20 focus:outline-none focus:border-cyan-500/50"></td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        async function updateLocation(productId, location) {
+            try {
+                await db.collection('products').doc(productId).update({ location: location });
+                showT("Location updated!");
+            } catch(e) { showT(e.message, "error"); }
+        }
+
+        // ===== INVOICES LOGIC =====
+        function renderInvoices() {
+            const tb = document.getElementById('invoices-table');
+            if(!tb) return;
+            const invoiced = allOrders.filter(o => ['out_for_delivery', 'delivered', 'returned'].includes(o.status));
+            if(!invoiced.length) { tb.innerHTML = '<tr><td colspan="6" class="text-center text-slate-500 py-8">No invoices yet.</td></tr>'; return; }
+            
+            tb.innerHTML = invoiced.map(o => {
+                const fee = o.deliveryFee || 0;
+                return '<tr class="hover:bg-white/[0.02]">' +
+                    '<td class="px-4 py-3 font-mono text-cyan-400 text-xs">#' + o.id.slice(-6).toUpperCase() + '</td>' +
+                    '<td class="px-4 py-3 text-sm">' + o.customerName + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-violet-400">' + (o.riderName || 'N/A') + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-right font-semibold">TZS ' + Number(o.totalAmount).toLocaleString() + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-right text-cyan-400 font-bold">TZS ' + Number(fee).toLocaleString() + '</td>' +
+                    '<td class="px-4 py-3 text-center"><button onclick="printInvoice(\'' + o.id + '\')" class="bg-white/[0.05] text-slate-300 border border-white/[0.1] font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-white/[0.1]"><span class="iconify inline mr-1" data-icon="mdi:printer"></span> Print</button></td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        // ===== NOTIFICATIONS LOGIC =====
+        function renderNotifications() {
+            const c = document.getElementById('notif-list');
+            if(!c) return;
+            let html = '';
+            let alertCount = 0;
+            
+            const pendingShip = allOrders.filter(o => o.status === 'confirmed').length;
+            if(pendingShip > 0) {
+                html += '<div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-blue-400" data-icon="mdi:package-variant-closed"></span><div><div class="font-bold text-blue-400 text-sm">' + pendingShip + ' Orders Awaiting Shipment</div><div class="text-xs text-slate-400">Assign riders to dispatch these orders.</div></div></div>';
+                alertCount += pendingShip;
+            }
+            
+            const lowStock = allProducts.filter(p => p.minStock && p.stock <= p.minStock);
+            lowStock.forEach(p => {
+                html += '<div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-yellow-400" data-icon="mdi:alert"></span><div><div class="font-bold text-yellow-400 text-sm">LOW STOCK: ' + p.name + '</div><div class="text-xs text-slate-400">Only ' + p.stock + ' left in warehouse.</div></div></div>';
+                alertCount++;
+            });
+
+            const recentReturns = allOrders.filter(o => o.status === 'returned').slice(0, 3);
+            recentReturns.forEach(o => {
+                html += '<div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-red-400" data-icon="mdi:keyboard-return"></span><div><div class="font-bold text-red-400 text-sm">ORDER RETURNED: #' + o.id.slice(-6).toUpperCase() + '</div><div class="text-xs text-slate-400">Customer: ' + o.customerName + '. Stock restored.</div></div></div>';
+                alertCount++;
+            });
+
+            c.innerHTML = html || '<p class="text-slate-500 text-center py-12">All clear! No notifications.</p>';
+            
+            var badge = document.getElementById('ship-notif-badge');
+            if(badge) {
+                if(alertCount > 0) { badge.classList.remove('hidden'); badge.textContent = alertCount; }
+                else { badge.classList.add('hidden'); }
+            }
+        }
+
+        function printLabel(orderId) {
+            var o = allOrders.find(function(x) { return x.id === orderId; });
+            if(!o) return;
+            
+            var printWindow = window.open('', '_blank');
+            var html = '<html><head><title>Label - #' + o.id.slice(-6).toUpperCase() + '</title>';
+            html += '<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script>';
+            html += '<style>';
+            html += 'body { font-family: Arial, sans-serif; margin: 0; padding: 20px; color: #000; background: #fff; }';
+            html += '.label-container { width: 400px; margin: 0 auto; border: 2px solid #000; padding: 20px; border-radius: 8px; }';
+            html += '.logo { text-align: center; font-size: 24px; font-weight: 900; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 10px; letter-spacing: 1px; }';
+            html += '.row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; }';
+            html += '.row span:first-child { font-weight: bold; color: #555; }';
+            html += '.section { border-bottom: 1px dashed #ccc; padding-bottom: 10px; margin-bottom: 10px; }';
+            html += '.notes { background: #fff3cd; border: 1px solid #ffeeba; padding: 8px; border-radius: 4px; font-size: 12px; margin-bottom: 15px; color: #856404; }';
+            html += '.barcode { text-align: center; margin-top: 15px; }';
+            html += '.footer { text-align: center; margin-top: 15px; font-size: 10px; color: #999; border-top: 1px dashed #ccc; padding-top: 10px; }';
+            html += '@media print { body { padding: 0; } .label-container { border: 1px solid #000; } }';
+            html += '</style></head><body>';
+            
+            html += '<div class="label-container">';
+            html += '<div class="logo">CHAPSHOP DELIVERY</div>';
+            
+            html += '<div class="section">';
+            html += '<div class="row"><span>Order ID:</span> <span style="font-family:monospace; font-weight:bold;">#' + o.id.slice(-6).toUpperCase() + '</span></div>';
+            html += '<div class="row"><span>Merchant:</span> <span>' + (o.merchantName || 'N/A') + '</span></div>';
+            html += '<div class="row"><span>Call Agent:</span> <span>' + (o.processedByName || 'N/A') + '</span></div>';
+            html += '</div>';
+            
+            html += '<div class="section">';
+            html += '<div class="row"><span>Customer:</span> <span>' + o.customerName + '</span></div>';
+            html += '<div class="row"><span>Phone:</span> <span>' + o.customerPhone + '</span></div>';
+            html += '<div class="row"><span>Address:</span> <span style="text-align:right; width:60%;">' + (o.customerAddress || 'N/A') + ', ' + (o.customerCity || 'N/A') + '</span></div>';
+            html += '</div>';
+            
+            html += '<div class="section">';
+            html += '<div class="row"><span>Product:</span> <span>' + o.itemName + ' (x' + o.qty + ')</span></div>';
+            html += '<div class="row"><span>Amount:</span> <span style="font-weight:bold;">TZS ' + Number(o.totalAmount).toLocaleString() + '</span></div>';
+            html += '</div>';
+            
+            if(o.callNotes) {
+                html += '<div class="notes"><strong>CC Note:</strong> ' + o.callNotes + '</div>';
+            }
+            
+            html += '<div class="barcode"><svg id="barcode"></svg></div>';
+            
+            html += '<div class="footer">Tear here and attach to package</div>';
+            html += '</div>';
+            
+            html += '<script>';
+            html += 'JsBarcode("#barcode", "' + o.id.slice(-6).toUpperCase() + '", { format: "CODE128", displayValue: true, fontSize: 16, margin: 10 });';
+            html += 'setTimeout(function() { window.print(); }, 500);';
+            html += '<\/script>';
+            
+            html += '</body></html>';
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
+
+        // ===== CHARTS LOGIC =====
+        let shipChart = null, statusChart = null;
+
+        function renderCharts() {
+            if (typeof Chart === 'undefined' || !allOrders) return;
+
+            const days = [];
+            const dayData = [];
+            const now = new Date();
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(now.getDate() - i);
+                d.setHours(0, 0, 0, 0);
+                days.push(dayNames[d.getDay()]);
+                
+                const nextDay = new Date(d);
+                nextDay.setDate(d.getDate() + 1);
+                
+                const count = allOrders.filter(o => o.createdAt && o.createdAt.toDate() >= d && o.createdAt.toDate() < nextDay).length;
+                dayData.push(count);
+            }
+
+            if (shipChart) shipChart.destroy();
+            shipChart = new Chart(document.getElementById('shipments-chart'), {
+                type: 'line',
+                data: {
+                    labels: days,
+                    datasets: [{
+                        label: 'Orders',
+                        data: dayData,
+                        borderColor: '#06b6d4',
+                        backgroundColor: 'rgba(6, 182, 212, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { color: '#475569', precision: 0 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#475569' }, grid: { display: false } }
+                    }
+                }
+            });
+
+            const statuses = {
+                'delivered': 0,
+                'out_for_delivery': 0, 
+                'confirmed': 0, 
+                'accepted': 0, 
+                'returned': 0,
+                'cancelled': 0
+            };
+
+            allOrders.forEach(o => {
+                if (statuses[o.status] !== undefined) statuses[o.status]++;
+            });
+
+            const statusData = [
+                statuses['delivered'],
+                statuses['out_for_delivery'],
+                statuses['confirmed'] + statuses['accepted'],
+                statuses['returned'],
+                statuses['cancelled']
+            ];
+
+            if (statusChart) statusChart.destroy();
+            statusChart = new Chart(document.getElementById('status-chart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Delivered', 'In Transit', 'Pending', 'Returned', 'Cancelled'],
+                    datasets: [{
+                        data: statusData,
+                        backgroundColor: [
+                            '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#ef4444'
+                        ],
+                        borderColor: '#0f172a',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 12 }, padding: 15 } }
+                    }
+                }
+            });
+        }
+
+        // ===== WHATSAPP NOTIFY LOGIC =====
+        function notifyCustomerWhatsApp(orderId) {
+            var o = allOrders.find(function(x) { return x.id === orderId; });
+            if(!o) return;
+            var cleanPhone = (o.customerPhone || '').replace(/[^0-9]/g, '');
+            var msg = encodeURIComponent('Hello ' + o.customerName + ', your ChapShop order #' + o.id.slice(-6).toUpperCase() + ' is out for delivery with ' + (o.riderName || 'our rider') + '! Track it here: https://chapshopdelivery.live/track.html');
+            window.open('https://wa.me/' + cleanPhone + '?text=' + msg, '_blank');
+        }
+
+        // ===== ZONE GROUPING LOGIC =====
+        function toggleZoneGroup() {
+            groupByZone = !groupByZone;
+            renderOrders();
+        }
+        
+        function bulkAssignZone(safeCity, originalCity) {
+            var riderSelect = document.getElementById('zone-rider-' + safeCity);
+            if(!riderSelect || !riderSelect.value) return showT("Select a rider for this zone first", "error");
+            var riderId = riderSelect.value;
+            var riderObj = allRiders.find(function(r) { return r.id === riderId; });
+            
+            var zoneOrders = allOrders.filter(function(o) { return o.status === 'confirmed' && (o.customerCity || 'Unknown') === originalCity; });
+            if(zoneOrders.length === 0) return showT("No orders in this zone", "error");
+            
+            if(confirm('Assign all ' + zoneOrders.length + ' orders in ' + originalCity + ' to ' + riderObj.name + '?')) {
+                zoneOrders.forEach(function(o) {
+                    updateStatus(o.id, 'out_for_delivery', riderObj.name, 0, riderObj.id);
+                });
+                showT(zoneOrders.length + ' orders assigned to ' + riderObj.name + '!');
+            }
+        }
+		        // ===== SHIPPING CREATE ORDER LOGIC =====
+        function openShipCreateOrder() {
+            var mOpts = allMerchants.length ? allMerchants.map(function(m){return '<option value="'+m.id+'" class="bg-slate-900">'+(m.shopName||m.name)+'</option>'}).join('') : '<option value="">No merchants found</option>';
+            var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:600px">';
+            h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Create New Order</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
+            h += '<form id="ship-create-form" class="space-y-4">';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Select Merchant</label><select id="sc-merchant" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white">'+mOpts+'</select></div>';
+            h += '<div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name</label><input type="text" id="sc-cname" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div><div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><input type="tel" id="sc-cphone" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div></div>';
+            h += '<div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">City</label><input type="text" id="sc-ccity" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div><div><label class="text-xs font-semibold text-slate-400 uppercase">Address</label><input type="text" id="sc-caddress" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Item Name</label><input type="text" id="sc-item" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div>';
+            h += '<div class="grid grid-cols-3 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">Qty</label><input type="number" id="sc-qty" value="1" min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" oninput="calcShipTotal()"></div><div><label class="text-xs font-semibold text-slate-400 uppercase">Unit Price</label><input type="number" id="sc-price" value="0" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" oninput="calcShipTotal()"></div><div><label class="text-xs font-semibold text-slate-400 uppercase">Total</label><input type="number" id="sc-total" value="0" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-cyan-400 font-bold"></div></div>';
+            h += '<button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 text-sm mt-2">Create Order</button>';
+            h += '</form></div></div>';
+            document.body.insertAdjacentHTML('beforeend', h);
+
+            document.getElementById('ship-create-form').addEventListener('submit', function(e){
+                e.preventDefault();
+                var mid = document.getElementById('sc-merchant').value;
+                if(!mid) { showT("Please select a merchant", "error"); return; }
+                
+                // Fetch merchant name
+                db.collection('users').doc(mid).get().then(function(doc) {
+                    var mObj = doc.exists ? doc.data() : {};
+                    var qty = parseInt(document.getElementById('sc-qty').value)||1;
+                    var price = parseInt(document.getElementById('sc-price').value)||0;
+                    var total = parseInt(document.getElementById('sc-total').value)||0;
+                    
+                    // Save order to Firestore
+                    return db.collection('orders').add({
+                        merchantId: mid, 
+                        merchantName: mObj.shopName || mObj.name || '',
+                        customerName: document.getElementById('sc-cname').value,
+                        customerPhone: document.getElementById('sc-cphone').value,
+                        customerCity: document.getElementById('sc-ccity').value,
+                        customerAddress: document.getElementById('sc-caddress').value,
+                        itemName: document.getElementById('sc-item').value,
+                        qty: qty, productPrice: price, totalAmount: total,
+                        status: 'confirmed', // Ready for shipping!
+                        shippedBy: myId(), shippedByName: window.currentUser.name,
+                        createdAt: new Date(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }).then(function(){
+                    showT("Order created successfully!");
+                    document.querySelector('.modal-overlay').remove();
+                }).catch(function(err){ showT(err.message, "error"); });
+            });
+        }
+
+        function calcShipTotal() {
+            var qty = parseInt(document.getElementById('sc-qty').value) || 0;
+            var price = parseInt(document.getElementById('sc-price').value) || 0;
+            document.getElementById('sc-total').value = (qty * price);
+        }
+		
+		        // ===== MULTI-STEP FULFILLMENT WORKFLOW =====
+        function getShippingFlow(status, city) {
+            const isLocal = (city && city.toLowerCase().includes('dar'));
+            
+            if (status === 'confirmed') return { next: 'preparing', label: 'Start Preparation', color: 'bg-blue-500 text-white' };
+            if (status === 'preparing') return { next: 'printed', label: 'Mark Printed', color: 'bg-purple-500 text-white' };
+            if (status === 'printed') {
+                if (isLocal) return { next: 'out_for_delivery', label: 'Out for Delivery', color: 'bg-violet-500 text-white' };
+                return { next: 'in_transit', label: 'Send in Transit', color: 'bg-indigo-500 text-white' };
+            }
+            if (status === 'in_transit') return { next: 'arrived', label: 'Mark Arrived', color: 'bg-teal-500 text-white' };
+            if (status === 'arrived') return { next: 'out_for_delivery', label: 'Out for Delivery', color: 'bg-violet-500 text-white' };
+            
+            return null; // No next step (e.g., already delivered)
         }
     </script>
 

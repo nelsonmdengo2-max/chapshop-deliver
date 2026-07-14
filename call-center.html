@@ -12,10 +12,11 @@
     <script src="core.js"></script>
     <style>
         *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+        body{background:#020617;}
         ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
         .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-        .toast{bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.16,1,.3,1);white-space:nowrap}
+        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.16,1,.3,1);white-space:nowrap;z-index:200}
         .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
         .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem}
         .sidebar-link:hover,.sidebar-link.active{background:rgba(6,182,212,0.1);color:#22d3ee}
@@ -27,18 +28,14 @@
         .ws-tab.active{background: rgba(6,182,212,0.2); color: #22d3ee;}
         .quick-tag{padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; cursor: pointer; transition: all 0.2s;}
         .quick-tag:hover{border-color: #06b6d4; color: #22d3ee;}
-        
-        /* MODAL STYLING */
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
         .modal-box{background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto}
-
-        /* SPINNER STYLING */
         @keyframes pulse-text { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
         .pulse-text { animation: pulse-text 1.5s ease-in-out infinite; }
     </style>
 </head>
 <body class="bg-[#020617] text-white min-h-screen">
-    <!-- BEAUTIFUL AUTH LOADER -->
+
     <div id="auth-loader" class="fixed inset-0 z-[9999] bg-[#020617] hidden flex flex-col items-center justify-center">
         <div class="relative w-16 h-16">
             <div class="absolute inset-0 border-4 border-cyan-500/20 rounded-full"></div>
@@ -47,13 +44,13 @@
         <p id="auth-loader-text" class="mt-5 text-slate-400 text-sm font-semibold tracking-wide pulse-text">Loading...</p>
     </div>
 
-    <div id="toast" class="toast fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-[#0f172a] border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+    <div id="toast" class="toast bg-[#0f172a] border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
         <span id="toast-icon" class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
         <span id="toast-msg" class="text-sm font-medium">Success</span>
     </div>
 
     <!-- LOGIN -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-[#020617]">
+    <div id="login-screen" class="min-h-screen flex items-center justify-center">
         <div class="w-full max-w-md px-6">
             <div class="text-center mb-8">
                 <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20"><span class="iconify text-white text-3xl" data-icon="mdi:headset"></span></div>
@@ -73,26 +70,26 @@
     <div id="app-screen" class="hidden h-screen flex overflow-hidden">
         
         <!-- SIDEBAR -->
-        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
-            <div class="p-6 border-b border-white/[0.08]">
+        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
+            <div class="p-6 border-b border-white/[0.08] flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:headset"></span></div>
                     <span class="font-bold text-white text-sm">ChapShop<span class="text-cyan-400 ml-1">Agent</span></span>
                 </div>
             </div>
-            <nav class="p-4 space-y-1">
+            <nav class="p-4 space-y-1 flex-1 overflow-y-auto">
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2">Main</div>
                 <button onclick="switchTab('dashboard')" class="sidebar-link active w-full text-left" id="nav-dashboard"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</button>
                 <button onclick="switchTab('workspace')" class="sidebar-link w-full text-left" id="nav-workspace"><span class="iconify text-lg" data-icon="mdi:phone-message-outline"></span> Workspace</button>
                 
-                               <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Tracking</div>
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Tracking</div>
                 <button onclick="switchTab('mycalls')" class="sidebar-link w-full text-left" id="nav-mycalls"><span class="iconify text-lg" data-icon="mdi:phone-log"></span> My Handled Calls</button>
                 <button onclick="switchTab('shipping')" class="sidebar-link w-full text-left" id="nav-shipping"><span class="iconify text-lg" data-icon="mdi:truck-fast-outline"></span> Shipping Tracking</button>
 
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Insights</div>
                 <button onclick="switchTab('performance')" class="sidebar-link w-full text-left" id="nav-performance"><span class="iconify text-lg" data-icon="mdi:chart-line"></span> My Performance</button>
             </nav>
-            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/[0.08] space-y-1">
+            <div class="p-4 border-t border-white/[0.08] space-y-1 flex-shrink-0">
                 <button onclick="switchTab('profile')" class="sidebar-link w-full text-left" id="nav-profile"><span class="iconify text-lg" data-icon="mdi:account-cog-outline"></span> Settings</button>
                 <button onclick="handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</button>
             </div>
@@ -105,11 +102,10 @@
                     <button onclick="toggleSidebar()" class="lg:hidden text-white p-1"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
                     <span class="font-bold text-white text-sm hidden lg:block"></span>
                 </div>
-                                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3">
                     <button onclick="toggleBreak()" id="break-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/30 text-xs font-bold text-green-400 transition-all">
                         <span id="break-dot" class="w-2 h-2 rounded-full bg-green-400"></span> <span id="break-text">Online</span>
                     </button>
-                    <!-- COMMISSION BADGE -->
                     <div id="cc-commission" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-xs font-bold text-green-400">
                         <span class="iconify" data-icon="mdi:cash-multiple"></span>
                         <span id="cc-commission-text">TZS 0</span>
@@ -144,12 +140,9 @@
                         <div class="stat-card border-violet-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-violet-400 uppercase">Delivered</span><span class="iconify text-violet-400" data-icon="mdi:truck-check"></span></div><div id="d-delivered" class="text-2xl font-bold text-white">0</div></div>
                         <div class="stat-card border-slate-500/20"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-slate-400 uppercase">Returned</span><span class="iconify text-slate-400" data-icon="mdi:package-variant-remove"></span></div><div id="d-returned" class="text-2xl font-bold text-white">0</div></div>
                     </div>
-                      <!-- AGENT OF THE MONTH -->
                     <div class="bg-gradient-to-r from-yellow-500/10 to-amber-500/5 border border-yellow-500/20 rounded-2xl p-6 mb-6 max-w-2xl">
                         <div id="aom-card">Loading Agent of the Month...</div>
                     </div>
-
-                    <!-- DAILY TARGET -->
                     <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 max-w-2xl">
                         <div class="flex justify-between items-center mb-3">
                             <h3 class="font-bold text-white">Daily Confirmation Target</h3>
@@ -159,8 +152,6 @@
                             <div id="target-bar" class="bg-gradient-to-r from-cyan-500 to-green-400 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
-                    
-                    <!-- LIVE AGENT LEADERBOARD -->
                     <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mt-6 max-w-2xl">
                         <h3 class="font-bold text-white mb-4 flex items-center gap-2"><span class="iconify text-yellow-400" data-icon="mdi:trophy"></span> Live Agent Leaderboard (Today)</h3>
                         <div id="leaderboard-list" class="space-y-2">Loading...</div>
@@ -168,7 +159,7 @@
                 </div>
 
                 <!-- WORKSPACE -->
-                                <div id="panel-workspace" class="tab-panel hidden">
+                <div id="panel-workspace" class="tab-panel hidden">
                     <div class="mb-6 bg-white/[0.02] border border-white/[0.08] rounded-xl p-3 flex flex-col sm:flex-row gap-3 items-center">
                         <div class="relative flex-1 w-full">
                             <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
@@ -184,13 +175,13 @@
                     <div id="ws-content" class="space-y-4"></div>
                 </div>
 
-                               <!-- MY HANDLED CALLS -->
+                <!-- MY HANDLED CALLS -->
                 <div id="panel-mycalls" class="tab-panel hidden">
                     <div class="mb-4 relative max-w-sm">
                         <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
                         <input type="text" id="mycalls-search" oninput="renderMyCalls()" placeholder="Search ID, phone, or name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50">
                     </div>
-                                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
                         <table class="w-full text-sm text-left min-w-[900px]">
                             <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]">
                                 <tr>
@@ -202,13 +193,12 @@
                                     <th class="px-4 py-3">Status</th>
                                     <th class="px-4 py-3">Notes</th>
                                     <th class="px-4 py-3">Date</th>
+                                    <th class="px-4 py-3 text-center">Action</th>
                                 </tr>
                             </thead>
-                                                        <tbody id="mycalls-table" class="divide-y divide-white/[0.05]"></tbody>
+                            <tbody id="mycalls-table" class="divide-y divide-white/[0.05]"></tbody>
                         </table>
                     </div>
-                    
-                    <!-- PAGINATION FOOTER -->
                     <div class="flex flex-col md:flex-row gap-3 mt-4 items-center justify-between text-xs text-slate-400">
                         <div class="flex items-center gap-2">
                             <span>Rows per page:</span>
@@ -226,7 +216,7 @@
                     </div>
                 </div>
 
-                                <!-- SHIPPING TRACKING -->
+                <!-- SHIPPING TRACKING -->
                 <div id="panel-shipping" class="tab-panel hidden">
                     <div class="mb-4 relative max-w-sm">
                         <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
@@ -241,7 +231,7 @@
                         <button onclick="filterShipping('returned')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Returned</button>
                         <button onclick="filterShipping('cancelled')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Cancelled</button>
                     </div>
-                                                            <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
                         <table class="w-full text-sm text-left min-w-[1100px]">
                             <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">Merchant</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Item</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3">Call Agent</th><th class="px-4 py-3">Rider</th><th class="px-4 py-3">Shipping Status</th><th class="px-4 py-3">Updated</th></tr></thead>
                             <tbody id="shipping-table" class="divide-y divide-white/[0.05]"></tbody>
@@ -293,26 +283,23 @@
             </div>
         </main>
         <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
-        
-        <!-- IMAGE LIGHTBOX -->
-        <div id="img-lightbox" class="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 hidden cursor-pointer" onclick="this.classList.add('hidden')">
-            <img id="lightbox-img" class="max-w-full max-h-full rounded-2xl shadow-2xl object-contain">
-        </div>
     </div>
 
     <script>
-        let allOrders = [], allAgents = [], dashFilter = 'all', currentWsTab = 'new';
-        let myCallsPage = 1, myCallsPageSize = 20;
-        const COMMISSION_PER_CONFIRMATION = 500; // Agents earn 500 TZS per confirmed order
-        let timerInterval = null, timerSeconds = 0, activeTimerId = null;
-        let knownOrderIds = new Set(), audioCtx, isOnBreak = false;
-        const myId = () => window.currentUser.uid;
+        var allOrders = [], allAgents = [], allMerchants = [], dashFilter = 'all', currentWsTab = 'new';
+        var myCallsPage = 1, myCallsPageSize = 20;
+        var COMMISSION_PER_CONFIRMATION = 500;
+        var timerInterval = null, timerSeconds = 0, activeTimerId = null;
+        var knownOrderIds = new Set(), audioCtx, isOnBreak = false;
+        var isClaiming = false;
+        var shipFilter = 'all';
+        const myId = function() { return window.currentUser.uid; };
         const DAILY_TARGET = 20;
 
         function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playDing() {
             if(!audioCtx) return;
-            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+            var o = audioCtx.createOscillator(); var g = audioCtx.createGain();
             o.connect(g); g.connect(audioCtx.destination);
             o.type = 'sine'; o.frequency.setValueAtTime(880, audioCtx.currentTime); o.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.1);
             g.gain.setValueAtTime(0.3, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
@@ -321,7 +308,7 @@
 
         function toggleBreak() {
             isOnBreak = !isOnBreak;
-            const btn = document.getElementById('break-btn'), dot = document.getElementById('break-dot'), txt = document.getElementById('break-text');
+            var btn = document.getElementById('break-btn'), dot = document.getElementById('break-dot'), txt = document.getElementById('break-text');
             if(isOnBreak) {
                 btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-xs font-bold text-yellow-400 transition-all';
                 dot.className = 'w-2 h-2 rounded-full bg-yellow-400'; txt.textContent = 'On Break';
@@ -329,10 +316,18 @@
                 btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/30 text-xs font-bold text-green-400 transition-all';
                 dot.className = 'w-2 h-2 rounded-full bg-green-400'; txt.textContent = 'Online';
             }
-            db.collection('users').doc(myId()).update({ agentStatus: isOnBreak ? 'break' : 'online' }).catch(()=>{});
+            db.collection('users').doc(myId()).update({ agentStatus: isOnBreak ? 'break' : 'online' }).catch(function(){});
         }
 
-                function hideAuthLoader() {
+        function showAuthLoader(text) {
+            var loader = document.getElementById('auth-loader');
+            if(!loader) return;
+            document.getElementById('auth-loader-text').innerText = text;
+            loader.classList.remove('hidden');
+            loader.classList.add('flex');
+        }
+
+        function hideAuthLoader() {
             var loader = document.getElementById('auth-loader');
             if(loader) { loader.classList.add('hidden'); loader.classList.remove('flex'); }
         }
@@ -346,35 +341,38 @@
             document.getElementById('set-email').value = window.currentUser.email || '';
             initAudio();
             
-                        // Fetch all call center agents for the leaderboard
-            db.collection('users').where('role', '==', 'call_center').onSnapshot(snap => {
-                allAgents = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            db.collection('users').where('role', '==', 'call_center').onSnapshot(function(snap) {
+                allAgents = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
                 renderLeaderboard();
                 renderAgentOfMonth();
             });
 
-            db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snap => {
-                allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                allOrders.forEach(o => { if(o.status === 'accepted' && !knownOrderIds.has(o.id)) playDing(); });
-                knownOrderIds = new Set(allOrders.map(o => o.id));
-                updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance();
+            db.collection('users').where('role', '==', 'merchant').onSnapshot(function(snap) {
+                allMerchants = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
+            });
+
+            db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
+                allOrders = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
+                allOrders.forEach(function(o) { if(o.status === 'accepted' && !knownOrderIds.has(o.id)) playDing(); });
+                knownOrderIds = new Set(allOrders.map(function(o) { return o.id; }));
+                updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance(); renderMyCalls();
             });
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
         function switchTab(t) { 
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden')); 
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active')); 
-            document.getElementById(`panel-${t}`).classList.remove('hidden'); 
-            document.getElementById(`nav-${t}`).classList.add('active'); 
+            document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.add('hidden'); }); 
+            document.querySelectorAll('.sidebar-link').forEach(function(l) { l.classList.remove('active'); }); 
+            document.getElementById('panel-' + t).classList.remove('hidden'); 
+            document.getElementById('nav-' + t).classList.add('active'); 
             if(window.innerWidth < 1024) toggleSidebar(); 
-            if(t === 'mycalls') renderMyCalls(); // Load the history table
+            if(t === 'mycalls') renderMyCalls(); 
         }
 
         function getDateFilter(filter) {
-            const now = new Date(); let s = null;
+            var now = new Date(); var s = null;
             if(filter === 'today') s = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            if(filter === 'week') { const d = now.getDay(); s = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (d===0?6:d-1)); }
+            if(filter === 'week') { var d = now.getDay(); s = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (d===0?6:d-1)); }
             if(filter === 'month') s = new Date(now.getFullYear(), now.getMonth(), 1);
             if(filter === 'year') s = new Date(now.getFullYear(), 0, 1);
             return s;
@@ -382,172 +380,130 @@
 
         function filterDash(f) {
             dashFilter = f;
-            document.querySelectorAll('.dash-btn').forEach(b => b.className = 'dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]');
+            document.querySelectorAll('.dash-btn').forEach(function(b) { b.className = 'dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'; });
             event.target.className = 'dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
             updateDashboard();
         }
 
         function updateDashboard() {
-            const start = getDateFilter(dashFilter);
-            const my = allOrders.filter(o => o.processedBy === myId() && (!start || (o.updatedAt && o.updatedAt.toDate() >= start)));
-            document.getElementById('d-new').textContent = allOrders.filter(o => o.status === 'accepted').length;
-            document.getElementById('d-confirmed').textContent = my.filter(o => o.status === 'confirmed').length;
-            document.getElementById('d-cancelled').textContent = my.filter(o => o.status === 'cancelled').length;
-            document.getElementById('d-noreply').textContent = my.filter(o => o.status === 'no_answer').length;
-            document.getElementById('d-scheduled').textContent = my.filter(o => o.status === 'callback_requested').length;
-            document.getElementById('d-outregion').textContent = my.filter(o => o.status === 'out_of_region').length;
-            document.getElementById('d-wrong').textContent = my.filter(o => o.status === 'wrong_number').length;
-            document.getElementById('d-delivered').textContent = my.filter(o => o.status === 'delivered').length;
-            document.getElementById('d-returned').textContent = my.filter(o => o.status === 'returned').length;
-            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
-            const todayConfirmed = allOrders.filter(o => o.processedBy === myId() && o.status === 'confirmed' && o.updatedAt && o.updatedAt.toDate() >= todayStart).length;
-            document.getElementById('target-text').textContent = `${todayConfirmed}/${DAILY_TARGET}`;
-            document.getElementById('target-bar').style.width = `${Math.min(100, (todayConfirmed/DAILY_TARGET)*100)}%`;
-            renderLeaderboard(); // Update daily leaderboard
-            renderAgentOfMonth(); // Update Agent of the Month
+            var start = getDateFilter(dashFilter);
+            var my = allOrders.filter(function(o) { return o.processedBy === myId() && (!start || (o.updatedAt && o.updatedAt.toDate() >= start)); });
+            document.getElementById('d-new').textContent = allOrders.filter(function(o) { return o.status === 'accepted'; }).length;
+            document.getElementById('d-confirmed').textContent = my.filter(function(o) { return o.status === 'confirmed'; }).length;
+            document.getElementById('d-cancelled').textContent = my.filter(function(o) { return o.status === 'cancelled'; }).length;
+            document.getElementById('d-noreply').textContent = my.filter(function(o) { return o.status === 'no_answer'; }).length;
+            document.getElementById('d-scheduled').textContent = my.filter(function(o) { return o.status === 'callback_requested'; }).length;
+            document.getElementById('d-outregion').textContent = my.filter(function(o) { return o.status === 'out_of_region'; }).length;
+            document.getElementById('d-wrong').textContent = my.filter(function(o) { return o.status === 'wrong_number'; }).length;
+            document.getElementById('d-delivered').textContent = my.filter(function(o) { return o.status === 'delivered'; }).length;
+            document.getElementById('d-returned').textContent = my.filter(function(o) { return o.status === 'returned'; }).length;
+            var todayStart = new Date(); todayStart.setHours(0,0,0,0);
+            var todayConfirmed = allOrders.filter(function(o) { return o.processedBy === myId() && o.status === 'confirmed' && o.updatedAt && o.updatedAt.toDate() >= todayStart; }).length;
+            document.getElementById('target-text').textContent = todayConfirmed + '/' + DAILY_TARGET;
+            document.getElementById('target-bar').style.width = Math.min(100, (todayConfirmed/DAILY_TARGET)*100) + '%';
+            
+            var totalConfirmed = allOrders.filter(function(o) { return o.processedBy === myId() && o.status === 'confirmed'; }).length;
+            var commission = totalConfirmed * COMMISSION_PER_CONFIRMATION;
+            document.getElementById('cc-commission-text').textContent = 'TZS ' + commission.toLocaleString();
+            
+            renderLeaderboard(); 
+            renderAgentOfMonth();
         }
 
         function switchWs(tab) {
             currentWsTab = tab;
-            document.querySelectorAll('.ws-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(`ws-tab-${tab}`).classList.add('active');
+            document.querySelectorAll('.ws-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.getElementById('ws-tab-' + tab).classList.add('active');
             renderWorkspace();
         }
 
-        function getCustomerHistory(phone) { return allOrders.filter(o => o.customerPhone === phone && o.processedBy); }
+        function getCustomerHistory(phone) { return allOrders.filter(function(o) { return o.customerPhone === phone && o.processedBy; }); }
 
         function renderWorkspace() {
-            const c = document.getElementById('ws-content');
-            const now = new Date();
-            const search = (document.getElementById('ws-search').value || '').toLowerCase();
-            let list = [];
+            var c = document.getElementById('ws-content');
+            var now = new Date();
+            var search = (document.getElementById('ws-search').value || '').toLowerCase();
+            var list = [];
 
             if(currentWsTab === 'new') {
-                list = allOrders.filter(o => o.status === 'accepted' && o.ccAssignedTo === myId());
+                list = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
                 if(!list.length) { 
                     c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>';
-                    claimNextOrder(); // Automatically fetch the next order!
+                    claimNextOrder(); 
                     return; 
                 }
             } else if(currentWsTab === 'retry') {
-                list = allOrders.filter(o => (o.status === 'no_answer' || o.status === 'busy') || (o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() <= now));
+                list = allOrders.filter(function(o) { return (o.processedBy === myId() || o.ccAssignedTo === myId()) && ((o.status === 'no_answer' || o.status === 'busy') || (o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() <= now)); });
                 if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No retry orders right now.</p>'; return; }
             } else if(currentWsTab === 'scheduled') {
-                list = allOrders.filter(o => o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() > now);
+                list = allOrders.filter(function(o) { return (o.processedBy === myId() || o.ccAssignedTo === myId()) && o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() > now; });
                 if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No scheduled callbacks.</p>'; return; }
             }
 
             if(search) {
-                list = list.filter(o => o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)));
+                list = list.filter(function(o) { return o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)); });
                 if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No orders match your search.</p>'; return; }
             }
 
-                        c.innerHTML = list.map(o => {
-                const history = getCustomerHistory(o.customerPhone);
-                const histText = history.length > 1 ? `<div class="mt-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-300"><span class="iconify inline-block mr-1" data-icon="mdi:history"></span>Customer ordered ${history.length} times. ${history.filter(h=>h.status==='delivered').length} delivered, ${history.filter(h=>h.status==='cancelled').length} cancelled.</div>` : '';
+            c.innerHTML = list.map(function(o) {
+                var history = getCustomerHistory(o.customerPhone);
+                var histText = history.length > 1 ? '<div class="mt-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-300"><span class="iconify inline-block mr-1" data-icon="mdi:history"></span>Customer ordered ' + history.length + ' times.</div>' : '';
                 
-                // Duplicate Order Alert Logic
-                const activeOrdersToday = allOrders.filter(x => x.customerPhone === o.customerPhone && ['accepted', 'confirmed'].includes(x.status) && x.createdAt && x.createdAt.toDate().toDateString() === new Date().toDateString()).length;
-                const dupAlert = activeOrdersToday > 1 ? `<div class="mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded-lg text-xs text-red-400 flex items-center gap-2"><span class="iconify" data-icon="mdi:alert-circle"></span> Warning: Customer has ${activeOrdersToday} active orders today! Verify they want all of them.</div>` : '';
+                var activeOrdersToday = allOrders.filter(function(x) { return x.customerPhone === o.customerPhone && ['accepted', 'confirmed'].includes(x.status) && x.createdAt && x.createdAt.toDate().toDateString() === new Date().toDateString(); }).length;
+                var dupAlert = activeOrdersToday > 1 ? '<div class="mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded-lg text-xs text-red-400 flex items-center gap-2"><span class="iconify" data-icon="mdi:alert-circle"></span> Warning: Customer has ' + activeOrdersToday + ' active orders today!</div>' : '';
                 
-                // WhatsApp & SMS Pre-filled Messages
-                                // WhatsApp & SMS Pre-filled Messages (Swahili)
-                const waMsg = encodeURIComponent('Habari! Ninakupigia simu kutoka ChapShop Delivery kuhusu agizo lako la ' + (o.itemName || 'bidhaa yako') + '. Tafadhali niambie wakati upatikanapo kuthibitisha uhitaji wako. Asante!');
-                const smsMsg = encodeURIComponent('ChapShop Delivery: Tafadhali thibitisha agizo lako la ' + (o.itemName || 'bidhaa') + '.');
-                const cleanPhone = (o.customerPhone || '').replace(/[^0-9]/g, '');
+                var waMsg = encodeURIComponent('Habari! Ninakupigia simu kutoka ChapShop Delivery kuhusu agizo lako la ' + (o.itemName || 'bidhaa yako') + '. Tafadhali niambie wakati upatikanapo.');
+                var cleanPhone = (o.customerPhone || '').replace(/[^0-9]/g, '');
                 
-                return `
-                <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-5 hover:border-cyan-500/30 transition-colors">
-                    <div class="flex flex-col md:flex-row justify-between gap-4 mb-4">
-                        <div>
-                            <div class="flex items-center gap-3 mb-1">
-                                <span class="font-mono text-cyan-400 font-bold">#${o.id.slice(-6).toUpperCase()}</span>
-                                ${getStatusBadge(o.status)}
-                                ${o.scheduledDate ? `<span class="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">📅 ${o.scheduledDate.toDate().toLocaleDateString()}</span>` : ''}
-                                <button onclick="openCcEditOrder('${o.id}')" class="ml-auto text-xs text-yellow-400 hover:underline">Edit Details</button>
-                            </div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-xs font-bold text-cyan-300 bg-cyan-500/10 px-2 py-1 rounded">🏪 ${o.merchantName || 'Unknown Merchant'}</span>
-                                <span class="text-slate-500 text-xs">• ${formatDate(o.createdAt)}</span>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-lg font-bold text-white">TZS ${Number(o.totalAmount).toLocaleString()}</div>
-                            <div class="text-xs text-slate-500">${o.itemName} x${o.qty}</div>
-                        </div>
-                    </div>
-                    ${dupAlert}
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-3 bg-black/20 rounded-xl">
-                        <div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Customer</div><div class="text-white text-sm font-medium">${o.customerName}</div></div>
-                        <div>
-                            <div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Phone</div>
-                            <div class="flex items-center gap-2">
-                                <a href="tel:${o.customerPhone}" class="text-cyan-400 text-sm font-medium hover:underline">${o.customerPhone}</a>
-                                <a href="https://wa.me/${cleanPhone}?text=${waMsg}" target="_blank" class="text-green-400 hover:text-green-300" title="Message on WhatsApp"><span class="iconify text-base" data-icon="mdi:whatsapp"></span></a>
-                                <a href="sms:${o.customerPhone}?body=${smsMsg}" class="text-blue-400 hover:text-blue-300" title="Send SMS"><span class="iconify text-base" data-icon="mdi:message-text"></span></a>
-                            </div>
-                        </div>
-                        <div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">City / Address</div><div class="text-slate-300 text-sm">${o.customerCity || 'N/A'}, ${o.customerAddress || 'N/A'}</div></div>
-                    </div>
-                    <div class="flex gap-4 mb-4 p-3 bg-cyan-500/5 border border-cyan-500/10 rounded-xl items-start">
-                        ${o.productImage ? `<div onclick="viewImg('${o.productImage}')" class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 overflow-hidden border border-white/10 cursor-pointer hover:border-cyan-500/50 transition-all"><img src="${o.productImage}" class="w-full h-full object-cover"></div>` : '<div class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 flex items-center justify-center border border-white/10"><span class="iconify text-4xl text-slate-600" data-icon="mdi:package-variant"></span></div>'}
-                        <div class="flex-1">
-                            <div class="text-[10px] text-cyan-400 uppercase font-bold mb-1">Product Ordered</div>
-                            <div class="text-white text-sm font-bold">${o.itemName || o.productName || 'Unknown'}</div>
-                            <div class="text-xs text-slate-400 mt-1 line-clamp-2">${o.productDesc || 'No description provided.'}</div>
-                        </div>
-                    </div>
-                    ${o.timeline && o.timeline.length ? `<div class="mt-4 border-t border-white/[0.05] pt-4"><div class="text-[10px] text-slate-500 uppercase font-bold mb-3">Order Timeline</div><div class="space-y-3 max-h-48 overflow-y-auto pr-2">${o.timeline.slice().reverse().map(t => `<div class="flex gap-3 text-xs"><div class="flex flex-col items-center"><div class="w-2 h-2 rounded-full bg-cyan-400 mt-1.5"></div><div class="w-px h-full bg-white/[0.05] mt-1"></div></div><div class="pb-3"><div class="text-slate-400">${formatDate(t.at)}</div><div class="text-white font-semibold mt-0.5">${t.status.replace(/_/g,' ').toUpperCase()}</div>${t.by ? `<div class="text-slate-500">by ${t.by}</div>` : ''}${t.note ? `<div class="text-slate-500 italic mt-1">"${t.note}"</div>` : ''}</div></div>`).join('')}</div></div>` : ''}
-                    ${histText}
-                    <form class="space-y-3 pt-4 border-t border-white/[0.05]">
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <button type="button" onclick="startTimer('${o.id}')" id="timer-btn-${o.id}" class="flex-1 bg-green-500/20 text-green-400 border border-green-500/30 font-semibold py-2.5 rounded-xl hover:bg-green-500/30 transition-colors flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:phone"></span> <span id="timer-label-${o.id}">Start Call</span></button>
-                            <div id="timer-display-${o.id}" class="hidden sm:flex items-center justify-center w-24 bg-black/30 border border-white/[0.1] rounded-xl text-cyan-400 font-mono font-bold text-sm">00:00</div>
-                            <select id="outcome-${o.id}" onchange="toggleSchedule(this.value, '${o.id}')" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"><option value="" disabled selected>-- Select Outcome --</option><option value="confirmed">✅ Confirmed</option><option value="no_answer">📞 No Reply</option><option value="wrong_number">❌ Wrong Number</option><option value="out_of_region">🗺️ Out of Region</option><option value="cancelled">❌ Customer Cancelled</option><option value="callback_requested">📅 Schedule Callback</option></select>
-                        </div>
-                        <div id="schedule-box-${o.id}" class="hidden bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl">
-                            <label class="text-xs font-bold text-indigo-400 uppercase">Callback Date (e.g. Customer pressed by mistake)</label>
-                            <input type="date" id="date-${o.id}" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500/50">
-                        </div>
-                        <div class="flex flex-wrap gap-2"><span class="text-xs text-slate-500 py-1">Quick Tags:</span><span type="button" onclick="addTag(this, 'Wants refund')" class="quick-tag">Wants refund</span><span type="button" onclick="addTag(this, 'Pay on delivery')" class="quick-tag">Pay on delivery</span><span type="button" onclick="addTag(this, 'Not interested')" class="quick-tag">Not interested</span><span type="button" onclick="addTag(this, 'Wrong item ordered')" class="quick-tag">Wrong item ordered</span><span type="button" onclick="addTag(this, 'Pressed by mistake')" class="quick-tag">Pressed by mistake</span></div>
-                        <textarea id="notes-${o.id}" rows="2" placeholder="Add call notes here..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 resize-none">${o.callNotes || ''}</textarea>
-                        <button type="button" onclick="handleFormSubmit('${o.id}', this)" class="w-full sm:w-auto sm:ml-auto bg-cyan-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 text-sm cursor-pointer active:scale-95 transition-transform"><span class="iconify" data-icon="mdi:check"></span> Update Order</button>
-                    </form>
-                </div>`;
+                var html = '<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-5 hover:border-cyan-500/30 transition-colors">';
+                html += '<div class="flex flex-col md:flex-row justify-between gap-4 mb-4">';
+                html += '<div><div class="flex items-center gap-3 mb-1"><span class="font-mono text-cyan-400 font-bold">#' + o.id.slice(-6).toUpperCase() + '</span>' + getStatusBadge(o.status) + (o.scheduledDate ? '<span class="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">📅 ' + o.scheduledDate.toDate().toLocaleDateString() + '</span>' : '') + '<button onclick="openCcEditOrder(\'' + o.id + '\')" class="ml-auto text-xs text-yellow-400 hover:underline">Edit Details</button></div>';
+                html += '<div class="flex items-center gap-2 mb-2"><span class="text-xs font-bold text-cyan-300 bg-cyan-500/10 px-2 py-1 rounded">🏪 ' + (o.merchantName || 'Unknown') + '</span><span class="text-slate-500 text-xs">• ' + formatDate(o.createdAt) + '</span></div></div>';
+                html += '<div class="text-right"><div class="text-lg font-bold text-white">TZS ' + Number(o.totalAmount).toLocaleString() + '</div><div class="text-xs text-slate-500">' + o.itemName + ' x' + o.qty + '</div></div>';
+                html += '</div>';
+                html += dupAlert;
+                html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-3 bg-black/20 rounded-xl"><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Customer</div><div class="text-white text-sm font-medium">' + o.customerName + '</div></div><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Phone</div><div class="flex items-center gap-2"><a href="tel:' + o.customerPhone + '" class="text-cyan-400 text-sm font-medium hover:underline">' + o.customerPhone + '</a><a href="https://wa.me/' + cleanPhone + '?text=' + waMsg + '" target="_blank" class="text-green-400 hover:text-green-300"><span class="iconify text-base" data-icon="mdi:whatsapp"></span></a></div></div><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Address</div><div class="text-slate-300 text-sm">' + (o.customerCity || 'N/A') + ', ' + (o.customerAddress || 'N/A') + '</div></div></div>';
+                               // RESTORED: PRODUCT IMAGE & DESCRIPTION BOX
+                html += '<div class="flex gap-4 mb-4 p-3 bg-cyan-500/5 border border-cyan-500/10 rounded-xl items-start">';
+                html += (o.productImage ? '<div onclick="viewImg(\'' + o.productImage + '\')" class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 overflow-hidden border border-white/10 cursor-pointer hover:border-cyan-500/50 transition-all"><img src="' + o.productImage + '" class="w-full h-full object-cover"></div>' : '<div class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 flex items-center justify-center border border-white/10"><span class="iconify text-4xl text-slate-600" data-icon="mdi:package-variant"></span></div>');
+                html += '<div class="flex-1"><div class="text-[10px] text-cyan-400 uppercase font-bold mb-1">Product Ordered</div><div class="text-white text-sm font-bold">' + (o.itemName || o.productName || 'Unknown') + '</div><div class="text-xs text-slate-400 mt-1 line-clamp-2">' + (o.productDesc || 'No description provided.') + '</div></div>';
+                html += '</div>';
+                
+                html += histText;
+                html += '<form class="space-y-3 pt-4 border-t border-white/[0.05]"><div class="flex flex-col sm:flex-row gap-3"><button type="button" onclick="startTimer(\'' + o.id + '\')" id="timer-btn-' + o.id + '" class="flex-1 bg-green-500/20 text-green-400 border border-green-500/30 font-semibold py-2.5 rounded-xl hover:bg-green-500/30 flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:phone"></span> <span id="timer-label-' + o.id + '">Start Call</span></button><div id="timer-display-' + o.id + '" class="hidden sm:flex items-center justify-center w-24 bg-black/30 border border-white/[0.1] rounded-xl text-cyan-400 font-mono font-bold text-sm">00:00</div><select id="outcome-' + o.id + '" onchange="toggleSchedule(this.value, \'' + o.id + '\')" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white"><option value="" disabled selected>-- Select Outcome --</option><option value="confirmed">✅ Confirmed</option><option value="no_answer">📞 No Reply</option><option value="wrong_number">❌ Wrong Number</option><option value="out_of_region">🗺️ Out of Region</option><option value="cancelled">❌ Cancelled</option><option value="callback_requested">📅 Schedule Callback</option></select></div>';
+                html += '<div id="schedule-box-' + o.id + '" class="hidden bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl"><label class="text-xs font-bold text-indigo-400 uppercase">Callback Date</label><input type="date" id="date-' + o.id + '" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white"></div>';
+                html += '<textarea id="notes-' + o.id + '" rows="2" placeholder="Add call notes here..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white resize-none">' + (o.callNotes || '') + '</textarea>';
+                html += '<button type="button" onclick="handleFormSubmit(\'' + o.id + '\', this)" class="w-full sm:w-auto sm:ml-auto bg-cyan-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-cyan-400 flex items-center justify-center gap-2 text-sm cursor-pointer"><span class="iconify" data-icon="mdi:check"></span> Update Order</button>';
+                html += '</form></div>';
+                return html;
             }).join('');
         }
 
         function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
-        function addTag(el, text) { const ta = el.closest('form').querySelector('textarea'); if(ta.value.includes(text)) { ta.value = ta.value.replace(text+', ', ''); el.style.borderColor=''; el.style.color=''; } else { ta.value += text + ', '; el.style.borderColor='#06b6d4'; el.style.color='#22d3ee'; } }
-        function viewImg(src) { document.getElementById('lightbox-img').src = src; document.getElementById('img-lightbox').classList.remove('hidden'); }
+        function addTag(el, text) { var ta = el.closest('form').querySelector('textarea'); if(ta.value.includes(text)) { ta.value = ta.value.replace(text+', ', ''); el.style.borderColor=''; el.style.color=''; } else { ta.value += text + ', '; el.style.borderColor='#06b6d4'; el.style.color='#22d3ee'; } }
 
-                function startTimer(id) {
+        function startTimer(id) {
             if(timerInterval) { showT("Finish current call first", "error"); return; }
             activeTimerId = id; timerSeconds = 0;
-            
-            // Auto-Dialer: Trigger phone app or VoIP software
-            var order = allOrders.find(o => o.id === id);
-            if(order && order.customerPhone) {
-                window.open('tel:' + order.customerPhone, '_blank');
-            }
-            
-            const btn = document.getElementById('timer-btn-'+id), label = document.getElementById('timer-label-'+id), display = document.getElementById('timer-display-'+id);
+            var order = allOrders.find(function(o) { return o.id === id; });
+            if(order && order.customerPhone) { window.open('tel:' + order.customerPhone, '_blank'); }
+            var btn = document.getElementById('timer-btn-'+id), label = document.getElementById('timer-label-'+id), display = document.getElementById('timer-display-'+id);
             btn.classList.remove('bg-green-500/20', 'text-green-400', 'border-green-500/30'); btn.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/30'); label.textContent = 'End Call';
             display.classList.remove('hidden'); display.classList.add('sm:flex');
-            timerInterval = setInterval(() => { timerSeconds++; const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0'); const s = (timerSeconds % 60).toString().padStart(2, '0'); display.textContent = `${m}:${s}`; }, 1000);
+            timerInterval = setInterval(function() { timerSeconds++; var m = Math.floor(timerSeconds / 60).toString().padStart(2, '0'); var s = (timerSeconds % 60).toString().padStart(2, '0'); display.textContent = m + ':' + s; }, 1000);
         }
 
         function stopTimer() {
-            clearInterval(timerInterval); timerInterval = null; const duration = timerSeconds; timerSeconds = 0; 
+            clearInterval(timerInterval); timerInterval = null; var duration = timerSeconds; timerSeconds = 0; 
             if(activeTimerId) {
-                const btn = document.getElementById('timer-btn-'+activeTimerId), label = document.getElementById('timer-label-'+activeTimerId), display = document.getElementById('timer-display-'+activeTimerId);
+                var btn = document.getElementById('timer-btn-'+activeTimerId), label = document.getElementById('timer-label-'+activeTimerId), display = document.getElementById('timer-display-'+activeTimerId);
                 if(btn) { btn.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/30'); btn.classList.remove('bg-red-500/20', 'text-red-400', 'border-red-500/30'); label.textContent = 'Start Call'; }
                 if(display) { display.classList.add('hidden'); display.classList.remove('sm:flex'); }
             }
             activeTimerId = null; return duration;
         }
 
-                function handleFormSubmit(id, btn) {
+        function handleFormSubmit(id, btn) {
             try {
                 var outcome = document.getElementById('outcome-'+id).value;
                 var notes = document.getElementById('notes-'+id).value;
@@ -556,7 +512,6 @@
                 if(!outcome) { showT("Select outcome", "error"); return; }
                 if(outcome === 'callback_requested' && !dateVal) { showT("Pick a date", "error"); return; }
                 
-                // Stop timer and get duration if it's running
                 var duration = (activeTimerId === id) ? stopTimer() : 0;
                 
                 btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Updating...'; 
@@ -568,11 +523,10 @@
                     callNotes: notes, 
                     processedBy: myId(), 
                     processedByName: window.currentUser.name, 
-                    callDuration: duration, // ADDED: Save the call time!
+                    callDuration: duration,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
                 };
 
-                // ADDED: Add to timeline so agents can see the history
                 updateData.timeline = firebase.firestore.FieldValue.arrayUnion({
                     status: outcome,
                     at: new Date().toISOString(),
@@ -600,20 +554,19 @@
             }
         }
 
-        let shipFilter = 'all';
         function filterShipping(f) {
             shipFilter = f;
-            document.querySelectorAll('.ship-btn').forEach(b => b.className = 'ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]');
+            document.querySelectorAll('.ship-btn').forEach(function(b) { b.className = 'ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'; });
             event.target.className = 'ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
             renderShipping();
         }
 
-                                        function renderShipping() {
-            const tb = document.getElementById('shipping-table');
-            const search = (document.getElementById('ship-search').value || '').toLowerCase();
-            let shipped = allOrders.filter(o => o.processedBy === myId() && ['confirmed', 'preparing', 'out_for_delivery', 'delivered', 'returned', 'cancelled'].includes(o.status));
-            if(shipFilter !== 'all') { shipped = shipped.filter(o => o.status === shipFilter); }
-            if(search) { shipped = shipped.filter(o => o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search))); }
+        function renderShipping() {
+            var tb = document.getElementById('shipping-table');
+            var search = (document.getElementById('ship-search').value || '').toLowerCase();
+            var shipped = allOrders.filter(function(o) { return o.processedBy === myId() && ['confirmed', 'preparing', 'out_for_delivery', 'delivered', 'returned', 'cancelled'].includes(o.status); });
+            if(shipFilter !== 'all') { shipped = shipped.filter(function(o) { return o.status === shipFilter; }); }
+            if(search) { shipped = shipped.filter(function(o) { return o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)); }); }
             if(!shipped.length) { tb.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-8">No orders in this category.</td></tr>'; return; }
             
             tb.innerHTML = shipped.map(function(o) {
@@ -637,79 +590,57 @@
             
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
             h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Order History</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
-            
             h += '<div class="space-y-4">';
-            
             h += '<div class="bg-white/[0.02] p-4 rounded-xl border border-white/[0.05]">';
             h += '<div class="flex justify-between mb-2"><span class="text-slate-400 text-sm">Order ID</span><span class="text-cyan-400 font-mono font-bold text-sm">#' + o.id.slice(-6).toUpperCase() + '</span></div>';
             h += '<div class="flex justify-between mb-2"><span class="text-slate-400 text-sm">Customer</span><span class="text-white text-sm font-medium">' + (o.customerName||'') + '</span></div>';
             h += '<div class="flex justify-between"><span class="text-slate-400 text-sm">Item</span><span class="text-white text-sm font-medium">' + (o.itemName||'') + ' x' + (o.qty||1) + '</span></div>';
             h += '</div>';
-
             h += '<div class="text-xs font-bold text-slate-500 uppercase mb-3">Tracking Timeline</div>';
-            h += '<div class="space-y-0">';
-            
+            h += '<div class="space-y-0">'; 
             if (o.timeline && o.timeline.length > 0) {
                 o.timeline.slice().reverse().forEach(function(t) {
-                    h += '<div class="flex gap-4">';
-                    h += '<div class="flex flex-col items-center">';
-                    h += '<div class="w-3 h-3 rounded-full bg-cyan-400 mt-1.5 flex-shrink-0"></div>';
-                    h += '<div class="w-px h-full bg-white/[0.05] mt-1"></div>';
-                    h += '</div>';
-                    h += '<div class="pb-5">';
-                    h += '<div class="text-slate-400 text-xs">' + formatDate(t.at) + '</div>';
-                    h += '<div class="text-white font-semibold text-sm mt-0.5">' + (t.status || 'updated').replace(/_/g,' ').toUpperCase() + '</div>';
-                    if(t.by) h += '<div class="text-orange-400 text-xs mt-0.5">By: ' + t.by + '</div>';
-                    if(t.note) h += '<div class="text-slate-500 italic text-xs mt-1">"' + t.note + '"</div>';
-                    h += '</div>';
-                    h += '</div>';
+                    h += '<div class="flex gap-4"><div class="flex flex-col items-center"><div class="w-3 h-3 rounded-full bg-cyan-400 mt-1.5 flex-shrink-0"></div><div class="w-px h-full bg-white/[0.05] mt-1"></div></div><div class="pb-5"><div class="text-slate-400 text-xs">' + formatDate(t.at) + '</div><div class="text-white font-semibold text-sm mt-0.5">' + (t.status || 'updated').replace(/_/g,' ').toUpperCase() + '</div>' + (t.by ? '<div class="text-orange-400 text-xs mt-0.5">By: ' + t.by + '</div>' : '') + (t.note ? '<div class="text-slate-500 italic text-xs mt-1">"' + t.note + '"</div>' : '') + '</div></div>';
                 });
             } else {
                 h += '<p class="text-slate-500 text-sm text-center py-4">No history recorded yet for this order.</p>';
             }
-            
             h += '</div></div></div></div>';
-            
             document.body.insertAdjacentHTML('beforeend', h);
         }
 
         function renderPerformance() {
-            const my = allOrders.filter(o => o.processedBy === myId());
-            const confirmed = my.filter(o => o.status === 'confirmed').length;
-            const totalProcessed = my.length;
-            const rate = totalProcessed > 0 ? Math.round((confirmed / totalProcessed) * 100) : 0;
-            const totalSeconds = my.reduce((s, o) => s + (o.callDuration || 0), 0);
-            const avgTime = totalProcessed > 0 ? Math.round(totalSeconds / totalProcessed) : 0;
+            var my = allOrders.filter(function(o) { return o.processedBy === myId(); });
+            var confirmed = my.filter(function(o) { return o.status === 'confirmed'; }).length;
+            var totalProcessed = my.length;
+            var rate = totalProcessed > 0 ? Math.round((confirmed / totalProcessed) * 100) : 0;
+            var totalSeconds = my.reduce(function(s, o) { return s + (o.callDuration || 0); }, 0);
+            var avgTime = totalProcessed > 0 ? Math.round(totalSeconds / totalProcessed) : 0;
             document.getElementById('p-total').textContent = totalProcessed;
-            document.getElementById('p-rate').textContent = `${rate}%`;
-            document.getElementById('p-time').textContent = avgTime > 60 ? `${Math.floor(avgTime/60)}m ${avgTime%60}s` : `${avgTime}s`;
-            const c = document.getElementById('p-history');
-            const recent = my.filter(o => o.updatedAt).sort((a,b) => (b.updatedAt.seconds||0) - (a.updatedAt.seconds||0)).slice(0, 30);
+            document.getElementById('p-rate').textContent = rate + '%';
+            document.getElementById('p-time').textContent = avgTime > 60 ? Math.floor(avgTime/60) + 'm ' + (avgTime%60) + 's' : avgTime + 's';
+            var c = document.getElementById('p-history');
+            var recent = my.filter(function(o) { return o.updatedAt; }).sort(function(a,b) { return (b.updatedAt.seconds||0) - (a.updatedAt.seconds||0); }).slice(0, 30);
             if(!recent.length) { c.innerHTML = '<p class="text-slate-500 text-center">No history yet.</p>'; return; }
-            c.innerHTML = recent.map(o => `<div class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl"><div class="flex items-center gap-3"><span class="font-mono text-cyan-400 text-xs">#${o.id.slice(-6).toUpperCase()}</span><span class="text-sm text-slate-300">${o.customerName}</span></div><div class="flex items-center gap-3"><span class="text-xs text-slate-500">${o.callDuration || 0}s</span>${getStatusBadge(o.status)}</div></div>`).join('');
+            c.innerHTML = recent.map(function(o) { return '<div class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl"><div class="flex items-center gap-3"><span class="font-mono text-cyan-400 text-xs">#' + o.id.slice(-6).toUpperCase() + '</span><span class="text-sm text-slate-300">' + o.customerName + '</span></div><div class="flex items-center gap-3"><span class="text-xs text-slate-500">' + (o.callDuration || 0) + 's</span>' + getStatusBadge(o.status) + '</div></div>'; }).join('');
         }
 
         async function saveProfile() { try { await db.collection('users').doc(myId()).update({ name: document.getElementById('set-name').value }); document.getElementById('header-name').textContent = document.getElementById('set-name').value; showT("Profile Saved!"); } catch(e) { showT(e.message, "error"); } }
 
         document.getElementById('pw-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const curr = document.getElementById('pw-current').value, newPw = document.getElementById('pw-new').value, conf = document.getElementById('pw-confirm').value;
+            var curr = document.getElementById('pw-current').value, newPw = document.getElementById('pw-new').value, conf = document.getElementById('pw-confirm').value;
             if(newPw !== conf) return showT("New passwords do not match", "error");
-            const user = firebase.auth().currentUser, cred = firebase.auth.EmailAuthProvider.credential(user.email, curr);
+            var user = firebase.auth().currentUser, cred = firebase.auth.EmailAuthProvider.credential(user.email, curr);
             try { await user.reauthenticateWithCredential(cred); await user.updatePassword(newPw); showT("Password updated!"); this.reset(); } catch(err) { showT("Current password is incorrect.", "error"); }
         });
-		
-		        let allMerchants = [];
-        // Load merchants so call center can assign the order to the right shop
-        db.collection('users').where('role', '==', 'merchant').onSnapshot(snap => {
-            allMerchants = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        });
 
-                function openCcCreateOrder() {
+        function openCcCreateOrder() {
+            var mOpts = allMerchants.length ? allMerchants.map(function(m){return '<option value="'+m.id+'" class="bg-slate-900">'+(m.shopName||m.name)+'</option>'}).join('') : '<option value="">No merchants found</option>';
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:600px">';
             h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">New Phone Order</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
             h += '<form id="cc-create-form" class="space-y-4">';
-            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Select Merchant</label><select id="cc-merchant" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"><option value="">Loading merchants...</option></select></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Select Merchant</label><select id="cc-merchant" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white">'+mOpts+'</select></div>';
             h += '<div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name</label><input type="text" id="cc-cname" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div><div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><input type="tel" id="cc-cphone" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div></div>';
             h += '<div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">City</label><input type="text" id="cc-ccity" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div><div><label class="text-xs font-semibold text-slate-400 uppercase">Address</label><input type="text" id="cc-caddress" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div></div>';
             h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Item Name</label><input type="text" id="cc-item" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div>';
@@ -717,29 +648,12 @@
             h += '<button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 text-sm mt-2">Create Order</button>';
             h += '</form></div></div>';
             document.body.insertAdjacentHTML('beforeend', h);
-            
-            // Fetch merchants directly when the popup opens
-            db.collection('users').where('role', '==', 'merchant').get().then(function(snap) {
-                var sel = document.getElementById('cc-merchant');
-                if (snap.empty) {
-                    sel.innerHTML = '<option value="">No merchants found</option>';
-                    return;
-                }
-                sel.innerHTML = snap.docs.map(function(m) {
-                    var d = m.data();
-                    return '<option value="'+m.id+'" class="bg-slate-900">'+(d.shopName||d.name)+'</option>';
-                }).join('');
-            }).catch(function(err) {
-                // This will show us the exact error if Firebase is blocking it!
-                document.getElementById('cc-merchant').innerHTML = '<option value="">Error: '+err.message+'</option>';
-            });
 
             document.getElementById('cc-create-form').addEventListener('submit', function(e){
                 e.preventDefault();
                 var mid = document.getElementById('cc-merchant').value;
                 if(!mid) { showT("Please select a merchant", "error"); return; }
                 
-                // Fetch the selected merchant's data to get their name
                 db.collection('users').doc(mid).get().then(function(doc) {
                     var mObj = doc.exists ? doc.data() : {};
                     var qty = parseInt(document.getElementById('cc-qty').value)||1;
@@ -755,7 +669,8 @@
                         customerAddress: document.getElementById('cc-caddress').value,
                         itemName: document.getElementById('cc-item').value,
                         qty: qty, productPrice: price, totalAmount: total,
-                        status: 'accepted', // Auto-accepts it since agent is on the phone!
+                        status: 'accepted', 
+                        ccAssignedTo: myId(),
                         processedBy: myId(), processedByName: window.currentUser.name,
                         createdAt: new Date(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
@@ -767,7 +682,7 @@
         }
 
         function openCcEditOrder(id) {
-            var o = allOrders.find(x => x.id === id);
+            var o = allOrders.find(function(x) { return x.id === id; });
             if(!o) return;
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
             h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Order #'+o.id.slice(-6).toUpperCase()+'</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
@@ -801,199 +716,199 @@
                 }).catch(function(err){ showT(err.message, "error"); });
             });
         }
-		                function renderMyCalls() {
-            const tb = document.getElementById('mycalls-table');
-            const search = (document.getElementById('mycalls-search').value || '').toLowerCase();
+
+        function renderMyCalls() {
+            var tb = document.getElementById('mycalls-table');
+            var search = (document.getElementById('mycalls-search').value || '').toLowerCase();
             
-            let myHandled = allOrders.filter(o => o.processedBy === myId());
+            var myHandled = allOrders.filter(function(o) { return o.processedBy === myId(); });
             
             if(search) {
-                myHandled = myHandled.filter(o => o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)));
+                myHandled = myHandled.filter(function(o) { return o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)); });
             }
             
-            myHandled.sort((a,b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
+            myHandled.sort(function(a,b) { return (b.updatedAt && b.updatedAt.seconds || 0) - (a.updatedAt && a.updatedAt.seconds || 0); });
             
-            const total = myHandled.length;
-            const totalPages = Math.ceil(total / myCallsPageSize);
+            var total = myHandled.length;
+            var totalPages = Math.ceil(total / myCallsPageSize);
             if (myCallsPage > totalPages && totalPages > 0) myCallsPage = totalPages;
             if (myCallsPage < 1) myCallsPage = 1;
 
-            const start = (myCallsPage - 1) * myCallsPageSize;
-            const end = start + myCallsPageSize;
-            const paginatedItems = myHandled.slice(start, end);
+            var start = (myCallsPage - 1) * myCallsPageSize;
+            var end = start + myCallsPageSize;
+            var paginatedItems = myHandled.slice(start, end);
             
-                        if(!total) { 
-                tb.innerHTML = '<tr><td colspan="8" class="text-center text-slate-500 py-8">You have not handled any calls yet.</td></tr>'; 
+            if(!total) { 
+                tb.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-8">You have not handled any calls yet.</td></tr>'; 
                 updateMyCallsPagination(0, 0, 0);
                 return; 
             }
             
-            tb.innerHTML = paginatedItems.map(o => `
-                <tr class="hover:bg-white/[0.02]">
-                    <td class="px-4 py-3 font-mono text-cyan-400 text-xs">#${o.id.slice(-6).toUpperCase()}</td>
-                    <td class="px-4 py-3 text-sm text-cyan-300 font-medium">${o.merchantName || 'N/A'}</td>
-                    <td class="px-4 py-3 text-sm">
-                        <div class="text-white font-medium">${o.customerName || ''}</div>
-                        <div class="text-xs text-slate-500">${o.customerPhone || ''}</div>
-                    </td>
-                    <td class="px-4 py-3 text-xs text-slate-300">${o.itemName || ''} x${o.qty || 1}</td>
-                    <td class="px-4 py-3 text-sm font-semibold">TZS ${Number(o.totalAmount).toLocaleString()}</td>
-                    <td class="px-4 py-3">${getStatusBadge(o.status)}</td>
-                    <td class="px-4 py-3 text-xs text-slate-400 max-w-[200px] truncate" title="${o.callNotes || ''}">${o.callNotes || '—'}</td>
-                    <td class="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">${formatDate(o.updatedAt)}</td>
-                </tr>
-            `).join('');
+            tb.innerHTML = paginatedItems.map(function(o) {
+                return '<tr class="hover:bg-white/[0.02]">' +
+                    '<td class="px-4 py-3 font-mono text-cyan-400 text-xs">#' + o.id.slice(-6).toUpperCase() + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-cyan-300 font-medium">' + (o.merchantName || 'N/A') + '</td>' +
+                    '<td class="px-4 py-3 text-sm"><div class="text-white font-medium">' + (o.customerName || '') + '</div><div class="text-xs text-slate-500">' + (o.customerPhone || '') + '</div></td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-300">' + (o.itemName || '') + ' x' + (o.qty || 1) + '</td>' +
+                    '<td class="px-4 py-3 text-sm font-semibold">TZS ' + Number(o.totalAmount).toLocaleString() + '</td>' +
+                    '<td class="px-4 py-3">' + getStatusBadge(o.status) + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-400 max-w-[200px] truncate" title="' + (o.callNotes || '') + '">' + (o.callNotes || '—') + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">' + formatDate(o.updatedAt) + '</td>' +
+                    '<td class="px-4 py-3 text-center"><button onclick="openEditCallStatus(\'' + o.id + '\')" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-yellow-500/30 cursor-pointer">Edit Status</button></td>' +
+                '</tr>';
+            }).join('');
             
-            const actualEnd = Math.min(end, total);
+            var actualEnd = Math.min(end, total);
             updateMyCallsPagination(total, start + 1, actualEnd);
         }
 
         function updateMyCallsPagination(totalCount, start, end) {
-            const info = document.getElementById('mycalls-pagination-info');
-            const prevBtn = document.getElementById('mycalls-prev-btn');
-            const nextBtn = document.getElementById('mycalls-next-btn');
-            const sizeSelect = document.getElementById('mycalls-page-size');
-            
+            var info = document.getElementById('mycalls-pagination-info');
+            var prevBtn = document.getElementById('mycalls-prev-btn');
+            var nextBtn = document.getElementById('mycalls-next-btn');
+            var sizeSelect = document.getElementById('mycalls-page-size');
             if(sizeSelect) sizeSelect.value = myCallsPageSize;
-            
             if(totalCount === 0) {
                 if(info) info.textContent = 'Showing 0 to 0 of 0';
                 if(prevBtn) prevBtn.disabled = true;
                 if(nextBtn) nextBtn.disabled = true;
                 return;
             }
-            
-            if(info) info.textContent = `Showing ${start} to ${end} of ${totalCount}`;
-            
-            const totalPages = Math.ceil(totalCount / myCallsPageSize);
+            if(info) info.textContent = 'Showing ' + start + ' to ' + end + ' of ' + totalCount;
+            var totalPages = Math.ceil(totalCount / myCallsPageSize);
             if(prevBtn) prevBtn.disabled = (myCallsPage === 1);
             if(nextBtn) nextBtn.disabled = (myCallsPage >= totalPages);
         }
 
-        function changeMyCallsPageSize(size) {
-            myCallsPageSize = parseInt(size);
-            myCallsPage = 1;
-            renderMyCalls();
+        function changeMyCallsPageSize(size) { myCallsPageSize = parseInt(size); myCallsPage = 1; renderMyCalls(); }
+        function nextMyCallsPage() { myCallsPage++; renderMyCalls(); }
+        function prevMyCallsPage() { myCallsPage--; renderMyCalls(); }
+
+        function openEditCallStatus(id) {
+            var o = allOrders.find(function(x) { return x.id === id; });
+            if(!o) return;
+            var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
+            h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Call Status</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
+            h += '<div class="bg-white/[0.02] p-4 rounded-xl border border-white/[0.05] mb-4">';
+            h += '<div class="flex justify-between mb-2"><span class="text-slate-400 text-sm">Order ID</span><span class="text-cyan-400 font-mono font-bold text-sm">#' + o.id.slice(-6).toUpperCase() + '</span></div>';
+            h += '<div class="flex justify-between"><span class="text-slate-400 text-sm">Customer</span><span class="text-white text-sm font-medium">' + (o.customerName || '') + '</span></div>';
+            h += '</div>';
+            h += '<form id="edit-call-status-form" class="space-y-4">';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Change Status To</label>';
+            h += '<select id="ecs-status" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" onchange="toggleScheduleBox(this.value)">';
+            h += '<option value="confirmed">✅ Confirmed</option>';
+            h += '<option value="no_answer">📞 No Reply</option>';
+            h += '<option value="wrong_number">❌ Wrong Number</option>';
+            h += '<option value="out_of_region">🗺️ Out of Region</option>';
+            h += '<option value="cancelled">❌ Customer Cancelled</option>';
+            h += '<option value="callback_requested">📅 Schedule Callback</option>';
+            h += '</select></div>';
+            h += '<div id="ecs-schedule-box" class="hidden bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl">';
+            h += '<label class="text-xs font-bold text-indigo-400 uppercase">Callback Date</label>';
+            h += '<input type="date" id="ecs-date" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500/50">';
+            h += '</div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Update Notes</label>';
+            h += '<textarea id="ecs-notes" rows="2" placeholder="Add call notes here..." class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 resize-none">' + (o.callNotes || '') + '</textarea></div>';
+            h += '<button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 text-sm mt-2">Save Changes</button>';
+            h += '</form></div></div>';
+            document.body.insertAdjacentHTML('beforeend', h);
+
+            document.getElementById('edit-call-status-form').addEventListener('submit', function(e){
+                e.preventDefault();
+                var status = document.getElementById('ecs-status').value;
+                var notes = document.getElementById('ecs-notes').value;
+                var dateVal = document.getElementById('ecs-date') ? document.getElementById('ecs-date').value : null;
+
+                if(status === 'callback_requested' && !dateVal) { showT("Please pick a date for the callback", "error"); return; }
+
+                var updateData = {
+                    status: status,
+                    callOutcome: status,
+                    callNotes: notes,
+                    processedBy: myId(),
+                    processedByName: window.currentUser.name,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    timeline: firebase.firestore.FieldValue.arrayUnion({ status: status, at: new Date().toISOString(), by: window.currentUser.name, note: notes })
+                };
+
+                if(status === 'callback_requested' && dateVal) { updateData.scheduledDate = firebase.firestore.Timestamp.fromDate(new Date(dateVal + "T12:00:00")); }
+
+                db.collection('orders').doc(id).update(updateData).then(function(){
+                    showT("Order status updated!");
+                    document.querySelector('.modal-overlay').remove();
+                }).catch(function(err){ showT(err.message, "error"); });
+            });
         }
 
-        function nextMyCallsPage() {
-            myCallsPage++;
-            renderMyCalls();
+        function toggleScheduleBox(val) {
+            var box = document.getElementById('ecs-schedule-box');
+            if(box) { if(val === 'callback_requested') { box.classList.remove('hidden'); } else { box.classList.add('hidden'); } }
         }
 
-        function prevMyCallsPage() {
-            myCallsPage--;
-            renderMyCalls();
-        }
-		                                 // ===== BULLETPROOF AUTH LOADER LOGIC =====
-        function showAuthLoader(text) {
-            var loader = document.getElementById('auth-loader');
-            if(!loader) return;
-            document.getElementById('auth-loader-text').innerText = text;
-            loader.classList.remove('hidden');
-            loader.classList.add('flex');
-        }
-
-        function hideAuthLoader() {
-            var loader = document.getElementById('auth-loader');
-            if(!loader) return;
-            loader.classList.add('hidden');
-            loader.classList.remove('flex');
-        }
-
-        // 1. Watch the Login Form directly
+        // ===== BULLETPROOF AUTH LOADER LOGIC =====
         document.addEventListener('DOMContentLoaded', function() {
             var loginForm = document.querySelector('#login-screen form');
-            if(loginForm) {
-                loginForm.addEventListener('submit', function(e) {
-                    showAuthLoader('Signing in...');
-                });
-            }
+            if(loginForm) { loginForm.addEventListener('submit', function(e) { showAuthLoader('Signing in...'); }); }
         });
 
-        // 2. Watch for ANY click on the Logout button
         document.addEventListener('click', function(e) {
             var btn = e.target.closest('[onclick*="handleLogout"]');
-            if(btn) {
-                showAuthLoader('Logging out...');
-            }
+            if(btn) { showAuthLoader('Logging out...'); }
         });
 
-        // 3. Watch Firebase Auth State directly (Hides spinner when login/logout finishes)
-        firebase.auth().onAuthStateChanged(function(user) {
-            hideAuthLoader();
-        });
+        firebase.auth().onAuthStateChanged(function(user) { hideAuthLoader(); });
 
-        // 4. Hide spinner if an error toast pops up (e.g., wrong password)
         var toastEl = document.getElementById('toast');
         if(toastEl) {
-            var observer = new MutationObserver(function() {
-                if (toastEl.classList.contains('show')) {
-                    hideAuthLoader();
-                }
-            });
+            var observer = new MutationObserver(function() { if (toastEl.classList.contains('show')) { hideAuthLoader(); } });
             observer.observe(toastEl, { attributes: true });
         }
-		        function downloadShiftReport() {
-            const myHandled = allOrders.filter(o => o.processedBy === myId());
+
+        function downloadShiftReport() {
+            var myHandled = allOrders.filter(function(o) { return o.processedBy === myId(); });
             if(!myHandled.length) return showT("No calls to export", "error");
-            
-            let csv = 'Order ID,Customer Name,Phone,Item,Amount,Status,Call Duration (s),Notes,Date\n';
-            myHandled.forEach(o => {
-                csv += [
-                    '#' + o.id.slice(-6).toUpperCase(),
-                    '"' + (o.customerName || '') + '"',
-                    '"' + (o.customerPhone || '') + '"',
-                    '"' + (o.itemName || '') + '"',
-                    o.totalAmount || 0,
-                    o.status || '',
-                    o.callDuration || 0,
-                    '"' + (o.callNotes || '').replace(/"/g, '""') + '"',
-                    o.updatedAt ? formatDate(o.updatedAt) : ''
-                ].join(',') + '\n';
+            var csv = 'Order ID,Customer Name,Phone,Item,Amount,Status,Call Duration (s),Notes,Date\n';
+            myHandled.forEach(function(o) {
+                csv += ['#' + o.id.slice(-6).toUpperCase(), '"' + (o.customerName || '') + '"', '"' + (o.customerPhone || '') + '"', '"' + (o.itemName || '') + '"', o.totalAmount || 0, o.status || '', o.callDuration || 0, '"' + (o.callNotes || '').replace(/"/g, '""') + '"', o.updatedAt ? formatDate(o.updatedAt) : ''].join(',') + '\n';
             });
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'shift_report_' + new Date().toISOString().slice(0,10) + '.csv';
-            a.click();
+            var blob = new Blob([csv], { type: 'text/csv' });
+            var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'shift_report_' + new Date().toISOString().slice(0,10) + '.csv'; a.click();
             showT("Shift report downloaded!");
         }
-		
-		        let isClaiming = false; // Prevents agents from spamming the database
-        
-        async function claimNextOrder() {
+
+                async function claimNextOrder() {
             if (isClaiming) return;
             isClaiming = true;
             
             try {
-                // Fetch the 10 oldest 'accepted' orders
-                const q = await db.collection('orders')
-                    .where('status', '==', 'accepted')
-                    .orderBy('createdAt', 'asc')
-                    .limit(10)
-                    .get();
-                
+                // Look for 'pending' orders
+                const q = await db.collection('orders').where('status', '==', 'pending').limit(15).get();
                 let claimed = false;
                 
+                // Sort manually in JavaScript
+                const docs = q.docs.sort(function(a, b) {
+                    const aT = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
+                    const bT = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
+                    return aT - bT;
+                });
+                
                 // Loop through them to find one that isn't assigned to anyone yet
-                for (const doc of q.docs) {
+                for (let i = 0; i < docs.length; i++) {
+                    const doc = docs[i];
                     const orderData = doc.data();
                     
                     if (!orderData.ccAssignedTo) {
                         try {
                             // Use a Firestore Transaction to safely claim the order
-                            // This guarantees two agents cannot claim the same order
                             await db.runTransaction(async (transaction) => {
                                 const orderDoc = await transaction.get(doc.ref);
-                                if (!orderDoc.exists || orderDoc.data().ccAssignedTo) {
-                                    // Someone else took it while we were reading, skip to the next
-                                    return;
+                                if (!orderDoc.exists || orderDoc.data().ccAssignedTo || orderDoc.data().status !== 'pending') {
+                                    return; // Someone else took it, skip
                                 }
                                 transaction.update(doc.ref, { 
                                     ccAssignedTo: myId(), 
-                                    ccAssignedAt: new Date() 
+                                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(), // Fixed timestamp
+                                    status: 'accepted' // Change status to accepted so it leaves the merchant pool
                                 });
                             });
                             
@@ -1001,137 +916,74 @@
                             claimed = true;
                             break; // Stop looking, we got one!
                         } catch (e) {
-                            // Transaction failed (someone else took it), continue to the next order in the loop
+                            // Log the error so we can see if Firebase is blocking it
+                            console.error("Claim transaction failed: ", e);
                         }
                     }
                 }
                 
                 if (!claimed) {
-                    // If we checked 10 orders and they were all taken by other agents, try again in 3 seconds
-                    setTimeout(() => { isClaiming = false; claimNextOrder(); }, 3000);
+                    // If we checked 15 orders and they were all taken, try again in 3 seconds
+                    setTimeout(function() { isClaiming = false; claimNextOrder(); }, 3000);
                 }
             } catch (err) {
-                console.error("Error claiming order: ", err);
+                console.error("Error querying for next order: ", err);
             } finally {
                 isClaiming = false;
             }
         }
-		        function renderLeaderboard() {
-            const c = document.getElementById('leaderboard-list');
+        function renderLeaderboard() {
+            var c = document.getElementById('leaderboard-list');
             if(!c) return;
-            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
-            
-            // Tally confirmations for today
-            const tally = {};
-            allOrders.forEach(o => {
-                if(o.status === 'confirmed' && o.processedBy && o.updatedAt && o.updatedAt.toDate() >= todayStart) {
-                    tally[o.processedBy] = (tally[o.processedBy] || 0) + 1;
-                }
+            var todayStart = new Date(); todayStart.setHours(0,0,0,0);
+            var tally = {};
+            allOrders.forEach(function(o) { if(o.status === 'confirmed' && o.processedBy && o.updatedAt && o.updatedAt.toDate() >= todayStart) { tally[o.processedBy] = (tally[o.processedBy] || 0) + 1; } });
+            allAgents.forEach(function(a) { if(!tally[a.id]) tally[a.id] = 0; });
+            var sorted = Object.keys(tally).map(function(id) { var agent = allAgents.find(function(a) { return a.id === id; }); return { id: id, name: agent ? (agent.name || 'Agent') : 'Unknown', count: tally[id] }; }).sort(function(a, b) { return b.count - a.count; });
+            var currentAgentRank = sorted.findIndex(function(a) { return a.id === myId(); }) + 1;
+            var html = '';
+            sorted.slice(0, 5).forEach(function(a, i) {
+                var isMe = a.id === myId();
+                var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
+                html += '<div class="flex items-center justify-between p-2 rounded-lg ' + (isMe ? 'bg-cyan-500/10 border border-cyan-500/20' : 'bg-white/[0.02]') + '"><div class="flex items-center gap-3"><span class="text-lg font-bold w-6 text-center ' + (i<3?'':'text-slate-500') + '">' + medal + '</span><span class="text-sm font-medium ' + (isMe ? 'text-cyan-400' : 'text-slate-300') + '">' + a.name + ' ' + (isMe ? '(You)' : '') + '</span></div><span class="text-sm font-bold ' + (isMe ? 'text-cyan-400' : 'text-white') + '">' + a.count + ' Confirmed</span></div>';
             });
-            
-            // Include agents with 0 confirmations so they show up on the board
-            allAgents.forEach(a => {
-                if(!tally[a.id]) tally[a.id] = 0;
-            });
-            
-            // Sort agents by score (highest first)
-            const sorted = Object.keys(tally).map(id => {
-                const agent = allAgents.find(a => a.id === id);
-                return { id: id, name: agent ? (agent.name || 'Agent') : 'Unknown', count: tally[id] };
-            }).sort((a, b) => b.count - a.count);
-            
-            // Find current agent's rank
-            const currentAgentRank = sorted.findIndex(a => a.id === myId()) + 1;
-            
-            let html = '';
-            
-            // Render Top 5
-            sorted.slice(0, 5).forEach((a, i) => {
-                const isMe = a.id === myId();
-                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
-                html += `
-                <div class="flex items-center justify-between p-2 rounded-lg ${isMe ? 'bg-cyan-500/10 border border-cyan-500/20' : 'bg-white/[0.02]'}">
-                    <div class="flex items-center gap-3">
-                        <span class="text-lg font-bold w-6 text-center ${i<3?'':'text-slate-500'}">${medal}</span>
-                        <span class="text-sm font-medium ${isMe ? 'text-cyan-400' : 'text-slate-300'}">${a.name} ${isMe ? '(You)' : ''}</span>
-                    </div>
-                    <span class="text-sm font-bold ${isMe ? 'text-cyan-400' : 'text-white'}">${a.count} Confirmed</span>
-                </div>`;
-            });
-
-            // If current agent is not in top 5, show their rank below
             if(currentAgentRank > 5) {
-                const myData = sorted.find(a => a.id === myId());
-                html += `
-                <div class="flex items-center justify-between p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 mt-2 border-dashed">
-                    <div class="flex items-center gap-3">
-                        <span class="text-lg font-bold w-6 text-center text-slate-500">${currentAgentRank}</span>
-                        <span class="text-sm font-medium text-cyan-400">${myData.name} (You)</span>
-                    </div>
-                    <span class="text-sm font-bold text-cyan-400">${myData.count} Confirmed</span>
-                </div>`;
+                var myData = sorted.find(function(a) { return a.id === myId(); });
+                html += '<div class="flex items-center justify-between p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 mt-2 border-dashed"><div class="flex items-center gap-3"><span class="text-lg font-bold w-6 text-center text-slate-500">' + currentAgentRank + '</span><span class="text-sm font-medium text-cyan-400">' + myData.name + ' (You)</span></div><span class="text-sm font-bold text-cyan-400">' + myData.count + ' Confirmed</span></div>';
             }
-            
             c.innerHTML = html || '<p class="text-slate-500 text-sm">No data yet.</p>';
         }
-		
-		        function renderAgentOfMonth() {
-            const c = document.getElementById('aom-card');
+
+        function renderAgentOfMonth() {
+            var c = document.getElementById('aom-card');
             if(!c) return;
-            
-            const now = new Date();
-            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-            
-            const stats = {};
-            allAgents.forEach(a => stats[a.id] = { id: a.id, name: a.name || 'Agent', processed: 0, confirmed: 0, delivered: 0 });
-            
-            allOrders.forEach(o => {
+            var now = new Date();
+            var monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            var stats = {};
+            allAgents.forEach(function(a) { stats[a.id] = { id: a.id, name: a.name || 'Agent', processed: 0, confirmed: 0, delivered: 0 }; });
+            allOrders.forEach(function(o) {
                 if (!o.processedBy || !o.updatedAt || o.updatedAt.toDate() < monthStart) return;
                 if (stats[o.processedBy]) {
                     stats[o.processedBy].processed++;
-                    if (['confirmed', 'out_for_delivery', 'delivered', 'returned'].includes(o.status)) {
-                        stats[o.processedBy].confirmed++;
-                    }
-                    if (o.status === 'delivered') {
-                        stats[o.processedBy].delivered++;
-                    }
+                    if (['confirmed', 'out_for_delivery', 'delivered', 'returned'].includes(o.status)) { stats[o.processedBy].confirmed++; }
+                    if (o.status === 'delivered') { stats[o.processedBy].delivered++; }
                 }
             });
+            var ranked = Object.values(stats).map(function(s) {
+                var confRate = s.processed > 0 ? Math.round((s.confirmed / s.processed) * 100) : 0;
+                var delRate = s.confirmed > 0 ? Math.round((s.delivered / s.confirmed) * 100) : 0;
+                var score = (s.delivered * 1000) + (delRate * 10) + confRate; 
+                return Object.assign(s, { confRate: confRate, delRate: delRate, score: score });
+            }).sort(function(a, b) { return b.score - a.score; });
             
-            const ranked = Object.values(stats).map(s => {
-                const confRate = s.processed > 0 ? Math.round((s.confirmed / s.processed) * 100) : 0;
-                const delRate = s.confirmed > 0 ? Math.round((s.delivered / s.confirmed) * 100) : 0;
-                // Score formula favors Delivered Orders heavily, then Delivery Rate, then Conf Rate
-                const score = (s.delivered * 1000) + (delRate * 10) + confRate; 
-                return { ...s, confRate, delRate, score };
-            }).sort((a, b) => b.score - a.score);
-            
-            const winner = ranked[0];
-            const isMe = winner && winner.id === myId();
-            
+            var winner = ranked[0];
+            var isMe = winner && winner.id === myId();
             if (!winner || winner.processed === 0) {
                 c.innerHTML = '<div class="text-center text-slate-400 text-sm py-4">No data for this month yet. Start calling to become the Agent of the Month!</div>';
                 return;
             }
-            
-            c.innerHTML = `
-                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div class="flex items-center gap-4">
-                        <span class="text-4xl">👑</span>
-                        <div>
-                            <div class="text-[10px] text-yellow-400 uppercase font-bold tracking-wider">Top Call Center Agent - ${now.toLocaleString('default', { month: 'long' })}</div>
-                            <div class="text-xl font-extrabold text-yellow-400">${winner.name} ${isMe ? '(You!) 🎉' : ''}</div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-6 text-center w-full md:w-auto">
-                        <div><div class="text-lg font-extrabold text-green-400">${winner.delivered}</div><div class="text-[10px] text-slate-500 uppercase">Delivered</div></div>
-                        <div><div class="text-lg font-extrabold text-cyan-400">${winner.confRate}%</div><div class="text-[10px] text-slate-500 uppercase">Confirm Rate</div></div>
-                        <div><div class="text-lg font-extrabold text-violet-400">${winner.delRate}%</div><div class="text-[10px] text-slate-500 uppercase">Delivery Rate</div></div>
-                    </div>
-                </div>
-            `;
+            c.innerHTML = '<div class="flex flex-col md:flex-row items-center justify-between gap-4"><div class="flex items-center gap-4"><span class="text-4xl">👑</span><div><div class="text-[10px] text-yellow-400 uppercase font-bold tracking-wider">Top Call Center Agent - ' + now.toLocaleString('default', { month: 'long' }) + '</div><div class="text-xl font-extrabold text-yellow-400">' + winner.name + ' ' + (isMe ? '(You!) 🎉' : '') + '</div></div></div><div class="grid grid-cols-3 gap-6 text-center w-full md:w-auto"><div><div class="text-lg font-extrabold text-green-400">' + winner.delivered + '</div><div class="text-[10px] text-slate-500 uppercase">Delivered</div></div><div><div class="text-lg font-extrabold text-cyan-400">' + winner.confRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Confirm Rate</div></div><div><div class="text-lg font-extrabold text-violet-400">' + winner.delRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Delivery Rate</div></div></div></div>';
         }
-
     </script>
 </body>
 </html>
