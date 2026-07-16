@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refund Management — ChapShop Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+        body{background:#020617;}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+        .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.16,1,.3,1);white-space:nowrap;z-index:200}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+        .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem;cursor:pointer}
+        .sidebar-link:hover,.sidebar-link.active{background:rgba(244,63,94,0.1);color:#fb7185}
+        .sb-header{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;padding:0 1rem;margin-top:1rem}
+    </style>
+</head>
+<body class="bg-[#020617] text-white min-h-screen">
+
+    <!-- PROCESS REFUND MODAL -->
+    <div id="refund-modal" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-[#0f172a] border border-white/10 rounded-2xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-base font-bold text-white">Process Refund</h3>
+                <button onclick="closeRefundModal()" class="text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
+            </div>
+            <input type="hidden" id="ref-order-id">
+            <div class="mb-4">
+                <label class="text-xs font-semibold text-slate-400 uppercase">Refund Method *</label>
+                <select id="ref-method" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500/50">
+                    <option value="Mobile Money">Mobile Money (M-Pesa/Tigo)</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="Cash">Cash (Handed to Customer)</option>
+                    <option value="Wallet Credit">ChapShop Wallet Credit</option>
+                </select>
+            </div>
+            <div class="mb-6">
+                <label class="text-xs font-semibold text-slate-400 uppercase">Transaction ID / Note</label>
+                <input type="text" id="ref-txn" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500/50" placeholder="e.g. Refund receipt number">
+            </div>
+            <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 mb-6 flex items-center justify-between">
+                <div>
+                    <div class="text-sm font-bold text-white">Restock Item?</div>
+                    <div class="text-xs text-slate-500 mt-1">Check this if the rider brought the item back to the warehouse.</div>
+                </div>
+                <input type="checkbox" id="ref-restock" class="w-5 h-5 rounded accent-rose-500 cursor-pointer">
+            </div>
+            <button onclick="approveRefund()" class="w-full bg-rose-500 text-white font-bold py-3.5 rounded-xl hover:bg-rose-400 transition-colors">Approve & Process Refund</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast bg-[#0f172a] border border-rose-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+        <span id="toast-icon" class="iconify text-rose-400 text-xl" data-icon="mdi:check-circle"></span>
+        <span id="toast-msg" class="text-sm font-medium">Success</span>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center">
+        <div class="w-full max-w-md px-6">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-rose-500 to-rose-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-500/20"><span class="iconify text-white text-3xl" data-icon="mdi:cash-refund"></span></div>
+                <h1 class="text-2xl font-bold gradient-text">Refund & Returns Center</h1>
+                <p class="text-slate-400 text-sm mt-1">Finance & Admin Access Only</p>
+            </div>
+            <form method="POST" onsubmit="handleLogin(event)" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Admin Email</label><input type="email" name="email" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500/50" placeholder="admin@chapshop.com"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Password</label><input type="password" name="password" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500/50" placeholder="••••••••"></div>
+                <button type="submit" class="w-full bg-rose-500 text-white font-semibold py-3 rounded-xl hover:bg-rose-400 transition-colors shadow-lg shadow-rose-500/20">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app-screen" class="hidden h-screen flex overflow-hidden">
+        
+        <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0">
+            <div class="p-4 border-b border-white/[0.08] flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-rose-500 to-rose-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:cash-refund"></span></div>
+                    <span class="font-bold text-white text-sm">ChapShop<span class="text-rose-400 ml-1">Refunds</span></span>
+                </div>
+            </div>
+            <nav class="p-2 flex-1 overflow-y-auto pb-4">
+                <div class="sidebar-link active" onclick="switchView('dash', this)"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</div>
+                
+                <div class="sb-header">💰 Refunds</div>
+                <div class="sidebar-link" onclick="switchView('pending', this)"><span class="iconify text-lg" data-icon="mdi:progress-clock"></span> Pending Approvals</div>
+                <div class="sidebar-link" onclick="switchView('processed', this)"><span class="iconify text-lg" data-icon="mdi:check-circle-outline"></span> Processed History</div>
+
+                <div class="sb-header">📊 System</div>
+                <div class="sidebar-link" onclick="switchView('reports', this)"><span class="iconify text-lg" data-icon="mdi:file-chart"></span> Financial Reports</div>
+                <div class="sidebar-link" onclick="switchView('settings', this)"><span class="iconify text-lg" data-icon="mdi:cog-outline"></span> Settings</div>
+            </nav>
+            <div class="p-4 border-t border-white/[0.08] flex-shrink-0">
+                <div class="sidebar-link text-red-400 hover:bg-red-500/10" onclick="auth.signOut()"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</div>
+            </div>
+        </aside>
+
+        <main class="flex-1 lg:ml-64 flex flex-col h-full">
+            <header class="nav-blur bg-[#020617]/80 border-b border-white/[0.08] px-6 py-3 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
+                    <h1 id="page-title" class="font-bold text-white text-sm">Dashboard</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-rose-500/20 flex items-center justify-center text-rose-400 font-bold text-xs" id="header-avatar">A</div>
+                    <span id="header-name" class="text-sm font-semibold text-white hidden sm:block">Admin</span>
+                </div>
+            </header> 
+            
+            <div class="p-6 flex-1 overflow-y-auto min-w-0">
+
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dash">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Pending Refunds</div><div id="kpi-pending" class="text-2xl font-bold text-yellow-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Amount Pending (TZS)</div><div id="kpi-pending-amount" class="text-2xl font-bold text-rose-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Processed Today</div><div id="kpi-processed" class="text-2xl font-bold text-green-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Refunded Today (TZS)</div><div id="kpi-refunded-today" class="text-2xl font-bold text-cyan-400">0</div></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="p-4 border-b border-white/[0.08] flex justify-between items-center"><h3 class="text-sm font-bold text-white">Awaiting Refund Approval</h3></div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Order ID</th><th class="p-4">Customer</th><th class="p-4">Reason</th><th class="p-4 text-right">Amount</th><th class="p-4 text-center">Action</th></tr></thead>
+                                <tbody id="dash-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- PENDING VIEW -->
+                <div id="view-pending" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Pending Refund Approvals</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Order Details</th><th class="p-4">Customer</th><th class="p-4">Return Reason</th><th class="p-4 text-right">Refund Amount</th><th class="p-4 text-center">Actions</th></tr></thead>
+                                <tbody id="pending-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- PROCESSED VIEW -->
+                <div id="view-processed" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Processed Refunds History</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Order ID</th><th class="p-4">Customer</th><th class="p-4">Method</th><th class="p-4 text-right">Amount</th><th class="p-4 text-center">Status</th><th class="p-4">Date</th></tr></thead>
+                                <tbody id="processed-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- REPORTS VIEW -->
+                <div id="view-reports" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Financial Reports</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4">Total Refunded (All Time)</h3>
+                            <div id="rep-total-refunded" class="text-3xl font-bold text-rose-400 mb-2">TZS 0</div>
+                            <p class="text-xs text-slate-500">Total money returned to customers.</p>
+                        </div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4">Items Restocked</h3>
+                            <div id="rep-restocked" class="text-3xl font-bold text-green-400 mb-2">0</div>
+                            <p class="text-xs text-slate-500">Total items returned to warehouse inventory.</p>
+                        </div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4">Rejected Claims</h3>
+                            <div id="rep-rejected" class="text-3xl font-bold text-slate-400 mb-2">0</div>
+                            <p class="text-xs text-slate-500">Refund requests denied by finance team.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SETTINGS VIEW -->
+                <div id="view-settings" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Admin Settings</h2>
+                    <div class="max-w-2xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-base font-bold text-white mb-4">Profile Information</h3>
+                        <form onsubmit="saveAdminSettings(event)">
+                            <div class="mb-4"><label class="text-xs font-semibold text-slate-400 uppercase">Full Name</label><input type="text" id="set-name" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500/50"></div>
+                            <div class="mb-4"><label class="text-xs font-semibold text-slate-400 uppercase">Email (Read-only)</label><input type="email" id="set-email" readonly class="w-full mt-1 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-slate-500 cursor-not-allowed"></div>
+                            <button type="submit" class="bg-rose-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-rose-400 transition-colors text-sm">Save Profile</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        var fc={apiKey:"AIzaSyBjyRehaNQqt5ogt5U3tiw8NYr4TyuX2iI",authDomain:"chapshop-delivery-88fe1.firebaseapp.com",projectId:"chapshop-delivery-88fe1",storageBucket:"chapshop-delivery-88fe1.firebasestorage.app",messagingSenderId:"540757404981",appId:"1:540757404981:web:f5ae5d041dd260304eb07c"};
+        firebase.initializeApp(fc);var auth=firebase.auth(),db=firebase.firestore();
+
+        let allOrders = [], allRefunds = [];
+        const refundStatuses = ['returned', 'failed'];
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Signing in...'; btn.disabled = true;
+            auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value).catch(err => {
+                showT(err.message, "error"); btn.innerHTML = 'Sign In'; btn.disabled = false;
+            });
+        }
+
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists && doc.data().active && doc.data().role === 'admin') {
+                    window.currentUser = { uid: user.uid, ...doc.data() };
+                    document.getElementById('header-name').textContent = doc.data().name || 'Admin';
+                    document.getElementById('header-avatar').textContent = (doc.data().name || 'A').charAt(0).toUpperCase();
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app-screen').classList.remove('hidden');
+                    loadData();
+                } else { 
+                    showT("Access Denied. Admins only.", "error");
+                    auth.signOut(); 
+                }
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+            }
+        });
+
+        function loadData() {
+            // Load Orders to find pending returns
+            db.collection('orders').onSnapshot(snap => {
+                allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderKPIs(); renderDashboard(); renderPending();
+            });
+            // Load Processed Refunds
+            db.collection('refunds').onSnapshot(snap => {
+                allRefunds = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderKPIs(); renderProcessed(); renderReports();
+            });
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        }
+
+        function switchView(view, el) {
+            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + view).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            if(el) el.classList.add('active');
+            document.getElementById('page-title').innerText = el ? el.innerText.trim() : 'Dashboard';
+            if(window.innerWidth < 1024) toggleSidebar(); 
+            if(view === 'settings') {
+                document.getElementById('set-name').value = window.currentUser?.name || '';
+                document.getElementById('set-email').value = window.currentUser?.email || '';
+            }
+        }
+        
+        function showT(m, t) {
+            t = t || "success";
+            var el = document.getElementById('toast'), ic = document.getElementById('toast-icon'), ms = document.getElementById('toast-msg');
+            ms.textContent = m; ic.setAttribute('data-icon', t === 'error' ? 'mdi:alert-circle' : 'mdi:check-circle');
+            ic.className = 'iconify text-xl ' + (t === 'error' ? 'text-red-400' : 'text-rose-400');
+            el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function getReason(o) {
+            if(o.failReason) return o.failReason;
+            // Look in timeline for the latest note
+            if(o.timeline && o.timeline.length > 0) {
+                const last = o.timeline[o.timeline.length - 1];
+                return last.note || last.status.replace(/_/g, ' ');
+            }
+            return 'Customer refused / Not available';
+        }
+
+        function renderKPIs() {
+            const pending = allOrders.filter(o => refundStatuses.includes(o.status));
+            document.getElementById('kpi-pending').textContent = pending.length;
+            document.getElementById('kpi-pending-amount').textContent = pending.reduce((s,o) => s + (o.totalAmount||0), 0).toLocaleString();
+
+            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+            const todayRefunds = allRefunds.filter(r => r.processedAt?.toDate() >= todayStart);
+            document.getElementById('kpi-processed').textContent = todayRefunds.length;
+            document.getElementById('kpi-refunded-today').textContent = todayRefunds.reduce((s,r) => s + (r.amount||0), 0).toLocaleString();
+        }
+
+        function renderDashboard() {
+            const tbody = document.getElementById('dash-tbody');
+            const pending = allOrders.filter(o => refundStatuses.includes(o.status)).slice(0, 10);
+            if(!pending.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-500">No pending refunds.</td></tr>'; return; }
+            tbody.innerHTML = pending.map(o => `
+                <tr class="hover:bg-white/[0.02]">
+                    <td class="p-4 text-white font-medium">#${o.id.slice(-6).toUpperCase()}</td>
+                    <td class="p-4 text-slate-400">${o.customerName || 'N/A'}</td>
+                    <td class="p-4 text-slate-400 text-xs">${getReason(o)}</td>
+                    <td class="p-4 text-right font-bold text-rose-400">TZS ${(o.totalAmount||0).toLocaleString()}</td>
+                    <td class="p-4 text-center"><button onclick="openRefundModal('${o.id}')" class="bg-rose-500 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-rose-400">Process</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPending() {
+            const tbody = document.getElementById('pending-tbody');
+            const pending = allOrders.filter(o => refundStatuses.includes(o.status));
+            if(!pending.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-500">No pending refunds.</td></tr>'; return; }
+            tbody.innerHTML = pending.map(o => `
+                <tr class="hover:bg-white/[0.02]">
+                    <td class="p-4"><div class="text-white font-medium">#${o.id.slice(-6).toUpperCase()}</div><div class="text-xs text-slate-500">${o.itemName || ''}</div></td>
+                    <td class="p-4"><div class="text-white font-medium">${o.customerName || 'N/A'}</div><div class="text-xs text-slate-500">${o.customerPhone || ''}</div></td>
+                    <td class="p-4 text-slate-400 text-xs">${getReason(o)}</td>
+                    <td class="p-4 text-right font-bold text-rose-400">TZS ${(o.totalAmount||0).toLocaleString()}</td>
+                    <td class="p-4 text-center">
+                        <div class="flex gap-2 justify-center">
+                            <button onclick="openRefundModal('${o.id}')" class="bg-rose-500 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-rose-400">Approve</button>
+                            <button onclick="rejectRefund('${o.id}')" class="bg-slate-700 text-slate-300 text-xs font-bold px-3 py-2 rounded-lg hover:bg-slate-600">Reject</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderProcessed() {
+            const tbody = document.getElementById('processed-tbody');
+            if(!allRefunds.length) { tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-500">No processed refunds yet.</td></tr>'; return; }
+            const sorted = [...allRefunds].sort((a,b) => (b.processedAt?.seconds || 0) - (a.processedAt?.seconds || 0));
+            tbody.innerHTML = sorted.map(r => `
+                <tr class="hover:bg-white/[0.02]">
+                    <td class="p-4 text-white font-medium">#${r.orderId.slice(-6).toUpperCase()}</td>
+                    <td class="p-4 text-slate-400">${r.customerName || 'N/A'}</td>
+                    <td class="p-4 text-slate-400 text-xs">${r.method || 'N/A'}</td>
+                    <td class="p-4 text-right font-bold text-rose-400">TZS ${(r.amount||0).toLocaleString()}</td>
+                    <td class="p-4 text-center"><span class="px-2 py-1 rounded-md ${r.status === 'rejected' ? 'bg-slate-500/10 text-slate-400' : 'bg-green-500/10 text-green-400'} text-xs font-bold uppercase">${r.status}</span></td>
+                    <td class="p-4 text-xs text-slate-500">${formatDate(r.processedAt)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderReports() {
+            const approved = allRefunds.filter(r => r.status === 'approved');
+            const rejected = allRefunds.filter(r => r.status === 'rejected');
+            const restocked = allRefunds.filter(r => r.restocked === true).length;
+            
+            document.getElementById('rep-total-refunded').textContent = 'TZS ' + approved.reduce((s,r) => s + (r.amount||0), 0).toLocaleString();
+            document.getElementById('rep-restocked').textContent = restocked;
+            document.getElementById('rep-rejected').textContent = rejected.length;
+        }
+
+        // ===== REFUND ACTIONS =====
+        function openRefundModal(orderId) {
+            document.getElementById('ref-order-id').value = orderId;
+            document.getElementById('ref-method').value = 'Mobile Money';
+            document.getElementById('ref-txn').value = '';
+            document.getElementById('ref-restock').checked = false;
+            document.getElementById('refund-modal').classList.remove('hidden');
+        }
+
+        function closeRefundModal() {
+            document.getElementById('refund-modal').classList.add('hidden');
+        }
+
+                async function approveRefund() {
+            const orderId = document.getElementById('ref-order-id').value;
+            const order = allOrders.find(o => o.id === orderId);
+            if(!order) return showT('Order not found', 'error');
+
+            const method = document.getElementById('ref-method').value;
+            const txn = document.getElementById('ref-txn').value.trim();
+            const restock = document.getElementById('ref-restock').checked;
+
+            try {
+                // 1. Create Refund Record in 'refunds' collection
+                await db.collection('refunds').add({
+                    orderId: orderId,
+                    merchantId: order.merchantId, // ADDED: Links refund to the merchant
+                    merchantName: order.merchantName, // ADDED: For display purposes
+                    customerName: order.customerName,
+                    customerPhone: order.customerPhone,
+                    itemName: order.itemName, // ADDED: So merchant knows what item was refunded
+                    qty: order.qty || 1, // ADDED: Quantity refunded
+                    amount: order.totalAmount || 0,
+                    method: method,
+                    txnNote: txn,
+                    restocked: restock,
+                    status: 'approved',
+                    processedBy: window.currentUser?.name || 'Admin',
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // 2. Update Order Status to 'cancelled' (Closed)
+                await db.collection('orders').doc(orderId).update({
+                    status: 'cancelled',
+                    refundStatus: 'approved',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    timeline: firebase.firestore.FieldValue.arrayUnion({ status: 'cancelled', at: new Date().toISOString(), by: window.currentUser?.name, note: `Refund approved via ${method}` })
+                });
+
+                // 3. If Restock is checked, add item back to inventory
+                if(restock && order.itemName) {
+                    var snap = await db.collection('products').where('name', '==', order.itemName).limit(1).get();
+                    if (!snap.empty) {
+                        await snap.docs[0].ref.update({ stock: firebase.firestore.FieldValue.increment(order.qty || 1) });
+                    }
+                }
+
+                showT('Refund processed successfully!');
+                closeRefundModal();
+            } catch(err) {
+                showT(err.message, 'error');
+            }
+        }
+        async function rejectRefund(orderId) {
+            if(!confirm('Reject this refund claim? The order will be marked as cancelled.')) return;
+            const order = allOrders.find(o => o.id === orderId);
+            try {
+                await db.collection('refunds').add({
+                    orderId: orderId,
+                    customerName: order.customerName,
+                    amount: order.totalAmount || 0,
+                    status: 'rejected',
+                    processedBy: window.currentUser?.name || 'Admin',
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await db.collection('orders').doc(orderId).update({
+                    status: 'cancelled',
+                    refundStatus: 'rejected',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    timeline: firebase.firestore.FieldValue.arrayUnion({ status: 'cancelled', at: new Date().toISOString(), by: window.currentUser?.name, note: 'Refund claim rejected' })
+                });
+                showT('Refund rejected.');
+            } catch(err) { showT(err.message, 'error'); }
+        }
+
+        function formatDate(ts) {
+            if(!ts) return 'N/A';
+            try { return new Date(ts.seconds * 1000).toLocaleString(); } catch(e) { return 'N/A'; }
+        }
+
+        function saveAdminSettings(e) {
+            e.preventDefault();
+            const name = document.getElementById('set-name').value.trim();
+            if(!name) return showT('Name is required', 'error');
+            db.collection('users').doc(window.currentUser.uid).update({ name: name })
+            .then(() => { 
+                showT('Profile updated successfully!'); 
+                window.currentUser.name = name; 
+                document.getElementById('header-name').textContent = name;
+                document.getElementById('header-avatar').textContent = name.charAt(0).toUpperCase();
+            }).catch(err => showT(err.message, 'error'));
+        }
+    </script>
+</body>
+</html>

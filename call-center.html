@@ -418,6 +418,7 @@
         }
 
         function getCustomerHistory(phone) { return allOrders.filter(function(o) { return o.customerPhone === phone && o.processedBy; }); }
+        function fmtDur(s){if(!s||s<=0)return'0s';if(s<60)return Math.round(s)+'s';var m=Math.floor(s/60),sec=Math.round(s%60);return m+'m '+sec+'s'}
 
         function renderWorkspace() {
             var c = document.getElementById('ws-content');
@@ -470,7 +471,17 @@
                 html += '</div>';
                 
                 html += histText;
-                html += '<form class="space-y-3 pt-4 border-t border-white/[0.05]"><div class="flex flex-col sm:flex-row gap-3"><button type="button" onclick="startTimer(\'' + o.id + '\')" id="timer-btn-' + o.id + '" class="flex-1 bg-green-500/20 text-green-400 border border-green-500/30 font-semibold py-2.5 rounded-xl hover:bg-green-500/30 flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:phone"></span> <span id="timer-label-' + o.id + '">Start Call</span></button><div id="timer-display-' + o.id + '" class="hidden sm:flex items-center justify-center w-24 bg-black/30 border border-white/[0.1] rounded-xl text-cyan-400 font-mono font-bold text-sm">00:00</div><select id="outcome-' + o.id + '" onchange="toggleSchedule(this.value, \'' + o.id + '\')" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white"><option value="" disabled selected>-- Select Outcome --</option><option value="confirmed">✅ Confirmed</option><option value="no_answer">📞 No Reply</option><option value="wrong_number">❌ Wrong Number</option><option value="out_of_region">🗺️ Out of Region</option><option value="cancelled">❌ Cancelled</option><option value="callback_requested">📅 Schedule Callback</option></select></div>';
+                                // Check if this order is the one currently being timed
+                var timerHtml = '';
+                if (o.id === activeTimerId) {
+                    var m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+                    var s = (timerSeconds % 60).toString().padStart(2, '0');
+                    timerHtml = '<button type="button" onclick="stopTimer()" id="timer-btn-'+o.id+'" class="flex-1 bg-red-500/20 text-red-400 border border-red-500/30 font-semibold py-2.5 rounded-xl hover:bg-red-500/30 flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:phone"></span> <span id="timer-label-'+o.id+'">End Call</span></button><div id="timer-display-'+o.id+'" class="sm:flex items-center justify-center w-24 bg-black/30 border border-red-500/30 rounded-xl text-red-400 font-mono font-bold text-sm">'+m+':'+s+'</div>';
+                } else {
+                    timerHtml = '<button type="button" onclick="startTimer(\'' + o.id + '\')" id="timer-btn-'+o.id+'" class="flex-1 bg-green-500/20 text-green-400 border border-green-500/30 font-semibold py-2.5 rounded-xl hover:bg-green-500/30 flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:phone"></span> <span id="timer-label-'+o.id+'">Start Call</span></button><div id="timer-display-'+o.id+'" class="hidden sm:flex items-center justify-center w-24 bg-black/30 border border-white/[0.1] rounded-xl text-cyan-400 font-mono font-bold text-sm">00:00</div>';
+                }
+
+                html += '<form class="space-y-3 pt-4 border-t border-white/[0.05]"><div class="flex flex-col sm:flex-row gap-3">'+timerHtml+'<select id="outcome-' + o.id + '" onchange="toggleSchedule(this.value, \'' + o.id + '\')" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white"><option value="" disabled selected>-- Select Outcome --</option><option value="confirmed">✅ Confirmed</option><option value="no_answer">📞 No Reply</option><option value="wrong_number">❌ Wrong Number</option><option value="out_of_region">🗺️ Out of Region</option><option value="cancelled">❌ Cancelled</option><option value="callback_requested">📅 Schedule Callback</option></select></div>';
                 html += '<div id="schedule-box-' + o.id + '" class="hidden bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl"><label class="text-xs font-bold text-indigo-400 uppercase">Callback Date</label><input type="date" id="date-' + o.id + '" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white"></div>';
                 html += '<textarea id="notes-' + o.id + '" rows="2" placeholder="Add call notes here..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white resize-none">' + (o.callNotes || '') + '</textarea>';
                 html += '<button type="button" onclick="handleFormSubmit(\'' + o.id + '\', this)" class="w-full sm:w-auto sm:ml-auto bg-cyan-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-cyan-400 flex items-center justify-center gap-2 text-sm cursor-pointer"><span class="iconify" data-icon="mdi:check"></span> Update Order</button>';
@@ -482,31 +493,43 @@
         function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
         function addTag(el, text) { var ta = el.closest('form').querySelector('textarea'); if(ta.value.includes(text)) { ta.value = ta.value.replace(text+', ', ''); el.style.borderColor=''; el.style.color=''; } else { ta.value += text + ', '; el.style.borderColor='#06b6d4'; el.style.color='#22d3ee'; } }
 
-            function startTimer(id) {
+        function startTimer(id) {
             if(timerInterval) { showT("Finish current call first", "error"); return; }
             activeTimerId = id; timerSeconds = 0;
             
-            // NEW: Increment the call attempts in Firebase
-            db.collection('orders').doc(id).update({ callAttempts: firebase.firestore.FieldValue.increment(1) });
+            // Increment the call attempts in Firebase
+            db.collection('orders').doc(id).update({ callAttempts: firebase.firestore.FieldValue.increment(1) }).catch(function(){});
 
-            var order = allOrders.find(o => o.id === id);
-            if(order && order.customerPhone) { window.open('tel:' + order.customerPhone, '_blank');
-            }
-            
-            const btn = document.getElementById('timer-btn-'+id), label = document.getElementById('timer-label-'+id), display = document.getElementById('timer-display-'+id);
-            btn.classList.remove('bg-green-500/20', 'text-green-400', 'border-green-500/30'); btn.classList.add('bg-red-500/20', 'text-red-400', 'border-red-500/30'); label.textContent = 'End Call';
-            display.classList.remove('hidden'); display.classList.add('sm:flex');
-            timerInterval = setInterval(() => { timerSeconds++; const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0'); const s = (timerSeconds % 60).toString().padStart(2, '0'); display.textContent = `${m}:${s}`; }, 1000);
+            // Start the interval
+            timerInterval = setInterval(() => { 
+                timerSeconds++; 
+                const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0'); 
+                const s = (timerSeconds % 60).toString().padStart(2, '0'); 
+                
+                // Find the display element on the screen RIGHT NOW
+                const disp = document.getElementById('timer-display-'+id);
+                if(disp) disp.textContent = `${m}:${s}`; 
+            }, 1000);
         }
 
         function stopTimer() {
-            clearInterval(timerInterval); timerInterval = null; var duration = timerSeconds; timerSeconds = 0; 
+            clearInterval(timerInterval); timerInterval = null; 
+            var duration = timerSeconds; 
+            timerSeconds = 0; 
+            
             if(activeTimerId) {
                 var btn = document.getElementById('timer-btn-'+activeTimerId), label = document.getElementById('timer-label-'+activeTimerId), display = document.getElementById('timer-display-'+activeTimerId);
                 if(btn) { btn.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/30'); btn.classList.remove('bg-red-500/20', 'text-red-400', 'border-red-500/30'); label.textContent = 'Start Call'; }
                 if(display) { display.classList.add('hidden'); display.classList.remove('sm:flex'); }
+                
+                // SAVE THE TALK TIME TO DATABASE IMMEDIATELY
+                var idToUpdate = activeTimerId;
+                db.collection('orders').doc(idToUpdate).update({
+                    callDuration: firebase.firestore.FieldValue.increment(duration)
+                }).catch(function(e){ console.error("Error saving call duration: ", e); });
             }
-            activeTimerId = null; return duration;
+            activeTimerId = null; 
+            return duration;
         }
 
         function handleFormSubmit(id, btn) {
@@ -515,10 +538,26 @@
                 var notes = document.getElementById('notes-'+id).value;
                 var dateVal = document.getElementById('date-'+id) ? document.getElementById('date-'+id).value : null;
                 
-                if(!outcome) { showT("Select outcome", "error"); return; }
+                                if(!outcome) { showT("Select outcome", "error"); return; }
+                
+                // ENFORCE 5-CALL RULE FOR NO ANSWER
+                if(outcome === 'no_answer') {
+                    var currentOrder = allOrders.find(x => x.id === id);
+                    var attempts = (currentOrder && currentOrder.callAttempts) ? currentOrder.callAttempts : 0;
+                    if(attempts < 5) {
+                        showT("You must call at least 5 times before marking No Reply. Current calls: " + attempts, "error");
+                        btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order'; 
+                        btn.disabled = false; 
+                        return;
+                    }
+                }
+                
                 if(outcome === 'callback_requested' && !dateVal) { showT("Pick a date", "error"); return; }
                 
-                var duration = (activeTimerId === id) ? stopTimer() : 0;
+                // Stop timer if it's running (it will save the duration to DB automatically)
+                if(activeTimerId === id) {
+                    stopTimer();
+                }
                 
                 btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Updating...'; 
                 btn.disabled = true; 
@@ -529,7 +568,6 @@
                     callNotes: notes, 
                     processedBy: myId(), 
                     processedByName: window.currentUser.name, 
-                    callDuration: duration,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
                 };
 

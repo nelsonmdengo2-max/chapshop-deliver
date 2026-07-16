@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Management — ChapShop Delivery</title>
+    <title>Advanced Stock Management — ChapShop Delivery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
@@ -11,7 +11,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="core.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    
     <style>
         *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
         body{background:#020617;}
@@ -23,13 +24,29 @@
         .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem;cursor:pointer}
         .sidebar-link:hover,.sidebar-link.active{background:rgba(6,182,212,0.1);color:#22d3ee}
         .sb-header{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;padding:0 1rem;margin-top:1rem}
+        .order-tab{padding:0.5rem 1rem;border-radius:0.5rem;font-size:0.75rem;font-weight:700;white-space:nowrap;cursor:pointer;transition:all .2s}
+        .rpt-tab { padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600; color: #94a3b8; cursor: pointer; transition: all .2s; }
+        .rpt-tab:hover { background: rgba(255,255,255,0.04); color: #fff; }
+        .rpt-tab.active { background: rgba(6,182,212,0.1); color: #22d3ee; }
     </style>
 </head>
 <body class="bg-[#020617] text-white min-h-screen">
 
-    <div id="toast" class="toast bg-[#0f172a] border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+        <div id="toast" class="toast bg-[#0f172a] border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
         <span id="toast-icon" class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
         <span id="toast-msg" class="text-sm font-medium">Success</span>
+    </div>
+
+    <!-- BARCODE SCANNER MODAL -->
+    <div id="scanner-modal" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-[#0f172a] border border-white/10 rounded-2xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-bold text-white">Scan Barcode</h3>
+                <button onclick="stopScanner()" class="text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
+            </div>
+            <div id="qr-reader" class="w-full rounded-xl overflow-hidden bg-black"></div>
+            <p class="text-xs text-slate-500 mt-4 text-center">Point your camera at the product barcode.</p>
+        </div>
     </div>
 
     <!-- LOGIN -->
@@ -50,95 +67,552 @@
     <!-- APP -->
     <div id="app-screen" class="hidden h-screen flex overflow-hidden">
         
+        <!-- SIDEBAR OVERLAY (MOBILE) -->
+        <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 lg:hidden" onclick="toggleSidebar()"></div>
+
         <!-- SIDEBAR -->
-        <aside class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 flex flex-col overflow-y-auto">
+        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0">
             <div class="p-4 border-b border-white/[0.08] flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:warehouse"></span></div>
                     <span class="font-bold text-white text-sm">ChapShop<span class="text-cyan-400 ml-1">WMS</span></span>
                 </div>
             </div>
-            <nav class="p-2 flex-1">
-                <div class="sidebar-link active" onclick="switchView('dash')"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</div>
-                
-                <div class="sb-header">Orders</div>
-                <div class="sidebar-link" onclick="window.location.href='admin-dashboard.html'"><span class="iconify text-lg" data-icon="mdi:package-variant-closed"></span> All Orders</div>
+            <nav class="p-2 flex-1 overflow-y-auto pb-4">
+                <div class="sidebar-link active" onclick="switchView('dash', this)"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</div>
                 
                 <div class="sb-header">Stock Management</div>
-                <div class="sidebar-link" onclick="switchView('stock')"><span class="iconify text-lg" data-icon="mdi:archive-outline"></span> Current Stock</div>
-                <div class="sidebar-link" onclick="switchView('stock')"><span class="iconify text-lg" data-icon="mdi:arrow-down-bold"></span> Stock In</div>
-                <div class="sidebar-link" onclick="switchView('stock')"><span class="iconify text-lg" data-icon="mdi:arrow-up-bold"></span> Stock Out</div>
-                <div class="sidebar-link" onclick="switchView('stock')"><span class="iconify text-lg" data-icon="mdi:swap-horizontal"></span> Stock Adjustment</div>
-                <div class="sidebar-link" onclick="switchView('stock')"><span class="iconify text-lg" data-icon="mdi:alert-circle-outline"></span> Low Stock</div>
+                <div class="sidebar-link" onclick="switchView('current-stock', this)"><span class="iconify text-lg" data-icon="mdi:archive-outline"></span> Current Stock</div>
+                <div class="sidebar-link" onclick="switchView('transfer-stock', this)"><span class="iconify text-lg" data-icon="mdi:swap-horizontal"></span> Transfer Stock</div>
+                <div class="sidebar-link" onclick="switchView('stock-in', this)"><span class="iconify text-lg" data-icon="mdi:arrow-down-bold"></span> Stock In</div>
+                <div class="sidebar-link" onclick="switchView('stock-out', this)"><span class="iconify text-lg" data-icon="mdi:arrow-up-bold"></span> Stock Out</div>
+                <div class="sidebar-link" onclick="switchView('damaged-expired', this)"><span class="iconify text-lg" data-icon="mdi:alert-circle-outline"></span> Damaged & Expired</div>
+                               <div class="sidebar-link" onclick="switchView('stock-adjust', this)"><span class="iconify text-lg" data-icon="mdi:clipboard-list-outline"></span> Stock Adjustment</div>
+                <div class="sidebar-link" onclick="switchView('stock-history', this)"><span class="iconify text-lg" data-icon="mdi:history"></span> Stock History</div>
+                <div class="sidebar-link" onclick="switchView('low-stock', this)"><span class="iconify text-lg" data-icon="mdi:alert"></span> Low / Out of Stock</div>
+
+                <div class="sb-header">Procurement</div>
+                <div class="sidebar-link" onclick="switchView('suppliers', this)"><span class="iconify text-lg" data-icon="mdi:truck-delivery-outline"></span> Suppliers</div>
+                <div class="sidebar-link" onclick="switchView('purchase-orders', this)"><span class="iconify text-lg" data-icon="mdi:file-document-outline"></span> Purchase Orders</div>
+
+                <div class="sb-header"> Products</div>
+                <div class="sidebar-link" onclick="switchView('current-stock', this)"><span class="iconify text-lg" data-icon="mdi:format-list-bulleted"></span> Product List</div>
+                <div class="sidebar-link" onclick="switchView('categories', this)"><span class="iconify text-lg" data-icon="mdi:tag-outline"></span> Categories</div>
+                <div class="sidebar-link" onclick="switchView('brands', this)"><span class="iconify text-lg" data-icon="mdi:watermark"></span> Brands</div>
+                <div class="sidebar-link" onclick="switchView('units', this)"><span class="iconify text-lg" data-icon="mdi:ruler"></span> Units</div>
+
+                <div class="sb-header">Warehouse</div>
+                <div class="sidebar-link" onclick="switchView('warehouses', this)"><span class="iconify text-lg" data-icon="mdi:warehouse"></span> Warehouses</div>
+                <div class="sidebar-link" onclick="switchView('bin-mgmt', this)"><span class="iconify text-lg" data-icon="mdi:map-marker-outline"></span> Bin Management</div>
                 
-                <div class="sb-header">Products</div>
-                <div class="sidebar-link" onclick="window.location.href='merchant-dashboard.html'"><span class="iconify text-lg" data-icon="mdi:shape-outline"></span> Product List</div>
-                
+                <div class="sb-header">Sales & Orders</div>
+                <div class="sidebar-link" onclick="switchView('orders', this)"><span class="iconify text-lg" data-icon="mdi:cart-outline"></span> All Orders</div>
+                <div class="sidebar-link" onclick="switchView('dispatch', this)"><span class="iconify text-lg" data-icon="mdi:package-check"></span> Dispatch / Packing</div>
+                <div class="sidebar-link" onclick="switchView('returns', this)"><span class="iconify text-lg" data-icon="mdi:undo-variant"></span> Returns</div>
+
                 <div class="sb-header">System</div>
-                <div class="sidebar-link" onclick="window.location.href='admin-dashboard.html'"><span class="iconify text-lg" data-icon="mdi:chart-bar"></span> Reports</div>
-                <div class="sidebar-link" onclick="window.location.href='admin-dashboard.html'"><span class="iconify text-lg" data-icon="mdi:cog-outline"></span> Settings</div>
+                <div class="sidebar-link" onclick="switchView('reports', this)"><span class="iconify text-lg" data-icon="mdi:chart-bar"></span> Reports</div>
+                <div class="sidebar-link" onclick="switchView('settings', this)"><span class="iconify text-lg" data-icon="mdi:cog-outline"></span> Settings</div>
+                <div class="sidebar-link" onclick="switchView('notifications', this)"><span class="iconify text-lg" data-icon="mdi:bell-outline"></span> Notifications <span id="notif-count-badge" class="ml-auto text-xs bg-red-500 text-white rounded-full px-2 py-0.5 hidden">0</span></div>
             </nav>
+            <div class="p-4 border-t border-white/[0.08] flex-shrink-0">
+                <div class="sidebar-link text-red-400 hover:bg-red-500/10" onclick="auth.signOut()"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</div>
+            </div>
         </aside>
 
         <!-- MAIN CONTENT -->
         <main class="flex-1 lg:ml-64 flex flex-col h-full">
             <header class="nav-blur bg-[#020617]/80 border-b border-white/[0.08] px-6 py-3 flex items-center justify-between flex-shrink-0">
-                <h1 id="page-title" class="font-bold text-white text-sm">Stock Dashboard</h1>
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
+                    <h1 id="page-title" class="font-bold text-white text-sm">Stock Dashboard</h1>
+                </div>
                 <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs" id="header-avatar">A</div>
                     <span id="header-name" class="text-sm font-semibold text-white hidden sm:block">Admin</span>
                 </div>
             </header> 
             
-            <div class="p-6 flex-1 overflow-y-auto">
+            <div class="p-6 flex-1 overflow-y-auto min-w-0">
 
                 <!-- DASHBOARD VIEW -->
                 <div id="view-dash">
-                    <!-- STOCK FILTERS -->
-                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 mb-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Total Products</div><div id="kpi-total-prods" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Total Stock Qty</div><div id="kpi-total-qty" class="text-2xl font-bold text-cyan-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Stock Value</div><div id="kpi-stock-value" class="text-2xl font-bold text-green-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Low Stock Items</div><div id="kpi-low-items" class="text-2xl font-bold text-yellow-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Out of Stock</div><div id="kpi-out-items" class="text-2xl font-bold text-red-400">0</div></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 mb-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
                         <input type="text" placeholder="Search Product" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
                         <input type="text" placeholder="SKU" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
                         <input type="text" placeholder="Barcode" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
-                        <select class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50"><option>Category</option></select>
-                        <select class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50"><option>Warehouse</option></select>
-                        <select class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50"><option>Status</option></select>
+                        <input type="text" placeholder="Category" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                        <input type="text" placeholder="Warehouse" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                        <input type="text" placeholder="Supplier" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                        <select class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
+                            <option>Status</option><option>Available</option><option>Reserved</option><option>Low Stock</option><option>Out of Stock</option><option>Expired</option>
+                        </select>
                         <input type="date" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50">
                     </div>
-
-                    <!-- CHARTS GRID -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        <!-- Line Chart -->
-                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
-                            <h3 class="text-sm font-bold text-white mb-4">Stock Movement (In vs Out)</h3>
-                            <div style="position:relative; height:250px;"><canvas id="movement-chart"></canvas></div>
-                        </div>
-                        <!-- Bar Chart -->
-                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
-                            <h3 class="text-sm font-bold text-white mb-4">Inventory Distribution</h3>
-                            <div style="position:relative; height:250px;"><canvas id="distribution-chart"></canvas></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-sm font-bold text-white mb-4">Stock Movement (In vs Out)</h3><div style="position:relative; height:250px;"><canvas id="movement-chart"></canvas></div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-sm font-bold text-white mb-4">Inventory Distribution</h3><div style="position:relative; height:250px;"><canvas id="distribution-chart"></canvas></div></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-8"><h3 class="text-sm font-bold text-white mb-4">Inventory Status</h3><div style="position:relative; height:300px;"><canvas id="status-chart"></canvas></div></div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="p-4 border-b border-white/[0.08]"><h3 class="text-sm font-bold text-white">Inventory Overview</h3></div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Product</th><th class="p-4">SKU</th><th class="p-4">Warehouse</th><th class="p-4 text-right">Available</th><th class="p-4 text-right">Reserved</th><th class="p-4 text-right">Reorder Lvl</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Action</th></tr></thead>
+                                <tbody id="dash-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
                         </div>
                     </div>
-                    
-                    <!-- Pie Chart -->
-                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
-                        <h3 class="text-sm font-bold text-white mb-4">Inventory Status</h3>
-                        <div style="position:relative; height:300px;"><canvas id="status-chart"></canvas></div>
+                </div> 
+
+                <!-- CURRENT STOCK VIEW -->
+                <div id="view-current-stock" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-lg font-bold text-white">Current Inventory</h2>
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <input type="text" id="cs-search" oninput="renderCurrentStock()" placeholder="Search..." class="flex-1 md:w-64 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500/50">
+                            <button type="button" onclick="document.getElementById('add-product-form').classList.toggle('hidden')" class="bg-cyan-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-cyan-400 transition-colors text-sm flex items-center gap-2 whitespace-nowrap"><span class="iconify" data-icon="mdi:plus"></span> Add Product</button>
+                        </div>
+                    </div>
+                    <div id="add-product-form" class="hidden bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <h3 class="text-base font-bold text-white mb-4">Register New Product</h3>
+                        <form onsubmit="handleAddProduct(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Merchant *</label><select id="ap-merchant" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"><option value="" disabled selected>Select Merchant</option></select></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Product Name *</label><input type="text" id="ap-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. Samsung Galaxy S24"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">SKU</label><input type="text" id="ap-sku" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. SAM-S24-001"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Warehouse</label><input type="text" id="ap-warehouse" value="Main Warehouse" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                                       <div><label class="text-xs font-semibold text-slate-400 uppercase">Initial Stock Quantity *</label><input type="number" id="ap-stock" required min="0" value="50" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Reorder Level (Min Stock)</label><input type="number" id="ap-minstock" min="0" value="10" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Alert when stock falls to..."></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Cost Price (TZS)</label><input type="number" id="ap-cost" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. 15000"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Selling Price (TZS)</label><input type="number" id="ap-price" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. 25000"></div>
+                            <div class="md:col-span-2 flex justify-end gap-3 mt-2">
+                                <button type="button" onclick="document.getElementById('add-product-form').classList.add('hidden')" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 border border-white/10 hover:bg-white/[0.04]">Cancel</button>
+                                <button type="submit" class="bg-cyan-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-cyan-400 transition-colors text-sm">Save Product</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Product</th><th class="p-4">SKU</th><th class="p-4">Warehouse</th><th class="p-4 text-right">Available</th><th class="p-4 text-right">Delivered</th><th class="p-4 text-right">Reorder Lvl</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Action</th></tr></thead>
+                                <tbody id="cs-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- TRANSFER STOCK VIEW -->
+                <div id="view-transfer-stock" class="hidden">
+                    <div class="max-w-xl">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:swap-horizontal"></span> Transfer Stock</h2>
+                            <form onsubmit="handleStockTransfer(event)" class="space-y-4">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Product *</label><select id="tr-product" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></select></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">From Warehouse</label><input type="text" id="tr-from" value="Main Warehouse" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">To Warehouse *</label><input type="text" id="tr-to" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. Secondary Warehouse"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Quantity to Transfer *</label><input type="number" id="tr-qty" required min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. 20"></div>
+                                <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 transition-colors">Transfer Stock</button>
+                            </form>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- STOCK IN VIEW -->
+                <div id="view-stock-in" class="hidden">
+                    <div class="max-w-xl">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><span class="iconify text-green-400 text-xl" data-icon="mdi:arrow-down-bold"></span> Add Stock</h2>
+                            <form onsubmit="handleStockIn(event)" class="space-y-4">
+                                <div class="flex gap-2 items-end">
+                                    <div class="flex-1"><label class="text-xs font-semibold text-slate-400 uppercase">Product *</label><select id="si-product" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></select></div>
+                                    <button type="button" onclick="startScanner('si-product')" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-3 text-cyan-400 hover:bg-white/[0.1]"><span class="iconify text-xl" data-icon="mdi:barcode-scan"></span></button>
+                                </div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Quantity to Add *</label><input type="number" id="si-qty" required min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. 50"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Supplier</label><input type="text" id="si-supplier" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Supplier name..."></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Batch No.</label><input type="text" id="si-batch" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. BN-2023-01"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Expiry Date</label><input type="date" id="si-expiry" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Note</label><input type="text" id="si-note" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="PO number..."></div>
+                                <button type="submit" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-400 transition-colors">Add to Stock</button>
+                            </form>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- STOCK OUT VIEW -->
+                <div id="view-stock-out" class="hidden">
+                    <div class="max-w-xl">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><span class="iconify text-red-400 text-xl" data-icon="mdi:arrow-up-bold"></span> Remove Stock</h2>
+                            <form onsubmit="handleStockOut(event)" class="space-y-4">
+                                <div class="flex gap-2 items-end">
+                                    <div class="flex-1"><label class="text-xs font-semibold text-slate-400 uppercase">Product *</label><select id="so-product" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></select></div>
+                                    <button type="button" onclick="startScanner('so-product')" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-3 text-cyan-400 hover:bg-white/[0.1]"><span class="iconify text-xl" data-icon="mdi:barcode-scan"></span></button>
+                                </div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Quantity to Remove *</label><input type="number" id="so-qty" required min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. 10"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Reason *</label><select id="so-reason" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"><option value="order">Customer Order</option><option value="damaged">Damaged/Defective</option><option value="expired">Expired</option><option value="lost">Lost/Missing</option><option value="other">Other</option></select></div>
+                                <button type="submit" class="w-full bg-red-500 text-white font-bold py-3 rounded-xl hover:bg-red-400 transition-colors">Remove from Stock</button>
+                            </form>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- DAMAGED & EXPIRED VIEW -->
+                <div id="view-damaged-expired" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-white">Damaged & Expired Inventory</h2>
+                        <div class="text-sm text-orange-400 font-bold">Quarantine List</div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Product</th><th class="p-4">Warehouse</th><th class="p-4 text-right">Damaged Qty</th><th class="p-4 text-right">Expired Qty</th><th class="p-4 text-center">Action</th></tr></thead>
+                                <tbody id="de-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- STOCK ADJUSTMENT VIEW -->
+                <div id="view-stock-adjust" class="hidden">
+                    <div class="max-w-xl">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h2 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><span class="iconify text-yellow-400 text-xl" data-icon="mdi:swap-horizontal"></span> Stock Adjustment (Stock Take)</h2>
+                            <p class="text-xs text-slate-500 mb-4">Use this to set the absolute stock level (e.g., if physical count shows 45, set to 45).</p>
+                            <form onsubmit="handleStockAdjust(event)" class="space-y-4">
+                                <div class="flex gap-2 items-end">
+                                    <div class="flex-1"><label class="text-xs font-semibold text-slate-400 uppercase">Product *</label><select id="sa-product" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></select></div>
+                                    <button type="button" onclick="startScanner('sa-product')" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-3 text-cyan-400 hover:bg-white/[0.1]"><span class="iconify text-xl" data-icon="mdi:barcode-scan"></span></button>
+                                </div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">New Total Quantity *</label><input type="number" id="sa-qty" required min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. 45"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Total Delivered (Optional)</label><input type="number" id="sa-delivered" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. 5"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Cost Price (TZS)</label><input type="number" id="sa-cost" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. 15000"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Reason *</label><input type="text" id="sa-reason" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Stock take correction..."></div>
+                                <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-3 rounded-xl hover:bg-yellow-400 transition-colors">Update Stock Level</button>
+                            </form>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- LOW / OUT OF STOCK VIEW -->
+                <div id="view-low-stock" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-white">Low Stock & Out of Stock Alerts</h2>
+                        <div class="text-sm text-red-400 font-bold">Items below reorder threshold</div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Product</th><th class="p-4 text-right">Current Stock</th><th class="p-4 text-right">Reorder Level</th><th class="p-4 text-center">Deficit</th></tr></thead>
+                                <tbody id="ls-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                        <div id="ls-empty" class="hidden p-10 text-center text-slate-500 text-sm">All items are sufficiently stocked!</div>
+                    </div>
+                </div> 
+
+                <!-- SUPPLIERS VIEW -->
+                <div id="view-suppliers" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-lg font-bold text-white">Suppliers</h2>
+                        <button type="button" onclick="document.getElementById('add-supplier-form').classList.toggle('hidden')" class="bg-cyan-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-cyan-400 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:plus"></span> Add Supplier</button>
+                    </div>
+                    <div id="add-supplier-form" class="hidden bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <form onsubmit="handleAddSupplier(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Supplier Name *</label><input type="text" id="sup-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. ABC Distributors"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><input type="text" id="sup-phone" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. +123456789"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Email</label><input type="email" id="sup-email" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. sales@abc.com"></div>
+                            <div class="md:col-span-3 flex justify-end"><button type="submit" class="bg-cyan-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-cyan-400 transition-colors text-sm">Save Supplier</button></div>
+                        </form>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto"><table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Name</th><th class="p-4">Phone</th><th class="p-4">Email</th><th class="p-4 text-center">Action</th></tr></thead>
+                            <tbody id="sup-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table></div>
+                    </div>
+                </div> 
+
+                <!-- PURCHASE ORDERS VIEW -->
+                <div id="view-purchase-orders" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-lg font-bold text-white">Purchase Orders (PO)</h2>
+                        <button type="button" onclick="document.getElementById('add-po-form').classList.toggle('hidden')" class="bg-cyan-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-cyan-400 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:plus"></span> Create PO</button>
+                    </div>
+                    <div id="add-po-form" class="hidden bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <form onsubmit="handleAddPO(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Supplier *</label><select id="po-supplier" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></select></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Product *</label><select id="po-product" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></select></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Quantity *</label><input type="number" id="po-qty" required min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. 100"></div>
+                            <div class="flex items-end"><button type="submit" class="w-full bg-cyan-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-cyan-400 transition-colors text-sm">Create PO</button></div>
+                        </form>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto"><table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">PO ID</th><th class="p-4">Supplier</th><th class="p-4">Product</th><th class="p-4 text-right">Qty</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Action</th></tr></thead>
+                            <tbody id="po-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table></div>
+                    </div>
+                </div> 
+
+                <!-- CATEGORIES VIEW -->
+                <div id="view-categories" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-lg font-bold text-white">Product Categories</h2>
+                        <button type="button" onclick="document.getElementById('add-cat-form').classList.toggle('hidden')" class="bg-cyan-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-cyan-400 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:plus"></span> Add Category</button>
+                    </div>
+                    <div id="add-cat-form" class="hidden bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <form onsubmit="handleAddCategory(event)" class="flex flex-col md:flex-row gap-4 items-end">
+                            <div class="flex-1 w-full"><label class="text-xs font-semibold text-slate-400 uppercase">Category Name *</label><input type="text" id="cat-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. Electronics"></div>
+                            <button type="submit" class="bg-cyan-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-cyan-400 transition-colors text-sm whitespace-nowrap">Save Category</button>
+                        </form>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto"><table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Category Name</th><th class="p-4 text-center">Action</th></tr></thead>
+                            <tbody id="cat-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table></div>
+                    </div>
+                </div> 
+
+                <!-- BRANDS VIEW -->
+                <div id="view-brands" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-lg font-bold text-white">Product Brands</h2>
+                        <button type="button" onclick="document.getElementById('add-brand-form').classList.toggle('hidden')" class="bg-cyan-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-cyan-400 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:plus"></span> Add Brand</button>
+                    </div>
+                    <div id="add-brand-form" class="hidden bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <form onsubmit="handleAddBrand(event)" class="flex flex-col md:flex-row gap-4 items-end">
+                            <div class="flex-1 w-full"><label class="text-xs font-semibold text-slate-400 uppercase">Brand Name *</label><input type="text" id="brand-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. Samsung"></div>
+                            <button type="submit" class="bg-cyan-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-cyan-400 transition-colors text-sm whitespace-nowrap">Save Brand</button>
+                        </form>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto"><table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Brand Name</th><th class="p-4 text-center">Action</th></tr></thead>
+                            <tbody id="brand-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table></div>
+                    </div>
+                </div> 
+
+                <!-- UNITS VIEW -->
+                <div id="view-units" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-lg font-bold text-white">Measurement Units</h2>
+                        <button type="button" onclick="document.getElementById('add-unit-form').classList.toggle('hidden')" class="bg-cyan-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-cyan-400 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:plus"></span> Add Unit</button>
+                    </div>
+                    <div id="add-unit-form" class="hidden bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <form onsubmit="handleAddUnit(event)" class="flex flex-col md:flex-row gap-4 items-end">
+                            <div class="flex-1 w-full"><label class="text-xs font-semibold text-slate-400 uppercase">Unit Name *</label><input type="text" id="unit-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. Pieces, KG, Liters"></div>
+                            <button type="submit" class="bg-cyan-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-cyan-400 transition-colors text-sm whitespace-nowrap">Save Unit</button>
+                        </form>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto"><table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Unit Name</th><th class="p-4 text-center">Action</th></tr></thead>
+                            <tbody id="unit-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table></div>
                     </div>
                 </div>
 
-                <!-- STOCK VIEW (Placeholder for now) -->
-                <div id="view-stock" class="hidden">
-                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 text-center text-slate-500">
-                        <p>Stock Table will go here.</p>
+                <!-- WAREHOUSES VIEW -->
+                <div id="view-warehouses" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-lg font-bold text-white">Warehouse Management</h2>
+                        <button type="button" onclick="document.getElementById('add-warehouse-form').classList.toggle('hidden')" class="bg-cyan-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-cyan-400 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:plus"></span> Add Warehouse</button>
                     </div>
-                </div>
+                    <div id="add-warehouse-form" class="hidden bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <form onsubmit="handleAddWarehouse(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Warehouse Name *</label><input type="text" id="wh-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. Main Warehouse"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Location</label><input type="text" id="wh-location" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. New York"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Capacity</label><input type="number" id="wh-capacity" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. 5000"></div>
+                            <div class="md:col-span-3 flex justify-end"><button type="submit" class="bg-cyan-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-cyan-400 transition-colors text-sm">Save Warehouse</button></div>
+                        </form>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Name</th><th class="p-4">Location</th><th class="p-4 text-right">Capacity</th><th class="p-4 text-center">Action</th></tr></thead>
+                                <tbody id="wh-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- BIN MANAGEMENT VIEW -->
+                <div id="view-bin-mgmt" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-lg font-bold text-white">Bin Management</h2>
+                        <button type="button" onclick="document.getElementById('add-bin-form').classList.toggle('hidden')" class="bg-cyan-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-cyan-400 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:plus"></span> Add Bin</button>
+                    </div>
+                    <div id="add-bin-form" class="hidden bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <form onsubmit="handleAddBin(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Bin Code *</label><input type="text" id="bin-code" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. A1-01"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Warehouse *</label><select id="bin-warehouse" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></select></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Notes</label><input type="text" id="bin-notes" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. Heave items"></div>
+                            <div class="md:col-span-3 flex justify-end"><button type="submit" class="bg-cyan-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-cyan-400 transition-colors text-sm">Save Bin</button></div>
+                        </form>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Bin Code</th><th class="p-4">Warehouse</th><th class="p-4">Notes</th><th class="p-4 text-center">Action</th></tr></thead>
+                                <tbody id="bin-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- ORDERS VIEW -->
+                <div id="view-orders" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                        <h2 class="text-lg font-bold text-white">All Orders</h2>
+                        <input type="text" id="ord-search" oninput="renderOrders()" placeholder="Search Order ID, Customer, Item..." class="flex-1 md:w-64 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500/50">
+                    </div>
+                    <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                        <button onclick="filterOrders('all')" id="tab-all" class="order-tab bg-cyan-500 text-white">All Orders</button>
+                        <button onclick="filterOrders('pending')" id="tab-pending" class="order-tab bg-white/[0.05] text-slate-400 hover:bg-white/[0.1]">Pending</button>
+                        <button onclick="filterOrders('confirmed')" id="tab-confirmed" class="order-tab bg-white/[0.05] text-slate-400 hover:bg-white/[0.1]">Confirmed</button>
+                        <button onclick="filterOrders('out_for_delivery')" id="tab-out_for_delivery" class="order-tab bg-white/[0.05] text-slate-400 hover:bg-white/[0.1]">Out for Delivery</button>
+                        <button onclick="filterOrders('delivered')" id="tab-delivered" class="order-tab bg-white/[0.05] text-slate-400 hover:bg-white/[0.1]">Delivered</button>
+                        <button onclick="filterOrders('cancelled')" id="tab-cancelled" class="order-tab bg-white/[0.05] text-slate-400 hover:bg-white/[0.1]">Cancelled</button>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Order ID</th><th class="p-4">Customer</th><th class="p-4">Item</th><th class="p-4 text-center">Status</th><th class="p-4 text-right">Qty</th></tr></thead>
+                                <tbody id="ord-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 border-t border-white/[0.08] flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div class="flex items-center gap-2 text-xs text-slate-400">
+                                <span>Rows per page:</span>
+                                <select id="ord-per-page" onchange="changeOrderPageSize()" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-white focus:outline-none focus:border-cyan-500/50">
+                                    <option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span id="ord-page-info" class="text-xs text-slate-400"></span>
+                                <div class="flex gap-2">
+                                    <button onclick="prevPageOrders()" id="ord-prev" class="px-3 py-1 rounded-lg bg-white/[0.05] text-slate-400 text-xs hover:bg-white/[0.1] disabled:opacity-50 disabled:cursor-not-allowed">Prev</button>
+                                    <button onclick="nextPageOrders()" id="ord-next" class="px-3 py-1 rounded-lg bg-white/[0.05] text-slate-400 text-xs hover:bg-white/[0.1] disabled:opacity-50 disabled:cursor-not-allowed">Next</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- DISPATCH / PACKING VIEW -->
+                <div id="view-dispatch" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Dispatch & Packing Station</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="p-4 border-b border-white/[0.08]"><h3 class="text-sm font-bold text-white">Orders Ready to Pack & Ship</h3></div>
+                        <div class="overflow-x-auto"><table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Order ID</th><th class="p-4">Customer</th><th class="p-4">Item</th><th class="p-4 text-right">Qty</th><th class="p-4 text-center">Print</th><th class="p-4 text-center">Action</th></tr></thead>
+                            <tbody id="disp-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table></div>
+                    </div>
+                </div> 
+
+                <!-- STOCK HISTORY VIEW -->
+                <div id="view-stock-history" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Stock Movement History (Audit Trail)</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto"><table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Date</th><th class="p-4">Product</th><th class="p-4">Type</th><th class="p-4 text-right">Qty</th><th class="p-4">Note</th></tr></thead>
+                            <tbody id="hist-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table></div>
+                    </div>
+                </div> 
+
+                <!-- RETURNS VIEW -->
+                <div id="view-returns" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Returned Orders</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Order ID</th><th class="p-4">Product Returned</th><th class="p-4 text-right">Qty</th><th class="p-4 text-center">Restock</th></tr></thead>
+                                <tbody id="ret-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- REPORTS VIEW -->
+                <div id="view-reports" class="hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        <div class="lg:col-span-1 space-y-2">
+                            <h2 class="text-lg font-bold text-white mb-4">Reports</h2>
+                            <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-2 space-y-1">
+                                <div onclick="switchReport('inventory')" id="rpt-tab-inventory" class="rpt-tab active">Current Inventory</div>
+                                <div onclick="switchReport('low')" id="rpt-tab-low" class="rpt-tab">Low Stock</div>
+                                <div onclick="switchReport('out')" id="rpt-tab-out" class="rpt-tab">Out of Stock</div>
+                                <div onclick="switchReport('expired')" id="rpt-tab-expired" class="rpt-tab">Expired Stock</div>
+                                <div onclick="switchReport('damaged')" id="rpt-tab-damaged" class="rpt-tab">Damaged Stock</div>
+                                <div onclick="switchReport('movement')" id="rpt-tab-movement" class="rpt-tab">Stock Movement</div>
+                                <div onclick="switchReport('valuation')" id="rpt-tab-valuation" class="rpt-tab">Stock Valuation</div>
+                                <div onclick="switchReport('audit')" id="rpt-tab-audit" class="rpt-tab">Inventory Audit</div>
+                                <div onclick="switchReport('fast')" id="rpt-tab-fast" class="rpt-tab">Fast Moving</div>
+                                <div onclick="switchReport('slow')" id="rpt-tab-slow" class="rpt-tab">Slow Moving</div>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-3">
+                            <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                                <div id="rpt-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- SETTINGS VIEW -->
+                <div id="view-settings" class="hidden">
+                    <div class="max-w-2xl mx-auto">
+                        <h2 class="text-lg font-bold text-white mb-6">Settings</h2>
+                        <div class="space-y-6">
+                            <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                                <h3 class="text-base font-bold text-white mb-4">Profile Information</h3>
+                                <form onsubmit="saveStockSettings(event)" class="space-y-4">
+                                    <div><label class="text-xs font-semibold text-slate-400 uppercase">Full Name</label><input type="text" id="set-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                    <div><label class="text-xs font-semibold text-slate-400 uppercase">Email (Read-only)</label><input type="email" id="set-email" readonly class="w-full mt-1 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-slate-500 cursor-not-allowed"></div>
+                                    <div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><input type="text" id="set-phone" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                                    <button type="submit" class="bg-cyan-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-cyan-400 transition-colors text-sm">Save Profile</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- NOTIFICATIONS VIEW -->
+                <div id="view-notifications" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-white">Notifications</h2>
+                        <button type="button" onclick="clearStockNotifs()" class="text-xs text-cyan-400 hover:text-cyan-300 font-semibold">Mark all read</button>
+                    </div>
+                    <div id="notif-list-stock" class="space-y-3"></div>
+                </div> 
 
             </div>
         </main>
     </div>
 
     <script>
-        let allProducts = [];
+        var fc={apiKey:"AIzaSyBjyRehaNQqt5ogt5U3tiw8NYr4TyuX2iI",authDomain:"chapshop-delivery-88fe1.firebaseapp.com",projectId:"chapshop-delivery-88fe1",storageBucket:"chapshop-delivery-88fe1.firebasestorage.app",messagingSenderId:"540757404981",appId:"1:540757404981:web:f5ae5d041dd260304eb07c"};
+        firebase.initializeApp(fc);var auth=firebase.auth(),db=firebase.firestore();
+        try{db.enablePersistence({synchronizeTabs:true})}catch(e){}
+
+        let allProducts = [], allWarehouses = [], allBins = [], allOrders = [], allCategories = [], allBrands = [], allUnits = [], allSuppliers = [], allPurchaseOrders = [], allHistory = [];
+        var allMerchants = [];
+        let currentOrderFilter = 'all';
+        let ordersCurrentPage = 1;
+        let ordersPerPage = 10;
+        let movChart, distChart, statChart;
+        let currentReport = 'inventory';
         const myId = () => window.currentUser.uid;
 
         function handleLogin(e) {
@@ -173,24 +647,127 @@
         function loadData() {
             db.collection('products').onSnapshot(snap => {
                 allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderCharts();
+                renderKPIs(); renderCharts(); renderDashboardTable(); renderCurrentStock(); renderLowStock(); renderDamagedExpired(); populateProductSelects();
+            });
+            db.collection('users').where('role', '==', 'merchant').onSnapshot(snap => {
+                allMerchants = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                populateMerchantSelects();
+            });
+            db.collection('warehouses').onSnapshot(snap => {
+                allWarehouses = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderWarehouses(); populateWarehouseSelects();
+            });
+            db.collection('bins').onSnapshot(snap => {
+                allBins = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderBins();
+            });
+            db.collection('categories').onSnapshot(snap => {
+                allCategories = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderCategories();
+            });
+            db.collection('brands').onSnapshot(snap => {
+                allBrands = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderBrands();
+            });
+            db.collection('units').onSnapshot(snap => {
+                allUnits = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderUnits();
+            });
+                db.collection('orders').onSnapshot(snap => {
+                allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderOrders(); renderReturns(); renderDispatch();
+                checkAutoReservations();
+            });
+            db.collection('suppliers').onSnapshot(snap => {
+                allSuppliers = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderSuppliers(); populateSupplierSelects();
+            });
+            db.collection('purchase_orders').onSnapshot(snap => {
+                allPurchaseOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderPurchaseOrders();
+            });
+            db.collection('stock_history').onSnapshot(snap => {
+                allHistory = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderHistory();
             });
         }
 
-        function switchView(view) {
-            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
-            document.getElementById('view-' + view).classList.remove('hidden');
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            event.target.closest('.sidebar-link').classList.add('active');
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebar-overlay');
+            sb.classList.toggle('-translate-x-full');
+            ov.classList.toggle('hidden');
         }
 
-        // CHARTS LOGIC
-        let movChart, distChart, statChart;
+        function switchView(view, el) {
+            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+            const targetView = document.getElementById('view-' + view);
+            if(targetView) targetView.classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            if(el) el.classList.add('active');
+            if(window.innerWidth < 1024) toggleSidebar(); 
+            if(view === 'reports') renderReports();
+            if(view === 'settings') renderSettings();
+            if(view === 'notifications') renderNotifications();
+        }
+        
+               // ===== BARCODE SCANNER LOGIC =====
+        let html5QrCode = null;
+        function startScanner(targetSelectId) {
+            const modal = document.getElementById('scanner-modal');
+            modal.classList.remove('hidden');
+            html5QrCode = new Html5Qrcode("qr-reader");
+            
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 250, height: 150 } },
+                (decodedText) => {
+                    matchScannedProduct(decodedText, targetSelectId);
+                    stopScanner();
+                },
+                (errorMessage) => { /* Ignore read errors silently */ }
+            ).catch(err => {
+                showT("Camera error: " + err, "error");
+                stopScanner();
+            });
+        }
 
+        function stopScanner() {
+            const modal = document.getElementById('scanner-modal');
+            modal.classList.add('hidden');
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    html5QrCode = null;
+                }).catch(err => { html5QrCode = null; });
+            }
+        }
+
+        function matchScannedProduct(barcode, targetSelectId) {
+            const matchedProduct = allProducts.find(p => p.sku === barcode || p.barcode === barcode);
+            if (matchedProduct) {
+                document.getElementById(targetSelectId).value = matchedProduct.id;
+                showT(`Found: ${matchedProduct.name}`);
+            } else {
+                showT('Barcode not found in system', 'error');
+            }
+        }
+
+        
+
+        function showT(m, t) {
+            t = t || "success";
+            var el = document.getElementById('toast'), ic = document.getElementById('toast-icon'), ms = document.getElementById('toast-msg');
+            ms.textContent = m;
+            ic.setAttribute('data-icon', t === 'error' ? 'mdi:alert-circle' : 'mdi:check-circle');
+            ic.className = 'iconify text-xl ' + (t === 'error' ? 'text-red-400' : 'text-cyan-400');
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        // ===== CHARTS LOGIC =====
         function renderCharts() {
             if (typeof Chart === 'undefined' || !allProducts.length) return;
-
-            // 1. Movement Chart (Simulated Data for visual)
             const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
             const inData = [15, 22, 10, 30, 18, 25, 12];
             const outData = [10, 18, 15, 20, 10, 15, 8];
@@ -204,9 +781,8 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
 
-            // 2. Distribution Chart (By Category)
             const catCounts = {};
-            allProducts.forEach(p => { const c = p.category || 'Uncategorized'; catCounts[c] = (catCounts[c] || 0) + (p.stock || 0); });
+            allProducts.forEach(p => { const c = p.category || p.warehouse || 'Uncategorized'; catCounts[c] = (catCounts[c] || 0) + (p.stock || 0); });
             if(distChart) distChart.destroy();
             distChart = new Chart(document.getElementById('distribution-chart'), {
                 type: 'bar',
@@ -214,26 +790,604 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
 
-            // 3. Status Chart (Pie)
-            const avail = allProducts.filter(p => p.stock > (p.minStock || 0)).length;
+            const avail = allProducts.filter(p => p.stock > (p.minStock || 0) && (p.damaged||0)==0 && (p.expired||0)==0).length;
+            const reserved = allProducts.filter(p => (p.reserved || 0) > 0).length;
             const low = allProducts.filter(p => p.stock > 0 && p.stock <= (p.minStock || 0)).length;
             const out = allProducts.filter(p => p.stock <= 0).length;
+            const expired = allProducts.filter(p => (p.expired || 0) > 0).length;
             if(statChart) statChart.destroy();
             statChart = new Chart(document.getElementById('status-chart'), {
                 type: 'pie',
-                data: { labels: ['Available', 'Low Stock', 'Out of Stock'], datasets: [{ data: [avail, low, out], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderColor: '#0f172a', borderWidth: 4 }] },
+                data: { labels: ['Available', 'Reserved', 'Low Stock', 'Out of Stock', 'Expired'], datasets: [{ data: [avail, reserved, low, out, expired], backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#f97316'], borderColor: '#0f172a', borderWidth: 4 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20 } } } }
             });
         }
 
-        function showT(m, t) {
-            t = t || "success";
-            var el = document.getElementById('toast'), ic = document.getElementById('toast-icon'), ms = document.getElementById('toast-msg');
-            ms.textContent = m;
-            ic.setAttribute('data-icon', t === 'error' ? 'mdi:alert-circle' : 'mdi:check-circle');
-            ic.className = 'iconify text-xl ' + (t === 'error' ? 'text-red-400' : 'text-cyan-400');
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 3000);
+        // ===== DASHBOARD & KPIs =====
+        function renderKPIs() {
+            document.getElementById('kpi-total-prods').textContent = allProducts.length;
+            document.getElementById('kpi-total-qty').textContent = allProducts.reduce((s, p) => s + (p.stock || 0), 0).toLocaleString();
+            document.getElementById('kpi-low-items').textContent = allProducts.filter(p => p.stock > 0 && p.stock <= (p.minStock || 0)).length;
+            document.getElementById('kpi-out-items').textContent = allProducts.filter(p => p.stock <= 0).length;
+        }
+
+        function getStockStatus(p) {
+            if((p.damaged || 0) > 0) return '<span class="px-2 py-1 rounded-md bg-pink-500/10 text-pink-400 text-xs font-bold">DAMAGED</span>';
+            if((p.expired || 0) > 0) return '<span class="px-2 py-1 rounded-md bg-orange-500/10 text-orange-400 text-xs font-bold">EXPIRED</span>';
+            if(p.stock <= 0) return '<span class="px-2 py-1 rounded-md bg-red-500/10 text-red-400 text-xs font-bold">OUT OF STOCK</span>';
+            if(p.stock <= (p.minStock||0)) return '<span class="px-2 py-1 rounded-md bg-yellow-500/10 text-yellow-400 text-xs font-bold">LOW STOCK</span>';
+            if((p.reserved || 0) > 0) return '<span class="px-2 py-1 rounded-md bg-blue-500/10 text-blue-400 text-xs font-bold">RESERVED</span>';
+            return '<span class="px-2 py-1 rounded-md bg-green-500/10 text-green-400 text-xs font-bold">IN STOCK</span>';
+        }
+
+        function renderDashboardTable() {
+            const tbody = document.getElementById('dash-tbody');
+            tbody.innerHTML = allProducts.map(p => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${p.name||'N/A'}</td><td class="p-4 text-slate-400 font-mono text-xs">${p.sku||'—'}</td><td class="p-4 text-slate-400">${p.warehouse||'Main'}</td><td class="p-4 text-right font-bold text-white">${p.stock||0}</td><td class="p-4 text-right text-blue-400">${p.reserved||0}</td><td class="p-4 text-right text-slate-500">${p.minStock||0}</td><td class="p-4 text-center">${getStockStatus(p)}</td><td class="p-4 text-center"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">View</button></td></tr>`).join('');
+        }
+
+        function renderCurrentStock() {
+            const tbody = document.getElementById('cs-tbody');
+            const search = (document.getElementById('cs-search').value || '').toLowerCase();
+            const filtered = allProducts.filter(p => (p.name||'').toLowerCase().includes(search) || (p.sku||'').toLowerCase().includes(search));
+            tbody.innerHTML = filtered.map(p => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${p.name||'N/A'}</td><td class="p-4 text-slate-400 font-mono text-xs">${p.sku||'—'}</td><td class="p-4 text-slate-400">${p.warehouse||'Main'}</td><td class="p-4 text-right font-bold text-white">${p.stock||0}</td><td class="p-4 text-right font-bold text-cyan-400">${p.delivered||0}</td><td class="p-4 text-right text-slate-500">${p.minStock||0}</td><td class="p-4 text-center">${getStockStatus(p)}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('products','${p.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
+        }
+
+        function renderWarehouses() {
+            const tbody = document.getElementById('wh-tbody');
+            if(!allWarehouses.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No warehouses found. Add one!</td></tr>'; return; }
+            tbody.innerHTML = allWarehouses.map(w => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${w.name||'N/A'}</td><td class="p-4 text-slate-400">${w.location||'—'}</td><td class="p-4 text-right text-slate-300">${w.capacity||'Unlimited'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('warehouses','${w.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
+        }
+
+        function renderBins() {
+            const tbody = document.getElementById('bin-tbody');
+            if(!allBins.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No bins found. Add one!</td></tr>'; return; }
+            tbody.innerHTML = allBins.map(b => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${b.code||'N/A'}</td><td class="p-4 text-slate-400">${b.warehouse||'—'}</td><td class="p-4 text-slate-400">${b.notes||'—'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('bins','${b.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
+        }
+
+        function renderCategories() {
+            const tbody = document.getElementById('cat-tbody');
+            if(!allCategories.length) { tbody.innerHTML = '<tr><td colspan="2" class="p-10 text-center text-slate-500 text-sm">No categories found. Add one!</td></tr>'; return; }
+            tbody.innerHTML = allCategories.map(c => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${c.name||'N/A'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('categories','${c.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
+        }
+
+        function renderBrands() {
+            const tbody = document.getElementById('brand-tbody');
+            if(!allBrands.length) { tbody.innerHTML = '<tr><td colspan="2" class="p-10 text-center text-slate-500 text-sm">No brands found. Add one!</td></tr>'; return; }
+            tbody.innerHTML = allBrands.map(b => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${b.name||'N/A'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('brands','${b.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
+        }
+
+        function renderUnits() {
+            const tbody = document.getElementById('unit-tbody');
+            if(!allUnits.length) { tbody.innerHTML = '<tr><td colspan="2" class="p-10 text-center text-slate-500 text-sm">No units found. Add one!</td></tr>'; return; }
+            tbody.innerHTML = allUnits.map(u => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${u.name||'N/A'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('units','${u.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
+        }
+
+        function handleAddCategory(e) {
+            e.preventDefault();
+            var data = { name: document.getElementById('cat-name').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+            if(!data.name) return showT('Category name is required', 'error');
+            db.collection('categories').add(data).then(() => { showT('Category added!'); e.target.reset(); document.getElementById('add-cat-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+        }
+
+        function handleAddBrand(e) {
+            e.preventDefault();
+            var data = { name: document.getElementById('brand-name').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+            if(!data.name) return showT('Brand name is required', 'error');
+            db.collection('brands').add(data).then(() => { showT('Brand added!'); e.target.reset(); document.getElementById('add-brand-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+        }
+
+        function handleAddUnit(e) {
+            e.preventDefault();
+            var data = { name: document.getElementById('unit-name').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+            if(!data.name) return showT('Unit name is required', 'error');
+            db.collection('units').add(data).then(() => { showT('Unit added!'); e.target.reset(); document.getElementById('add-unit-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+        }
+
+        function filterOrders(status) {
+            currentOrderFilter = status;
+            ordersCurrentPage = 1; 
+            document.querySelectorAll('.order-tab').forEach(b => b.className = 'order-tab bg-white/[0.05] text-slate-400 hover:bg-white/[0.1]');
+            const activeTab = document.getElementById('tab-' + status);
+            if(activeTab) activeTab.className = 'order-tab bg-cyan-500 text-white';
+            renderOrders();
+        }
+
+        function renderOrders() {
+            const tbody = document.getElementById('ord-tbody');
+            if(!allOrders.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No orders found.</td></tr>'; return; }
+            let filtered = allOrders;
+            if(currentOrderFilter !== 'all') {
+                filtered = allOrders.filter(o => (o.status || 'pending').toLowerCase() === currentOrderFilter);
+            }
+            const searchQuery = (document.getElementById('ord-search')?.value || '').toLowerCase();
+            if(searchQuery) {
+                filtered = filtered.filter(o => {
+                    const name = o.customerName || o.customer || o.name || o.fullName || o.buyer || (o.address && o.address.name) || (o.shippingAddress && o.shippingAddress.name) || '';
+                    const item = o.itemName || o.item || o.productName || o.product || '';
+                    const oid = (o.id || '').toLowerCase();
+                    return name.toLowerCase().includes(searchQuery) || item.toLowerCase().includes(searchQuery) || oid.includes(searchQuery);
+                });
+            }
+            if(!filtered.length) { 
+                tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No orders match your search/filter.</td></tr>';
+                document.getElementById('ord-page-info').textContent = '0-0 of 0';
+                document.getElementById('ord-prev').disabled = true;
+                document.getElementById('ord-next').disabled = true;
+                return; 
+            }
+            const totalPages = Math.ceil(filtered.length / ordersPerPage);
+            if(ordersCurrentPage > totalPages) ordersCurrentPage = 1;
+            const startIndex = (ordersCurrentPage - 1) * ordersPerPage;
+            const endIndex = startIndex + ordersPerPage;
+            const paginatedOrders = filtered.slice(startIndex, endIndex);
+            tbody.innerHTML = paginatedOrders.map(o => {
+                const status = (o.status || 'pending').toLowerCase();
+                const statusColors = { pending: 'bg-slate-500/10 text-slate-400', confirmed: 'bg-blue-500/10 text-blue-400', processing: 'bg-yellow-500/10 text-yellow-400', out_for_delivery: 'bg-cyan-500/10 text-cyan-400', delivered: 'bg-green-500/10 text-green-400', cancelled: 'bg-red-500/10 text-red-400', returned: 'bg-orange-500/10 text-orange-400', wrong_number: 'bg-red-500/10 text-red-400', callback_requested: 'bg-purple-500/10 text-purple-400' };
+                const colorClass = statusColors[status] || 'bg-slate-500/10 text-slate-400';
+                const name = o.customerName || o.customer || o.name || o.fullName || o.buyer || (o.address && o.address.name) || (o.shippingAddress && o.shippingAddress.name) || 'N/A';
+                const item = o.itemName || o.item || o.productName || o.product || 'N/A';
+                const qty = o.qty || o.quantity || o.totalQty || 1;
+                return `<tr class="hover:bg-white/[0.02] transition-colors">
+                    <td class="p-4 text-white font-medium">#${(o.id || '').substring(0,6)}</td>
+                    <td class="p-4 text-slate-400">${name}</td>
+                    <td class="p-4 text-slate-400">${item}</td>
+                    <td class="p-4 text-center"><span class="px-2 py-1 rounded-md ${colorClass} text-xs font-bold uppercase">${o.status || 'PENDING'}</span></td>
+                    <td class="p-4 text-right font-bold text-white">${qty}</td>
+                </tr>`;
+            }).join('');
+            const startNum = startIndex + 1;
+            const endNum = Math.min(endIndex, filtered.length);
+            document.getElementById('ord-page-info').textContent = `${startNum}-${endNum} of ${filtered.length}`;
+            document.getElementById('ord-prev').disabled = ordersCurrentPage === 1;
+            document.getElementById('ord-next').disabled = ordersCurrentPage === totalPages || totalPages === 0;
+        }
+
+        function changeOrderPageSize() {
+            ordersPerPage = parseInt(document.getElementById('ord-per-page').value);
+            ordersCurrentPage = 1;
+            renderOrders();
+        }
+        function nextPageOrders() { ordersCurrentPage++; renderOrders(); }
+        function prevPageOrders() { if(ordersCurrentPage > 1) { ordersCurrentPage--; renderOrders(); } }
+
+        function renderReturns() {
+            const tbody = document.getElementById('ret-tbody');
+            const returns = allOrders.filter(o => (o.status || '').toLowerCase() === 'returned');
+            if(!returns.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No returned orders.</td></tr>'; return; }
+            tbody.innerHTML = returns.map(o => {
+                const item = o.itemName || o.item || o.productName || o.product || 'N/A';
+                const qty = o.qty || o.quantity || o.totalQty || 1;
+                return `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">#${o.id.substring(0,6)}</td><td class="p-4 text-slate-400">${item}</td><td class="p-4 text-right font-bold text-white">${qty}</td><td class="p-4 text-center"><button type="button" onclick="restockReturned('${o.id}')" class="text-green-400 hover:text-green-300 text-xs font-bold hover:underline">Restock</button></td></tr>`;
+            }).join('');
+        }
+
+        function renderLowStock() {
+            const tbody = document.getElementById('ls-tbody');
+            const emptyEl = document.getElementById('ls-empty');
+            const lowItems = allProducts.filter(p => p.stock <= (p.minStock || 0));
+            if(!lowItems.length) { emptyEl.classList.remove('hidden'); tbody.innerHTML = ''; return; }
+            emptyEl.classList.add('hidden');
+            tbody.innerHTML = lowItems.map(p => { const deficit = (p.minStock || 0) - p.stock; return `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${p.name||'N/A'}</td><td class="p-4 text-right font-bold text-red-400">${p.stock||0}</td><td class="p-4 text-right text-slate-500">${p.minStock||0}</td><td class="p-4 text-center font-bold text-yellow-400">-${deficit > 0 ? deficit : 0}</td></tr>`; }).join('');
+        }
+
+        function renderDamagedExpired() {
+            const tbody = document.getElementById('de-tbody');
+            const items = allProducts.filter(p => (p.damaged || 0) > 0 || (p.expired || 0) > 0);
+            if(!items.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No damaged or expired items!</td></tr>'; return; }
+            tbody.innerHTML = items.map(p => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${p.name||'N/A'}</td><td class="p-4 text-slate-400">${p.warehouse||'Main'}</td><td class="p-4 text-right font-bold text-pink-400">${p.damaged||0}</td><td class="p-4 text-right font-bold text-orange-400">${p.expired||0}</td><td class="p-4 text-center"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Dispose</button></td></tr>`).join('');
+        }
+
+        function populateProductSelects() {
+            ['si-product', 'so-product', 'sa-product', 'tr-product', 'po-product'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.innerHTML = '<option value="" disabled selected>-- Select Product --</option>' + allProducts.map(p => `<option value="${p.id}">${p.name} (Avail: ${p.stock||0})</option>`).join('');
+            });
+        }
+
+        function populateWarehouseSelects() {
+            const el = document.getElementById('bin-warehouse');
+            if(el) el.innerHTML = '<option value="" disabled selected>-- Select Warehouse --</option>' + allWarehouses.map(w => `<option value="${w.name}">${w.name}</option>`).join('');
+        }
+
+        function populateMerchantSelects() {
+            var el = document.getElementById('ap-merchant');
+            if(el) el.innerHTML = '<option value="" disabled selected>Select Merchant</option>' + allMerchants.filter(u => u.role === 'merchant').map(m => '<option value="'+m.id+'">'+(m.shopName || m.name)+'</option>').join('');
+        }
+
+        function handleAddWarehouse(e) {
+            e.preventDefault();
+            var data = { name: document.getElementById('wh-name').value.trim(), location: document.getElementById('wh-location').value.trim(), capacity: parseInt(document.getElementById('wh-capacity').value) || 0, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+            if(!data.name) return showT('Warehouse name is required', 'error');
+            db.collection('warehouses').add(data).then(() => { showT('Warehouse added!'); e.target.reset(); document.getElementById('add-warehouse-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+        }
+
+        function handleAddBin(e) {
+            e.preventDefault();
+            var data = { code: document.getElementById('bin-code').value.trim(), warehouse: document.getElementById('bin-warehouse').value, notes: document.getElementById('bin-notes').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+            if(!data.code || !data.warehouse) return showT('Bin Code and Warehouse are required', 'error');
+            db.collection('bins').add(data).then(() => { showT('Bin added!'); e.target.reset(); document.getElementById('add-bin-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+        }
+
+        function handleAddProduct(e) {
+            e.preventDefault();
+            var merchantSelect = document.getElementById('ap-merchant');
+            var data = {
+                name: document.getElementById('ap-name').value.trim(), sku: document.getElementById('ap-sku').value.trim(), warehouse: document.getElementById('ap-warehouse').value.trim() || 'Main Warehouse',
+                merchantId: merchantSelect.value, merchantName: merchantSelect.options[merchantSelect.selectedIndex].text,
+                stock: parseInt(document.getElementById('ap-stock').value) || 0, minStock: parseInt(document.getElementById('ap-minstock').value) || 10,
+                costPrice: parseInt(document.getElementById('ap-cost').value) || 0, sellingPrice: parseInt(document.getElementById('ap-price').value) || 0,
+                reserved: 0, damaged: 0, expired: 0, delivered: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if(!data.name || !data.merchantId) return showT('Product Name and Merchant are required', 'error');
+            db.collection('products').add(data).then(() => { showT('Product added!'); e.target.reset(); document.getElementById('ap-stock').value = 50; document.getElementById('ap-minstock').value = 10; document.getElementById('add-product-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+        }
+
+        function deleteItem(collection, id) {
+            if(!confirm('Are you sure you want to delete this permanently?')) return;
+            db.collection(collection).doc(id).delete().then(() => showT('Deleted!')).catch(err => showT(err.message, 'error'));
+        }
+
+        function restockReturned(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if(!order || !order.itemName) return showT('Cannot find item name to restock', 'error');
+            db.collection('products').where('name', '==', order.itemName).limit(1).get().then(snap => {
+                if(!snap.empty) {
+                    snap.docs[0].ref.update({ stock: firebase.firestore.FieldValue.increment(order.qty || 1) }).then(() => {
+                        db.collection('orders').doc(orderId).update({ status: 'restocked' }).then(() => showT('Item restocked successfully!'));
+                    });
+                } else { showT('Product not found in inventory', 'error'); }
+            });
+        }
+
+        function logHistory(prodId, prodName, type, qty, note) {
+            db.collection('stock_history').add({
+                productId: prodId, productName: prodName, type: type, qty: qty, note: note,
+                user: window.currentUser?.name || 'System',
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        function handleStockIn(e) {
+            e.preventDefault();
+            const prodId = document.getElementById('si-product').value;
+            const qty = parseInt(document.getElementById('si-qty').value);
+            const batch = document.getElementById('si-batch').value;
+            const expiry = document.getElementById('si-expiry').value;
+            if(!prodId || !qty) return;
+            let updateData = { stock: firebase.firestore.FieldValue.increment(qty) };
+            if(batch) updateData.batchNo = batch;
+            if(expiry) updateData.expiryDate = expiry;
+            db.collection('products').doc(prodId).update(updateData)
+            .then(() => { 
+                logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Stock In', qty, document.getElementById('si-note').value);
+                showT(`Added ${qty} to stock!`); e.target.reset(); 
+            })
+            .catch(err => showT(err.message, 'error'));
+        }
+        
+        function handleStockOut(e) {
+            e.preventDefault();
+            const prodId = document.getElementById('so-product').value;
+            const qty = parseInt(document.getElementById('so-qty').value);
+            const reason = document.getElementById('so-reason').value;
+            if(!prodId || !qty) return;
+            let updateData = { stock: firebase.firestore.FieldValue.increment(-qty), delivered: firebase.firestore.FieldValue.increment(qty) };
+            if(reason === 'damaged') updateData.damaged = firebase.firestore.FieldValue.increment(qty);
+            if(reason === 'expired') updateData.expired = firebase.firestore.FieldValue.increment(qty);
+            db.collection('products').doc(prodId).update(updateData)
+            .then(() => { 
+                logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Stock Out', qty, reason);
+                showT(`Removed ${qty} from stock!`); e.target.reset(); 
+            })
+            .catch(err => showT(err.message, 'error'));
+        }
+
+        function handleStockTransfer(e) {
+            e.preventDefault();
+            const prodId = document.getElementById('tr-product').value;
+            const qty = parseInt(document.getElementById('tr-qty').value);
+            const toWh = document.getElementById('tr-to').value;
+            if(!prodId || !qty) return;
+            db.collection('products').doc(prodId).update({ warehouse: toWh })
+            .then(() => { 
+                logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Transfer', qty, `To: ${toWh}`);
+                showT(`Transferred ${qty} items to ${toWh}!`); e.target.reset(); 
+            })
+            .catch(err => showT(err.message, 'error'));
+        }
+
+        function handleStockAdjust(e) {
+            e.preventDefault();
+            const prodId = document.getElementById('sa-product').value;
+            const newQty = parseInt(document.getElementById('sa-qty').value);
+            const deliveredVal = document.getElementById('sa-delivered').value;
+            const reason = document.getElementById('sa-reason').value;
+            if(!prodId || newQty === undefined) return;
+            let updateData = { stock: newQty };
+            if(deliveredVal !== '') updateData.delivered = parseInt(deliveredVal);
+            const costVal = document.getElementById('sa-cost').value;
+            if(costVal !== '') updateData.costPrice = parseInt(costVal);
+            db.collection('products').doc(prodId).update(updateData)
+            .then(() => { 
+                logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Adjustment', newQty, reason);
+                showT(`Stock adjusted to ${newQty}!`); e.target.reset(); 
+            })
+            .catch(err => showT(err.message, 'error'));
+        }
+
+        function renderHistory() {
+            const tbody = document.getElementById('hist-tbody');
+            if(!allHistory.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No stock movements recorded yet.</td></tr>'; return; }
+            const sorted = [...allHistory].sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+            tbody.innerHTML = sorted.map(h => {
+                const date = h.timestamp ? new Date(h.timestamp.seconds * 1000).toLocaleString() : 'N/A';
+                const typeColors = { 'Stock In': 'text-green-400', 'Stock Out': 'text-red-400', 'Transfer': 'text-cyan-400', 'Adjustment': 'text-yellow-400' };
+                return `<tr class="hover:bg-white/[0.02] transition-colors">
+                    <td class="p-4 text-slate-400 text-xs">${date}</td>
+                    <td class="p-4 text-white font-medium">${h.productName||'N/A'}</td>
+                    <td class="p-4 font-bold ${typeColors[h.type] || 'text-slate-400'}">${h.type||'N/A'}</td>
+                    <td class="p-4 text-right font-bold text-white">${h.qty||0}</td>
+                    <td class="p-4 text-slate-400 text-xs">${h.note || '—'} ${h.user ? '('+h.user+')' : ''}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function deductStockForOrder(order) {
+            if (!order.itemName || !order.merchantId || !order.qty) return;
+            try {
+                var snap = await db.collection('products').where('name', '==', order.itemName).where('merchantId', '==', order.merchantId).limit(1).get();
+                if (!snap.empty) {
+                    var prodDoc = snap.docs[0];
+                    var currentStock = prodDoc.data().stock || 0;
+                    var newStock = Math.max(0, currentStock - order.qty);
+                    await prodDoc.ref.update({ stock: newStock, delivered: firebase.firestore.FieldValue.increment(order.qty) });
+                }
+            } catch(e) { console.error("Error deducting stock:", e); }
+        }
+
+        // ===== SUPPLIERS LOGIC =====
+        function renderSuppliers() {
+            const tbody = document.getElementById('sup-tbody');
+            if(!allSuppliers.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No suppliers found. Add one!</td></tr>'; return; }
+            tbody.innerHTML = allSuppliers.map(s => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${s.name||'N/A'}</td><td class="p-4 text-slate-400">${s.phone||'—'}</td><td class="p-4 text-slate-400">${s.email||'—'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('suppliers','${s.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
+        }
+        function populateSupplierSelects() {
+            const el = document.getElementById('po-supplier');
+            if(el) el.innerHTML = '<option value="" disabled selected>-- Select Supplier --</option>' + allSuppliers.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+        }
+        function handleAddSupplier(e) {
+            e.preventDefault();
+            var data = { name: document.getElementById('sup-name').value.trim(), phone: document.getElementById('sup-phone').value.trim(), email: document.getElementById('sup-email').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+            if(!data.name) return showT('Supplier name is required', 'error');
+            db.collection('suppliers').add(data).then(() => { showT('Supplier added!'); e.target.reset(); document.getElementById('add-supplier-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+        }
+
+        // ===== PURCHASE ORDERS LOGIC =====
+        function renderPurchaseOrders() {
+            const tbody = document.getElementById('po-tbody');
+            if(!allPurchaseOrders.length) { tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-slate-500 text-sm">No Purchase Orders found.</td></tr>'; return; }
+            tbody.innerHTML = allPurchaseOrders.map(p => {
+                const isPending = p.status === 'pending';
+                return `<tr class="hover:bg-white/[0.02] transition-colors">
+                    <td class="p-4 text-white font-medium">#${(p.id || '').substring(0,6)}</td>
+                    <td class="p-4 text-slate-400">${p.supplier||'N/A'}</td>
+                    <td class="p-4 text-slate-400">${p.productName||'N/A'}</td>
+                    <td class="p-4 text-right font-bold text-white">${p.qty||0}</td>
+                    <td class="p-4 text-center"><span class="px-2 py-1 rounded-md ${isPending ? 'bg-yellow-500/10 text-yellow-400' : 'bg-green-500/10 text-green-400'} text-xs font-bold uppercase">${p.status||'PENDING'}</span></td>
+                    <td class="p-4 text-center">
+                        ${isPending ? `<button type="button" onclick="receivePO('${p.id}')" class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-lg hover:bg-green-400">Receive Stock</button>` : '<span class="text-slate-500 text-xs">Completed</span>'}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+        function handleAddPO(e) {
+            e.preventDefault();
+            var prodSelect = document.getElementById('po-product');
+            var data = {
+                supplier: document.getElementById('po-supplier').value,
+                productId: prodSelect.value,
+                productName: prodSelect.options[prodSelect.selectedIndex].text.split(' (')[0],
+                qty: parseInt(document.getElementById('po-qty').value) || 0,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if(!data.supplier || !data.productId) return showT('Supplier and Product are required', 'error');
+            db.collection('purchase_orders').add(data).then(() => { showT('PO Created!'); e.target.reset(); document.getElementById('add-po-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+        }
+        function receivePO(poId) {
+            const po = allPurchaseOrders.find(p => p.id === poId);
+            if(!po || po.status !== 'pending') return;
+            if(!confirm(`Receive ${po.qty} of ${po.productName} into inventory?`)) return;
+            db.collection('products').doc(po.productId).update({ stock: firebase.firestore.FieldValue.increment(po.qty) })
+            .then(() => {
+                db.collection('purchase_orders').doc(poId).update({ status: 'received' })
+                .then(() => showT('Stock received successfully!'));
+            }).catch(err => showT(err.message, 'error'));
+        }
+
+        // ===== DISPATCH / PACKING LOGIC =====
+        function renderDispatch() {
+            const tbody = document.getElementById('disp-tbody');
+            const dispatchOrders = allOrders.filter(o => ['confirmed', 'ready', 'processing'].includes((o.status || '').toLowerCase()));
+            if(!dispatchOrders.length) { tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-slate-500 text-sm">No orders ready for dispatch.</td></tr>'; return; }
+            tbody.innerHTML = dispatchOrders.map(o => {
+                const name = o.customerName || o.customer || o.name || 'N/A';
+                const item = o.itemName || o.item || o.productName || o.product || 'N/A';
+                const qty = o.qty || o.quantity || o.totalQty || 1;
+                const oid = (o.id || '').substring(0,6);
+                return `<tr class="hover:bg-white/[0.02] transition-colors">
+                    <td class="p-4 text-white font-medium">#${oid}</td>
+                    <td class="p-4 text-slate-400">${name}</td>
+                    <td class="p-4 text-slate-400">${item}</td>
+                    <td class="p-4 text-right font-bold text-white">${qty}</td>
+                    <td class="p-4 text-center flex gap-2 justify-center">
+                        <button onclick="printDocument('picklist', '${oid}', '${name}', '${item}', ${qty})" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Pick List</button>
+                        <span class="text-slate-600">|</span>
+                        <button onclick="printDocument('slip', '${oid}', '${name}', '${item}', ${qty})" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Packing Slip</button>
+                    </td>
+                    <td class="p-4 text-center"><button type="button" onclick="dispatchOrder('${o.id}', '${o.merchantId || ''}', '${item}', ${qty})" class="bg-cyan-500 text-white text-xs font-bold px-3 py-1 rounded-lg hover:bg-cyan-400">Dispatch</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        function printDocument(type, oid, name, item, qty) {
+            const win = window.open('', '_blank', 'width=800,height=600');
+            const title = type === 'picklist' ? 'PICK LIST' : 'PACKING SLIP';
+            const color = type === 'picklist' ? '#dc2626' : '#0ea5e9';
+            win.document.write(`<html><head><title>${title} - ${oid}</title><style>body{font-family:sans-serif;padding:40px;color:#111}.header{border-bottom:3px solid ${color};padding-bottom:20px;margin-bottom:30px}.title{font-size:32px;font-weight:800;color:${color};margin:0}.info{display:flex;justify-content:space-between;margin-bottom:40px;font-size:14px}.box{border:1px dashed #999;padding:30px;text-align:center;margin-bottom:30px}.item{font-size:24px;font-weight:bold;margin-top:10px}.qty{font-size:48px;font-weight:800;color:${color}}</style></head><body>
+                <div class="header"><h1 class="title">${title}</h1></div>
+                <div class="info"><div><strong>Order ID:</strong> #${oid}</div><div><strong>Customer:</strong> ${name}</div></div>
+                <div class="box"><div style="font-size:14px;color:#666">ITEM TO ${type === 'picklist' ? 'PICK' : 'PACK'}</div><div class="item">${item}</div><div class="qty">${qty} PCS</div></div>
+                ${type === 'picklist' ? '<p style="font-size:12px;color:#666">* Picker Signature: ___________________________</p>' : '<p style="font-size:12px;color:#66px">Thank you for your order!</p>'}
+                <script>window.onload = function() { window.print(); }<\/script>
+            </body></html>`);
+            win.document.close();
+        }
+        async function dispatchOrder(orderId, merchantId, itemName, qty) {
+            if(!confirm('Dispatch this order? This will deduct stock and mark as Out for Delivery.')) return;
+            try {
+                var snap = await db.collection('products').where('name', '==', itemName).limit(1).get();
+                if (!snap.empty) {
+                    var prodDoc = snap.docs[0];
+                    var currentStock = prodDoc.data().stock || 0;
+                    var newStock = Math.max(0, currentStock - qty);
+                    await prodDoc.ref.update({ stock: newStock, delivered: firebase.firestore.FieldValue.increment(qty) });
+                }
+                await db.collection('orders').doc(orderId).update({ status: 'out_for_delivery' });
+                showT('Order dispatched successfully!');
+            } catch(e) { showT('Error dispatching: ' + e.message, 'error'); }
+        }
+
+        // ===== REPORTS LOGIC =====
+        function renderReports() { switchReport(currentReport); }
+
+        function switchReport(type) {
+            currentReport = type;
+            document.querySelectorAll('.rpt-tab').forEach(t => t.classList.remove('active'));
+            const activeTab = document.getElementById('rpt-tab-' + type);
+            if(activeTab) activeTab.classList.add('active');
+            const c = document.getElementById('rpt-content');
+            let html = '';
+
+            if(type === 'inventory') {
+                html += `<h3 class="text-base font-bold text-white mb-4">Current Inventory Report</h3>
+                <div class="overflow-x-auto"><table class="w-full text-sm">
+                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">SKU</th><th class="p-3 text-right">Available</th><th class="p-3 text-right">Delivered</th><th class="p-3 text-right">Value (TZS)</th></tr></thead>
+                    <tbody class="divide-y divide-white/[0.05]">`;
+                allProducts.forEach(p => {
+                    html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-slate-400 font-mono text-xs">${p.sku||'—'}</td><td class="p-3 text-right font-bold text-white">${p.stock||0}</td><td class="p-3 text-right text-cyan-400">${p.delivered||0}</td><td class="p-3 text-right text-green-400">${((p.stock||0) * (p.costPrice||0)).toLocaleString()}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+            } 
+            else if(type === 'low') {
+                const items = allProducts.filter(p => p.stock > 0 && p.stock <= (p.minStock || 0));
+                html += `<h3 class="text-base font-bold text-white mb-4">Low Stock Report (${items.length} items)</h3>
+                <div class="overflow-x-auto"><table class="w-full text-sm">
+                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">Current</th><th class="p-3 text-right">Reorder Lvl</th><th class="p-3 text-right">Deficit</th></tr></thead>
+                    <tbody class="divide-y divide-white/[0.05]">`;
+                if(!items.length) html += `<tr><td colspan="4" class="p-4 text-center text-slate-500">No low stock items</td></tr>`;
+                items.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-right font-bold text-yellow-400">${p.stock||0}</td><td class="p-3 text-right text-slate-500">${p.minStock||0}</td><td class="p-3 text-right text-red-400">-${(p.minStock||0) - (p.stock||0)}</td></tr>`; });
+                html += `</tbody></table></div>`;
+            }
+            else if(type === 'out') {
+                const items = allProducts.filter(p => p.stock <= 0);
+                html += `<h3 class="text-base font-bold text-white mb-4">Out of Stock Report (${items.length} items)</h3>
+                <div class="overflow-x-auto"><table class="w-full text-sm">
+                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">SKU</th><th class="p-3 text-right">Last Delivered</th></tr></thead>
+                    <tbody class="divide-y divide-white/[0.05]">`;
+                if(!items.length) html += `<tr><td colspan="3" class="p-4 text-center text-slate-500">No out of stock items</td></tr>`;
+                items.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-slate-400 font-mono text-xs">${p.sku||'—'}</td><td class="p-3 text-right text-cyan-400">${p.delivered||0}</td></tr>`; });
+                html += `</tbody></table></div>`;
+            }
+            else if(type === 'expired' || type === 'damaged') {
+                const isExpired = type === 'expired';
+                const items = allProducts.filter(p => (isExpired ? p.expired : p.damaged) > 0);
+                html += `<h3 class="text-base font-bold text-white mb-4">${isExpired ? 'Expired' : 'Damaged'} Stock Report (${items.length} items)</h3>
+                <div class="overflow-x-auto"><table class="w-full text-sm">
+                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">Warehouse</th><th class="p-3 text-right">Qty</th></tr></thead>
+                    <tbody class="divide-y divide-white/[0.05]">`;
+                if(!items.length) html += `<tr><td colspan="3" class="p-4 text-center text-slate-500">No ${isExpired ? 'expired' : 'damaged'} items</td></tr>`;
+                items.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-slate-400">${p.warehouse||'Main'}</td><td class="p-3 text-right font-bold text-${isExpired ? 'orange' : 'pink'}-400">${isExpired ? p.expired : p.damaged}</td></tr>`; });
+                html += `</tbody></table></div>`;
+            }
+            else if(type === 'movement') {
+                html += `<h3 class="text-base font-bold text-white mb-4">Stock Movement Report</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white/[0.02] p-4 rounded-xl border border-white/10"><div class="text-xs text-slate-500 mb-1">Total Stock In (Available)</div><div class="text-2xl font-bold text-green-400">${allProducts.reduce((s,p)=>s+(p.stock||0),0)}</div></div>
+                    <div class="bg-white/[0.02] p-4 rounded-xl border border-white/10"><div class="text-xs text-slate-500 mb-1">Total Stock Out (Delivered)</div><div class="text-2xl font-bold text-red-400">${allProducts.reduce((s,p)=>s+(p.delivered||0),0)}</div></div>
+                </div>
+                <div class="overflow-x-auto"><table class="w-full text-sm">
+                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">In</th><th class="p-3 text-right">Out</th><th class="p-3 text-right">Current</th></tr></thead>
+                    <tbody class="divide-y divide-white/[0.05]">`;
+                allProducts.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-right text-green-400">${(p.stock||0) + (p.delivered||0)}</td><td class="p-3 text-right text-red-400">${p.delivered||0}</td><td class="p-3 text-right font-bold text-white">${p.stock||0}</td></tr>`; });
+                html += `</tbody></table></div>`;
+            }
+            else if(type === 'valuation') {
+                const totalVal = allProducts.reduce((s,p)=>s+((p.stock||0)*(p.costPrice||0)),0);
+                html += `<h3 class="text-base font-bold text-white mb-4">Stock Valuation Report (Total: TZS ${totalVal.toLocaleString()})</h3>
+                <div class="overflow-x-auto"><table class="w-full text-sm">
+                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">Qty</th><th class="p-3 text-right">Unit Cost (TZS)</th><th class="p-3 text-right">Total Value (TZS)</th></tr></thead>
+                    <tbody class="divide-y divide-white/[0.05]">`;
+                allProducts.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-right font-bold text-white">${p.stock||0}</td><td class="p-3 text-right text-slate-400">${(p.costPrice||0).toLocaleString()}</td><td class="p-3 text-right text-green-400">${((p.stock||0)*(p.costPrice||0)).toLocaleString()}</td></tr>`; });
+                html += `</tbody></table></div>`;
+            }
+            else if(type === 'audit') {
+                html += `<h3 class="text-base font-bold text-white mb-4">Inventory Audit Report</h3>
+                <div class="overflow-x-auto"><table class="w-full text-sm">
+                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">Warehouse</th><th class="p-3 text-right">System Qty</th><th class="p-3 text-right">Physical Count</th><th class="p-3 text-right">Variance</th></tr></thead>
+                    <tbody class="divide-y divide-white/[0.05]">`;
+                allProducts.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-slate-400">${p.warehouse||'Main'}</td><td class="p-3 text-right text-blue-400">${p.stock||0}</td><td class="p-3 text-right text-slate-500">—</td><td class="p-3 text-right text-slate-500">—</td></tr>`; });
+                html += `</tbody></table></div>`;
+            }
+            else if(type === 'fast' || type === 'slow') {
+                const isFast = type === 'fast';
+                const sorted = [...allProducts].sort((a,b) => isFast ? (b.delivered||0)-(a.delivered||0) : (a.delivered||0)-(b.delivered||0));
+                const items = sorted.slice(0, 10);
+                html += `<h3 class="text-base font-bold text-white mb-4">${isFast ? 'Fast' : 'Slow'} Moving Products (Top 10)</h3>
+                <div class="overflow-x-auto"><table class="w-full text-sm">
+                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">Delivered</th><th class="p-3 text-right">Current Stock</th></tr></thead>
+                    <tbody class="divide-y divide-white/[0.05]">`;
+                items.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-right font-bold text-${isFast ? 'green' : 'red'}-400">${p.delivered||0}</td><td class="p-3 text-right text-slate-400">${p.stock||0}</td></tr>`; });
+                html += `</tbody></table></div>`;
+            }
+            c.innerHTML = html;
+        }
+
+        function renderSettings() {
+            if(!window.currentUser) return;
+            document.getElementById('set-name').value = window.currentUser.name || '';
+            document.getElementById('set-email').value = window.currentUser.email || '';
+            document.getElementById('set-phone').value = window.currentUser.phone || '';
+        }
+
+        function saveStockSettings(e) {
+            e.preventDefault();
+            const name = document.getElementById('set-name').value.trim();
+            const phone = document.getElementById('set-phone').value.trim();
+            if(!name) return showT('Name is required', 'error');
+            db.collection('users').doc(window.currentUser.uid).update({ name: name, phone: phone })
+            .then(() => { showT('Profile updated!'); window.currentUser.name = name; window.currentUser.phone = phone; document.getElementById('header-name').textContent = name; document.getElementById('header-avatar').textContent = name.charAt(0).toUpperCase(); })
+            .catch(err => showT(err.message, 'error'));
+        }
+
+        function renderNotifications() {
+            const c = document.getElementById('notif-list-stock');
+            const alerts = allProducts.filter(p => p.stock <= (p.minStock || 0));
+            const badge = document.getElementById('notif-count-badge');
+            if(badge) { if(alerts.length > 0) { badge.classList.remove('hidden'); badge.textContent = alerts.length; } else { badge.classList.add('hidden'); } }
+            if(!alerts.length) { c.innerHTML = '<div class="text-center py-10 text-slate-500 text-sm">No new notifications. All stock levels are healthy!</div>'; return; }
+            c.innerHTML = alerts.map(p => {
+                const isOut = p.stock <= 0;
+                const msg = isOut ? `${p.name} is completely OUT OF STOCK.` : `${p.name} is low on stock (${p.stock} left, min: ${p.minStock || 0}).`;
+                return `<div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-start gap-3"><div class="w-9 h-9 rounded-lg ${isOut ? 'text-red-400 bg-red-500/10' : 'text-yellow-400 bg-yellow-500/10'} flex items-center justify-center flex-shrink-0"><span class="iconify text-lg" data-icon="${isOut ? 'mdi:alert-circle' : 'mdi:alert'}"></span></div><div class="flex-1"><div class="text-sm text-white font-medium">${msg}</div><div class="text-xs text-slate-500 mt-1">Merchant: ${p.merchantName || 'N/A'}</div></div></div>`;
+            }).join('');
+        }
+
+        function clearStockNotifs() {
+            document.getElementById('notif-list-stock').innerHTML = '<div class="text-center py-10 text-slate-500 text-sm">No new notifications.</div>';
+            const badge = document.getElementById('notif-count-badge');
+            if(badge) badge.classList.add('hidden');
+            showT('Notifications cleared');
         }
     </script>
 </body>

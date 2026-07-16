@@ -92,8 +92,9 @@
 .notif-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:380px;background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;box-shadow:0 25px 50px rgba(0,0,0,0.5);z-index:60;overflow:hidden;display:none}
 .notif-dropdown.open{display:block}
 .notif-header{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:between}
-.notif-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;cursor:pointer;transition:background .1s;border-bottom:1px solid rgba(255,255,255,0.03)}
-.notif-item:hover{background:rgba(255,255,255,0.03)}
+.notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;cursor:pointer;transition:all .15s;border-bottom:1px solid rgba(255,255,255,0.04)}
+.notif-item:hover{background:rgba(6,182,212,0.05)}
+.notif-item.unread{background:rgba(6,182,212,0.03)}
 .notif-item:last-child{border-bottom:none}
 .notif-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
         
@@ -205,9 +206,35 @@
                         <button type="button" data-tab="cc-perf" data-panel="cc-perf" data-title="Agent Performance" class="sb-child">Agent Performance</button>
                         <button type="button" data-tab="orders" data-panel="orders" data-status-filter="escalations" data-title="Escalations" class="sb-child">Escalations</button>
                                               <button type="button" data-tab="tickets" data-panel="tickets" class="sb-child">Support Tickets</button>
-                        <button type="button" data-tab="livechat" data-panel="livechat" data-title="Live Chat Support" class="sb-child">Live Chat</button>
+                                                                      <button type="button" data-tab="livechat" data-panel="livechat" data-title="Live Chat Support" class="sb-child">Live Chat</button>
                     </div>
-                </div>       <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Customers</div>
+                </div> 
+                
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Riders</div>
+                <div class="sb-section">
+                    <button type="button" class="sb-header" data-section="riders"><span class="iconify text-lg" data-icon="mdi:moped"></span><span class="sb-label">Rider Management</span><span class="iconify sb-arrow" data-icon="mdi:chevron-down"></span></button>
+                    <div class="sb-children" id="sec-riders">
+                        <button type="button" data-tab="rider-create" data-panel="rider-create" data-title="Create Rider Account" class="sb-child">Create Rider Account</button>
+                    </div>
+                </div>
+
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Inventory</div>
+                <div class="sb-section">
+                    <button type="button" class="sb-header" data-section="stock"><span class="iconify text-lg" data-icon="mdi:warehouse"></span><span class="sb-label">Stock Management</span><span class="iconify sb-arrow" data-icon="mdi:chevron-down"></span></button>
+                    <div class="sb-children" id="sec-stock">
+                        <button type="button" data-tab="stock-create" data-panel="stock-create" data-title="Create Stock Account" class="sb-child">Create Stock Staff Account</button>
+                    </div>
+                </div>
+
+                <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Follow Up</div>
+                <div class="sb-section">
+                    <button type="button" class="sb-header" data-section="followup"><span class="iconify text-lg" data-icon="mdi:phone-follow"></span><span class="sb-label">Follow-Up Management</span><span class="iconify sb-arrow" data-icon="mdi:chevron-down"></span></button>
+                    <div class="sb-children" id="sec-followup">
+                        <button type="button" data-tab="followup-create" data-panel="followup-create" data-title="Create Follow-Up Account" class="sb-child">Create Follow-Up Account</button>
+                    </div>
+                </div>
+
+       <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Customers</div>
                 <div class="sb-section">
                     <button type="button" class="sb-header" data-section="cust"><span class="iconify text-lg" data-icon="mdi:account-group-outline"></span><span class="sb-label">Customer Management</span><span class="iconify sb-arrow" data-icon="mdi:chevron-down"></span></button>
                     <div class="sb-children" id="sec-cust">
@@ -597,6 +624,49 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- CREATE RIDER ACCOUNT -->
+                <div id="panel-rider-create" class="tab-panel hidden">
+                    <div class="max-w-lg"><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:moped"></span> Create Rider Account</h3>
+                        <form id="rider-form" class="space-y-4">
+                            <div><label class="form-label">Full Name *</label><input type="text" id="rider-name" required class="input-dark" placeholder="Rider Name"></div>
+                            <div><label class="form-label">Email *</label><input type="email" id="rider-email" required class="input-dark" placeholder="rider@chapshop.com"></div>
+                            <div><label class="form-label">Password *</label><input type="password" id="rider-pass" required minlength="6" class="input-dark" placeholder="Min 6 characters"></div>
+                            <div><label class="form-label">Phone</label><input type="text" id="rider-phone" class="input-dark" placeholder="+255..."></div>
+                            <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Create Rider Account</button>
+                        </form>
+                    </div></div>
+                </div>
+
+                <!-- CREATE STOCK ACCOUNT -->
+                <div id="panel-stock-create" class="tab-panel hidden">
+                    <div class="max-w-lg"><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:warehouse"></span> Create Stock Staff Account</h3>
+                        <form id="stock-form" class="space-y-4">
+                            <div><label class="form-label">Full Name *</label><input type="text" id="stock-name" required class="input-dark" placeholder="Staff Name"></div>
+                            <div><label class="form-label">Email *</label><input type="email" id="stock-email" required class="input-dark" placeholder="stock@chapshop.com"></div>
+                            <div><label class="form-label">Password *</label><input type="password" id="stock-pass" required minlength="6" class="input-dark" placeholder="Min 6 characters"></div>
+                            <div><label class="form-label">Phone</label><input type="text" id="stock-phone" class="input-dark" placeholder="+255..."></div>
+                            <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Create Stock Account</button>
+                        </form>
+                    </div></div>
+                </div>
+
+                <!-- CREATE FOLLOW-UP ACCOUNT -->
+                <div id="panel-followup-create" class="tab-panel hidden">
+                    <div class="max-w-lg"><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:phone-follow"></span> Create Follow-Up Agent Account</h3>
+                        <form id="followup-form" class="space-y-4">
+                            <div><label class="form-label">Full Name *</label><input type="text" id="followup-name" required class="input-dark" placeholder="Agent Name"></div>
+                            <div><label class="form-label">Email *</label><input type="email" id="followup-email" required class="input-dark" placeholder="followup@chapshop.com"></div>
+                            <div><label class="form-label">Password *</label><input type="password" id="followup-pass" required minlength="6" class="input-dark" placeholder="Min 6 characters"></div>
+                            <div><label class="form-label">Phone</label><input type="text" id="followup-phone" class="input-dark" placeholder="+255..."></div>
+                            <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Create Follow-Up Account</button>
+                        </form>
+                    </div></div>
+                </div>
+
                 <!-- CUSTOMERS -->
                 <div id="panel-customers" class="tab-panel hidden">
                     <div class="mb-5 relative max-w-sm"><span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="customer-search" oninput="renderCustomers()" placeholder="Search name or phone..." class="input-dark pl-11"></div>
@@ -859,7 +929,7 @@ function getMPDataP(u,list){var mO=list.filter(function(o){return o.merchantId==
 function dlReport(){var type=reportType||'revenue';var list=byPeriod(allOrders,'createdAt',reportPeriod);if(type==='merchant'){dlCSV('merchant-report-'+reportPeriod+'.csv',['Merchant','Shop','Total','Delivered','Pending','Cancelled','Returned','Revenue','Success%'],allUsers.filter(function(u){return u.role==='merchant'}).map(function(u){var r=getMPDataP(u,list);return[r.u.name,r.u.shopName||'',r.t,r.d,r.p,r.c,r.r,r.rev,r.rate+'%']}))}else if(type==='shipping'){dlCSV('shipping-report-'+reportPeriod+'.csv',['Name','Role','Total','Delivered','Active','Returned','Revenue'],allUsers.filter(function(u){return u.role==='shipping'||u.role==='shipping_manager'}).map(function(u){var rO=list.filter(function(o){return o.riderId===u.id});return[u.name,u.role,rO.length,rO.filter(function(o){return o.status==='delivered'}).length,rO.filter(function(o){return o.status==='out_for_delivery'}).length,rO.filter(function(o){return o.status==='returned'}).length,rO.filter(function(o){return o.status==='delivered'}).reduce(function(s,o){return s+(o.totalAmount||0)},0)]}))}else if(type==='callcenter'){dlCSV('cc-report-'+reportPeriod+'.csv',['Agent','Calls','Confirmed','No Reply','Wrong#','Cancelled','Callback','OutRegion','Conversion%','Avg Call'],allUsers.filter(function(u){return u.role==='call_center'}).map(function(u){var aO=list.filter(function(o){return o.processedBy===u.id});var h=aO.filter(function(o){return['confirmed','no_answer','delivered','cancelled','wrong_number','callback_requested','out_of_region'].indexOf(o.status)!==-1});var d=aO.filter(function(o){return o.status==='delivered'}).length;var ts=aO.reduce(function(s,o){return s+(o.callDuration||0)},0);return[u.name,h.length,d,aO.filter(function(o){return o.status==='no_answer'}).length,aO.filter(function(o){return o.status==='wrong_number'}).length,aO.filter(function(o){return o.status==='cancelled'}).length,aO.filter(function(o){return o.status==='callback_requested'}).length,aO.filter(function(o){return o.status==='out_of_region'}).length,h.length?Math.round(d/h.length*100)+'%':'0%',h.length?fmtDur(Math.round(ts/h.length)):'0s']}))}else{var sc={};list.forEach(function(o){sc[o.status]=(sc[o.status]||0)+1});dlCSV('revenue-report-'+reportPeriod+'.csv',['Status','Count','Percentage'],Object.keys(sc).sort(function(a,b){return sc[b]-sc[a]}).map(function(s){return[s,sc[s],list.length?Math.round(sc[s]/list.length*100)+'%':'0%']}))}}
 
 /* ===== USERS ===== */
-function renderUsers(){var c=$('users-list');if(!c)return;var list=allUsers.filter(function(u){return u.role!=='admin'});if(!list.length){c.innerHTML=empty('mdi:shield-key-outline','No users.');return}var rc={'merchant':'bg-cyan-500/10 text-cyan-400','call_center':'bg-orange-500/10 text-orange-400','shipping':'bg-violet-500/10 text-violet-400','shipping_manager':'bg-violet-500/10 text-violet-400'};c.innerHTML=list.map(function(u){var r=rc[u.role]||'bg-slate-500/10 text-slate-400';return'<div class="data-card p-4 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl '+(r.split(' ')[0])+' flex items-center justify-center '+(r.split(' ')[1])+' font-bold text-lg">'+(u.name||'U').charAt(0).toUpperCase()+'</div><div><div class="text-white font-bold">'+u.name+(u.approved===false?' <span class="badge bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">PENDING</span>':'')+'</div><div class="text-slate-500 text-sm">'+u.email+(u.shopName?' · '+u.shopName:'')+'</div></div></div><div class="flex items-center gap-3"><span class="badge '+r+'">'+u.role.replace(/_/g,' ')+'</span><button type="button" class="p-2 rounded-lg hover:bg-white/[0.04] '+(u.active?'text-green-400':'text-red-400')+'" data-toggle="'+u.id+'" data-state="'+!u.active+'"><span class="iconify text-xl" data-icon="'+(u.active?'mdi:toggle-switch':'mdi:toggle-switch-off-outline')+'"></span></button><button type="button" class="p-2 rounded-lg hover:bg-red-500/10 text-slate-500 hover:text-red-400" data-delete="'+u.id+'"><span class="iconify text-xl" data-icon="mdi:delete-outline"></span></button></div></div>'}).join('')}
+function renderUsers(){var c=$('users-list');if(!c)return;var list=allUsers.filter(function(u){return u.role!=='admin'});if(!list.length){c.innerHTML=empty('mdi:shield-key-outline','No users.');return}var rc={'merchant':'bg-cyan-500/10 text-cyan-400','call_center':'bg-orange-500/10 text-orange-400','shipping':'bg-violet-500/10 text-violet-400','shipping_manager':'bg-violet-500/10 text-violet-400','rider':'bg-emerald-500/10 text-emerald-400','stock':'bg-amber-500/10 text-amber-400','follow_up':'bg-pink-500/10 text-pink-400'};c.innerHTML=list.map(function(u){var r=rc[u.role]||'bg-slate-500/10 text-slate-400';return'<div class="data-card p-4 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl '+(r.split(' ')[0])+' flex items-center justify-center '+(r.split(' ')[1])+' font-bold text-lg">'+(u.name||'U').charAt(0).toUpperCase()+'</div><div><div class="text-white font-bold">'+u.name+(u.approved===false?' <span class="badge bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">PENDING</span>':'')+'</div><div class="text-slate-500 text-sm">'+u.email+(u.shopName?' · '+u.shopName:'')+'</div></div></div><div class="flex items-center gap-3"><span class="badge '+r+'">'+u.role.replace(/_/g,' ')+'</span><button type="button" class="p-2 rounded-lg hover:bg-white/[0.04] '+(u.active?'text-green-400':'text-red-400')+'" data-toggle="'+u.id+'" data-state="'+!u.active+'"><span class="iconify text-xl" data-icon="'+(u.active?'mdi:toggle-switch':'mdi:toggle-switch-off-outline')+'"></span></button><button type="button" class="p-2 rounded-lg hover:bg-red-500/10 text-slate-500 hover:text-red-400" data-delete="'+u.id+'"><span class="iconify text-xl" data-icon="mdi:delete-outline"></span></button></div></div>'}).join('')}
 
 /* ===== ROLES ===== */
 function renderRoles(){var c=$('roles-content');if(!c)return;var roles=[{n:'Merchant',r:'merchant',c:'cyan',i:'mdi:storefront',d:'Create products, manage orders, view sales'},{n:'Call Center',r:'call_center',c:'orange',i:'mdi:headset',d:'Handle calls, confirm orders, track performance'},{n:'Shipping Staff',r:'shipping',c:'violet',i:'mdi:truck-fast',d:'Manage deliveries, update status, handle returns'},{n:'Shipping Manager',r:'shipping_manager',c:'violet',i:'mdi:truck-cog',d:'Oversee shipping operations, staff management'},{n:'Admin',r:'admin',c:'rose',i:'mdi:shield-account',d:'Full system access'}];c.innerHTML='<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'+roles.map(function(r){var cnt=allUsers.filter(function(u){return u.role===r.r}).length,act=allUsers.filter(function(u){return u.role===r.r&&u.active}).length;return'<div class="perf-card"><div class="perf-accent bg-gradient-to-r from-'+r.c+'-500 to-transparent"></div><div class="flex items-center gap-4 mb-4"><div class="w-14 h-14 rounded-2xl bg-'+r.c+'-500/10 flex items-center justify-center"><span class="iconify text-2xl text-'+r.c+'-400" data-icon="'+r.i+'"></span></div><div><div class="text-white font-bold text-lg">'+r.n+'</div><div class="text-sm text-slate-500">'+r.d+'</div></div></div><div class="grid grid-cols-2 gap-3 text-center pt-3 border-t border-white/[0.05]"><div><div class="text-2xl font-extrabold text-'+r.c+'-400">'+cnt+'</div><div class="text-sm text-slate-500">Total</div></div><div><div class="text-2xl font-extrabold text-green-400">'+act+'</div><div class="text-sm text-slate-500">Active</div></div></div></div>'}).join('')+'</div>'}
@@ -930,21 +1000,30 @@ function openNotifDropdown(){
 
 function renderNotifList(){
     var c=$('notif-list');if(!c)return;
-    var items=notifs.slice(0,20);
-    if(!items.length){c.innerHTML='<div class="notif-empty"><span class="iconify text-3xl text-slate-700" data-icon="mdi:bell-off-outline"></span><p class="text-slate-500 text-sm mt-2">No notifications yet</p></div>';return}
+    var items=notifs.slice(0,30);
+    if(!items.length){c.innerHTML='<div class="notif-empty"><span class="iconify text-4xl text-slate-700 mx-auto block mb-2" data-icon="mdi:bell-off-outline"></span><p class="text-slate-500 text-sm">You\'re all caught up!</p></div>';return}
+    
     c.innerHTML=items.map(function(n){
-        var dotColor=n.type==='pending'?'bg-yellow-400':'bg-red-400';
-        var label=n.type==='pending'?'NEW ORDER':'ESCALATION';
-        var labelColor=n.type==='pending'?'text-yellow-400':'text-red-400';
-        return'<div class="notif-item'+(n.read?' opacity-50':'')+'" data-notif-id="'+n.id+'" data-notif-goto="'+n.type==='pending'?'orders':'orders'+'" data-notif-filter="'+n.type==='pending'?'pending':'escalations'+'">'+
-            '<div class="notif-dot '+dotColor+'"></div>'+
-            '<div class="flex-1 min-w-0">'+
-                '<div class="flex items-center gap-2 mb-0.5"><span class="text-[10px] font-bold '+labelColor+'">'+label+'</span><span class="text-slate-600 text-[10px]">'+fmtDate(n.time)+'</span></div>'+
-                '<div class="text-sm text-white font-medium truncate">'+n.text+'</div>'+
-                '<div class="text-xs text-slate-500 font-mono">#'+n.id.slice(-6).toUpperCase()+'</div>'+
-            '</div>'+
-            (!n.read?'<div class="w-2 h-2 rounded-full bg-cyan-400 flex-shrink-0 mt-2"></div>':'')+
-        '</div>'
+        var dotColor = n.type==='pending' ? 'bg-yellow-400' : 'bg-red-400';
+        var label = n.type==='pending' ? 'NEW ORDER' : 'ESCALATION';
+        var labelBg = n.type==='pending' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20';
+        
+        // Fixed the string concatenation bug here
+        var goto = 'orders';
+        var filter = n.type === 'pending' ? 'pending' : 'escalations';
+        
+        return '<div class="notif-item '+(!n.read ? 'unread' : '')+'" data-notif-id="'+n.id+'" data-notif-goto="'+goto+'" data-notif-filter="'+filter+'">'+
+                    '<div class="notif-dot '+dotColor+' mt-1.5"></div>'+
+                    '<div class="flex-1 min-w-0">'+
+                        '<div class="flex items-center justify-between gap-2 mb-1.5">'+
+                            '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold '+labelBg+'">'+label+'</span>'+
+                            '<span class="text-slate-500 text-[10px] whitespace-nowrap">'+fmtDate(n.time)+'</span>'+
+                        '</div>'+
+                        '<div class="text-sm text-white font-medium truncate mb-1">'+n.text+'</div>'+
+                        '<div class="text-xs text-cyan-400 font-mono">#'+n.id.slice(-6).toUpperCase()+'</div>'+
+                    '</div>'+
+                    (!n.read ? '<div class="w-2.5 h-2.5 rounded-full bg-cyan-400 flex-shrink-0 mt-2"></div>' : '')+
+                '</div>';
     }).join('');
 }
 
@@ -1007,7 +1086,7 @@ function showDuplicateWarning(dupes,formData){var h='<div class="modal-overlay" 
 /* ===== REFUNDS ===== */
 function startRefundListener(){if(refundListenerStarted)return;refundListenerStarted=true;db.collection('refunds').orderBy('createdAt','desc').limit(200).onSnapshot(function(s){refundLogs=snapDocs(s);renderRefunds()})}
 function renderRefunds(){var c=$('refunds-list');if(!c)return;startRefundListener();var list=byPeriod(refundLogs,'createdAt',refundPeriod);var f=($('refund-filter')||{}).value||'';if(f)list=list.filter(function(r){return r.status===f});setEl('rf-pending',refundLogs.filter(function(r){return r.status==='pending'}).length);setEl('rf-approved',refundLogs.filter(function(r){return r.status==='approved'}).length);setEl('rf-processed',refundLogs.filter(function(r){return r.status==='processed'}).length);setEl('rf-total',fmtM(refundLogs.filter(function(r){return r.status==='processed'||r.status==='approved'}).reduce(function(s,r){return s+(r.amount||0)},0)));if(!list.length){c.innerHTML=empty('mdi:cash-refund','No refunds found.');return}var rc={pending:'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',approved:'bg-green-500/10 text-green-400 border border-green-500/20',processed:'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20',rejected:'bg-red-500/10 text-red-400 border border-red-500/20'};c.innerHTML=list.map(function(r){return'<div class="data-card p-4"><div class="flex items-center justify-between mb-2"><div class="flex items-center gap-3"><span class="font-mono text-cyan-400 font-bold text-sm">#'+r.id.slice(-6).toUpperCase()+'</span><span class="badge '+(rc[r.status]||rc.pending)+'">'+r.status.toUpperCase()+'</span></div><span class="text-lg font-extrabold text-white">'+fmtM(r.amount)+'</span></div><div class="text-white font-medium text-sm">'+(r.customerName||'')+' <span class="text-slate-500">· '+(r.customerPhone||'')+'</span></div><div class="text-slate-500 text-sm mt-0.5">Order: #'+(r.orderId||'').slice(-6).toUpperCase()+' · '+(r.itemName||'')+' x'+(r.qty||1)+'</div><div class="text-slate-500 text-sm">Reason: '+(r.reason||'N/A')+'</div><div class="flex items-center justify-between mt-3 pt-3 border-t border-white/[0.05]"><span class="text-slate-600 text-xs">'+fmtDate(r.createdAt)+(r.processedAt?' · Processed: '+fmtDate(r.processedAt):'')+'</span><div class="flex gap-2">'+(r.status==='pending'?'<button type="button" class="btn-sm green" style="padding:4px 10px;font-size:11px" data-approve-refund="'+r.id+'">Approve</button><button type="button" class="btn-sm red" style="padding:4px 10px;font-size:11px" data-reject-refund="'+r.id+'">Reject</button>':'')+(r.status==='approved'?'<button type="button" class="btn-sm cyan" style="padding:4px 10px;font-size:11px" data-process-refund="'+r.id+'">Mark Processed</button>':'')+'</div></div></div>'}).join('')}
-function openCreateRefund(){var delivered=allOrders.filter(function(o){return o.status==='delivered'||o.status==='returned'});if(!delivered.length){showT('No delivered/returned orders to refund','error');return}var h='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box" style="max-width:500px"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white flex items-center gap-2"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:cash-refund"></span> New Refund</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="refund-form" class="space-y-4"><div><label class="form-label">Select Order <span class="text-red-400">*</span></label><select id="rf-order" required class="input-dark" onchange="rfOrderChanged()"><option value="" class="bg-slate-900">-- Select Order --</option>'+delivered.slice(0,50).map(function(o){return'<option value="'+o.id+'" class="bg-slate-900">#'+o.id.slice(-6).toUpperCase()+' — '+(o.customerName||'')+' — '+fmtM(o.totalAmount)+'</option>'}).join('')+'</select></div><div id="rf-order-info" style="display:none"><div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 space-y-2 text-sm"><div class="flex justify-between"><span class="text-slate-500">Customer</span><span id="rf-info-name" class="text-white font-medium">—</span></div><div class="flex justify-between"><span class="text-slate-500">Item</span><span id="rf-info-item" class="text-white font-medium">—</span></div><div class="flex justify-between"><span class="text-slate-500">Order Total</span><span id="rf-info-total" class="text-white font-bold">—</span></div></div></div><div><label class="form-label">Refund Amount (TZS) <span class="text-red-400">*</span></label><input type="number" id="rf-amount" required min="0" class="input-dark" placeholder="0"></div><div><label class="form-label">Reason <span class="text-red-400">*</span></label><select id="rf-reason" required class="input-dark"><option value="" class="bg-slate-900">-- Select Reason --</option><option value="Customer request" class="bg-slate-900">Customer request</option><option value="Damaged item" class="bg-slate-900">Damaged item</option><option value="Wrong item delivered" class="bg-slate-900">Wrong item delivered</option><option value="Failed delivery" class="bg-slate-900">Failed delivery</option><option value="Quality issue" class="bg-slate-900">Quality issue</option><option value="Other" class="bg-slate-900">Other</option></select></div><div><label class="form-label">Notes</label><textarea id="rf-notes" class="input-dark" rows="2" placeholder="Additional details..."></textarea></div><button type="submit" id="rf-submit-btn" class="w-full bg-cyan-500 text-white font-bold py-3.5 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Create Refund</button></form></div></div>';$('modal-container').innerHTML=h;document.getElementById('refund-form').addEventListener('submit',function(ev){ev.preventDefault();var btn=$('rf-submit-btn'),orig=btn.innerHTML;btn.innerHTML='<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Creating...';btn.disabled=true;btn.classList.add('opacity-70');var oid=$('rf-order').value,o=allOrders.find(function(x){return x.id===oid});db.collection('refunds').add({orderId:oid,customerName:o?o.customerName:'',customerPhone:o?o.customerPhone:'',itemName:o?o.itemName:'',qty:o?o.qty:1,orderTotal:o?o.totalAmount:0,amount:parseInt($('rf-amount').value)||0,reason:$('rf-reason').value,notes:$('rf-notes').value.trim(),status:'pending',createdBy:window.currentUser.uid,createdByName:window.currentUser.name||'Admin',createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){showT('Refund created!');logAudit('order_updated','order',oid,'#'+oid.slice(-6).toUpperCase(),'Refund initiated — '+fmtM(parseInt($('rf-amount').value||0)));closeModal()}).catch(function(e){showT(e.message,'error')}).finally(function(){btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70')})})}
+function openCreateRefund(){var delivered=allOrders.filter(function(o){return o.status==='delivered'||o.status==='returned'});if(!delivered.length){showT('No delivered/returned orders to refund','error');return}var h='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box" style="max-width:500px"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white flex items-center gap-2"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:cash-refund"></span> New Refund</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="refund-form" class="space-y-4"><div><label class="form-label">Select Order <span class="text-red-400">*</span></label><select id="rf-order" required class="input-dark" onchange="rfOrderChanged()"><option value="" class="bg-slate-900">-- Select Order --</option>'+delivered.slice(0,50).map(function(o){return'<option value="'+o.id+'" class="bg-slate-900">#'+o.id.slice(-6).toUpperCase()+' — '+(o.customerName||'')+' — '+fmtM(o.totalAmount)+'</option>'}).join('')+'</select></div><div id="rf-order-info" style="display:none"><div class="bg-white/[0.03] border border-white/[0.06] rounded-xl p-4 space-y-2 text-sm"><div class="flex justify-between"><span class="text-slate-500">Customer</span><span id="rf-info-name" class="text-white font-medium">—</span></div><div class="flex justify-between"><span class="text-slate-500">Item</span><span id="rf-info-item" class="text-white font-medium">—</span></div><div class="flex justify-between"><span class="text-slate-500">Order Total</span><span id="rf-info-total" class="text-white font-bold">—</span></div></div></div><div><label class="form-label">Refund Amount (TZS) <span class="text-red-400">*</span></label><input type="number" id="rf-amount" required min="0" class="input-dark" placeholder="0"></div><div><label class="form-label">Reason <span class="text-red-400">*</span></label><select id="rf-reason" required class="input-dark"><option value="" class="bg-slate-900">-- Select Reason --</option><option value="Customer request" class="bg-slate-900">Customer request</option><option value="Damaged item" class="bg-slate-900">Damaged item</option><option value="Wrong item delivered" class="bg-slate-900">Wrong item delivered</option><option value="Failed delivery" class="bg-slate-900">Failed delivery</option><option value="Quality issue" class="bg-slate-900">Quality issue</option><option value="Other" class="bg-slate-900">Other</option></select></div><div><label class="form-label">Notes</label><textarea id="rf-notes" class="input-dark" rows="2" placeholder="Additional details..."></textarea></div><button type="submit" id="rf-submit-btn" class="w-full bg-cyan-500 text-white font-bold py-3.5 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Create Refund</button></form></div></div>';$('modal-container').innerHTML=h;document.getElementById('refund-form').addEventListener('submit',function(ev){ev.preventDefault();var btn=$('rf-submit-btn'),orig=btn.innerHTML;btn.innerHTML='<span class="iconify animate-spin text-lg" data-icon="mdi:loading"></span> Creating...';btn.disabled=true;btn.classList.add('opacity-70');var oid=$('rf-order').value,o=allOrders.find(function(x){return x.id===oid});db.collection('refunds').add({orderId:oid,merchantId:o?o.merchantId:'',merchantName:o?o.merchantName:'',customerName:o?o.customerName:'',customerPhone:o?o.customerPhone:'',itemName:o?o.itemName:'',qty:o?o.qty:1,orderTotal:o?o.totalAmount:0,amount:parseInt($('rf-amount').value)||0,reason:$('rf-reason').value,notes:$('rf-notes').value.trim(),status:'pending',createdBy:window.currentUser.uid,createdByName:window.currentUser.name||'Admin',createdAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){showT('Refund created!');logAudit('order_updated','order',oid,'#'+oid.slice(-6).toUpperCase(),'Refund initiated — '+fmtM(parseInt($('rf-amount').value||0)));closeModal()}).catch(function(e){showT(e.message,'error')}).finally(function(){btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70')})})}
 function rfOrderChanged(){var oid=$('rf-order').value,info=$('rf-order-info'),o=allOrders.find(function(x){return x.id===oid});if(!o){info.style.display='none';return}info.style.display='block';$('rf-info-name').textContent=(o.customerName||'')+' · '+(o.customerPhone||'');$('rf-info-item').textContent=(o.itemName||'')+' x'+(o.qty||1);$('rf-info-total').textContent=fmtM(o.totalAmount||0);$('rf-amount').value=o.totalAmount||0}
 /* ===== RIDER WORKLOAD ===== */
 function renderRiderWorkload(){var c=$('rider-workload-list');if(!c)return;var riders=allUsers.filter(function(u){return(u.role==='shipping'||u.role==='shipping_manager')&&u.active});var activeOrders=allOrders.filter(function(o){return o.status==='confirmed'||o.status==='out_for_delivery'});var inTransit=allOrders.filter(function(o){return o.status==='out_for_delivery'});var delivered=allOrders.filter(function(o){return o.status==='delivered'});setEl('rw-active',riders.length);setEl('rw-transit',inTransit.length);var totalLoad=0,availCount=0;var rows=riders.map(function(r){var rActive=activeOrders.filter(function(o){return o.riderId===r.id});var rTransit=inTransit.filter(function(o){return o.riderId===r.id});var rDelivered=delivered.filter(function(o){return o.riderId===r.id});var rReturned=allOrders.filter(function(o){return o.status==='returned'&&o.riderId===r.id});var load=rActive.length;totalLoad+=load;if(load<5)availCount++;var maxLoad=10;var pct=Math.min(load/maxLoad*100,100);var barColor=load>=8?'bg-red-500':load>=5?'bg-yellow-500':load>=1?'bg-cyan-500':'bg-slate-700';var statusLabel=load>=8?'Overloaded':load>=5?'Busy':load>=1?'Active':'Available';var statusColor=load>=8?'text-red-400':load>=5?'text-yellow-400':load>=1?'text-cyan-400':'text-green-400';return{r:r,load:load,transit:rTransit.length,delivered:rDelivered.length,returned:rReturned.length,pct:pct,barColor:barColor,statusLabel:statusLabel,statusColor:statusColor}});rows.sort(function(a,b){return b.load-a.load});setEl('rw-available',availCount);setEl('rw-avg',riders.length?Math.round(totalLoad/riders.length):0);if(!rows.length){c.innerHTML=empty('mdi:truck-fast','No active riders.');return}c.innerHTML=rows.map(function(row){return'<div class="data-card p-5"><div class="flex items-center justify-between mb-3"><div class="flex items-center gap-3"><div class="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center text-violet-400 font-bold text-xl">'+(row.r.name||'R').charAt(0).toUpperCase()+'</div><div><div class="text-white font-bold">'+row.r.name+'</div><div class="text-slate-500 text-sm">'+row.r.phone+(row.r.email?' · '+row.r.email:'')+'</div></div></div><div class="text-right"><div class="text-2xl font-extrabold text-white">'+row.load+'</div><div class="text-xs text-slate-500">Active Deliveries</div></div></div><div class="progress-bar mb-3" style="height:8px"><div class="fill '+row.barColor+'" style="width:'+row.pct+'%"></div></div><div class="grid grid-cols-5 gap-2 text-center mb-3"><div><div class="text-lg font-extrabold text-violet-400">'+row.transit+'</div><div class="text-[10px] text-slate-500">In Transit</div></div><div><div class="text-lg font-extrabold text-green-400">'+row.delivered+'</div><div class="text-[10px] text-slate-500">Delivered</div></div><div><div class="text-lg font-extrabold text-red-400">'+row.returned+'</div><div class="text-[10px] text-slate-500">Returned</div></div><div><div class="text-lg font-extrabold '+row.statusColor+'">'+row.statusLabel+'</div><div class="text-[10px] text-slate-500">Status</div></div><div><div class="text-lg font-extrabold text-slate-400">'+Math.round(row.pct)+'%</div><div class="text-[10px] text-slate-500">Capacity</div></div></div>'+(row.load<5?'<button type="button" class="btn-sm green w-full justify-center" data-rider-assign-quick="'+row.r.id+'"><span class="iconify text-sm" data-icon="mdi:plus-circle"></span> Assign Next Order to '+row.r.name+'</button>':'<button type="button" class="btn-sm red w-full justify-center opacity-50 cursor-not-allowed" disabled><span class="iconify text-sm" data-icon="mdi:alert"></span> Rider is busy ('+row.load+' deliveries)</button>')+'</div>'}).join('')}
@@ -1130,13 +1209,32 @@ document.addEventListener('click',function(e){
     btn=e.target.closest('[data-delete-order]');
     if(btn){if(confirm('Delete this order permanently?')){var doId=btn.getAttribute('data-delete-order');db.collection('orders').doc(doId).delete().then(function(){showT('Order deleted!');logAudit('order_deleted','order',doId,'#'+doId.slice(-6).toUpperCase(),'Deleted order permanently')}).catch(function(er){showT(er.message,'error')})}return}
     btn=e.target.closest('[data-edit-order]');
-    if(btn){var oid=btn.getAttribute('data-edit-order'),o=allOrders.find(function(x){return x.id===oid});if(!o)return;var agents=allUsers.filter(function(u){return u.role==='call_center'&&u.active});var riders=allUsers.filter(function(u){return(u.role==='shipping'||u.role==='shipping_manager')&&u.active});var statuses=['pending','accepted','confirmed','no_answer','wrong_number','callback_requested','out_of_region','out_for_delivery','delivered','returned','cancelled'];$('modal-container').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Order #'+o.id.slice(-6).toUpperCase()+'</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="edit-order-form" class="space-y-4"><div><label class="form-label">Customer Name</label><input type="text" id="eo-name" class="input-dark" value="'+(o.customerName||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Phone</label><input type="text" id="eo-phone" class="input-dark" value="'+(o.customerPhone||'')+'"></div><div><label class="form-label">City</label><input type="text" id="eo-city" class="input-dark" value="'+(o.customerCity||'')+'"></div></div><div><label class="form-label">Address</label><input type="text" id="eo-address" class="input-dark" value="'+(o.customerAddress||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Status</label><select id="eo-status" class="input-dark">'+statuses.map(function(s){return'<option value="'+s+'" class="bg-slate-900"'+(o.status===s?' selected':'')+'>'+s.replace(/_/g,' ')+'</option>'}).join('')+'</select></div><div><label class="form-label">Amount (TZS)</label><input type="number" id="eo-amount" class="input-dark" value="'+(o.totalAmount||0)+'"></div></div><div><label class="form-label">Assign to Agent</label><select id="eo-agent" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+agents.map(function(a){return'<option value="'+a.id+'" class="bg-slate-900"'+(o.processedBy===a.id?' selected':'')+'>'+a.name+'</option>'}).join('')+'</select></div><div><label class="form-label">Assign to Rider</label><select id="eo-rider" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+riders.map(function(r){return'<option value="'+r.id+'" class="bg-slate-900"'+(o.riderId===r.id?' selected':'')+'>'+r.name+'</option>'}).join('')+'</select></div><button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Save Changes</button></form></div></div>';document.getElementById('edit-order-form').addEventListener('submit',function(ev){ev.preventDefault();var up={customerName:$('eo-name').value,customerPhone:$('eo-phone').value,customerCity:$('eo-city').value,customerAddress:$('eo-address').value,status:$('eo-status').value,totalAmount:parseInt($('eo-amount').value)||0};var ag=$('eo-agent').value;if(ag){var agObj=allUsers.find(function(u){return u.id===ag});up.processedBy=ag;up.processedByName=agObj?agObj.name:''}else{up.processedBy=firebase.firestore.FieldValue.delete();up.processedByName=firebase.firestore.FieldValue.delete()}var rd=$('eo-rider').value;if(rd){var rdObj=allUsers.find(function(u){return u.id===rd});up.riderId=rd;up.riderName=rdObj?rdObj.name:''}else{up.riderId=firebase.firestore.FieldValue.delete();up.riderName=firebase.firestore.FieldValue.delete()}db.collection('orders').doc(oid).update(up).then(function(){showT('Order updated!');closeModal()}).catch(function(er){showT(er.message,'error')})});return}
+    if(btn){var oid=btn.getAttribute('data-edit-order'),o=allOrders.find(function(x){return x.id===oid});if(!o)return;var agents=allUsers.filter(function(u){return u.role==='call_center'&&u.active});var riders=allUsers.filter(function(u){return(u.role==='shipping'||u.role==='shipping_manager')&&u.active});var statuses=['pending','accepted','confirmed','no_answer','wrong_number','callback_requested','out_of_region','out_for_delivery','delivered','returned','cancelled'];$('modal-container').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Order #'+o.id.slice(-6).toUpperCase()+'</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="edit-order-form" class="space-y-4"><div><label class="form-label">Customer Name</label><input type="text" id="eo-name" class="input-dark" value="'+(o.customerName||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Phone</label><input type="text" id="eo-phone" class="input-dark" value="'+(o.customerPhone||'')+'"></div><div><label class="form-label">City</label><input type="text" id="eo-city" class="input-dark" value="'+(o.customerCity||'')+'"></div></div><div><label class="form-label">Address</label><input type="text" id="eo-address" class="input-dark" value="'+(o.customerAddress||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Status</label><select id="eo-status" class="input-dark">'+statuses.map(function(s){return'<option value="'+s+'" class="bg-slate-900"'+(o.status===s?' selected':'')+'>'+s.replace(/_/g,' ')+'</option>'}).join('')+'</select></div><div><label class="form-label">Amount (TZS)</label><input type="number" id="eo-amount" class="input-dark" value="'+(o.totalAmount||0)+'"></div></div><div><label class="form-label">Assign to Agent</label><select id="eo-agent" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+agents.map(function(a){return'<option value="'+a.id+'" class="bg-slate-900"'+(o.processedBy===a.id?' selected':'')+'>'+a.name+'</option>'}).join('')+'</select></div><div><label class="form-label">Assign to Rider</label><select id="eo-rider" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+riders.map(function(r){return'<option value="'+r.id+'" class="bg-slate-900"'+(o.riderId===r.id?' selected':'')+'>'+r.name+'</option>'}).join('')+'</select></div><button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Save Changes</button></form></div></div>';document.getElementById('edit-order-form').addEventListener('submit',function(ev){ev.preventDefault();var up={customerName:$('eo-name').value,customerPhone:$('eo-phone').value,customerCity:$('eo-city').value,customerAddress:$('eo-address').value,status:$('eo-status').value,totalAmount:parseInt($('eo-amount').value)||0};var ag=$('eo-agent').value;if(ag){var agObj=allUsers.find(function(u){return u.id===ag});up.processedBy=ag;up.processedByName=agObj?agObj.name:''}else{up.processedBy=firebase.firestore.FieldValue.delete();up.processedByName=firebase.firestore.FieldValue.delete()}var rd=$('eo-rider').value;if(rd){var rdObj=allUsers.find(function(u){return u.id===rd});up.riderId=rd;up.riderName=rdObj?rdObj.name:''}else{up.riderId=firebase.firestore.FieldValue.delete();up.riderName=firebase.firestore.FieldValue.delete()}db.collection('orders').doc(oid).update(up).then(function(){showT('Order updated!');if(up.status==='delivered'&&o.status!=='delivered'){autoMinusStock(o)};closeModal()}).catch(function(er){showT(er.message,'error')})});return}
     btn=e.target.closest('[data-assign-order]');
     if(btn){var oid=btn.getAttribute('data-assign-order'),agents=allUsers.filter(function(u){return u.role==='call_center'&&u.active});if(!agents.length){showT('No active agents available','error');return}$('modal-container').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Assign Agent</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="assign-form" class="space-y-4"><div><label class="form-label">Select Agent</label><select id="as-agent" class="input-dark" required>'+agents.map(function(a){return'<option value="'+a.id+'" class="bg-slate-900">'+a.name+' ('+a.email+')</option>'}).join('')+'</select></div><button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Assign</button></form></div></div>';document.getElementById('assign-form').addEventListener('submit',function(ev){ev.preventDefault();var ag=$('as-agent').value,agObj=allUsers.find(function(u){return u.id===ag});db.collection('orders').doc(oid).update({processedBy:ag,processedByName:agObj?agObj.name:''}).then(function(){showT('Agent assigned!');logAudit('order_assigned','order',oid,'#'+oid.slice(-6).toUpperCase(),'Assigned to agent '+(agObj?agObj.name:''))}).catch(function(er){showT(er.message,'error')})});return}
     btn=e.target.closest('[data-print-order]');
     if(btn){printOrder(btn.getAttribute('data-print-order'));return}
         btn=e.target.closest('[data-approve-refund]');
-    if(btn){db.collection('refunds').doc(btn.getAttribute('data-approve-refund')).update({status:'approved'}).then(function(){showT('Refund approved!');logAudit('order_updated','refund',btn.getAttribute('data-approve-refund'),'Refund','Approved refund')}).catch(function(e){showT(e.message,'error')});return}
+    if(btn){
+        var refId=btn.getAttribute('data-approve-refund');
+        db.collection('refunds').doc(refId).get().then(function(doc){
+            if(!doc.exists) return;
+            var refData=doc.data();
+            // 1. Update Refund Status
+            db.collection('refunds').doc(refId).update({status:'approved', processedAt: firebase.firestore.FieldValue.serverTimestamp()});
+            // 2. Update Original Order to Cancelled
+            if(refData.orderId){
+                db.collection('orders').doc(refData.orderId).update({
+                    status:'cancelled', 
+                    refundStatus:'approved',
+                    timeline: firebase.firestore.FieldValue.arrayUnion({status:'cancelled', at:new Date().toISOString(), by:window.currentUser.name, note:'Refund approved by Admin'})
+                });
+            }
+            showT('Refund approved & Order Cancelled!');
+            logAudit('order_updated','refund',refId,'Refund','Approved refund');
+        }).catch(function(e){showT(e.message,'error')});
+        return;
+    }
     btn=e.target.closest('[data-reject-refund]');
     if(btn){db.collection('refunds').doc(btn.getAttribute('data-reject-refund')).update({status:'rejected'}).then(function(){showT('Refund rejected!');logAudit('order_updated','refund',btn.getAttribute('data-reject-refund'),'Refund','Rejected refund')}).catch(function(e){showT(e.message,'error')});return}
     btn=e.target.closest('[data-process-refund]');
@@ -1254,9 +1352,100 @@ function togglePass(id,btn){
         else if(msg.indexOf('WEAK_PASSWORD')!==-1)msg='Password is too weak';
         showT(msg,'error');
     }).finally(function(){
-        btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70');
-    });
+        
+            btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70');
+        });
 });
+
+        /* ===== CREATE RIDER ACCOUNT ===== */
+        $('rider-form').addEventListener('submit', function(e){
+            e.preventDefault();
+            var btn=this.querySelector('button[type="submit"]'),orig=btn.innerHTML;
+            btn.innerHTML='<span class="iconify animate-spin" data-icon="mdi:loading"></span> Creating...';
+            btn.disabled=true;btn.classList.add('opacity-70');
+            var email=$('rider-email').value.trim(),pass=$('rider-pass').value,name=$('rider-name').value.trim();
+            if(pass.length<6){showT('Password must be at least 6 characters','error');btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70');return}
+            createUser(email,pass).then(function(uid){
+                return db.collection('users').doc(uid).set({
+                    name:name,
+                    email:email,
+                    role:'rider',
+                    phone:$('rider-phone').value.trim()||'',
+                    active:true,
+                    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }).then(function(uid){
+                showT('Rider account created successfully!');
+                logAudit('user_created','user',uid,'Rider: '+name,'Created rider account — '+email);
+                this.reset();
+            }.bind(this)).catch(function(err){
+                var msg=err.message;
+                if(msg.indexOf('EMAIL_EXISTS')!==-1)msg='This email is already registered';
+                showT(msg,'error');
+            }).finally(function(){
+                btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70');
+            });
+        });
+
+        /* ===== CREATE STOCK ACCOUNT ===== */
+        $('stock-form').addEventListener('submit', function(e){
+            e.preventDefault();
+            var btn=this.querySelector('button[type="submit"]'),orig=btn.innerHTML;
+            btn.innerHTML='<span class="iconify animate-spin" data-icon="mdi:loading"></span> Creating...';
+            btn.disabled=true;btn.classList.add('opacity-70');
+            var email=$('stock-email').value.trim(),pass=$('stock-pass').value,name=$('stock-name').value.trim();
+            if(pass.length<6){showT('Password must be at least 6 characters','error');btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70');return}
+            createUser(email,pass).then(function(uid){
+                return db.collection('users').doc(uid).set({
+                    name:name,
+                    email:email,
+                    role:'stock',
+                    phone:$('stock-phone').value.trim()||'',
+                    active:true,
+                    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }).then(function(uid){
+                showT('Stock account created successfully!');
+                logAudit('user_created','user',uid,'Stock: '+name,'Created stock account — '+email);
+                this.reset();
+            }.bind(this)).catch(function(err){
+                var msg=err.message;
+                if(msg.indexOf('EMAIL_EXISTS')!==-1)msg='This email is already registered';
+                showT(msg,'error');
+            }).finally(function(){
+                btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70');
+            });
+        });
+
+        /* ===== CREATE FOLLOW-UP ACCOUNT ===== */
+        $('followup-form').addEventListener('submit', function(e){
+            e.preventDefault();
+            var btn=this.querySelector('button[type="submit"]'),orig=btn.innerHTML;
+            btn.innerHTML='<span class="iconify animate-spin" data-icon="mdi:loading"></span> Creating...';
+            btn.disabled=true;btn.classList.add('opacity-70');
+            var email=$('followup-email').value.trim(),pass=$('followup-pass').value,name=$('followup-name').value.trim();
+            if(pass.length<6){showT('Password must be at least 6 characters','error');btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70');return}
+            createUser(email,pass).then(function(uid){
+                return db.collection('users').doc(uid).set({
+                    name:name,
+                    email:email,
+                    role:'follow_up',
+                    phone:$('followup-phone').value.trim()||'',
+                    active:true,
+                    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }).then(function(uid){
+                showT('Follow-Up account created successfully!');
+                logAudit('user_created','user',uid,'Follow-Up: '+name,'Created follow-up account — '+email);
+                this.reset();
+            }.bind(this)).catch(function(err){
+                var msg=err.message;
+                if(msg.indexOf('EMAIL_EXISTS')!==-1)msg='This email is already registered';
+                showT(msg,'error');
+            }).finally(function(){
+                btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70');
+            });
+        });
 
         /* ===== LIVE CHAT SYSTEM ===== */
         let activeChatId = null;
@@ -1355,6 +1544,18 @@ function togglePass(id,btn){
             if(!text) return '';
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.replace(/[&<>"']/g, m => map[m]);
+        }
+		        async function autoMinusStock(order) {
+            if (!order.itemName || !order.merchantId || !order.qty) return;
+            try {
+                var snap = await db.collection('products').where('name', '==', order.itemName).where('merchantId', '==', order.merchantId).limit(1).get();
+                if (!snap.empty) {
+                    var prodDoc = snap.docs[0];
+                    var currentStock = prodDoc.data().stock || 0;
+                    var newStock = Math.max(0, currentStock - order.qty);
+                    await prodDoc.ref.update({ stock: newStock });
+                }
+            } catch(e) { console.error("Stock deduct error:", e); }
         }
 </script>
 </body>

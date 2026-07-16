@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Follow-Up Management — ChapShop Delivery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <style>
+        *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+        body{background:#020617;}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+        .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.16,1,.3,1);white-space:nowrap;z-index:200}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+        .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem;cursor:pointer}
+        .sidebar-link:hover,.sidebar-link.active{background:rgba(16,185,129,0.1);color:#34d399}
+        .sb-header{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;padding:0 1rem;margin-top:1rem}
+    </style>
+</head>
+<body class="bg-[#020617] text-white min-h-screen">
+
+    <!-- ORDER MODAL (Create/Edit) -->
+    <div id="order-modal" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-[#0f172a] border border-white/10 rounded-2xl p-6 w-full max-w-2xl my-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="modal-title" class="text-base font-bold text-white">Create New Order</h3>
+                <button onclick="closeOrderModal()" class="text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
+            </div>
+            <form onsubmit="saveOrder(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="hidden" id="ord-id">
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name *</label><input type="text" id="ord-cust" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Phone *</label><input type="text" id="ord-phone" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
+                <div class="md:col-span-2"><label class="text-xs font-semibold text-slate-400 uppercase">Delivery Address</label><input type="text" id="ord-address" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Item Name *</label><input type="text" id="ord-item" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Quantity</label><input type="number" id="ord-qty" value="1" min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Total Amount (TZS)</label><input type="number" id="ord-amount" value="0" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Status</label><select id="ord-status" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50">
+                    <option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="processing">Processing</option><option value="out_for_delivery">Out for Delivery</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option><option value="callback_requested">Callback Requested</option>
+                </select></div>
+                <div class="md:col-span-2 flex justify-end gap-3 mt-2">
+                    <button type="button" onclick="closeOrderModal()" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-400 border border-white/10 hover:bg-white/[0.04]">Cancel</button>
+                    <button type="submit" class="bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-emerald-400 transition-colors text-sm">Save Order</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOG CALL MODAL -->
+    <div id="log-call-modal" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-[#0f172a] border border-white/10 rounded-2xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-bold text-white">Record Follow Up</h3>
+                <button onclick="closeLogCallModal()" class="text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
+            </div>
+            <input type="hidden" id="log-call-id">
+            <div class="mb-4">
+                <label class="text-xs font-semibold text-slate-400 uppercase">Call Outcome / Notes</label>
+                <textarea id="log-call-notes" rows="3" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50" placeholder="e.g. Customer asked to call back tomorrow..."></textarea>
+            </div>
+            <div class="mb-6">
+                <label class="text-xs font-semibold text-slate-400 uppercase">Issue Resolved?</label>
+                <div class="flex gap-3 mt-2">
+                    <button onclick="resolveCall(true)" class="flex-1 bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-400 text-sm">Yes (Complete)</button>
+                    <button onclick="resolveCall(false)" class="flex-1 bg-yellow-500 text-black font-bold py-3 rounded-xl hover:bg-yellow-400 text-sm">No (Schedule Next)</button>
+                </div>
+            </div>
+            <div id="schedule-box" class="hidden mb-4">
+                <label class="text-xs font-semibold text-slate-400 uppercase">Schedule Next Follow Up</label>
+                <input type="datetime-local" id="log-follow-up-date" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50">
+                <button onclick="scheduleFollowUp()" class="w-full mt-3 bg-yellow-500 text-black font-bold py-3 rounded-xl hover:bg-yellow-400 text-sm">Save & Schedule</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOMER HISTORY MODAL -->
+    <div id="history-modal" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-[#0f172a] border border-white/10 rounded-2xl p-6 w-full max-w-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="hist-title" class="text-base font-bold text-white">Customer Order History</h3>
+                <button onclick="document.getElementById('history-modal').classList.add('hidden')" class="text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
+            </div>
+            <div class="overflow-x-auto max-h-[60vh]">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="p-3">Order ID</th><th class="p-3">Item</th><th class="p-3">Amount</th><th class="p-3">Status</th><th class="p-3">Date</th></tr></thead>
+                    <tbody id="hist-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast bg-[#0f172a] border border-emerald-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+        <span id="toast-icon" class="iconify text-emerald-400 text-xl" data-icon="mdi:check-circle"></span>
+        <span id="toast-msg" class="text-sm font-medium">Success</span>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center">
+        <div class="w-full max-w-md px-6">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/20"><span class="iconify text-white text-3xl" data-icon="mdi:phone-in-talk"></span></div>
+                <h1 class="text-2xl font-bold gradient-text">Follow-Up Center</h1>
+            </div>
+            <form method="POST" onsubmit="handleLogin(event)" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Agent Email</label><input type="email" name="email" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50" placeholder="agent@chapshop.com"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Password</label><input type="password" name="password" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50" placeholder="••••••••"></div>
+                <button type="submit" class="w-full bg-emerald-500 text-white font-semibold py-3 rounded-xl hover:bg-emerald-400 transition-colors shadow-lg shadow-emerald-500/20">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app-screen" class="hidden h-screen flex overflow-hidden">
+        
+        <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0">
+            <div class="p-4 border-b border-white/[0.08] flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:phone-in-talk"></span></div>
+                    <span class="font-bold text-white text-sm">ChapShop<span class="text-emerald-400 ml-1">FollowUp</span></span>
+                </div>
+            </div>
+            <nav class="p-2 flex-1 overflow-y-auto pb-4">
+                <div class="sidebar-link active" onclick="switchView('dash', this)"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</div>
+                
+                <div class="sb-header">📦 Orders</div>
+                <div class="sidebar-link" onclick="switchView('orders', this, 'all')"><span class="iconify text-lg" data-icon="mdi:clipboard-list-outline"></span> All Orders</div>
+                <div class="sidebar-link" onclick="switchView('orders', this, 'pending')"><span class="iconify text-lg" data-icon="mdi:phone-alert"></span> Pending Orders</div>
+                <div class="sidebar-link" onclick="switchView('orders', this, 'processing')"><span class="iconify text-lg" data-icon="mdi:progress-clock"></span> Processing</div>
+                <div class="sidebar-link" onclick="switchView('orders', this, 'delivered')"><span class="iconify text-lg" data-icon="mdi:check-circle-outline"></span> Delivered</div>
+                <div class="sidebar-link" onclick="switchView('orders', this, 'returned')"><span class="iconify text-lg" data-icon="mdi:undo-variant"></span> Returned Orders</div>
+                <div class="sidebar-link" onclick="switchView('orders', this, 'cancelled')"><span class="iconify text-lg" data-icon="mdi:close-circle-outline"></span> Cancelled</div>
+
+                <div class="sb-header">🔔 Reminders & Notes</div>
+                <div class="sidebar-link" onclick="switchView('reminders', this)"><span class="iconify text-lg" data-icon="mdi:bell-alert"></span> Reminders</div>
+                <div class="sidebar-link" onclick="switchView('notes', this)"><span class="iconify text-lg" data-icon="mdi:note-edit"></span> Follow Up Notes</div>
+
+                <div class="sb-header">System</div>
+                <div class="sidebar-link" onclick="switchView('reports', this)"><span class="iconify text-lg" data-icon="mdi:file-chart"></span> Reports</div>
+                <div class="sidebar-link" onclick="switchView('settings', this)"><span class="iconify text-lg" data-icon="mdi:cog-outline"></span> Settings</div>
+            </nav>
+            <div class="p-4 border-t border-white/[0.08] flex-shrink-0">
+                <div class="sidebar-link text-red-400 hover:bg-red-500/10" onclick="auth.signOut()"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</div>
+            </div>
+        </aside>
+
+        <main class="flex-1 lg:ml-64 flex flex-col h-full">
+            <header class="nav-blur bg-[#020617]/80 border-b border-white/[0.08] px-6 py-3 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
+                    <h1 id="page-title" class="font-bold text-white text-sm">Dashboard</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-xs" id="header-avatar">A</div>
+                    <span id="header-name" class="text-sm font-semibold text-white hidden sm:block">Agent</span>
+                </div>
+            </header> 
+            
+            <div class="p-6 flex-1 overflow-y-auto min-w-0">
+
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dash">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Pending Calls</div><div id="kpi-pending" class="text-2xl font-bold text-yellow-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Confirmed Today</div><div id="kpi-confirmed" class="text-2xl font-bold text-green-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Cancelled Today</div><div id="kpi-cancelled" class="text-2xl font-bold text-red-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Returned Orders</div><div id="kpi-returned" class="text-2xl font-bold text-orange-400">0</div></div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-sm font-bold text-white mb-4">Follow Ups by Status</h3><div style="position:relative; height:250px;"><canvas id="status-pie-chart"></canvas></div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-sm font-bold text-white mb-4">Daily Follow Ups</h3><div style="position:relative; height:250px;"><canvas id="daily-line-chart"></canvas></div></div>
+                    </div>
+                </div> 
+
+                <!-- ORDERS VIEW -->
+                <div id="view-orders" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 id="orders-title" class="text-lg font-bold text-white">All Orders</h2>
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <input type="text" id="orders-search" oninput="renderOrders()" placeholder="Search..." class="flex-1 md:w-64 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50">
+                            <button onclick="exportCSV()" class="bg-slate-700 text-white font-bold px-4 py-2 rounded-xl hover:bg-slate-600 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:file-export"></span> Export</button>
+                            <button type="button" onclick="openOrderModal()" class="bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-emerald-400 transition-colors text-sm flex items-center gap-2 whitespace-nowrap"><span class="iconify" data-icon="mdi:plus"></span> New Order</button>
+                        </div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs">
+                                    <th class="p-4">Order Details</th><th class="p-4">Customer Info</th><th class="p-4">Merchant</th><th class="p-4">Rider</th><th class="p-4">Call Center</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Quick Actions</th>
+                                </tr></thead>
+                                <tbody id="orders-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 border-t border-white/[0.08] flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div class="flex items-center gap-2 text-xs text-slate-400">
+                                <span>Rows per page:</span>
+                                <select id="orders-page-size" onchange="changePageSize()" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-white focus:outline-none">
+                                    <option value="10">10</option><option value="20">20</option><option value="50">50</option><option value="100">100</option>
+                                </select>
+                            </div>
+                            <div id="orders-pagination-info" class="text-xs text-slate-400">Showing 0 to 0 of 0</div>
+                            <div class="flex gap-2">
+                                <button onclick="prevPage()" id="prev-btn" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30">Prev</button>
+                                <button onclick="nextPage()" id="next-btn" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30">Next</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- REMINDERS VIEW -->
+                <div id="view-reminders" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Reminders</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 text-center"><span class="iconify text-4xl text-emerald-400 mx-auto block mb-3" data-icon="mdi:email-fast"></span><h3 class="text-sm font-bold text-white">Email Reminders</h3><p class="text-xs text-slate-500 mt-2">Automated email follow-ups for pending orders.</p></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 text-center"><span class="iconify text-4xl text-cyan-400 mx-auto block mb-3" data-icon="mdi:message-text"></span><h3 class="text-sm font-bold text-white">SMS Reminders</h3><p class="text-xs text-slate-500 mt-2">Bulk SMS to customers who don't answer calls.</p></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 text-center"><span class="iconify text-4xl text-yellow-400 mx-auto block mb-3" data-icon="mdi:bell-ring"></span><h3 class="text-sm font-bold text-white">Notifications</h3><p class="text-xs text-slate-500 mt-2">In-app alerts for urgent callbacks.</p></div>
+                    </div>
+                </div>
+
+                <!-- NOTES VIEW -->
+                <div id="view-notes" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Follow Up Notes</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <form onsubmit="saveNote(event)" class="flex gap-4">
+                            <input type="text" id="note-text" required placeholder="Write a quick note..." class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50">
+                            <button type="submit" class="bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-emerald-400 text-sm">Add Note</button>
+                        </form>
+                    </div>
+                    <div id="notes-list" class="space-y-3"></div>
+                </div>
+
+                <!-- REPORTS VIEW -->
+                <div id="view-reports" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Reports</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4">Agent Performance</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between"><span class="text-slate-400">Total Processed</span><span class="font-bold text-white" id="rep-processed">0</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Confirmed</span><span class="font-bold text-green-400" id="rep-conf">0</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Cancelled</span><span class="font-bold text-red-400" id="rep-canc">0</span></div>
+                                <div class="flex justify-between"><span class="text-slate-400">Success Rate</span><span class="font-bold text-emerald-400" id="rep-rate">0%</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SETTINGS VIEW -->
+                <div id="view-settings" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Agent Settings</h2>
+                    <div class="max-w-2xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-base font-bold text-white mb-4">Profile Information</h3>
+                        <form onsubmit="saveAgentSettings(event)">
+                            <div class="mb-4"><label class="text-xs font-semibold text-slate-400 uppercase">Full Name</label><input type="text" id="set-name" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
+                            <div class="mb-4"><label class="text-xs font-semibold text-slate-400 uppercase">Email (Read-only)</label><input type="email" id="set-email" readonly class="w-full mt-1 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-slate-500 cursor-not-allowed"></div>
+                            <button type="submit" class="bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-emerald-400 transition-colors text-sm">Save Profile</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        var fc={apiKey:"AIzaSyBjyRehaNQqt5ogt5U3tiw8NYr4TyuX2iI",authDomain:"chapshop-delivery-88fe1.firebaseapp.com",projectId:"chapshop-delivery-88fe1",storageBucket:"chapshop-delivery-88fe1.firebasestorage.app",messagingSenderId:"540757404981",appId:"1:540757404981:web:f5ae5d041dd260304eb07c"};
+        firebase.initializeApp(fc);var auth=firebase.auth(),db=firebase.firestore();
+
+        let allOrders = [], allUsers = [], allNotes = [];
+        let pieChart, lineChart;
+        let currentOrderFilter = 'all';
+        let currentPage = 1, pageSize = 10;
+        const pendingStatuses = ['pending', 'callback_requested', 'no_answer', 'wrong_number'];
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Signing in...'; btn.disabled = true;
+            auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value).catch(err => {
+                showT(err.message, "error"); btn.innerHTML = 'Sign In'; btn.disabled = false;
+            });
+        }
+
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists && doc.data().active && (doc.data().role === 'follow_up' || doc.data().role === 'admin' || doc.data().role === 'call_center')) {
+                    window.currentUser = { uid: user.uid, ...doc.data() };
+                    document.getElementById('header-name').textContent = doc.data().name || 'Agent';
+                    document.getElementById('header-avatar').textContent = (doc.data().name || 'A').charAt(0).toUpperCase();
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app-screen').classList.remove('hidden');
+                    loadData();
+                } else { 
+                    showT("Access Denied. Not a follow-up agent.", "error");
+                    auth.signOut(); 
+                }
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+            }
+        });
+
+        function loadData() {
+            db.collection('orders').onSnapshot(snap => {
+                allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderKPIs(); renderCharts(); renderOrders(); renderReports();
+            });
+            db.collection('users').onSnapshot(snap => {
+                allUsers = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderOrders();
+            });
+            db.collection('notes').onSnapshot(snap => {
+                allNotes = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderNotes();
+            });
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        }
+
+        function switchView(view, el, filter = null) {
+            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + view).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            if(el) el.classList.add('active');
+            document.getElementById('page-title').innerText = el ? el.innerText.trim() : 'Dashboard';
+            if(window.innerWidth < 1024) toggleSidebar(); 
+            
+            if(view === 'orders' && filter) {
+                currentOrderFilter = filter;
+                currentPage = 1;
+                document.getElementById('orders-title').innerText = filter.charAt(0).toUpperCase() + filter.slice(1) + " Orders";
+                renderOrders();
+            }
+            if(view === 'settings') {
+                document.getElementById('set-name').value = window.currentUser?.name || '';
+                document.getElementById('set-email').value = window.currentUser?.email || '';
+            }
+        }
+        
+        function showT(m, t) {
+            t = t || "success";
+            var el = document.getElementById('toast'), ic = document.getElementById('toast-icon'), ms = document.getElementById('toast-msg');
+            ms.textContent = m; ic.setAttribute('data-icon', t === 'error' ? 'mdi:alert-circle' : 'mdi:check-circle');
+            ic.className = 'iconify text-xl ' + (t === 'error' ? 'text-red-400' : 'text-emerald-400');
+            el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function getStatusBadge(status) {
+            const colors = {
+                pending: 'bg-slate-500/10 text-slate-400', confirmed: 'bg-green-500/10 text-green-400', processing: 'bg-yellow-500/10 text-yellow-400',
+                out_for_delivery: 'bg-violet-500/10 text-violet-400', delivered: 'bg-green-500/10 text-green-400', cancelled: 'bg-red-500/10 text-red-400',
+                callback_requested: 'bg-cyan-500/10 text-cyan-400', no_answer: 'bg-orange-500/10 text-orange-400', wrong_number: 'bg-red-500/10 text-red-400',
+                returned: 'bg-orange-500/10 text-orange-400', failed: 'bg-red-500/10 text-red-400'
+            };
+            return `<span class="px-2 py-1 rounded-md ${colors[status] || 'bg-slate-500/10 text-slate-400'} text-xs font-bold uppercase">${status.replace(/_/g, ' ')}</span>`;
+        }
+
+        // SLA Logic
+        function getSlaDot(o) {
+            if (!o.createdAt) return '';
+            const now = new Date();
+            const created = o.createdAt.toDate();
+            const diffHours = (now - created) / (1000 * 60 * 60);
+            if (diffHours > 48) return '<span class="w-2 h-2 rounded-full bg-red-500 inline-block mr-2 animate-pulse" title="Overdue"></span>';
+            if (diffHours > 24) return '<span class="w-2 h-2 rounded-full bg-yellow-500 inline-block mr-2" title="Warning"></span>';
+            return '<span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-2" title="New"></span>';
+        }
+
+        function getActionButtons(o) {
+            const cleanPhone = (o.customerPhone || '').replace(/[^0-9]/g, '');
+            const waPhone = cleanPhone.startsWith('0') ? '255' + cleanPhone.substring(1) : cleanPhone;
+            const waMsgDefault = encodeURIComponent(`Hello ${o.customerName || ''}, this is ChapShop regarding your order #${o.id.slice(-6).toUpperCase()}.`);
+            const waMsgAddress = encodeURIComponent(`Hello ${o.customerName || ''}, please confirm your delivery address for order #${o.id.slice(-6).toUpperCase()}.`);
+            const waMsgArriving = encodeURIComponent(`Hello ${o.customerName || ''}, your rider is arriving with your order #${o.id.slice(-6).toUpperCase()}. Please prepare the cash.`);
+
+            return `
+                <div class="flex items-center justify-center gap-2">
+                    <a href="tel:${cleanPhone}" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 p-2 rounded-lg hover:bg-emerald-500/30" title="Call Customer"><span class="iconify" data-icon="mdi:phone"></span></a>
+                    <div class="relative group">
+                        <button class="bg-green-500/20 text-green-400 border border-green-500/30 p-2 rounded-lg hover:bg-green-500/30" title="WhatsApp Templates"><span class="iconify" data-icon="mdi:whatsapp"></span></button>
+                        <div class="absolute right-0 mt-2 w-56 bg-[#0f172a] border border-white/10 rounded-xl shadow-xl hidden group-hover:block z-10">
+                            <a href="https://wa.me/${waPhone}?text=${waMsgDefault}" target="_blank" class="block px-4 py-2 text-xs text-slate-300 hover:bg-white/5">Default Message</a>
+                            <a href="https://wa.me/${waPhone}?text=${waMsgAddress}" target="_blank" class="block px-4 py-2 text-xs text-slate-300 hover:bg-white/5">Confirm Address</a>
+                            <a href="https://wa.me/${waPhone}?text=${waMsgArriving}" target="_blank" class="block px-4 py-2 text-xs text-slate-300 hover:bg-white/5">Rider Arriving</a>
+                        </div>
+                    </div>
+                    <button onclick="openLogCallModal('${o.id}')" class="bg-violet-500/20 text-violet-400 border border-violet-500/30 p-2 rounded-lg hover:bg-violet-500/30" title="Record Follow Up"><span class="iconify" data-icon="mdi:phone-in-talk"></span></button>
+                    <button onclick="openOrderModal('${o.id}')" class="bg-blue-500/20 text-blue-400 border border-blue-500/30 p-2 rounded-lg hover:bg-blue-500/30" title="Edit Order"><span class="iconify" data-icon="mdi:pencil"></span></button>
+                    <button onclick="deleteOrder('${o.id}')" class="bg-red-500/20 text-red-400 border border-red-500/30 p-2 rounded-lg hover:bg-red-500/30" title="Delete"><span class="iconify" data-icon="mdi:trash-can"></span></button>
+                </div>
+            `;
+        }
+
+        function renderKPIs() {
+            document.getElementById('kpi-pending').textContent = allOrders.filter(o => pendingStatuses.includes(o.status)).length;
+            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+            const todayOrders = allOrders.filter(o => o.updatedAt?.toDate() >= todayStart);
+            document.getElementById('kpi-confirmed').textContent = todayOrders.filter(o => o.status === 'confirmed').length;
+            document.getElementById('kpi-cancelled').textContent = todayOrders.filter(o => o.status === 'cancelled').length;
+            document.getElementById('kpi-returned').textContent = allOrders.filter(o => o.status === 'returned').length;
+        }
+
+        function renderCharts() {
+            if (typeof Chart === 'undefined') return;
+            if(pieChart) pieChart.destroy();
+            pieChart = new Chart(document.getElementById('status-pie-chart'), {
+                type: 'pie',
+                data: { labels: ['Completed', 'Pending', 'Overdue', 'Cancelled'], datasets: [{ data: [allOrders.filter(o=>['delivered','confirmed'].includes(o.status)).length, allOrders.filter(o=>['pending'].includes(o.status)).length, allOrders.filter(o=>['callback_requested','no_answer'].includes(o.status)).length, allOrders.filter(o=>['cancelled'].includes(o.status)).length], backgroundColor: ['#10b981', '#f59e0b', '#06b6d4', '#ef4444'], borderColor: '#0f172a', borderWidth: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20 } } } }
+            });
+
+            if(lineChart) lineChart.destroy();
+            lineChart = new Chart(document.getElementById('daily-line-chart'), {
+                type: 'line',
+                data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Follow Ups', data: [12, 19, 15, 25, 22, 30, 18], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+        }
+
+        function renderOrders() {
+            const tbody = document.getElementById('orders-tbody');
+            const search = (document.getElementById('orders-search')?.value || '').toLowerCase();
+            let filtered = allOrders;
+
+            if(currentOrderFilter !== 'all') {
+                if(currentOrderFilter === 'pending') filtered = allOrders.filter(o => pendingStatuses.includes(o.status));
+                else if(currentOrderFilter === 'processing') filtered = allOrders.filter(o => ['confirmed', 'processing', 'out_for_delivery'].includes(o.status));
+                else if(currentOrderFilter === 'returned') filtered = allOrders.filter(o => o.status === 'returned' || o.status === 'failed');
+                else filtered = allOrders.filter(o => o.status === currentOrderFilter);
+            }
+
+            if(search) {
+                filtered = filtered.filter(o => (o.customerName||'').toLowerCase().includes(search) || (o.customerPhone||'').includes(search) || o.id.toLowerCase().includes(search));
+            }
+
+            const total = filtered.length;
+            const totalPages = Math.ceil(total / pageSize);
+            if(currentPage > totalPages && totalPages > 0) currentPage = 1;
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const paginated = filtered.slice(start, end);
+
+            if(!paginated.length) { 
+                tbody.innerHTML = '<tr><td colspan="7" class="p-10 text-center text-slate-500">No orders found.</td></tr>'; 
+                updatePagination(0, 0, 0);
+                return; 
+            }
+
+            tbody.innerHTML = paginated.map(o => {
+                const merchant = allUsers.find(u => u.id === o.merchantId);
+                const rider = allUsers.find(u => u.id === o.riderId);
+                const assignedAgent = allUsers.find(u => u.id === o.assignedTo);
+                
+                let agentHtml = assignedAgent ? `<span class="text-cyan-400 font-medium">${assignedAgent.name}</span>` : `<button onclick="assignToMe('${o.id}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-bold px-2 py-1 rounded hover:bg-cyan-500/30">Assign Me</button>`;
+                
+                let scheduleHtml = '';
+                if(o.followUpDate) {
+                    try {
+                        const d = new Date(o.followUpDate.seconds * 1000);
+                        scheduleHtml = `<div class="text-xs text-yellow-400 mt-1 flex items-center gap-1"><span class="iconify" data-icon="mdi:calendar-clock"></span> ${d.toLocaleString()}</div>`;
+                    } catch(e){}
+                }
+
+                return `
+                    <tr class="hover:bg-white/[0.02]">
+                        <td class="p-4"><div class="text-white font-medium flex items-center">${getSlaDot(o)} #${o.id.slice(-6).toUpperCase()}</div><div class="text-xs text-slate-500">${o.itemName || ''} x${o.qty||1}</div><div class="text-xs text-green-400 font-bold mt-1">TZS ${(o.totalAmount||0).toLocaleString()}</div></td>
+                        <td class="p-4"><div class="text-white font-medium cursor-pointer hover:text-emerald-400" onclick="viewCustomerHistory('${o.customerPhone || ''}')">${o.customerName || 'N/A'}</div><div class="text-xs text-slate-500">${o.customerPhone || 'N/A'}</div><div class="text-xs text-slate-500 mt-1">${o.customerAddress || ''}</div></td>
+                        <td class="p-4 text-slate-400 text-xs">${merchant?.shopName || merchant?.name || 'N/A'}</td>
+                        <td class="p-4 text-slate-400 text-xs">${rider?.name || 'Unassigned'}</td>
+                        <td class="p-4 text-xs">${agentHtml} ${scheduleHtml}</td>
+                        <td class="p-4 text-center">${getStatusBadge(o.status)}</td>
+                        <td class="p-4">${getActionButtons(o)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const actualEnd = Math.min(end, total);
+            updatePagination(total, start + 1, actualEnd);
+        }
+
+        function updatePagination(total, start, end) {
+            const info = document.getElementById('orders-pagination-info');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const sizeSelect = document.getElementById('orders-page-size');
+            if(sizeSelect) sizeSelect.value = pageSize;
+            if(total === 0) { info.textContent = 'Showing 0 to 0 of 0'; prevBtn.disabled = true; nextBtn.disabled = true; return; }
+            info.textContent = `Showing ${start} to ${end} of ${total}`;
+            const totalPages = Math.ceil(total / pageSize);
+            prevBtn.disabled = (currentPage === 1);
+            nextBtn.disabled = (currentPage >= totalPages);
+        }
+
+        function changePageSize() { pageSize = parseInt(document.getElementById('orders-page-size').value); currentPage = 1; renderOrders(); }
+        function nextPage() { currentPage++; renderOrders(); }
+        function prevPage() { currentPage--; renderOrders(); }
+
+        // ===== ORDER CRUD =====
+        function openOrderModal(orderId = null) {
+            const modal = document.getElementById('order-modal');
+            const title = document.getElementById('modal-title');
+            if(orderId) {
+                const o = allOrders.find(x => x.id === orderId);
+                if(!o) return;
+                title.innerText = 'Edit Order';
+                document.getElementById('ord-id').value = o.id;
+                document.getElementById('ord-cust').value = o.customerName || '';
+                document.getElementById('ord-phone').value = o.customerPhone || '';
+                document.getElementById('ord-address').value = o.customerAddress || '';
+                document.getElementById('ord-item').value = o.itemName || '';
+                document.getElementById('ord-qty').value = o.qty || 1;
+                document.getElementById('ord-amount').value = o.totalAmount || 0;
+                document.getElementById('ord-status').value = o.status || 'pending';
+            } else {
+                title.innerText = 'Create New Order';
+                document.getElementById('ord-id').value = '';
+                document.getElementById('ord-cust').value = ''; document.getElementById('ord-phone').value = '';
+                document.getElementById('ord-address').value = ''; document.getElementById('ord-item').value = '';
+                document.getElementById('ord-qty').value = 1; document.getElementById('ord-amount').value = 0;
+                document.getElementById('ord-status').value = 'pending';
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeOrderModal() { document.getElementById('order-modal').classList.add('hidden'); }
+
+        async function saveOrder(e) {
+            e.preventDefault();
+            const id = document.getElementById('ord-id').value;
+            const data = {
+                customerName: document.getElementById('ord-cust').value.trim(),
+                customerPhone: document.getElementById('ord-phone').value.trim(),
+                customerAddress: document.getElementById('ord-address').value.trim(),
+                itemName: document.getElementById('ord-item').value.trim(),
+                qty: parseInt(document.getElementById('ord-qty').value) || 1,
+                totalAmount: parseInt(document.getElementById('ord-amount').value) || 0,
+                status: document.getElementById('ord-status').value,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                if(id) {
+                    data.timeline = firebase.firestore.FieldValue.arrayUnion({ status: data.status, at: new Date().toISOString(), by: window.currentUser?.name || 'Agent' });
+                    await db.collection('orders').doc(id).update(data);
+                    showT('Order updated successfully!');
+                } else {
+                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    data.timeline = [{ status: data.status, at: new Date().toISOString(), by: window.currentUser?.name || 'Agent' }];
+                    await db.collection('orders').add(data);
+                    showT('Order created successfully!');
+                }
+                closeOrderModal();
+            } catch(err) { showT(err.message, 'error'); }
+        }
+
+        async function deleteOrder(id) {
+            if(!confirm('Are you sure you want to permanently delete this order?')) return;
+            try {
+                await db.collection('orders').doc(id).delete();
+                showT('Order deleted!');
+            } catch(err) { showT(err.message, 'error'); }
+        }
+
+        // ===== CALL CENTER WORKFLOW =====
+        async function assignToMe(orderId) {
+            try {
+                await db.collection('orders').doc(orderId).update({
+                    assignedTo: window.currentUser.uid,
+                    timeline: firebase.firestore.FieldValue.arrayUnion({ status: 'assigned_to_agent', at: new Date().toISOString(), by: window.currentUser.name })
+                });
+                showT('Order assigned to you!');
+            } catch(err) { showT(err.message, 'error'); }
+        }
+
+        function openLogCallModal(orderId) {
+            document.getElementById('log-call-id').value = orderId;
+            document.getElementById('log-call-notes').value = '';
+            document.getElementById('schedule-box').classList.add('hidden');
+            document.getElementById('log-call-modal').classList.remove('hidden');
+        }
+
+        function closeLogCallModal() { document.getElementById('log-call-modal').classList.add('hidden'); }
+
+        async function resolveCall(isResolved) {
+            const orderId = document.getElementById('log-call-id').value;
+            const notes = document.getElementById('log-call-notes').value.trim();
+            
+            if(isResolved) {
+                try {
+                    await db.collection('orders').doc(orderId).update({
+                        status: 'confirmed', 
+                        followUpNotes: notes,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        timeline: firebase.firestore.FieldValue.arrayUnion({ status: 'confirmed', at: new Date().toISOString(), by: window.currentUser.name, note: notes })
+                    });
+                    showT('Issue resolved! Order confirmed.');
+                    closeLogCallModal();
+                } catch(err) { showT(err.message, 'error'); }
+            } else {
+                document.getElementById('schedule-box').classList.remove('hidden');
+            }
+        }
+
+        async function scheduleFollowUp() {
+            const orderId = document.getElementById('log-call-id').value;
+            const notes = document.getElementById('log-call-notes').value.trim();
+            const dateStr = document.getElementById('log-follow-up-date').value;
+            
+            if(!dateStr) return showT('Please select a date and time', 'error');
+            const followUpDate = firebase.firestore.Timestamp.fromDate(new Date(dateStr));
+
+            try {
+                await db.collection('orders').doc(orderId).update({
+                    status: 'callback_requested',
+                    followUpNotes: notes,
+                    followUpDate: followUpDate,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    timeline: firebase.firestore.FieldValue.arrayUnion({ status: 'callback_requested', at: new Date().toISOString(), by: window.currentUser.name, note: notes })
+                });
+                showT('Next follow-up scheduled!');
+                closeLogCallModal();
+            } catch(err) { showT(err.message, 'error'); }
+        }
+
+        async function rescheduleOrder(id) {
+            if(!confirm('Change this order back to PENDING for rescheduled delivery?')) return;
+            try {
+                await db.collection('orders').doc(id).update({
+                    status: 'pending', 
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    timeline: firebase.firestore.FieldValue.arrayUnion({ status: 'pending', at: new Date().toISOString(), by: window.currentUser?.name || 'Agent', note: 'Order rescheduled after return' })
+                });
+                showT('Order rescheduled! It is back in the pending queue.');
+            } catch(err) { showT(err.message, 'error'); }
+        }
+
+        // ===== CUSTOMER HISTORY =====
+        function viewCustomerHistory(phone) {
+            if(!phone) return showT('No phone number available', 'error');
+            const history = allOrders.filter(o => o.customerPhone === phone);
+            const tbody = document.getElementById('hist-tbody');
+            document.getElementById('hist-title').innerText = `History for ${phone}`;
+            
+            if(!history.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">No past orders found.</td></tr>'; }
+            else {
+                tbody.innerHTML = history.map(o => `
+                    <tr>
+                        <td class="p-3 text-white font-medium">#${o.id.slice(-6).toUpperCase()}</td>
+                        <td class="p-3 text-slate-400">${o.itemName || ''}</td>
+                        <td class="p-3 text-green-400 font-bold">TZS ${(o.totalAmount||0).toLocaleString()}</td>
+                        <td class="p-3">${getStatusBadge(o.status)}</td>
+                        <td class="p-3 text-xs text-slate-500">${formatDate(o.createdAt)}</td>
+                    </tr>
+                `).join('');
+            }
+            document.getElementById('history-modal').classList.remove('hidden');
+        }
+
+        // ===== CSV EXPORT =====
+        function exportCSV() {
+            let filtered = allOrders;
+            if(currentOrderFilter !== 'all') {
+                if(currentOrderFilter === 'pending') filtered = allOrders.filter(o => pendingStatuses.includes(o.status));
+                else if(currentOrderFilter === 'processing') filtered = allOrders.filter(o => ['confirmed', 'processing', 'out_for_delivery'].includes(o.status));
+                else if(currentOrderFilter === 'returned') filtered = allOrders.filter(o => o.status === 'returned' || o.status === 'failed');
+                else filtered = allOrders.filter(o => o.status === currentOrderFilter);
+            }
+
+            let csv = "Order ID,Customer Name,Phone,Address,Item,Qty,Amount,Status,Date\n";
+            filtered.forEach(o => {
+                const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleString() : 'N/A';
+                csv += `${o.id.slice(-6)},${o.customerName || ''},${o.customerPhone || ''},${o.customerAddress || ''},${o.itemName || ''},${o.qty || 1},${o.totalAmount || 0},${o.status || ''},${date}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `orders_${currentOrderFilter}_${new Date().toLocaleDateString()}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showT('CSV Exported!');
+        }
+
+        // ===== NOTES =====
+        async function saveNote(e) {
+            e.preventDefault();
+            const text = document.getElementById('note-text').value.trim();
+            if(!text) return;
+            try {
+                await db.collection('notes').add({ text: text, agent: window.currentUser?.name || 'Agent', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+                document.getElementById('note-text').value = '';
+                showT('Note added!');
+            } catch(err) { showT(err.message, 'error'); }
+        }
+
+        function renderNotes() {
+            const c = document.getElementById('notes-list');
+            if(!allNotes.length) { c.innerHTML = '<div class="text-center text-slate-500 py-8 text-sm">No notes yet.</div>'; return; }
+            const sorted = [...allNotes].sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            c.innerHTML = sorted.map(n => `
+                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex justify-between items-start gap-3">
+                    <div>
+                        <div class="text-sm text-white">${n.text}</div>
+                        <div class="text-xs text-slate-500 mt-2">By ${n.agent} - ${formatDate(n.createdAt)}</div>
+                    </div>
+                    <button onclick="deleteNote('${n.id}')" class="text-red-400 hover:text-red-300 text-xs"><span class="iconify text-lg" data-icon="mdi:trash-can"></span></button>
+                </div>
+            `).join('');
+        }
+
+        async function deleteNote(id) {
+            try { await db.collection('notes').doc(id).delete(); showT('Note deleted!'); } catch(err) { showT(err.message, 'error'); }
+        }
+
+        // ===== REPORTS =====
+        function renderReports() {
+            const processed = allOrders.length;
+            const conf = allOrders.filter(o => ['confirmed', 'delivered'].includes(o.status)).length;
+            const canc = allOrders.filter(o => o.status === 'cancelled').length;
+            const rate = processed > 0 ? ((conf / processed) * 100).toFixed(0) : 0;
+            document.getElementById('rep-processed').textContent = processed;
+            document.getElementById('rep-conf').textContent = conf;
+            document.getElementById('rep-canc').textContent = canc;
+            document.getElementById('rep-rate').textContent = rate + '%';
+        }
+
+        function formatDate(ts) {
+            if(!ts) return 'N/A';
+            try { return new Date(ts.seconds * 1000).toLocaleString(); } catch(e) { return 'N/A'; }
+        }
+
+        function saveAgentSettings(e) {
+            e.preventDefault();
+            const name = document.getElementById('set-name').value.trim();
+            if(!name) return showT('Name is required', 'error');
+            db.collection('users').doc(window.currentUser.uid).update({ name: name })
+            .then(() => { 
+                showT('Profile updated successfully!'); 
+                window.currentUser.name = name; 
+                document.getElementById('header-name').textContent = name;
+                document.getElementById('header-avatar').textContent = name.charAt(0).toUpperCase();
+            }).catch(err => showT(err.message, 'error'));
+        }
+    </script>
+</body>
+</html>

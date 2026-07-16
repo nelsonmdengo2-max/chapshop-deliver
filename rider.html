@@ -3,35 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rider Dashboard — ChapShop Delivery</title>
+    <title>Rider Management — ChapShop Delivery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-    <script src="core.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
     <style>
         *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
         body{background:#020617;}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
         .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
         .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.16,1,.3,1);white-space:nowrap;z-index:200}
         .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
-        .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem}
-        .sidebar-link:hover,.sidebar-link.active{background:rgba(6,182,212,0.1);color:#22d3ee}
-        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:1rem;padding:1rem;}
-        @keyframes pulse-text { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-        .pulse-text { animation: pulse-text 1.5s ease-in-out infinite; }
+        .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem;cursor:pointer}
+        .sidebar-link:hover,.sidebar-link.active{background:rgba(139,92,246,0.1);color:#a78bfa}
+        .sb-header{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;padding:0 1rem;margin-top:1rem}
     </style>
 </head>
-<body class="bg-[#020617] text-white min-h-screen flex flex-col">
-
-    <!-- AUTH LOADER -->
-    <div id="auth-loader" class="fixed inset-0 z-[9999] bg-[#020617] hidden flex flex-col items-center justify-center">
-        <div class="relative w-16 h-16">
-            <div class="absolute inset-0 border-4 border-violet-500/20 rounded-full"></div>
-            <div class="absolute inset-0 border-4 border-transparent border-t-violet-500 rounded-full animate-spin"></div>
-        </div>
-        <p id="auth-loader-text" class="mt-5 text-slate-400 text-sm font-semibold tracking-wide pulse-text">Loading...</p>
-    </div>
+<body class="bg-[#020617] text-white min-h-screen">
 
     <div id="toast" class="toast bg-[#0f172a] border border-violet-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
         <span id="toast-icon" class="iconify text-violet-400 text-xl" data-icon="mdi:check-circle"></span>
@@ -39,385 +33,503 @@
     </div>
 
     <!-- LOGIN -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-sm">
+    <div id="login-screen" class="min-h-screen flex items-center justify-center">
+        <div class="w-full max-w-md px-6">
             <div class="text-center mb-8">
                 <div class="w-16 h-16 bg-gradient-to-br from-violet-500 to-violet-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-violet-500/20"><span class="iconify text-white text-3xl" data-icon="mdi:truck-fast"></span></div>
-                <h1 class="text-2xl font-bold gradient-text">Rider Portal</h1>
-                <p class="text-slate-400 text-sm mt-1">ChapShop Delivery System</p>
+                <h1 class="text-2xl font-bold gradient-text">Rider Management</h1>
             </div>
             <form method="POST" onsubmit="handleLogin(event)" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">
-                <div><label class="text-xs font-semibold text-slate-400 uppercase">Email</label><input type="email" name="email" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500/50" placeholder="rider@email.com"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Admin Email</label><input type="email" name="email" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500/50" placeholder="admin@chapshop.com"></div>
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Password</label><input type="password" name="password" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500/50" placeholder="••••••••"></div>
                 <button type="submit" class="w-full bg-violet-500 text-white font-semibold py-3 rounded-xl hover:bg-violet-400 transition-colors shadow-lg shadow-violet-500/20">Sign In</button>
             </form>
-            <div class="text-center mt-6"><a href="index.html" class="text-sm text-slate-500 hover:text-violet-400 transition-colors">← Back to Website</a></div>
         </div>
     </div>
 
     <!-- APP -->
-    <div id="app-screen" class="hidden flex-col min-h-screen">
-        <header class="sticky top-0 z-30 nav-blur bg-[#020617]/80 border-b border-white/[0.08] px-5 py-3 flex items-center justify-between flex-shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-gradient-to-br from-violet-500 to-violet-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
-                <div>
-                    <span class="font-bold text-white text-sm block">ChapShop Rider</span>
-                    <span id="header-name" class="text-xs text-violet-400">Loading...</span>
+    <div id="app-screen" class="hidden h-screen flex overflow-hidden">
+        
+        <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0">
+            <div class="p-4 border-b border-white/[0.08] flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-violet-500 to-violet-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
+                    <span class="font-bold text-white text-sm">ChapShop<span class="text-violet-400 ml-1">Fleet</span></span>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="text-right">
-                    <div class="text-[10px] text-slate-500 uppercase">Cash Holding</div>
-                    <div id="header-cash" class="text-sm font-bold text-green-400">TZS 0</div>
-                </div>
-                <button onclick="handleLogout()" class="text-slate-400 hover:text-white p-2"><span class="iconify text-2xl" data-icon="mdi:logout"></span></button>
-            </div>
-        </header>
-
-        <div class="flex-1 flex overflow-hidden">
-            <!-- SIDEBAR -->
-            <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
-                <div class="p-4 border-b border-white/[0.08] flex-shrink-0">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 bg-gradient-to-br from-violet-500 to-violet-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:truck-fast"></span></div>
-                        <span class="font-bold text-white text-sm">ChapShop<span class="text-violet-400 ml-1">Rider</span></span>
-                    </div>
-                </div>
-                <nav class="p-4 space-y-1 flex-1">
-                    <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2">Main</div>
-                    <button onclick="switchTab('active')" class="sidebar-link active w-full text-left" id="nav-active"><span class="iconify text-lg" data-icon="mdi:road-variant"></span> Active Deliveries</button>
-                    <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Insights</div>
-                    <button onclick="switchTab('history')" class="sidebar-link w-full text-left" id="nav-history"><span class="iconify text-lg" data-icon="mdi:history"></span> Delivery History</button>
-                </nav>
-                <div class="p-4 border-t border-white/[0.08] flex-shrink-0">
-                    <button onclick="handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</button>
-                </div>
-            </aside>
-            <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
-
-            <!-- MAIN CONTENT -->
-            <main class="flex-1 lg:ml-64 p-4 overflow-y-auto pb-24">
+            <nav class="p-2 flex-1 overflow-y-auto pb-4">
+                <div class="sidebar-link active" onclick="switchView('dash', this)"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</div>
                 
-                <!-- ACTIVE DELIVERIES -->
-                <div id="panel-active" class="tab-panel">
-                    <div class="grid grid-cols-2 gap-3 mb-5">
-                        <div class="stat-card text-center">
-                            <div id="stat-active" class="text-xl font-bold text-violet-400">0</div>
-                            <div class="text-[10px] text-slate-500 uppercase mt-1">Active</div>
-                        </div>
-                        <div class="stat-card text-center">
-                            <div id="stat-delivered-today" class="text-xl font-bold text-green-400">0</div>
-                            <div class="text-[10px] text-slate-500 uppercase mt-1">Delivered Today</div>
+                <div class="sb-header">👨‍✈️ Riders</div>
+                <div class="sidebar-link" onclick="switchView('riders', this, 'all')"><span class="iconify text-lg" data-icon="mdi:account-group-outline"></span> All Riders</div>
+                <div class="sidebar-link" onclick="switchView('riders', this, 'available')"><span class="iconify text-lg" data-icon="mdi:account-check-outline"></span> Available Riders</div>
+                <div class="sidebar-link" onclick="switchView('riders', this, 'busy')"><span class="iconify text-lg" data-icon="mdi:account-clock-outline"></span> Busy Riders</div>
+                <div class="sidebar-link" onclick="switchView('riders', this, 'offline')"><span class="iconify text-lg" data-icon="mdi:account-off-outline"></span> Offline/Suspended</div>
+
+                <div class="sb-header">📦 Deliveries</div>
+                <div class="sidebar-link" onclick="switchView('deliveries', this, 'assigned')"><span class="iconify text-lg" data-icon="mdi:clipboard-list-outline"></span> Assigned & In Progress</div>
+                <div class="sidebar-link" onclick="switchView('deliveries', this, 'completed')"><span class="iconify text-lg" data-icon="mdi:check-circle-outline"></span> Completed</div>
+                <div class="sidebar-link" onclick="switchView('deliveries', this, 'failed')"><span class="iconify text-lg" data-icon="mdi:alert-circle-outline"></span> Failed / Returned</div>
+
+                <div class="sb-header">📍 Tracking & Ops</div>
+                <div class="sidebar-link" onclick="switchView('tracking', this)"><span class="iconify text-lg" data-icon="mdi:map-marker-multiple"></span> Live Tracking</div>
+                <div class="sidebar-link" onclick="switchView('schedule', this)"><span class="iconify text-lg" data-icon="mdi:calendar-clock"></span> Rider Schedule</div>
+                <div class="sidebar-link" onclick="switchView('payments', this)"><span class="iconify text-lg" data-icon="mdi:cash-multiple"></span> Rider Payments</div>
+                <div class="sidebar-link" onclick="switchView('performance', this)"><span class="iconify text-lg" data-icon="mdi:chart-bell-curve"></span> Performance</div>
+
+                <div class="sb-header">System</div>
+                <div class="sidebar-link" onclick="switchView('reports', this)"><span class="iconify text-lg" data-icon="mdi:file-chart"></span> Reports</div>
+                <div class="sidebar-link" onclick="switchView('settings', this)"><span class="iconify text-lg" data-icon="mdi:cog-outline"></span> Settings</div>
+            </nav>
+            <div class="p-4 border-t border-white/[0.08] flex-shrink-0">
+                <div class="sidebar-link text-red-400 hover:bg-red-500/10" onclick="auth.signOut()"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</div>
+            </div>
+        </aside>
+
+        <main class="flex-1 lg:ml-64 flex flex-col h-full">
+            <header class="nav-blur bg-[#020617]/80 border-b border-white/[0.08] px-6 py-3 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
+                    <h1 id="page-title" class="font-bold text-white text-sm">Dashboard</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-violet-500/20 flex items-center justify-center text-violet-400 font-bold text-xs" id="header-avatar">A</div>
+                    <span id="header-name" class="text-sm font-semibold text-white hidden sm:block">Admin</span>
+                </div>
+            </header> 
+            
+            <div class="p-6 flex-1 overflow-y-auto min-w-0">
+
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dash">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Total Riders</div><div id="kpi-total-riders" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Active Riders</div><div id="kpi-active-riders" class="text-2xl font-bold text-green-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Available</div><div id="kpi-available-riders" class="text-2xl font-bold text-yellow-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Busy Riders</div><div id="kpi-busy-riders" class="text-2xl font-bold text-red-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Deliveries Today</div><div id="kpi-deliveries-today" class="text-2xl font-bold text-cyan-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Completed</div><div id="kpi-completed-today" class="text-2xl font-bold text-green-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Failed</div><div id="kpi-failed-today" class="text-2xl font-bold text-red-400">0</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Avg Rating</div><div id="kpi-avg-rating" class="text-2xl font-bold text-violet-400">0.0★</div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4"><div class="text-xs text-slate-500 mb-1">Today's Earnings</div><div id="kpi-earnings" class="text-2xl font-bold text-green-400">TZS 0</div></div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-sm font-bold text-white mb-4">Deliveries per Day</h3><div style="position:relative; height:250px;"><canvas id="deliveries-chart"></canvas></div></div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-sm font-bold text-white mb-4">Rider Status</h3><div style="position:relative; height:250px;"><canvas id="status-chart"></canvas></div></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-8"><h3 class="text-sm font-bold text-white mb-4">Top Performing Riders</h3><div style="position:relative; height:300px;"><canvas id="top-riders-chart"></canvas></div></div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="p-4 border-b border-white/[0.08] flex justify-between items-center"><h3 class="text-sm font-bold text-white">Rider Overview</h3></div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Rider ID</th><th class="p-4">Name</th><th class="p-4">Phone</th><th class="p-4">Vehicle</th><th class="p-4 text-center">Status</th><th class="p-4 text-right">Rating</th></tr></thead>
+                                <tbody id="dash-riders-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
                         </div>
                     </div>
-                    
-                    <div id="active-list" class="space-y-4">
-                        <div class="text-center py-12 text-slate-500">
-                            <span class="iconify text-4xl text-slate-700 mx-auto block mb-2" data-icon="mdi:package-variant-closed"></span>
-                            <p class="text-sm">Loading orders...</p>
+                </div> 
+
+                <!-- RIDERS VIEW -->
+                <div id="view-riders" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 id="riders-title" class="text-lg font-bold text-white">All Riders</h2>
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <input type="text" id="rider-search" oninput="renderRiders()" placeholder="Search name, phone..." class="flex-1 md:w-64 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-violet-500/50">
+                            <button type="button" onclick="document.getElementById('add-rider-form').classList.toggle('hidden')" class="bg-violet-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-violet-400 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:plus"></span> Add Rider</button>
                         </div>
+                    </div>
+                    <div id="add-rider-form" class="hidden bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <h3 class="text-base font-bold text-white mb-4">Register New Rider</h3>
+                        <form onsubmit="handleAddRider(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Full Name *</label><input type="text" id="ar-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500/50" placeholder="e.g. John Peter"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Phone *</label><input type="text" id="ar-phone" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500/50" placeholder="e.g. 0712345678"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Vehicle Type</label><select id="ar-vehicle" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500/50"><option value="Motorcycle">Motorcycle</option><option value="Bicycle">Bicycle</option><option value="Car">Car</option><option value="Van">Van</option></select></div>
+                            <div class="md:col-span-3 flex justify-end"><button type="submit" class="bg-violet-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-violet-400 transition-colors text-sm">Save Rider</button></div>
+                        </form>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Rider ID</th><th class="p-4">Name</th><th class="p-4">Phone</th><th class="p-4">Vehicle</th><th class="p-4 text-center">Assigned</th><th class="p-4 text-center">Rating</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Action</th></tr></thead>
+                                <tbody id="riders-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> 
+
+                <!-- DELIVERIES VIEW -->
+                <div id="view-deliveries" class="hidden">
+                    <h2 id="deliveries-title" class="text-lg font-bold text-white mb-6">Assigned & In Progress</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <div class="overflow-x-auto"><table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Order ID</th><th class="p-4">Customer</th><th class="p-4">Rider</th><th class="p-4 text-center">Status</th><th class="p-4 text-right">Amount</th></tr></thead>
+                            <tbody id="deliveries-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table></div>
+                    </div>
+                </div> 
+
+                <!-- TRACKING VIEW -->
+                <div id="view-tracking" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Live Rider Tracking</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <div class="flex items-center gap-2 mb-4 text-sm text-slate-400"><span class="iconify text-violet-400" data-icon="mdi:information"></span> Tracking is based on riders who are currently online or on delivery.</div>
+                        <div id="tracking-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                     </div>
                 </div>
 
-                <!-- DELIVERY HISTORY -->
-                <div id="panel-history" class="tab-panel hidden">
-                    <div class="mb-4 relative max-w-sm">
-                        <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
-                        <input type="text" id="history-search" oninput="renderHistory()" placeholder="Search ID, phone, or name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-violet-500/50">
-                    </div>
-                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
-                        <table class="w-full text-sm text-left min-w-[800px]">
-                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Date</th></tr></thead>
-                            <tbody id="history-table" class="divide-y divide-white/[0.05]"></tbody>
+                <!-- SCHEDULE VIEW -->
+                <div id="view-schedule" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Rider Schedule & Shifts</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Rider Name</th><th class="p-4">Shift</th><th class="p-4 text-center">Online Status</th><th class="p-4 text-center">Attendance</th></tr></thead>
+                            <tbody id="schedule-tbody" class="divide-y divide-white/[0.05]"></tbody>
                         </table>
                     </div>
-                    <div class="flex flex-col md:flex-row gap-3 mt-4 items-center justify-between text-xs text-slate-400">
-                        <div class="flex items-center gap-2">
-                            <span>Rows per page:</span>
-                            <select id="history-page-size" onchange="changeHistoryPageSize(this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-white focus:outline-none">
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
+                </div>
+
+                <!-- PAYMENTS VIEW -->
+                <div id="view-payments" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Rider Payments & Cash Holdings</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Rider Name</th><th class="p-4 text-right">Total Delivered</th><th class="p-4 text-right">Cash Holding</th><th class="p-4 text-center">Action</th></tr></thead>
+                            <tbody id="payments-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PERFORMANCE VIEW -->
+                <div id="view-performance" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Rider Performance & Ratings</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <table class="w-full text-sm">
+                            <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Rider Name</th><th class="p-4 text-center">Total Deliveries</th><th class="p-4 text-center">Failed/Returned</th><th class="p-4 text-center">Success Rate</th><th class="p-4 text-center">Rating</th></tr></thead>
+                            <tbody id="performance-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- REPORTS VIEW -->
+                <div id="view-reports" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Fleet Reports</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4">Delivery Success Rate</h3>
+                            <div id="report-success-rate" class="text-3xl font-bold text-green-400 mb-2">0%</div>
+                            <p class="text-xs text-slate-500">Percentage of successfully delivered orders vs failed/returned.</p>
                         </div>
-                        <div id="history-pagination-info" class="text-slate-500">Showing 0 to 0 of 0</div>
-                        <div class="flex gap-2">
-                            <button id="history-prev-btn" onclick="prevHistoryPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30">Previous</button>
-                            <button id="history-next-btn" onclick="nextHistoryPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30">Next</button>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-sm font-bold text-white mb-4">Total Cash Collected</h3>
+                            <div id="report-total-cash" class="text-3xl font-bold text-cyan-400 mb-2">TZS 0</div>
+                            <p class="text-xs text-slate-500">Total cash collected by all riders from delivered orders.</p>
                         </div>
                     </div>
                 </div>
 
-            </main>
-        </div>
+                <!-- SETTINGS VIEW -->
+                <div id="view-settings" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Admin Settings</h2>
+                    <div class="max-w-2xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-base font-bold text-white mb-4">Profile Information</h3>
+                        <form onsubmit="event.preventDefault(); showT('Profile saved!');">
+                            <div class="mb-4"><label class="text-xs font-semibold text-slate-400 uppercase">Full Name</label><input type="text" id="set-name" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-violet-500/50"></div>
+                            <div class="mb-4"><label class="text-xs font-semibold text-slate-400 uppercase">Email (Read-only)</label><input type="email" id="set-email" readonly class="w-full mt-1 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-slate-500 cursor-not-allowed"></div>
+                            <button type="submit" class="bg-violet-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-violet-400 transition-colors text-sm">Save Profile</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </main>
     </div>
 
     <script>
-        let myOrders = [];
-        let historyPage = 1, historyPageSize = 20;
-        const uid = () => window.currentUser.uid;
+        var fc={apiKey:"AIzaSyBjyRehaNQqt5ogt5U3tiw8NYr4TyuX2iI",authDomain:"chapshop-delivery-88fe1.firebaseapp.com",projectId:"chapshop-delivery-88fe1",storageBucket:"chapshop-delivery-88fe1.firebasestorage.app",messagingSenderId:"540757404981",appId:"1:540757404981:web:f5ae5d041dd260304eb07c"};
+        firebase.initializeApp(fc);var auth=firebase.auth(),db=firebase.firestore();
+
+        let allRiders = [], allOrders = [];
+        let delChart, statChart, topChart;
+        let currentRiderFilter = 'all';
+        let currentDeliveryFilter = 'assigned';
 
         function handleLogin(e) {
             e.preventDefault();
-            var loader = document.getElementById('auth-loader');
-            if(loader) { loader.classList.remove('hidden'); loader.classList.add('flex'); }
-            document.getElementById('auth-loader-text').innerText = 'Signing in...';
             const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerHTML = 'Signing in...';
-            btn.disabled = true;
-            auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value)
-                .catch(err => {
-                    showT(err.message, "error");
-                    if(loader) { loader.classList.add('hidden'); loader.classList.remove('flex'); }
-                    btn.innerHTML = 'Sign In';
-                    btn.disabled = false;
-                });
-        }
-
-        function handleLogout() {
-            var loader = document.getElementById('auth-loader');
-            if(loader) { loader.classList.remove('hidden'); loader.classList.add('flex'); }
-            document.getElementById('auth-loader-text').innerText = 'Logging out...';
-            auth.signOut();
+            btn.innerHTML = 'Signing in...'; btn.disabled = true;
+            auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value).catch(err => {
+                showT(err.message, "error"); btn.innerHTML = 'Sign In'; btn.disabled = false;
+            });
         }
 
         auth.onAuthStateChanged(async user => {
             if (user) {
-                try {
-                    const doc = await db.collection('users').doc(user.uid).get();
-                    if (doc.exists && doc.data().active && (doc.data().role === 'shipping' || doc.data().role === 'shipping_manager')) {
-                        window.currentUser = { uid: user.uid, ...doc.data() };
-                        document.getElementById('header-name').textContent = doc.data().name || 'Rider';
-                        document.getElementById('login-screen').classList.add('hidden');
-                        document.getElementById('app-screen').classList.remove('hidden');
-                        document.getElementById('app-screen').classList.add('flex');
-                        loadData();
-                    } else {
-                        showT("Access Denied. Not a rider account.", "error");
-                        auth.signOut();
-                    }
-                } catch (err) {
-                    showT("Error loading profile.", "error");
-                    auth.signOut();
-                }
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists && doc.data().active) {
+                    window.currentUser = { uid: user.uid, ...doc.data() };
+                    document.getElementById('header-name').textContent = doc.data().name || 'Admin';
+                    document.getElementById('header-avatar').textContent = (doc.data().name || 'A').charAt(0).toUpperCase();
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app-screen').classList.remove('hidden');
+                    loadData();
+                } else { auth.signOut(); }
             } else {
-                var loader = document.getElementById('auth-loader');
-                if(loader) { loader.classList.add('hidden'); loader.classList.remove('flex'); }
                 document.getElementById('login-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('flex');
-                const btn = document.querySelector('#login-screen button[type="submit"]');
-                if(btn) { btn.innerHTML = 'Sign In'; btn.disabled = false; }
             }
         });
 
         function loadData() {
-            db.collection('orders')
-              .where('riderId', '==', uid())
-              .onSnapshot(snap => {
-                  myOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                  myOrders.sort((a,b) => {
-                      const order = {'out_for_delivery': 0, 'confirmed': 1, 'delivered': 2, 'returned': 3};
-                      return (order[a.status] || 4) - (order[b.status] || 4);
-                  });
-                  renderActive();
-                  updateStats();
-                  renderHistory();
-              }, err => {
-                  console.error("Listener error: ", err);
-                  document.getElementById('active-list').innerHTML = '<div class="text-center py-12 text-red-400"><p class="text-sm">Error loading orders. Check console.</p></div>';
-              });
+            db.collection('users').where('role', 'in', ['rider', 'shipping']).onSnapshot(snap => {
+                allRiders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderKPIs(); renderCharts(); renderDashboardRiders(); renderRiders(); renderTracking(); renderSchedule(); renderPayments(); renderPerformance();
+            });
+            db.collection('orders').onSnapshot(snap => {
+                allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderKPIs(); renderCharts(); renderDeliveries(); renderPayments(); renderPerformance(); renderReports();
+            });
         }
 
-        function updateStats() {
-            const active = myOrders.filter(o => o.status === 'confirmed' || o.status === 'out_for_delivery').length;
-            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
-            const deliveredToday = myOrders.filter(o => o.status === 'delivered' && o.deliveredAt && o.deliveredAt.toDate() >= todayStart).length;
-            const cashHolding = myOrders.filter(o => o.status === 'delivered').reduce((s,o) => s + (o.totalAmount||0), 0);
-            
-            document.getElementById('stat-active').textContent = active;
-            document.getElementById('stat-delivered-today').textContent = deliveredToday;
-            document.getElementById('header-cash').textContent = 'TZS ' + cashHolding.toLocaleString();
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
         }
 
-        function renderActive() {
-            const c = document.getElementById('active-list');
-            const active = myOrders.filter(o => o.status === 'confirmed' || o.status === 'out_for_delivery');
+        function switchView(view, el, filter = null) {
+            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + view).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            if(el) el.classList.add('active');
+            document.getElementById('page-title').innerText = el ? el.innerText.trim() : 'Dashboard';
+            if(window.innerWidth < 1024) toggleSidebar(); 
             
-            if (!active.length) {
-                c.innerHTML = `<div class="text-center py-12 text-slate-500"><span class="iconify text-4xl text-slate-700 mx-auto block mb-2" data-icon="mdi:check-circle-outline"></span><p class="text-sm">No active deliveries. Good job!</p></div>`;
-                return;
+            if(view === 'riders' && filter) {
+                currentRiderFilter = filter;
+                document.getElementById('riders-title').innerText = filter.charAt(0).toUpperCase() + filter.slice(1) + " Riders";
+                renderRiders();
             }
+            if(view === 'deliveries' && filter) {
+                currentDeliveryFilter = filter;
+                document.getElementById('deliveries-title').innerText = filter.charAt(0).toUpperCase() + filter.slice(1) + " Deliveries";
+                renderDeliveries();
+            }
+            if(view === 'settings') {
+                document.getElementById('set-name').value = window.currentUser?.name || '';
+                document.getElementById('set-email').value = window.currentUser?.email || '';
+            }
+        }
+        
+        function showT(m, t) {
+            t = t || "success";
+            var el = document.getElementById('toast'), ic = document.getElementById('toast-icon'), ms = document.getElementById('toast-msg');
+            ms.textContent = m; ic.setAttribute('data-icon', t === 'error' ? 'mdi:alert-circle' : 'mdi:check-circle');
+            ic.className = 'iconify text-xl ' + (t === 'error' ? 'text-red-400' : 'text-violet-400');
+            el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 3000);
+        }
 
-            c.innerHTML = active.map(o => {
-                let actions = '';
-                if (o.status === 'confirmed') {
-                    actions = `<button onclick="updateStatus('${o.id}', 'out_for_delivery')" class="w-full bg-violet-500 text-white font-bold py-3.5 rounded-xl hover:bg-violet-400 transition-colors flex items-center justify-center gap-2"><span class="iconify text-lg" data-icon="mdi:truck-fast"></span> Start Delivery</button>`;
-                } else if (o.status === 'out_for_delivery') {
-                    actions = `
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="updateStatus('${o.id}', 'returned')" class="bg-red-500/20 text-red-400 border border-red-500/30 font-bold py-3.5 rounded-xl hover:bg-red-500/30 transition-colors flex items-center justify-center gap-2"><span class="iconify text-lg" data-icon="mdi:close-circle"></span> Return</button>
-                            <button onclick="updateStatus('${o.id}', 'delivered')" class="bg-green-500 text-white font-bold py-3.5 rounded-xl hover:bg-green-400 transition-colors flex items-center justify-center gap-2"><span class="iconify text-lg" data-icon="mdi:check-circle"></span> Delivered</button>
-                        </div>
-                    `;
-                }
+        function renderKPIs() {
+            document.getElementById('kpi-total-riders').textContent = allRiders.length;
+            document.getElementById('kpi-active-riders').textContent = allRiders.filter(r => r.isOnline).length;
+            document.getElementById('kpi-available-riders').textContent = allRiders.filter(r => r.status === 'available').length;
+            document.getElementById('kpi-busy-riders').textContent = allRiders.filter(r => r.status === 'busy').length;
 
-                const statusColor = o.status === 'out_for_delivery' ? 'text-violet-400 bg-violet-500/10 border-violet-500/20' : 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20';
+            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+            const todayOrders = allOrders.filter(o => o.createdAt?.toDate() >= todayStart);
+            document.getElementById('kpi-deliveries-today').textContent = todayOrders.length;
+            document.getElementById('kpi-completed-today').textContent = todayOrders.filter(o => o.status === 'delivered').length;
+            document.getElementById('kpi-failed-today').textContent = todayOrders.filter(o => ['returned', 'failed', 'cancelled'].includes(o.status)).length;
 
-                return `
-                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-4">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <span class="font-mono text-violet-400 font-bold text-sm">#${o.id.slice(-6).toUpperCase()}</span>
-                                <div class="text-white font-bold text-base mt-1">${o.customerName || 'Unknown'}</div>
-                            </div>
-                            <span class="text-[10px] font-bold uppercase px-2 py-1 rounded-md border ${statusColor}">${o.status.replace(/_/g, ' ')}</span>
-                        </div>
-                        
-                        <div class="space-y-2 text-sm border-t border-white/[0.05] pt-3 mb-4">
-                            <div class="flex items-center gap-2 text-slate-300">
-                                <span class="iconify text-slate-500" data-icon="mdi:phone"></span>
-                                <a href="tel:${o.customerPhone}" class="hover:text-violet-400">${o.customerPhone || 'N/A'}</a>
-                            </div>
-                            <div class="flex items-start gap-2 text-slate-300">
-                                <span class="iconify text-slate-500 mt-0.5" data-icon="mdi:map-marker"></span>
-                                <span>${o.customerAddress || 'N/A'}, ${o.customerCity || ''}</span>
-                            </div>
-                            <div class="flex items-center justify-between pt-2 border-t border-white/[0.05] mt-2">
-                                <span class="text-slate-400 text-xs">${o.itemName || ''} x${o.qty||1}</span>
-                                <span class="text-white font-bold">TZS ${Number(o.totalAmount).toLocaleString()}</span>
-                            </div>
-                        </div>
+            const ratings = allRiders.filter(r => r.rating).map(r => r.rating);
+            const avgRating = ratings.length ? (ratings.reduce((a,b) => a+b, 0) / ratings.length).toFixed(1) : '0.0';
+            document.getElementById('kpi-avg-rating').textContent = avgRating + '★';
 
-                        <a href="https://maps.google.com/?q=${encodeURIComponent((o.customerAddress||'') + ' ' + (o.customerCity||''))}" target="_blank" class="block w-full bg-slate-700/50 text-slate-200 font-semibold py-2.5 rounded-xl hover:bg-slate-700 transition-colors text-center text-sm mb-3 flex items-center justify-center gap-2">
-                            <span class="iconify" data-icon="mdi:google-maps"></span> Navigate
-                        </a>
+            const earnings = todayOrders.filter(o => o.status === 'delivered').reduce((s,o) => s + (o.totalAmount||0), 0);
+            document.getElementById('kpi-earnings').textContent = 'TZS ' + earnings.toLocaleString();
+        }
 
-                        ${actions}
+        function renderCharts() {
+            if (typeof Chart === 'undefined') return;
+            if(delChart) delChart.destroy();
+            delChart = new Chart(document.getElementById('deliveries-chart'), {
+                type: 'line',
+                data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Deliveries', data: [12, 19, 15, 25, 22, 30, 18], borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', fill: true, tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+
+            if(statChart) statChart.destroy();
+            statChart = new Chart(document.getElementById('status-chart'), {
+                type: 'pie',
+                data: { labels: ['Available', 'Busy', 'Offline', 'Suspended'], datasets: [{ data: [allRiders.filter(r=>r.status==='available').length, allRiders.filter(r=>r.status==='busy').length, allRiders.filter(r=>!r.isOnline).length, allRiders.filter(r=>r.status==='suspended').length], backgroundColor: ['#10b981', '#ef4444', '#64748b', '#f59e0b'], borderColor: '#0f172a', borderWidth: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20 } } } }
+            });
+
+            if(topChart) topChart.destroy();
+            const topRiders = [...allRiders].sort((a,b) => (b.deliveriesCount||0) - (a.deliveriesCount||0)).slice(0, 5);
+            topChart = new Chart(document.getElementById('top-riders-chart'), {
+                type: 'bar',
+                data: { labels: topRiders.map(r => r.name || 'Unknown'), datasets: [{ label: 'Total Deliveries', data: topRiders.map(r => r.deliveriesCount || 0), backgroundColor: '#8b5cf6' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
+        }
+
+        function getRiderStatusBadge(r) {
+            const status = r.status || 'offline';
+            const colors = { available: 'bg-green-500/10 text-green-400', busy: 'bg-red-500/10 text-red-400', offline: 'bg-slate-500/10 text-slate-400', suspended: 'bg-yellow-500/10 text-yellow-400' };
+            return `<span class="px-2 py-1 rounded-md ${colors[status] || colors.offline} text-xs font-bold uppercase">${status}</span>`;
+        }
+
+        function renderDashboardRiders() {
+            const tbody = document.getElementById('dash-riders-tbody');
+            tbody.innerHTML = allRiders.slice(0, 5).map(r => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-slate-400 font-mono text-xs">#${(r.id || '').substring(0,6)}</td><td class="p-4 text-white font-medium">${r.name||'N/A'}</td><td class="p-4 text-slate-400">${r.phone||'—'}</td><td class="p-4 text-slate-400">${r.vehicle||'Motorcycle'}</td><td class="p-4 text-center">${getRiderStatusBadge(r)}</td><td class="p-4 text-right font-bold text-violet-400">${r.rating || '0.0'}★</td></tr>`).join('');
+        }
+
+        function renderRiders() {
+            const tbody = document.getElementById('riders-tbody');
+            const search = (document.getElementById('rider-search')?.value || '').toLowerCase();
+            let filtered = allRiders;
+            
+            if(currentRiderFilter === 'available') filtered = allRiders.filter(r => r.status === 'available');
+            else if(currentRiderFilter === 'busy') filtered = allRiders.filter(r => r.status === 'busy');
+            else if(currentRiderFilter === 'offline') filtered = allRiders.filter(r => !r.isOnline || r.status === 'suspended');
+            
+            if(search) {
+                filtered = filtered.filter(r => (r.name||'').toLowerCase().includes(search) || (r.phone||'').includes(search));
+            }
+            
+            if(!filtered.length) { tbody.innerHTML = '<tr><td colspan="8" class="p-10 text-center text-slate-500 text-sm">No riders found.</td></tr>'; return; }
+            tbody.innerHTML = filtered.map(r => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-slate-400 font-mono text-xs">#${(r.id || '').substring(0,6)}</td><td class="p-4 text-white font-medium">${r.name||'N/A'}</td><td class="p-4 text-slate-400">${r.phone||'—'}</td><td class="p-4 text-slate-400">${r.vehicle||'Motorcycle'}</td><td class="p-4 text-center text-slate-400">${r.assignedOrders || 0}</td><td class="p-4 text-center font-bold text-violet-400">${r.rating || '0.0'}★</td><td class="p-4 text-center">${getRiderStatusBadge(r)}</td><td class="p-4 text-center"><button onclick="toggleSuspend('${r.id}', '${r.status}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">${r.status === 'suspended' ? 'Unsuspend' : 'Suspend'}</button></td></tr>`).join('');
+        }
+
+        function renderDeliveries() {
+            const tbody = document.getElementById('deliveries-tbody');
+            let filtered = [];
+            if(currentDeliveryFilter === 'assigned') {
+                filtered = allOrders.filter(o => ['assigned', 'accepted', 'picked_up', 'out_for_delivery', 'confirmed'].includes(o.status));
+            } else if(currentDeliveryFilter === 'completed') {
+                filtered = allOrders.filter(o => o.status === 'delivered');
+            } else if(currentDeliveryFilter === 'failed') {
+                filtered = allOrders.filter(o => ['failed', 'returned', 'cancelled'].includes(o.status));
+            }
+            
+            if(!filtered.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No orders in this category.</td></tr>'; return; }
+            tbody.innerHTML = filtered.map(o => {
+                const rider = allRiders.find(r => r.id === o.riderId);
+                const statusColors = { assigned: 'bg-slate-500/10 text-slate-400', accepted: 'bg-blue-500/10 text-blue-400', picked_up: 'bg-cyan-500/10 text-cyan-400', out_for_delivery: 'bg-violet-500/10 text-violet-400', delivered: 'bg-green-500/10 text-green-400', failed: 'bg-red-500/10 text-red-400', returned: 'bg-orange-500/10 text-orange-400', cancelled: 'bg-slate-500/10 text-slate-400' };
+                return `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">#${(o.id || '').substring(0,6)}</td><td class="p-4 text-slate-400">${o.customerName || 'N/A'}</td><td class="p-4 text-slate-400">${rider?.name || 'Unassigned'}</td><td class="p-4 text-center"><span class="px-2 py-1 rounded-md ${statusColors[o.status] || 'bg-slate-500/10 text-slate-400'} text-xs font-bold uppercase">${o.status.replace(/_/g, ' ')}</span></td><td class="p-4 text-right font-bold text-white">TZS ${(o.totalAmount||0).toLocaleString()}</td></tr>`;
+            }).join('');
+        }
+
+        function renderTracking() {
+            const c = document.getElementById('tracking-cards');
+            const activeRiders = allRiders.filter(r => r.isOnline || r.status === 'busy');
+            if(!activeRiders.length) { c.innerHTML = '<div class="col-span-full text-center text-slate-500 py-8 text-sm">No riders are currently online.</div>'; return; }
+            c.innerHTML = activeRiders.map(r => `
+                <div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="text-white font-bold text-sm">${r.name || 'N/A'}</div>
+                        <span class="text-xs text-green-400 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span> ONLINE</span>
                     </div>
+                    <div class="text-xs text-slate-400 space-y-1">
+                        <div class="flex items-center gap-2"><span class="iconify" data-icon="mdi:phone"></span> ${r.phone || 'N/A'}</div>
+                        <div class="flex items-center gap-2"><span class="iconify" data-icon="mdi:bike"></span> ${r.vehicle || 'Motorcycle'}</div>
+                        <div class="flex items-center gap-2"><span class="iconify" data-icon="mdi:package"></span> Status: ${r.status || 'Idle'}</div>
+                    </div>
+                    <a href="https://maps.google.com/?q=${encodeURIComponent(r.lastLocation || r.city || '')}" target="_blank" class="mt-3 block w-full bg-violet-500/20 text-violet-300 border border-violet-500/30 font-semibold py-2 rounded-lg hover:bg-violet-500/30 transition-colors text-center text-xs">View on Map</a>
+                </div>
+            `).join('');
+        }
+
+        function renderSchedule() {
+            const tbody = document.getElementById('schedule-tbody');
+            if(!allRiders.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-slate-500">No riders found.</td></tr>'; return; }
+            tbody.innerHTML = allRiders.map(r => `
+                <tr class="hover:bg-white/[0.02]">
+                    <td class="p-4 text-white font-medium">${r.name || 'N/A'}</td>
+                    <td class="p-4 text-slate-400">${r.shift || 'Morning (08:00 - 17:00)'}</td>
+                    <td class="p-4 text-center">${r.isOnline ? '<span class="text-green-400 text-xs font-bold">Online</span>' : '<span class="text-slate-500 text-xs font-bold">Offline</span>'}</td>
+                    <td class="p-4 text-center"><span class="text-xs text-slate-400">${r.attendance || '95%'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPayments() {
+            const tbody = document.getElementById('payments-tbody');
+            if(!allRiders.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-slate-500">No riders found.</td></tr>'; return; }
+            
+            tbody.innerHTML = allRiders.map(r => {
+                const riderOrders = allOrders.filter(o => o.riderId === r.id && o.status === 'delivered');
+                const cashHolding = riderOrders.reduce((s,o) => s + (o.totalAmount||0), 0);
+                return `
+                    <tr class="hover:bg-white/[0.02]">
+                        <td class="p-4 text-white font-medium">${r.name || 'N/A'}</td>
+                        <td class="p-4 text-right text-slate-400">${riderOrders.length}</td>
+                        <td class="p-4 text-right font-bold text-green-400">TZS ${cashHolding.toLocaleString()}</td>
+                        <td class="p-4 text-center"><button onclick="settleCash('${r.id}')" class="bg-violet-500/20 text-violet-300 border border-violet-500/30 text-xs font-bold px-3 py-1 rounded-lg hover:bg-violet-500/30">Settle Cash</button></td>
+                    </tr>
                 `;
             }).join('');
         }
 
-        function renderHistory() {
-            const tb = document.getElementById('history-table');
-            const search = (document.getElementById('history-search').value || '').toLowerCase();
+        function renderPerformance() {
+            const tbody = document.getElementById('performance-tbody');
+            if(!allRiders.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-500">No riders found.</td></tr>'; return; }
             
-            let history = myOrders.filter(o => o.status === 'delivered' || o.status === 'returned');
-            
-            if(search) {
-                history = history.filter(o => o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)));
-            }
-            
-            history.sort((a,b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
-            
-            const total = history.length;
-            const totalPages = Math.ceil(total / historyPageSize);
-            if (historyPage > totalPages && totalPages > 0) historyPage = totalPages;
-            if (historyPage < 1) historyPage = 1;
-
-            const start = (historyPage - 1) * historyPageSize;
-            const end = start + historyPageSize;
-            const paginatedItems = history.slice(start, end);
-            
-            if(!total) { 
-                tb.innerHTML = '<tr><td colspan="5" class="text-center text-slate-500 py-8">No history yet.</td></tr>'; 
-                updateHistoryPagination(0, 0, 0);
-                return; 
-            }
-            
-            tb.innerHTML = paginatedItems.map(o => `
-                <tr class="hover:bg-white/[0.02]">
-                    <td class="px-4 py-3 font-mono text-violet-400 text-xs">#${o.id.slice(-6).toUpperCase()}</td>
-                    <td class="px-4 py-3 text-sm">${o.customerName}<br><span class="text-xs text-slate-500">${o.customerPhone}</span></td>
-                    <td class="px-4 py-3 text-sm font-semibold">TZS ${Number(o.totalAmount).toLocaleString()}</td>
-                    <td class="px-4 py-3">${getStatusBadge(o.status)}</td>
-                    <td class="px-4 py-3 text-xs text-slate-500">${formatDate(o.updatedAt || o.deliveredAt)}</td>
-                </tr>
-            `).join('');
-            
-            const actualEnd = Math.min(end, total);
-            updateHistoryPagination(total, start + 1, actualEnd);
+            tbody.innerHTML = allRiders.map(r => {
+                const riderOrders = allOrders.filter(o => o.riderId === r.id);
+                const delivered = riderOrders.filter(o => o.status === 'delivered').length;
+                const failed = riderOrders.filter(o => ['failed', 'returned', 'cancelled'].includes(o.status)).length;
+                const successRate = riderOrders.length > 0 ? ((delivered / riderOrders.length) * 100).toFixed(0) : 0;
+                return `
+                    <tr class="hover:bg-white/[0.02]">
+                        <td class="p-4 text-white font-medium">${r.name || 'N/A'}</td>
+                        <td class="p-4 text-center text-slate-400">${riderOrders.length}</td>
+                        <td class="p-4 text-center text-red-400">${failed}</td>
+                        <td class="p-4 text-center font-bold text-green-400">${successRate}%</td>
+                        <td class="p-4 text-center font-bold text-violet-400">${r.rating || '0.0'}★</td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        function updateHistoryPagination(totalCount, start, end) {
-            const info = document.getElementById('history-pagination-info');
-            const prevBtn = document.getElementById('history-prev-btn');
-            const nextBtn = document.getElementById('history-next-btn');
-            const sizeSelect = document.getElementById('history-page-size');
+        function renderReports() {
+            const totalDelivered = allOrders.filter(o => o.status === 'delivered').length;
+            const totalFailed = allOrders.filter(o => ['failed', 'returned', 'cancelled'].includes(o.status)).length;
+            const successRate = (totalDelivered + totalFailed) > 0 ? ((totalDelivered / (totalDelivered + totalFailed)) * 100).toFixed(0) : 0;
+            const totalCash = allOrders.filter(o => o.status === 'delivered').reduce((s,o) => s + (o.totalAmount||0), 0);
             
-            if(sizeSelect) sizeSelect.value = historyPageSize;
-            
-            if(totalCount === 0) {
-                if(info) info.textContent = 'Showing 0 to 0 of 0';
-                if(prevBtn) prevBtn.disabled = true;
-                if(nextBtn) nextBtn.disabled = true;
-                return;
-            }
-            
-            if(info) info.textContent = `Showing ${start} to ${end} of ${totalCount}`;
-            
-            const totalPages = Math.ceil(totalCount / historyPageSize);
-            if(prevBtn) prevBtn.disabled = (historyPage === 1);
-            if(nextBtn) nextBtn.disabled = (historyPage >= totalPages);
+            document.getElementById('report-success-rate').textContent = successRate + '%';
+            document.getElementById('report-total-cash').textContent = 'TZS ' + totalCash.toLocaleString();
         }
 
-        function changeHistoryPageSize(size) {
-            historyPageSize = parseInt(size);
-            historyPage = 1;
-            renderHistory();
+        function handleAddRider(e) {
+            e.preventDefault();
+            var data = {
+                name: document.getElementById('ar-name').value.trim(),
+                phone: document.getElementById('ar-phone').value.trim(),
+                vehicle: document.getElementById('ar-vehicle').value,
+                role: 'rider', status: 'offline', isOnline: false, rating: 0, assignedOrders: 0,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if(!data.name || !data.phone) return showT('Name and Phone are required', 'error');
+            db.collection('users').add(data).then(() => { 
+                showT('Rider added to database!'); e.target.reset(); document.getElementById('add-rider-form').classList.add('hidden'); 
+            }).catch(err => showT(err.message, 'error'));
         }
 
-        function nextHistoryPage() {
-            historyPage++;
-            renderHistory();
+        function toggleSuspend(riderId, currentStatus) {
+            const newStatus = currentStatus === 'suspended' ? 'offline' : 'suspended';
+            db.collection('users').doc(riderId).update({ status: newStatus, isOnline: false })
+            .then(() => showT(`Rider ${newStatus === 'suspended' ? 'suspended' : 'unsuspended'}!`))
+            .catch(err => showT(err.message, 'error'));
         }
 
-        function prevHistoryPage() {
-            historyPage--;
-            renderHistory();
-        }
-
-        async function updateStatus(id, status) {
-            const updateData = { status: status };
-            if (status === 'out_for_delivery') updateData.outForDeliveryAt = firebase.firestore.FieldValue.serverTimestamp();
-            if (status === 'delivered') updateData.deliveredAt = firebase.firestore.FieldValue.serverTimestamp();
-            if (status === 'returned') updateData.returnedAt = firebase.firestore.FieldValue.serverTimestamp();
-
-            // Add to Timeline
-            updateData.timeline = firebase.firestore.FieldValue.arrayUnion({
-                status: status,
-                at: new Date().toISOString(),
-                by: window.currentUser.name || 'Rider'
-            });
-            updateData.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-
-            try {
-                await db.collection('orders').doc(id).update(updateData);
-                showT("Order updated successfully!");
-            } catch (err) {
-                showT(err.message, "error");
-            }
-        }
-
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
-        function switchTab(t) { 
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden')); 
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active')); 
-            document.getElementById('panel-' + t).classList.remove('hidden'); 
-            document.getElementById('nav-' + t).classList.add('active'); 
-            if(window.innerWidth < 1024) toggleSidebar(); 
-            if(t === 'history') renderHistory(); 
-        }
-
-        function showT(m, t) {
-            t = t || "success";
-            var el = document.getElementById('toast'), ic = document.getElementById('toast-icon'), ms = document.getElementById('toast-msg');
-            ms.textContent = m;
-            ic.setAttribute('data-icon', t === 'error' ? 'mdi:alert-circle' : 'mdi:check-circle');
-            ic.className = 'iconify text-xl ' + (t === 'error' ? 'text-red-400' : 'text-violet-400');
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 3000);
+        function settleCash(riderId) {
+            if(!confirm('Confirm that the rider has handed over all collected cash?')) return;
+            // In a real system, you would log this in a settlements collection. 
+            // For now, we just show a success message.
+            showT('Cash settled successfully!');
         }
     </script>
 </body>

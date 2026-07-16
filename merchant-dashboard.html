@@ -127,6 +127,7 @@
                 <button onclick="switchTab('trend')" class="sidebar-link w-full text-left" id="nav-trend"><span class="iconify text-lg" data-icon="mdi:chart-timeline-variant"></span> <span data-i18n="trend">Sales Trend</span></button>
                 <button onclick="switchTab('reports')" class="sidebar-link w-full text-left" id="nav-reports"><span class="iconify text-lg" data-icon="mdi:chart-bar"></span> <span data-i18n="reports">Reports</span></button>
                 <button onclick="switchTab('settlements')" class="sidebar-link w-full text-left" id="nav-settlements"><span class="iconify text-lg" data-icon="mdi:cash-check"></span> <span data-i18n="settlements">Settlements</span></button>
+<button onclick="switchTab('refunds')" class="sidebar-link w-full text-left" id="nav-refunds"><span class="iconify text-lg" data-icon="mdi:cash-refund"></span> Refunds & Deductions</button>
                 <button onclick="switchTab('notifications')" class="sidebar-link w-full text-left relative" id="nav-notifications"><span class="iconify text-lg" data-icon="mdi:bell-outline"></span> <span data-i18n="notifications">Notifications</span> <span id="notif-badge" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span></button>
 
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]" data-i18n="system">System</div>
@@ -376,6 +377,31 @@
                         <div class="stat-card"><div class="text-[10px] font-bold text-green-400/70 uppercase mb-1">Net Payout</div><div id="st-payout" class="text-2xl font-bold text-green-400">TZS 0</div></div>
                     </div>
                     <div id="settle-list" class="space-y-2"></div>
+                </div>
+
+                <!-- REFUNDS & DEDUCTIONS -->
+                <div id="panel-refunds" class="tab-panel hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Refunds & Deductions</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="stat-card"><div class="text-[10px] font-bold text-rose-400/70 uppercase mb-1">Total Deducted</div><div id="ref-total-deducted" class="text-2xl font-bold text-rose-400">TZS 0</div></div>
+                        <div class="stat-card"><div class="text-[10px] font-bold text-yellow-400/70 uppercase mb-1">Pending Refunds</div><div id="ref-pending-count" class="text-2xl font-bold text-yellow-400">0</div></div>
+                        <div class="stat-card"><div class="text-[10px] font-bold text-green-400/70 uppercase mb-1">Approved Refunds</div><div id="ref-approved-count" class="text-2xl font-bold text-green-400">0</div></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
+                        <table class="w-full text-sm text-left min-w-[800px]">
+                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]">
+                                <tr>
+                                    <th class="px-4 py-3">Order ID</th>
+                                    <th class="px-4 py-3">Customer</th>
+                                    <th class="px-4 py-3">Reason / Note</th>
+                                    <th class="px-4 py-3 text-right">Amount Deducted</th>
+                                    <th class="px-4 py-3 text-center">Status</th>
+                                    <th class="px-4 py-3">Date Processed</th>
+                                </tr>
+                            </thead>
+                            <tbody id="refunds-table-body" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
                 </div>
 
                <!-- SALES TREND -->
@@ -660,7 +686,7 @@ Content-Type: application/json</pre>
     </div> <!-- This closes the <div id="app-screen"> -->
 
     <script>
-        let myOrders = [], myProducts = [], filteredOrders = [], lastOrderCount = 0, settlePeriod = 'all', salesChart = null, selectedCategory = 'all', localZones = [];
+        let myOrders = [], myProducts = [], myRefunds = [], filteredOrders = [], lastOrderCount = 0, settlePeriod = 'all', salesChart = null, selectedCategory = 'all', localZones = [];
 let currentPage = 1, pageSize = 15;
                      
 					 
@@ -857,6 +883,14 @@ let currentPage = 1, pageSize = 15;
         function loadData() {
             db.collection('products').where('merchantId', '==', uid()).onSnapshot(snap => { myProducts = snap.docs.map(d => ({id: d.id, ...d.data()})); updateDashboard(); populateDropdowns(); renderProducts(); renderInventory(); renderNotifications(); renderCatalog(); });
             db.collection('orders').where('merchantId', '==', uid()).orderBy('createdAt', 'desc').onSnapshot(snap => { myOrders = snap.docs.map(d => ({id: d.id, ...d.data()})); if(myOrders.length>lastOrderCount&&lastOrderCount>0){showOrderToast(myOrders.length-lastOrderCount)} lastOrderCount=myOrders.length; filteredOrders = [...myOrders]; updateDashboard(); renderReviewList(); renderOrdersTable(); renderNotifications(); renderSettlements(); });
+            
+            // Safe listener for Refunds
+            db.collection('refunds').where('merchantId', '==', uid()).onSnapshot(snap => { 
+                myRefunds = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+                renderRefunds(); 
+            }, err => {
+                console.log("Refunds permission pending.");
+            });
         }
 function renderSalesChart(){if(typeof Chart==='undefined')return;var canvas=document.getElementById('sales-chart'),empty=document.getElementById('chart-empty'),label=document.getElementById('chart-period-label');if(!canvas)return;var delivered=filterTrend(myOrders.filter(function(o){return o.status==='delivered'}),'createdAt'),labels=[],data=[],now=new Date();if(trendPeriod==='today'){label.textContent='Today (Hourly)';for(var h=0;h<=now.getHours();h++){labels.push(h+':00');data.push(delivered.filter(function(o){return o.createdAt.toDate().getHours()===h}).reduce(function(s,o){return s+(o.totalAmount||0)},0))}}else if(trendPeriod==='week'){label.textContent='This Week (Daily)';var dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],weekStart=new Date(now),dow=now.getDay();weekStart.setDate(now.getDate()-(dow===0?6:dow-1));weekStart.setHours(0,0,0,0);for(var i=0;i<7;i++){var dd=new Date(weekStart);dd.setDate(weekStart.getDate()+i);labels.push(dayNames[i]);if(dd>now){data.push(0);continue}var key=dd.toISOString().split('T')[0];data.push(delivered.filter(function(o){return o.createdAt.toDate().toISOString().split('T')[0]===key}).reduce(function(s,o){return s+(o.totalAmount||0)},0))}}else if(trendPeriod==='month'){label.textContent='This Month (Daily)';var daysInMonth=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();for(var i=1;i<=Math.min(daysInMonth,now.getDate());i++){labels.push(i);var key=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(i).padStart(2,'0');data.push(delivered.filter(function(o){return o.createdAt.toDate().toISOString().split('T')[0]===key}).reduce(function(s,o){return s+(o.totalAmount||0)},0))}}else if(trendPeriod==='year'){label.textContent='This Year (Monthly)';var mNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];for(var i=0;i<=now.getMonth();i++){labels.push(mNames[i]);data.push(delivered.filter(function(o){var d=o.createdAt.toDate();return d.getMonth()===i&&d.getFullYear()===now.getFullYear()}).reduce(function(s,o){return s+(o.totalAmount||0)},0))}}else if(trendPeriod==='all'){label.textContent='All Time (Monthly)';var months={};delivered.forEach(function(o){var d=o.createdAt.toDate(),k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');months[k]=(months[k]||0)+(o.totalAmount||0)});Object.keys(months).sort().forEach(function(k){labels.push(k);data.push(months[k])})}else if(trendPeriod==='custom'&&trendFrom&&trendTo){label.textContent='Custom Range (Daily)';var from=new Date(trendFrom+'T00:00:00'),to=new Date(trendTo+'T00:00:00');for(var d=new Date(from);d<=to;d.setDate(d.getDate()+1)){labels.push(d.toISOString().split('T')[0].slice(5));var dk=d.toISOString().split('T')[0];data.push(delivered.filter(function(o){return o.createdAt.toDate().toISOString().split('T')[0]===dk}).reduce(function(s,o){return s+(o.totalAmount||0)},0))}}var hasData=data.some(function(v){return v>0});canvas.style.display=hasData?'block':'none';empty.classList.toggle('hidden',hasData);var tr=document.getElementById('trend-revenue'),to2=document.getElementById('trend-orders'),ta=document.getElementById('trend-avg');if(tr)tr.textContent='TZS '+delivered.reduce(function(s,o){return s+(o.totalAmount||0)},0).toLocaleString();if(to2)to2.textContent=delivered.length;if(ta)ta.textContent=delivered.length?'TZS '+Math.round(delivered.reduce(function(s,o){return s+(o.totalAmount||0)},0)/delivered.length).toLocaleString():'TZS 0';if(!hasData)return;if(salesChart)salesChart.destroy();salesChart=new Chart(canvas,{type:'bar',data:{labels:labels,datasets:[{data:data,backgroundColor:'rgba(6,182,212,0.4)',hoverBackgroundColor:'rgba(6,182,212,0.7)',borderColor:'rgb(6,182,212)',borderWidth:1,borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f172a',titleColor:'#e2e8f0',bodyColor:'#22d3ee',borderColor:'rgba(6,182,212,0.3)',borderWidth:1,padding:10,displayColors:false,callbacks:{label:function(ctx){return'TZS '+Number(ctx.raw).toLocaleString()}}}},scales:{x:{ticks:{color:'#475569',font:{size:10},maxRotation:45},grid:{display:false},border:{display:false}},y:{ticks:{color:'#475569',font:{size:10},callback:function(v){if(v>=1e6)return(v/1e6).toFixed(1)+'M';if(v>=1e3)return(v/1e3).toFixed(0)+'K';return v}},grid:{color:'rgba(255,255,255,0.04)'},border:{display:false}}}}})}
 function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value||'';p=p.trim();var c=document.getElementById('phone-lookup-results');if(!p){c.innerHTML='';return}var found=myOrders.filter(function(o){return(o.customerPhone||'').indexOf(p)!==-1});if(!found.length){c.innerHTML='<p class="text-slate-500 text-center text-sm py-4">No orders found for '+p+'</p>';return}c.innerHTML=found.map(function(o){return'<div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center justify-between cursor-pointer hover:border-cyan-500/20" onclick="viewOrder(\''+o.id+'\')"><div><div class="font-mono text-cyan-400 font-bold text-xs">#'+o.id.slice(-6).toUpperCase()+'</div><div class="text-white text-sm font-medium mt-0.5">'+(o.customerName||'')+'</div></div><div class="text-right"><div class="text-sm font-bold text-white">'+fmtM(o.totalAmount)+'</div>'+getStatusBadge(o.status)+'<div class="text-xs text-slate-500 mt-1">'+fmtDate(o.createdAt)+'</div></div></div>'}).join('')}
@@ -1464,6 +1498,42 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
         function setSettlePeriod(p,btn){settlePeriod=p;document.querySelectorAll('#settle-btns .date-btn').forEach(function(b){b.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'});if(btn)btn.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';renderSettlements()}
         function renderSettlements(){var c=document.getElementById('settle-list');if(!c)return;var list=myOrders;var now=new Date(),s,e;if(settlePeriod==='today'){s=new Date(now.getFullYear(),now.getMonth(),now.getDate());e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59)}else if(settlePeriod==='week'){var d=now.getDay();s=new Date(now.getFullYear(),now.getMonth(),now.getDate()-(d===0?6:d-1));e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59)}else if(settlePeriod==='month'){s=new Date(now.getFullYear(),now.getMonth(),1);e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59)}if(s)list=list.filter(function(o){return o.createdAt&&o.createdAt.toDate()>=s&&o.createdAt.toDate()<=e});var del=list.filter(function(o){return o.status==='delivered'});var gross=del.reduce(function(s,o){return s+(o.totalAmount||0)},0);var comm=Math.round(gross*0.1);var net=gross-comm;document.getElementById('st-gross').textContent='TZS '+gross.toLocaleString();document.getElementById('st-comm').textContent='-TZS '+comm.toLocaleString();var pel=document.getElementById('st-payout');pel.textContent='TZS '+net.toLocaleString();pel.className='text-2xl font-bold '+(net>=0?'text-green-400':'text-red-400');if(!del.length){c.innerHTML='<p class="text-slate-500 text-center py-8">No delivered orders for this period.</p>';return}c.innerHTML=del.map(function(o){return'<div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center justify-between"><div><span class="font-mono text-cyan-400 font-bold text-sm">#'+o.id.slice(-6).toUpperCase()+'</span><div class="text-slate-400 text-sm mt-0.5">'+(o.customerName||'')+' · '+(o.itemName||'')+' x'+(o.qty||1)+'</div></div><div class="text-right"><div class="text-white font-bold">TZS '+(o.totalAmount||0).toLocaleString()+'</div><div class="text-slate-500 text-xs">'+formatDate(o.createdAt)+'</div></div></div>'}).join('')}
         function requestCancel(id){if(!confirm('Request cancellation for this order?'))return;db.collection('orders').doc(id).update({status:'cancel_requested'}).then(function(){showT('Cancellation requested — admin will review');renderOrdersTable()}).catch(function(e){showT(e.message,'error')})}
+
+        function renderRefunds() {
+            const tbody = document.getElementById('refunds-table-body');
+            if(!tbody) return;
+            
+            const sorted = [...myRefunds].sort((a,b) => (b.processedAt?.seconds || 0) - (a.processedAt?.seconds || 0));
+            const totalDeducted = sorted.filter(r => r.status === 'approved').reduce((s,r) => s + (r.amount||0), 0);
+            const pending = sorted.filter(r => r.status === 'pending');
+            const approved = sorted.filter(r => r.status === 'approved');
+            
+            document.getElementById('ref-total-deducted').textContent = 'TZS ' + totalDeducted.toLocaleString();
+            document.getElementById('ref-pending-count').textContent = pending.length;
+            document.getElementById('ref-approved-count').textContent = approved.length;
+
+            if(!sorted.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-slate-500 py-8">No refund records found. When ChapShop processes a refund for your customer, it will appear here.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = sorted.map(r => {
+                const statusBadge = r.status === 'approved' 
+                    ? '<span class="px-2 py-1 rounded-md bg-green-500/10 text-green-400 text-xs font-bold uppercase">Approved</span>'
+                    : r.status === 'rejected'
+                    ? '<span class="px-2 py-1 rounded-md bg-slate-500/10 text-slate-400 text-xs font-bold uppercase">Rejected</span>'
+                    : '<span class="px-2 py-1 rounded-md bg-yellow-500/10 text-yellow-400 text-xs font-bold uppercase">Pending</span>';
+                
+                return `<tr class="hover:bg-white/[0.02]">
+                    <td class="px-4 py-3 font-mono text-cyan-400 text-xs">#${(r.orderId || '').slice(-6).toUpperCase()}</td>
+                    <td class="px-4 py-3 text-sm text-white">${r.customerName || 'N/A'}</td>
+                    <td class="px-4 py-3 text-xs text-slate-400">${r.txnNote || r.reason || 'Customer refund processed by ChapShop'}</td>
+                    <td class="px-4 py-3 text-right font-bold text-rose-400">TZS ${(r.amount||0).toLocaleString()}</td>
+                    <td class="px-4 py-3 text-center">${statusBadge}</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">${r.processedAt ? formatDate(r.processedAt) : 'N/A'}</td>
+                </tr>`;
+            }).join('');
+        }
         function requestRefund(id){if(!confirm('Request refund for this order?'))return;db.collection('orders').doc(id).update({status:'refund_requested'}).then(function(){showT('Refund requested — admin will review');renderOrdersTable()}).catch(function(e){showT(e.message,'error')})}
            function openGoogleSheetsModal() {
             var key = window.currentUser.apiKey;
