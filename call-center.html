@@ -426,8 +426,19 @@
             var search = (document.getElementById('ws-search').value || '').toLowerCase();
             var list = [];
 
-            if(currentWsTab === 'new') {
+                        if(currentWsTab === 'new') {
                 list = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
+                
+                // AUTOMATIC RECYCLE: If no new orders, pull oldest 'no_answer' and 'callback_requested'
+                if(!list.length) {
+                    list = allOrders.filter(function(o) { 
+                        return (o.processedBy === myId() || o.ccAssignedTo === myId()) && 
+                               (o.status === 'no_answer' || o.status === 'callback_requested'); 
+                    }).sort(function(a, b) { 
+                        return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0); // Oldest first
+                    }).slice(0, 1); // Just get the oldest one to work on
+                }
+
                 if(!list.length) { 
                     c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>';
                     claimNextOrder(); 
@@ -439,7 +450,7 @@
             } else if(currentWsTab === 'scheduled') {
                 list = allOrders.filter(function(o) { return (o.processedBy === myId() || o.ccAssignedTo === myId()) && o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() > now; });
                 if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No scheduled callbacks.</p>'; return; }
-            }
+            }i
 
             if(search) {
                 list = list.filter(function(o) { return o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)); });
@@ -483,6 +494,13 @@
 
                 html += '<form class="space-y-3 pt-4 border-t border-white/[0.05]"><div class="flex flex-col sm:flex-row gap-3">'+timerHtml+'<select id="outcome-' + o.id + '" onchange="toggleSchedule(this.value, \'' + o.id + '\')" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white"><option value="" disabled selected>-- Select Outcome --</option><option value="confirmed">✅ Confirmed</option><option value="no_answer">📞 No Reply</option><option value="wrong_number">❌ Wrong Number</option><option value="out_of_region">🗺️ Out of Region</option><option value="cancelled">❌ Cancelled</option><option value="callback_requested">📅 Schedule Callback</option></select></div>';
                 html += '<div id="schedule-box-' + o.id + '" class="hidden bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl"><label class="text-xs font-bold text-indigo-400 uppercase">Callback Date</label><input type="date" id="date-' + o.id + '" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white"></div>';
+                              // Quick Notes Buttons
+                html += '<div class="flex flex-wrap gap-2 mb-2">';
+                html += '<button type="button" onclick="addQuickNote(\''+o.id+'\', \'Order by mistake\')" class="quick-tag">Order by mistake</button>';
+                html += '<button type="button" onclick="addQuickNote(\''+o.id+'\', \'No need again\')" class="quick-tag">No need again</button>';
+                html += '<button type="button" onclick="addQuickNote(\''+o.id+'\', \'Customer will call back\')" class="quick-tag">Customer will call back</button>';
+                html += '<button type="button" onclick="addQuickNote(\''+o.id+'\', \'Wrong number\')" class="quick-tag">Wrong number</button>';
+                html += '</div>';
                 html += '<textarea id="notes-' + o.id + '" rows="2" placeholder="Add call notes here..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white resize-none">' + (o.callNotes || '') + '</textarea>';
                 html += '<button type="button" onclick="handleFormSubmit(\'' + o.id + '\', this)" class="w-full sm:w-auto sm:ml-auto bg-cyan-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-cyan-400 flex items-center justify-center gap-2 text-sm cursor-pointer"><span class="iconify" data-icon="mdi:check"></span> Update Order</button>';
                 html += '</form></div>';
@@ -490,7 +508,16 @@
             }).join('');
         }
 
-        function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
+               function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
+        
+        function addQuickNote(id, text) {
+            var ta = document.getElementById('notes-'+id);
+            if(ta.value.trim() !== '') {
+                ta.value += ', ' + text; // Append if there is already text
+            } else {
+                ta.value = text; // Set text if empty
+            }
+        }
         function addTag(el, text) { var ta = el.closest('form').querySelector('textarea'); if(ta.value.includes(text)) { ta.value = ta.value.replace(text+', ', ''); el.style.borderColor=''; el.style.color=''; } else { ta.value += text + ', '; el.style.borderColor='#06b6d4'; el.style.color='#22d3ee'; } }
 
         function startTimer(id) {
