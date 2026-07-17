@@ -426,7 +426,7 @@
             var search = (document.getElementById('ws-search').value || '').toLowerCase();
             var list = [];
 
-                        if(currentWsTab === 'new') {
+                                  if(currentWsTab === 'new') {
                 list = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
                 
                 // AUTOMATIC RECYCLE: If no new orders, pull oldest 'no_answer' and 'callback_requested'
@@ -450,7 +450,7 @@
             } else if(currentWsTab === 'scheduled') {
                 list = allOrders.filter(function(o) { return (o.processedBy === myId() || o.ccAssignedTo === myId()) && o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() > now; });
                 if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No scheduled callbacks.</p>'; return; }
-            }i
+            }
 
             if(search) {
                 list = list.filter(function(o) { return o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)); });
