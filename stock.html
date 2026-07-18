@@ -604,855 +604,791 @@
     </div>
 
     <script>
-        var fc={apiKey:"AIzaSyBjyRehaNQqt5ogt5U3tiw8NYr4TyuX2iI",authDomain:"chapshop-delivery-88fe1.firebaseapp.com",projectId:"chapshop-delivery-88fe1",storageBucket:"chapshop-delivery-88fe1.firebasestorage.app",messagingSenderId:"540757404981",appId:"1:540757404981:web:f5ae5d041dd260304eb07c"};
-        firebase.initializeApp(fc);var auth=firebase.auth(),db=firebase.firestore();
-        try{db.enablePersistence({synchronizeTabs:true})}catch(e){}
+    var fc={apiKey:"AIzaSyBjyRehaNQqt5ogt5U3tiw8NYr4TyuX2iI",authDomain:"chapshop-delivery-88fe1.firebaseapp.com",projectId:"chapshop-delivery-88fe1",storageBucket:"chapshop-delivery-88fe1.firebasestorage.app",messagingSenderId:"540757404981",appId:"1:540757404981:web:f5ae5d041dd260304eb07c"};
+    firebase.initializeApp(fc);var auth=firebase.auth(),db=firebase.firestore();
+    try{db.enablePersistence({synchronizeTabs:true})}catch(e){}
 
-        let allProducts = [], allWarehouses = [], allBins = [], allOrders = [], allCategories = [], allBrands = [], allUnits = [], allSuppliers = [], allPurchaseOrders = [], allHistory = [];
-        var allMerchants = [];
-        let currentOrderFilter = 'all';
-        let ordersCurrentPage = 1;
-        let ordersPerPage = 10;
-        let movChart, distChart, statChart;
-        let currentReport = 'inventory';
-        const myId = () => window.currentUser.uid;
+    let allProducts = [], allWarehouses = [], allBins = [], allOrders = [], allCategories = [], allBrands = [], allUnits = [], allSuppliers = [], allPurchaseOrders = [], allHistory = [];
+    var allMerchants = [];
+    let currentOrderFilter = 'all';
+    let ordersCurrentPage = 1;
+    let ordersPerPage = 10;
+    let movChart, distChart, statChart;
+    let currentReport = 'inventory';
 
-        function handleLogin(e) {
-            e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.innerHTML = 'Signing in...';
-            btn.disabled = true;
-            auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value).catch(err => {
-                showT(err.message, "error");
-                btn.innerHTML = 'Sign In';
-                btn.disabled = false;
-            });
-        }
-
-        auth.onAuthStateChanged(async user => {
-            if (user) {
-                const doc = await db.collection('users').doc(user.uid).get();
-                if (doc.exists && doc.data().active) {
-                    window.currentUser = { uid: user.uid, ...doc.data() };
-                    document.getElementById('header-name').textContent = doc.data().name || 'User';
-                    document.getElementById('header-avatar').textContent = (doc.data().name || 'U').charAt(0).toUpperCase();
-                    document.getElementById('login-screen').classList.add('hidden');
-                    document.getElementById('app-screen').classList.remove('hidden');
-                    loadData();
-                } else { auth.signOut(); }
-            } else {
-                document.getElementById('login-screen').classList.remove('hidden');
-                document.getElementById('app-screen').classList.add('hidden');
-            }
+    function handleLogin(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.innerHTML = 'Signing in...';
+        btn.disabled = true;
+        auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value).catch(err => {
+            showT(err.message, "error");
+            btn.innerHTML = 'Sign In';
+            btn.disabled = false;
         });
-		        function checkAutoReservations() { return; }
+    }
 
-                function loadData() {
-            db.collection('products').onSnapshot(snap => {
-                allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderKPIs(); renderCharts(); renderDashboardTable(); renderCurrentStock(); renderLowStock(); renderDamagedExpired(); populateProductSelects();
-            });
-            db.collection('users').where('role', '==', 'merchant').onSnapshot(snap => {
-                allMerchants = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                populateMerchantSelects();
-            });
-            db.collection('warehouses').onSnapshot(snap => {
-                allWarehouses = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderWarehouses(); populateWarehouseSelects();
-            });
-            db.collection('bins').onSnapshot(snap => {
-                allBins = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderBins();
-            });
-            db.collection('categories').onSnapshot(snap => {
-                allCategories = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderCategories();
-            });
-            db.collection('brands').onSnapshot(snap => {
-                allBrands = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderBrands();
-            });
-            db.collection('units').onSnapshot(snap => {
-                allUnits = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderUnits();
-            });
-            db.collection('orders').onSnapshot(snap => {
-                allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderOrders(); renderReturns(); renderDispatch();
-            });
-            db.collection('suppliers').onSnapshot(snap => {
-                allSuppliers = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderSuppliers(); populateSupplierSelects();
-            });
-            db.collection('purchase_orders').onSnapshot(snap => {
-                allPurchaseOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderPurchaseOrders();
-            });
-            db.collection('stock_history').onSnapshot(snap => {
-                allHistory = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderHistory();
-            });
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            const doc = await db.collection('users').doc(user.uid).get();
+            if (doc.exists && doc.data().active) {
+                window.currentUser = { uid: user.uid, ...doc.data() };
+                document.getElementById('header-name').textContent = doc.data().name || 'User';
+                document.getElementById('header-avatar').textContent = (doc.data().name || 'U').charAt(0).toUpperCase();
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                loadData();
+            } else { auth.signOut(); }
+        } else {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('app-screen').classList.add('hidden');
         }
-        
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            const ov = document.getElementById('sidebar-overlay');
-            sb.classList.toggle('-translate-x-full');
-            ov.classList.toggle('hidden');
-        }
+    });
 
-        function switchView(view, el) {
-            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
-            const targetView = document.getElementById('view-' + view);
-            if(targetView) targetView.classList.remove('hidden');
-            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            if(el) el.classList.add('active');
-            if(window.innerWidth < 1024) toggleSidebar(); 
-            if(view === 'reports') renderReports();
-            if(view === 'settings') renderSettings();
-            if(view === 'notifications') renderNotifications();
-        }
-        
-               // ===== BARCODE SCANNER LOGIC =====
-        let html5QrCode = null;
-        function startScanner(targetSelectId) {
-            const modal = document.getElementById('scanner-modal');
-            modal.classList.remove('hidden');
-            html5QrCode = new Html5Qrcode("qr-reader");
-            
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: { width: 250, height: 150 } },
-                (decodedText) => {
-                    matchScannedProduct(decodedText, targetSelectId);
-                    stopScanner();
-                },
-                (errorMessage) => { /* Ignore read errors silently */ }
-            ).catch(err => {
-                showT("Camera error: " + err, "error");
+    function loadData() {
+        db.collection('products').onSnapshot(snap => {
+            allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderKPIs(); renderCharts(); renderDashboardTable(); renderCurrentStock(); renderLowStock(); renderDamagedExpired(); populateProductSelects();
+        });
+        db.collection('users').where('role', '==', 'merchant').onSnapshot(snap => {
+            allMerchants = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            populateMerchantSelects();
+        });
+        db.collection('warehouses').onSnapshot(snap => {
+            allWarehouses = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderWarehouses(); populateWarehouseSelects();
+        });
+        db.collection('bins').onSnapshot(snap => {
+            allBins = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderBins();
+        });
+        db.collection('categories').onSnapshot(snap => {
+            allCategories = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderCategories();
+        });
+        db.collection('brands').onSnapshot(snap => {
+            allBrands = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderBrands();
+        });
+        db.collection('units').onSnapshot(snap => {
+            allUnits = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderUnits();
+        });
+        db.collection('orders').onSnapshot(snap => {
+            allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderOrders(); renderReturns(); renderDispatch();
+        });
+        db.collection('suppliers').onSnapshot(snap => {
+            allSuppliers = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderSuppliers(); populateSupplierSelects();
+        });
+        db.collection('purchase_orders').onSnapshot(snap => {
+            allPurchaseOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderPurchaseOrders();
+        });
+        db.collection('stock_history').onSnapshot(snap => {
+            allHistory = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            renderHistory();
+        });
+    }
+
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebar-overlay');
+        sb.classList.toggle('-translate-x-full');
+        ov.classList.toggle('hidden');
+    }
+
+    function switchView(view, el) {
+        document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+        const targetView = document.getElementById('view-' + view);
+        if(targetView) targetView.classList.remove('hidden');
+        document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+        if(el) el.classList.add('active');
+        if(window.innerWidth < 1024) toggleSidebar();
+        if(view === 'reports') renderReports();
+        if(view === 'settings') renderSettings();
+        if(view === 'notifications') renderNotifications();
+    }
+
+    // ===== BARCODE SCANNER =====
+    let html5QrCode = null;
+    function startScanner(targetSelectId) {
+        const modal = document.getElementById('scanner-modal');
+        modal.classList.remove('hidden');
+        html5QrCode = new Html5Qrcode("qr-reader");
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 250, height: 150 } },
+            (decodedText) => {
+                matchScannedProduct(decodedText, targetSelectId);
                 stopScanner();
-            });
-        }
+            },
+            () => {}
+        ).catch(err => {
+            showT("Camera error: " + err, "error");
+            stopScanner();
+        });
+    }
 
-        function stopScanner() {
-            const modal = document.getElementById('scanner-modal');
-            modal.classList.add('hidden');
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode.clear();
-                    html5QrCode = null;
-                }).catch(err => { html5QrCode = null; });
+    function stopScanner() {
+        const modal = document.getElementById('scanner-modal');
+        modal.classList.add('hidden');
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => { html5QrCode.clear(); html5QrCode = null; }).catch(() => { html5QrCode = null; });
+        }
+    }
+
+    function matchScannedProduct(barcode, targetSelectId) {
+        const matchedProduct = allProducts.find(p => p.sku === barcode || p.barcode === barcode);
+        if (matchedProduct) {
+            document.getElementById(targetSelectId).value = matchedProduct.id;
+            showT('Found: ' + matchedProduct.name);
+        } else {
+            showT('Barcode not found in system', 'error');
+        }
+    }
+
+    function showT(m, t) {
+        t = t || "success";
+        var el = document.getElementById('toast'), ic = document.getElementById('toast-icon'), ms = document.getElementById('toast-msg');
+        ms.textContent = m;
+        ic.setAttribute('data-icon', t === 'error' ? 'mdi:alert-circle' : 'mdi:check-circle');
+        ic.className = 'iconify text-xl ' + (t === 'error' ? 'text-red-400' : 'text-cyan-400');
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    // ===== CHARTS =====
+    function renderCharts() {
+        if (typeof Chart === 'undefined' || !allProducts.length) return;
+        const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const inData = [15, 22, 10, 30, 18, 25, 12];
+        const outData = [10, 18, 15, 20, 10, 15, 8];
+        if(movChart) movChart.destroy();
+        movChart = new Chart(document.getElementById('movement-chart'), {
+            type: 'line',
+            data: { labels: labels, datasets: [
+                { label: 'Stock In', data: inData, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true },
+                { label: 'Stock Out', data: outData, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', fill: true }
+            ]},
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+        });
+
+        const catCounts = {};
+        allProducts.forEach(p => { const c = p.category || p.warehouse || 'Uncategorized'; catCounts[c] = (catCounts[c] || 0) + (p.stock || 0); });
+        if(distChart) distChart.destroy();
+        distChart = new Chart(document.getElementById('distribution-chart'), {
+            type: 'bar',
+            data: { labels: Object.keys(catCounts), datasets: [{ label: 'Units', data: Object.values(catCounts), backgroundColor: '#06b6d4' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+        });
+
+        const avail = allProducts.filter(p => p.stock > (p.minStock || 0) && (p.damaged||0)==0 && (p.expired||0)==0).length;
+        const reserved = allProducts.filter(p => (p.reserved || 0) > 0).length;
+        const low = allProducts.filter(p => p.stock > 0 && p.stock <= (p.minStock || 0)).length;
+        const out = allProducts.filter(p => p.stock <= 0).length;
+        const expired = allProducts.filter(p => (p.expired || 0) > 0).length;
+        if(statChart) statChart.destroy();
+        statChart = new Chart(document.getElementById('status-chart'), {
+            type: 'pie',
+            data: { labels: ['Available', 'Reserved', 'Low Stock', 'Out of Stock', 'Expired'], datasets: [{ data: [avail, reserved, low, out, expired], backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#f97316'], borderColor: '#0f172a', borderWidth: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20 } } } }
+        });
+    }
+
+    // ===== KPIs =====
+    function renderKPIs() {
+        document.getElementById('kpi-total-prods').textContent = allProducts.length;
+        document.getElementById('kpi-total-qty').textContent = allProducts.reduce((s, p) => s + (p.stock || 0), 0).toLocaleString();
+        document.getElementById('kpi-stock-value').textContent = allProducts.reduce((s, p) => s + ((p.stock || 0) * (p.costPrice || 0)), 0).toLocaleString();
+        document.getElementById('kpi-low-items').textContent = allProducts.filter(p => p.stock > 0 && p.stock <= (p.minStock || 0)).length;
+        document.getElementById('kpi-out-items').textContent = allProducts.filter(p => p.stock <= 0).length;
+    }
+
+    function getStockStatus(p) {
+        if((p.damaged || 0) > 0) return '<span class="px-2 py-1 rounded-md bg-pink-500/10 text-pink-400 text-xs font-bold">DAMAGED</span>';
+        if((p.expired || 0) > 0) return '<span class="px-2 py-1 rounded-md bg-orange-500/10 text-orange-400 text-xs font-bold">EXPIRED</span>';
+        if(p.stock <= 0) return '<span class="px-2 py-1 rounded-md bg-red-500/10 text-red-400 text-xs font-bold">OUT OF STOCK</span>';
+        if(p.stock <= (p.minStock||0)) return '<span class="px-2 py-1 rounded-md bg-yellow-500/10 text-yellow-400 text-xs font-bold">LOW STOCK</span>';
+        if((p.reserved || 0) > 0) return '<span class="px-2 py-1 rounded-md bg-blue-500/10 text-blue-400 text-xs font-bold">RESERVED</span>';
+        return '<span class="px-2 py-1 rounded-md bg-green-500/10 text-green-400 text-xs font-bold">IN STOCK</span>';
+    }
+
+    function renderDashboardTable() {
+        const tbody = document.getElementById('dash-tbody');
+        if(!tbody) return;
+        tbody.innerHTML = allProducts.map(p => {
+            const totalStock = (p.stock||0) + (p.delivered||0);
+            const remaining = p.stock||0;
+            return `<tr class="hover:bg-white/[0.02] transition-colors">
+                <td class="p-4 text-white font-medium">${p.name||'N/A'}</td>
+                <td class="p-4 text-slate-400 font-mono text-xs">${p.sku||'—'}</td>
+                <td class="p-4 text-slate-400">${p.warehouse||'Main'}</td>
+                <td class="p-4 text-right font-bold text-slate-300">${totalStock}</td>
+                <td class="p-4 text-right font-bold text-cyan-400">${p.delivered||0}</td>
+                <td class="p-4 text-right font-bold text-green-400">${remaining}</td>
+                <td class="p-4 text-center">${getStockStatus(p)}</td>
+            </tr>`;
+        }).join('');
+
+        const table = tbody.parentElement;
+        if(table && table.tagName === 'TABLE') {
+            const thead = table.querySelector('thead');
+            if(thead) {
+                thead.innerHTML = '<tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">SKU</th><th class="p-3">Warehouse</th><th class="p-3 text-right">Total Stock</th><th class="p-3 text-right">Delivered</th><th class="p-3 text-right">Remaining Stock</th><th class="p-3 text-center">Status</th></tr>';
             }
         }
+    }
 
-        function matchScannedProduct(barcode, targetSelectId) {
-            const matchedProduct = allProducts.find(p => p.sku === barcode || p.barcode === barcode);
-            if (matchedProduct) {
-                document.getElementById(targetSelectId).value = matchedProduct.id;
-                showT(`Found: ${matchedProduct.name}`);
-            } else {
-                showT('Barcode not found in system', 'error');
-            }
+    // ===== CURRENT STOCK (was missing!) =====
+    function renderCurrentStock() {
+        const tbody = document.getElementById('cs-tbody');
+        if (!tbody) return;
+
+        const search = (document.getElementById('cs-search')?.value || '').toLowerCase();
+        let filtered = allProducts;
+
+        if (search) {
+            filtered = allProducts.filter(p =>
+                (p.name || '').toLowerCase().includes(search) ||
+                (p.sku || '').toLowerCase().includes(search) ||
+                (p.warehouse || '').toLowerCase().includes(search) ||
+                (p.merchantName || '').toLowerCase().includes(search)
+            );
         }
 
-        
-
-        function showT(m, t) {
-            t = t || "success";
-            var el = document.getElementById('toast'), ic = document.getElementById('toast-icon'), ms = document.getElementById('toast-msg');
-            ms.textContent = m;
-            ic.setAttribute('data-icon', t === 'error' ? 'mdi:alert-circle' : 'mdi:check-circle');
-            ic.className = 'iconify text-xl ' + (t === 'error' ? 'text-red-400' : 'text-cyan-400');
-            el.classList.add('show');
-            setTimeout(() => el.classList.remove('show'), 3000);
-        }
-
-        // ===== CHARTS LOGIC =====
-        function renderCharts() {
-            if (typeof Chart === 'undefined' || !allProducts.length) return;
-            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            const inData = [15, 22, 10, 30, 18, 25, 12];
-            const outData = [10, 18, 15, 20, 10, 15, 8];
-            if(movChart) movChart.destroy();
-            movChart = new Chart(document.getElementById('movement-chart'), {
-                type: 'line',
-                data: { labels: labels, datasets: [
-                    { label: 'Stock In', data: inData, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true },
-                    { label: 'Stock Out', data: outData, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', fill: true }
-                ]},
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
-            });
-
-            const catCounts = {};
-            allProducts.forEach(p => { const c = p.category || p.warehouse || 'Uncategorized'; catCounts[c] = (catCounts[c] || 0) + (p.stock || 0); });
-            if(distChart) distChart.destroy();
-            distChart = new Chart(document.getElementById('distribution-chart'), {
-                type: 'bar',
-                data: { labels: Object.keys(catCounts), datasets: [{ label: 'Units', data: Object.values(catCounts), backgroundColor: '#06b6d4' }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
-            });
-
-            const avail = allProducts.filter(p => p.stock > (p.minStock || 0) && (p.damaged||0)==0 && (p.expired||0)==0).length;
-            const reserved = allProducts.filter(p => (p.reserved || 0) > 0).length;
-            const low = allProducts.filter(p => p.stock > 0 && p.stock <= (p.minStock || 0)).length;
-            const out = allProducts.filter(p => p.stock <= 0).length;
-            const expired = allProducts.filter(p => (p.expired || 0) > 0).length;
-            if(statChart) statChart.destroy();
-            statChart = new Chart(document.getElementById('status-chart'), {
-                type: 'pie',
-                data: { labels: ['Available', 'Reserved', 'Low Stock', 'Out of Stock', 'Expired'], datasets: [{ data: [avail, reserved, low, out, expired], backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#f97316'], borderColor: '#0f172a', borderWidth: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20 } } } }
-            });
-        }
-
-        // ===== DASHBOARD & KPIs =====
-        function renderKPIs() {
-            document.getElementById('kpi-total-prods').textContent = allProducts.length;
-            document.getElementById('kpi-total-qty').textContent = allProducts.reduce((s, p) => s + (p.stock || 0), 0).toLocaleString();
-            document.getElementById('kpi-low-items').textContent = allProducts.filter(p => p.stock > 0 && p.stock <= (p.minStock || 0)).length;
-            document.getElementById('kpi-out-items').textContent = allProducts.filter(p => p.stock <= 0).length;
-        }
-
-        function getStockStatus(p) {
-            if((p.damaged || 0) > 0) return '<span class="px-2 py-1 rounded-md bg-pink-500/10 text-pink-400 text-xs font-bold">DAMAGED</span>';
-            if((p.expired || 0) > 0) return '<span class="px-2 py-1 rounded-md bg-orange-500/10 text-orange-400 text-xs font-bold">EXPIRED</span>';
-            if(p.stock <= 0) return '<span class="px-2 py-1 rounded-md bg-red-500/10 text-red-400 text-xs font-bold">OUT OF STOCK</span>';
-            if(p.stock <= (p.minStock||0)) return '<span class="px-2 py-1 rounded-md bg-yellow-500/10 text-yellow-400 text-xs font-bold">LOW STOCK</span>';
-            if((p.reserved || 0) > 0) return '<span class="px-2 py-1 rounded-md bg-blue-500/10 text-blue-400 text-xs font-bold">RESERVED</span>';
-            return '<span class="px-2 py-1 rounded-md bg-green-500/10 text-green-400 text-xs font-bold">IN STOCK</span>';
-        }
-
-        function renderDashboardTable() {
-            const tbody = document.getElementById('dash-tbody');
-            tbody.innerHTML = allProducts.map(p => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${p.name||'N/A'}</td><td class="p-4 text-slate-400 font-mono text-xs">${p.sku||'—'}</td><td class="p-4 text-slate-400">${p.warehouse||'Main'}</td><td class="p-4 text-right font-bold text-white">${p.stock||0}</td><td class="p-4 text-right text-blue-400">${p.reserved||0}</td><td class="p-4 text-right text-slate-500">${p.minStock||0}</td><td class="p-4 text-center">${getStockStatus(p)}</td><td class="p-4 text-center"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">View</button></td></tr>`).join('');
-        }
-
-                        function renderDashboardTable() {
-            const tbody = document.getElementById('dash-tbody');
-            if(!tbody) return;
-            tbody.innerHTML = allProducts.map(p => {
-                const totalStock = (p.stock||0) + (p.delivered||0);
-                const remaining = p.stock||0;
-                return `<tr class="hover:bg-white/[0.02] transition-colors">
-                    <td class="p-4 text-white font-medium">${p.name||'N/A'}</td>
-                    <td class="p-4 text-slate-400 font-mono text-xs">${p.sku||'—'}</td>
-                    <td class="p-4 text-slate-400">${p.warehouse||'Main'}</td>
-                    <td class="p-4 text-right font-bold text-slate-300">${totalStock}</td>
-                    <td class="p-4 text-right font-bold text-cyan-400">${p.delivered||0}</td>
-                    <td class="p-4 text-right font-bold text-green-400">${remaining}</td>
-                    <td class="p-4 text-center">${getStockStatus(p)}</td>
-                </tr>`;
-            }).join('');
-
-            // Force update headers
-            const table = tbody.parentElement;
-            if(table && table.tagName === 'TABLE') {
-                const thead = table.querySelector('thead');
-                if(thead) {
-                    thead.innerHTML = `<tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">SKU</th><th class="p-3">Warehouse</th><th class="p-3 text-right">Total Stock</th><th class="p-3 text-right">Delivered</th><th class="p-3 text-right">Remaining Stock</th><th class="p-3 text-center">Status</th></tr>`;
-                }
-            }
-        }
-        function renderWarehouses() {
-            const tbody = document.getElementById('wh-tbody');
-            if(!allWarehouses.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No warehouses found. Add one!</td></tr>'; return; }
-            tbody.innerHTML = allWarehouses.map(w => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${w.name||'N/A'}</td><td class="p-4 text-slate-400">${w.location||'—'}</td><td class="p-4 text-right text-slate-300">${w.capacity||'Unlimited'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('warehouses','${w.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
-        }
-
-        function renderBins() {
-            const tbody = document.getElementById('bin-tbody');
-            if(!allBins.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No bins found. Add one!</td></tr>'; return; }
-            tbody.innerHTML = allBins.map(b => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${b.code||'N/A'}</td><td class="p-4 text-slate-400">${b.warehouse||'—'}</td><td class="p-4 text-slate-400">${b.notes||'—'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('bins','${b.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
-        }
-
-        function renderCategories() {
-            const tbody = document.getElementById('cat-tbody');
-            if(!allCategories.length) { tbody.innerHTML = '<tr><td colspan="2" class="p-10 text-center text-slate-500 text-sm">No categories found. Add one!</td></tr>'; return; }
-            tbody.innerHTML = allCategories.map(c => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${c.name||'N/A'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('categories','${c.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
-        }
-
-        function renderBrands() {
-            const tbody = document.getElementById('brand-tbody');
-            if(!allBrands.length) { tbody.innerHTML = '<tr><td colspan="2" class="p-10 text-center text-slate-500 text-sm">No brands found. Add one!</td></tr>'; return; }
-            tbody.innerHTML = allBrands.map(b => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${b.name||'N/A'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('brands','${b.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
-        }
-
-        function renderUnits() {
-            const tbody = document.getElementById('unit-tbody');
-            if(!allUnits.length) { tbody.innerHTML = '<tr><td colspan="2" class="p-10 text-center text-slate-500 text-sm">No units found. Add one!</td></tr>'; return; }
-            tbody.innerHTML = allUnits.map(u => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${u.name||'N/A'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('units','${u.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
-        }
-
-        function handleAddCategory(e) {
-            e.preventDefault();
-            var data = { name: document.getElementById('cat-name').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-            if(!data.name) return showT('Category name is required', 'error');
-            db.collection('categories').add(data).then(() => { showT('Category added!'); e.target.reset(); document.getElementById('add-cat-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
-        }
-
-        function handleAddBrand(e) {
-            e.preventDefault();
-            var data = { name: document.getElementById('brand-name').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-            if(!data.name) return showT('Brand name is required', 'error');
-            db.collection('brands').add(data).then(() => { showT('Brand added!'); e.target.reset(); document.getElementById('add-brand-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
-        }
-
-        function handleAddUnit(e) {
-            e.preventDefault();
-            var data = { name: document.getElementById('unit-name').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-            if(!data.name) return showT('Unit name is required', 'error');
-            db.collection('units').add(data).then(() => { showT('Unit added!'); e.target.reset(); document.getElementById('add-unit-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
-        }
-
-        function filterOrders(status) {
-            currentOrderFilter = status;
-            ordersCurrentPage = 1; 
-            document.querySelectorAll('.order-tab').forEach(b => b.className = 'order-tab bg-white/[0.05] text-slate-400 hover:bg-white/[0.1]');
-            const activeTab = document.getElementById('tab-' + status);
-            if(activeTab) activeTab.className = 'order-tab bg-cyan-500 text-white';
-            renderOrders();
-        }
-
-        function renderOrders() {
-            const tbody = document.getElementById('ord-tbody');
-            if(!allOrders.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No orders found.</td></tr>'; return; }
-            let filtered = allOrders;
-            if(currentOrderFilter !== 'all') {
-                filtered = allOrders.filter(o => (o.status || 'pending').toLowerCase() === currentOrderFilter);
-            }
-            const searchQuery = (document.getElementById('ord-search')?.value || '').toLowerCase();
-            if(searchQuery) {
-                filtered = filtered.filter(o => {
-                    const name = o.customerName || o.customer || o.name || o.fullName || o.buyer || (o.address && o.address.name) || (o.shippingAddress && o.shippingAddress.name) || '';
-                    const item = o.itemName || o.item || o.productName || o.product || '';
-                    const oid = (o.id || '').toLowerCase();
-                    return name.toLowerCase().includes(searchQuery) || item.toLowerCase().includes(searchQuery) || oid.includes(searchQuery);
-                });
-            }
-            if(!filtered.length) { 
-                tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No orders match your search/filter.</td></tr>';
-                document.getElementById('ord-page-info').textContent = '0-0 of 0';
-                document.getElementById('ord-prev').disabled = true;
-                document.getElementById('ord-next').disabled = true;
-                return; 
-            }
-            const totalPages = Math.ceil(filtered.length / ordersPerPage);
-            if(ordersCurrentPage > totalPages) ordersCurrentPage = 1;
-            const startIndex = (ordersCurrentPage - 1) * ordersPerPage;
-            const endIndex = startIndex + ordersPerPage;
-            const paginatedOrders = filtered.slice(startIndex, endIndex);
-            tbody.innerHTML = paginatedOrders.map(o => {
-                const status = (o.status || 'pending').toLowerCase();
-                const statusColors = { pending: 'bg-slate-500/10 text-slate-400', confirmed: 'bg-blue-500/10 text-blue-400', processing: 'bg-yellow-500/10 text-yellow-400', out_for_delivery: 'bg-cyan-500/10 text-cyan-400', delivered: 'bg-green-500/10 text-green-400', cancelled: 'bg-red-500/10 text-red-400', returned: 'bg-orange-500/10 text-orange-400', wrong_number: 'bg-red-500/10 text-red-400', callback_requested: 'bg-purple-500/10 text-purple-400' };
-                const colorClass = statusColors[status] || 'bg-slate-500/10 text-slate-400';
-                const name = o.customerName || o.customer || o.name || o.fullName || o.buyer || (o.address && o.address.name) || (o.shippingAddress && o.shippingAddress.name) || 'N/A';
-                const item = o.itemName || o.item || o.productName || o.product || 'N/A';
-                const qty = o.qty || o.quantity || o.totalQty || 1;
-                return `<tr class="hover:bg-white/[0.02] transition-colors">
-                    <td class="p-4 text-white font-medium">#${(o.id || '').substring(0,6)}</td>
-                    <td class="p-4 text-slate-400">${name}</td>
-                    <td class="p-4 text-slate-400">${item}</td>
-                    <td class="p-4 text-center"><span class="px-2 py-1 rounded-md ${colorClass} text-xs font-bold uppercase">${o.status || 'PENDING'}</span></td>
-                    <td class="p-4 text-right font-bold text-white">${qty}</td>
-                </tr>`;
-            }).join('');
-            const startNum = startIndex + 1;
-            const endNum = Math.min(endIndex, filtered.length);
-            document.getElementById('ord-page-info').textContent = `${startNum}-${endNum} of ${filtered.length}`;
-            document.getElementById('ord-prev').disabled = ordersCurrentPage === 1;
-            document.getElementById('ord-next').disabled = ordersCurrentPage === totalPages || totalPages === 0;
-        }
-
-        function changeOrderPageSize() {
-            ordersPerPage = parseInt(document.getElementById('ord-per-page').value);
-            ordersCurrentPage = 1;
-            renderOrders();
-        }
-        function nextPageOrders() { ordersCurrentPage++; renderOrders(); }
-        function prevPageOrders() { if(ordersCurrentPage > 1) { ordersCurrentPage--; renderOrders(); } }
-
-        function renderReturns() {
-            const tbody = document.getElementById('ret-tbody');
-            const returns = allOrders.filter(o => (o.status || '').toLowerCase() === 'returned');
-            if(!returns.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No returned orders.</td></tr>'; return; }
-            tbody.innerHTML = returns.map(o => {
-                const item = o.itemName || o.item || o.productName || o.product || 'N/A';
-                const qty = o.qty || o.quantity || o.totalQty || 1;
-                return `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">#${o.id.substring(0,6)}</td><td class="p-4 text-slate-400">${item}</td><td class="p-4 text-right font-bold text-white">${qty}</td><td class="p-4 text-center"><button type="button" onclick="restockReturned('${o.id}')" class="text-green-400 hover:text-green-300 text-xs font-bold hover:underline">Restock</button></td></tr>`;
-            }).join('');
-        }
-
-        function renderLowStock() {
-            const tbody = document.getElementById('ls-tbody');
-            const emptyEl = document.getElementById('ls-empty');
-            const lowItems = allProducts.filter(p => p.stock <= (p.minStock || 0));
-            if(!lowItems.length) { emptyEl.classList.remove('hidden'); tbody.innerHTML = ''; return; }
-            emptyEl.classList.add('hidden');
-            tbody.innerHTML = lowItems.map(p => { const deficit = (p.minStock || 0) - p.stock; return `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${p.name||'N/A'}</td><td class="p-4 text-right font-bold text-red-400">${p.stock||0}</td><td class="p-4 text-right text-slate-500">${p.minStock||0}</td><td class="p-4 text-center font-bold text-yellow-400">-${deficit > 0 ? deficit : 0}</td></tr>`; }).join('');
-        }
-
-        function renderDamagedExpired() {
-            const tbody = document.getElementById('de-tbody');
-            const items = allProducts.filter(p => (p.damaged || 0) > 0 || (p.expired || 0) > 0);
-            if(!items.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No damaged or expired items!</td></tr>'; return; }
-            tbody.innerHTML = items.map(p => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${p.name||'N/A'}</td><td class="p-4 text-slate-400">${p.warehouse||'Main'}</td><td class="p-4 text-right font-bold text-pink-400">${p.damaged||0}</td><td class="p-4 text-right font-bold text-orange-400">${p.expired||0}</td><td class="p-4 text-center"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Dispose</button></td></tr>`).join('');
-        }
-
-        function populateProductSelects() {
-            ['si-product', 'so-product', 'sa-product', 'tr-product', 'po-product'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.innerHTML = '<option value="" disabled selected>-- Select Product --</option>' + allProducts.map(p => `<option value="${p.id}">${p.name} (Avail: ${p.stock||0})</option>`).join('');
-            });
-        }
-
-        function populateWarehouseSelects() {
-            const el = document.getElementById('bin-warehouse');
-            if(el) el.innerHTML = '<option value="" disabled selected>-- Select Warehouse --</option>' + allWarehouses.map(w => `<option value="${w.name}">${w.name}</option>`).join('');
-        }
-
-        function populateMerchantSelects() {
-            var el = document.getElementById('ap-merchant');
-            if(el) el.innerHTML = '<option value="" disabled selected>Select Merchant</option>' + allMerchants.filter(u => u.role === 'merchant').map(m => '<option value="'+m.id+'">'+(m.shopName || m.name)+'</option>').join('');
-        }
-
-        function handleAddWarehouse(e) {
-            e.preventDefault();
-            var data = { name: document.getElementById('wh-name').value.trim(), location: document.getElementById('wh-location').value.trim(), capacity: parseInt(document.getElementById('wh-capacity').value) || 0, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-            if(!data.name) return showT('Warehouse name is required', 'error');
-            db.collection('warehouses').add(data).then(() => { showT('Warehouse added!'); e.target.reset(); document.getElementById('add-warehouse-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
-        }
-
-        function handleAddBin(e) {
-            e.preventDefault();
-            var data = { code: document.getElementById('bin-code').value.trim(), warehouse: document.getElementById('bin-warehouse').value, notes: document.getElementById('bin-notes').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-            if(!data.code || !data.warehouse) return showT('Bin Code and Warehouse are required', 'error');
-            db.collection('bins').add(data).then(() => { showT('Bin added!'); e.target.reset(); document.getElementById('add-bin-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
-        }
-
-        function handleAddProduct(e) {
-            e.preventDefault();
-            var merchantSelect = document.getElementById('ap-merchant');
-            var data = {
-                name: document.getElementById('ap-name').value.trim(), sku: document.getElementById('ap-sku').value.trim(), warehouse: document.getElementById('ap-warehouse').value.trim() || 'Main Warehouse',
-                merchantId: merchantSelect.value, merchantName: merchantSelect.options[merchantSelect.selectedIndex].text,
-                stock: parseInt(document.getElementById('ap-stock').value) || 0, minStock: parseInt(document.getElementById('ap-minstock').value) || 10,
-                costPrice: parseInt(document.getElementById('ap-cost').value) || 0, sellingPrice: parseInt(document.getElementById('ap-price').value) || 0,
-                reserved: 0, damaged: 0, expired: 0, delivered: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            if(!data.name || !data.merchantId) return showT('Product Name and Merchant are required', 'error');
-         db.collection('products').add(data).then(() => { showT('Product added!'); e.target.reset(); document.getElementById('ap-stock').value = 50; document.getElementById('ap-minstock').value = 10; document.getElementById('add-product-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
-        }
-
-        function deleteItem(collection, id) { {
-            if(!confirm('Are you sure you want to delete this permanently?')) return;
-            db.collection(collection).doc(id).delete().then(() => showT('Deleted!')).catch(err => showT(err.message, 'error'));
-        }
-
-        function restockReturned(orderId) {
-            const order = allOrders.find(o => o.id === orderId);
-            if(!order || !order.itemName) return showT('Cannot find item name to restock', 'error');
-            db.collection('products').where('name', '==', order.itemName).limit(1).get().then(snap => {
-                if(!snap.empty) {
-                    snap.docs[0].ref.update({ stock: firebase.firestore.FieldValue.increment(order.qty || 1) }).then(() => {
-                        db.collection('orders').doc(orderId).update({ status: 'restocked' }).then(() => showT('Item restocked successfully!'));
-                    });
-                } else { showT('Product not found in inventory', 'error'); }
-            });
-        }
-
-        function logHistory(prodId, prodName, type, qty, note) {
-            db.collection('stock_history').add({
-                productId: prodId, productName: prodName, type: type, qty: qty, note: note,
-                user: window.currentUser?.name || 'System',
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        }
-
-        function handleStockIn(e) {
-            e.preventDefault();
-            const prodId = document.getElementById('si-product').value;
-            const qty = parseInt(document.getElementById('si-qty').value);
-            const batch = document.getElementById('si-batch').value;
-            const expiry = document.getElementById('si-expiry').value;
-            if(!prodId || !qty) return;
-            let updateData = { stock: firebase.firestore.FieldValue.increment(qty) };
-            if(batch) updateData.batchNo = batch;
-            if(expiry) updateData.expiryDate = expiry;
-            db.collection('products').doc(prodId).update(updateData)
-            .then(() => { 
-                logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Stock In', qty, document.getElementById('si-note').value);
-                showT(`Added ${qty} to stock!`); e.target.reset(); 
-            })
-            .catch(err => showT(err.message, 'error'));
-        }
-        
-        function handleStockOut(e) {
-            e.preventDefault();
-            const prodId = document.getElementById('so-product').value;
-            const qty = parseInt(document.getElementById('so-qty').value);
-            const reason = document.getElementById('so-reason').value;
-            if(!prodId || !qty) return;
-            let updateData = { stock: firebase.firestore.FieldValue.increment(-qty), delivered: firebase.firestore.FieldValue.increment(qty) };
-            if(reason === 'damaged') updateData.damaged = firebase.firestore.FieldValue.increment(qty);
-            if(reason === 'expired') updateData.expired = firebase.firestore.FieldValue.increment(qty);
-            db.collection('products').doc(prodId).update(updateData)
-            .then(() => { 
-                logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Stock Out', qty, reason);
-                showT(`Removed ${qty} from stock!`); e.target.reset(); 
-            })
-            .catch(err => showT(err.message, 'error'));
-        }
-
-        function handleStockTransfer(e) {
-            e.preventDefault();
-            const prodId = document.getElementById('tr-product').value;
-            const qty = parseInt(document.getElementById('tr-qty').value);
-            const toWh = document.getElementById('tr-to').value;
-            if(!prodId || !qty) return;
-            db.collection('products').doc(prodId).update({ warehouse: toWh })
-            .then(() => { 
-                logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Transfer', qty, `To: ${toWh}`);
-                showT(`Transferred ${qty} items to ${toWh}!`); e.target.reset(); 
-            })
-            .catch(err => showT(err.message, 'error'));
-        }
-
-        function handleStockAdjust(e) {
-            e.preventDefault();
-            const prodId = document.getElementById('sa-product').value;
-            const newQty = parseInt(document.getElementById('sa-qty').value);
-            const deliveredVal = document.getElementById('sa-delivered').value;
-            const reason = document.getElementById('sa-reason').value;
-            if(!prodId || newQty === undefined) return;
-            let updateData = { stock: newQty };
-            if(deliveredVal !== '') updateData.delivered = parseInt(deliveredVal);
-            const costVal = document.getElementById('sa-cost').value;
-            if(costVal !== '') updateData.costPrice = parseInt(costVal);
-            db.collection('products').doc(prodId).update(updateData)
-            .then(() => { 
-                logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Adjustment', newQty, reason);
-                showT(`Stock adjusted to ${newQty}!`); e.target.reset(); 
-            })
-            .catch(err => showT(err.message, 'error'));
-        }
-
-        function renderHistory() {
-            const tbody = document.getElementById('hist-tbody');
-            if(!allHistory.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No stock movements recorded yet.</td></tr>'; return; }
-            const sorted = [...allHistory].sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-            tbody.innerHTML = sorted.map(h => {
-                const date = h.timestamp ? new Date(h.timestamp.seconds * 1000).toLocaleString() : 'N/A';
-                const typeColors = { 'Stock In': 'text-green-400', 'Stock Out': 'text-red-400', 'Transfer': 'text-cyan-400', 'Adjustment': 'text-yellow-400' };
-                return `<tr class="hover:bg-white/[0.02] transition-colors">
-                    <td class="p-4 text-slate-400 text-xs">${date}</td>
-                    <td class="p-4 text-white font-medium">${h.productName||'N/A'}</td>
-                    <td class="p-4 font-bold ${typeColors[h.type] || 'text-slate-400'}">${h.type||'N/A'}</td>
-                    <td class="p-4 text-right font-bold text-white">${h.qty||0}</td>
-                    <td class="p-4 text-slate-400 text-xs">${h.note || '—'} ${h.user ? '('+h.user+')' : ''}</td>
-                </tr>`;
-            }).join('');
-        }
-
-        async function deductStockForOrder(order) {
-            if (!order.itemName || !order.merchantId || !order.qty) return;
-            try {
-                var snap = await db.collection('products').where('name', '==', order.itemName).where('merchantId', '==', order.merchantId).limit(1).get();
-                if (!snap.empty) {
-                    var prodDoc = snap.docs[0];
-                    var currentStock = prodDoc.data().stock || 0;
-                    var newStock = Math.max(0, currentStock - order.qty);
-                    await prodDoc.ref.update({ stock: newStock, delivered: firebase.firestore.FieldValue.increment(order.qty) });
-                }
-            } catch(e) { console.error("Error deducting stock:", e); }
-        }
-
-        // ===== SUPPLIERS LOGIC =====
-        function renderSuppliers() {
-            const tbody = document.getElementById('sup-tbody');
-            if(!allSuppliers.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No suppliers found. Add one!</td></tr>'; return; }
-            tbody.innerHTML = allSuppliers.map(s => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${s.name||'N/A'}</td><td class="p-4 text-slate-400">${s.phone||'—'}</td><td class="p-4 text-slate-400">${s.email||'—'}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('suppliers','${s.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
-        }
-        function populateSupplierSelects() {
-            const el = document.getElementById('po-supplier');
-            if(el) el.innerHTML = '<option value="" disabled selected>-- Select Supplier --</option>' + allSuppliers.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
-        }
-        function handleAddSupplier(e) {
-            e.preventDefault();
-            var data = { name: document.getElementById('sup-name').value.trim(), phone: document.getElementById('sup-phone').value.trim(), email: document.getElementById('sup-email').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
-            if(!data.name) return showT('Supplier name is required', 'error');
-            db.collection('suppliers').add(data).then(() => { showT('Supplier added!'); e.target.reset(); document.getElementById('add-supplier-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
-        }
-
-        // ===== PURCHASE ORDERS LOGIC =====
-        function renderPurchaseOrders() {
-            const tbody = document.getElementById('po-tbody');
-            if(!allPurchaseOrders.length) { tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-slate-500 text-sm">No Purchase Orders found.</td></tr>'; return; }
-            tbody.innerHTML = allPurchaseOrders.map(p => {
-                const isPending = p.status === 'pending';
-                return `<tr class="hover:bg-white/[0.02] transition-colors">
-                    <td class="p-4 text-white font-medium">#${(p.id || '').substring(0,6)}</td>
-                    <td class="p-4 text-slate-400">${p.supplier||'N/A'}</td>
-                    <td class="p-4 text-slate-400">${p.productName||'N/A'}</td>
-                    <td class="p-4 text-right font-bold text-white">${p.qty||0}</td>
-                    <td class="p-4 text-center"><span class="px-2 py-1 rounded-md ${isPending ? 'bg-yellow-500/10 text-yellow-400' : 'bg-green-500/10 text-green-400'} text-xs font-bold uppercase">${p.status||'PENDING'}</span></td>
-                    <td class="p-4 text-center">
-                        ${isPending ? `<button type="button" onclick="receivePO('${p.id}')" class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-lg hover:bg-green-400">Receive Stock</button>` : '<span class="text-slate-500 text-xs">Completed</span>'}
-                    </td>
-                </tr>`;
-            }).join('');
-        }
-        function handleAddPO(e) {
-            e.preventDefault();
-            var prodSelect = document.getElementById('po-product');
-            var data = {
-                supplier: document.getElementById('po-supplier').value,
-                productId: prodSelect.value,
-                productName: prodSelect.options[prodSelect.selectedIndex].text.split(' (')[0],
-                qty: parseInt(document.getElementById('po-qty').value) || 0,
-                status: 'pending',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            if(!data.supplier || !data.productId) return showT('Supplier and Product are required', 'error');
-            db.collection('purchase_orders').add(data).then(() => { showT('PO Created!'); e.target.reset(); document.getElementById('add-po-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
-        }
-        function receivePO(poId) {
-            const po = allPurchaseOrders.find(p => p.id === poId);
-            if(!po || po.status !== 'pending') return;
-            if(!confirm(`Receive ${po.qty} of ${po.productName} into inventory?`)) return;
-            db.collection('products').doc(po.productId).update({ stock: firebase.firestore.FieldValue.increment(po.qty) })
-            .then(() => {
-                db.collection('purchase_orders').doc(poId).update({ status: 'received' })
-                .then(() => showT('Stock received successfully!'));
-            }).catch(err => showT(err.message, 'error'));
-        }
-
-        // ===== DISPATCH / PACKING LOGIC =====
-        function renderDispatch() {
-            const tbody = document.getElementById('disp-tbody');
-            const dispatchOrders = allOrders.filter(o => ['confirmed', 'ready', 'processing'].includes((o.status || '').toLowerCase()));
-            if(!dispatchOrders.length) { tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-slate-500 text-sm">No orders ready for dispatch.</td></tr>'; return; }
-            tbody.innerHTML = dispatchOrders.map(o => {
-                const name = o.customerName || o.customer || o.name || 'N/A';
-                const item = o.itemName || o.item || o.productName || o.product || 'N/A';
-                const qty = o.qty || o.quantity || o.totalQty || 1;
-                const oid = (o.id || '').substring(0,6);
-                return `<tr class="hover:bg-white/[0.02] transition-colors">
-                    <td class="p-4 text-white font-medium">#${oid}</td>
-                    <td class="p-4 text-slate-400">${name}</td>
-                    <td class="p-4 text-slate-400">${item}</td>
-                    <td class="p-4 text-right font-bold text-white">${qty}</td>
-                    <td class="p-4 text-center flex gap-2 justify-center">
-                        <button onclick="printDocument('picklist', '${oid}', '${name}', '${item}', ${qty})" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Pick List</button>
-                        <span class="text-slate-600">|</span>
-                        <button onclick="printDocument('slip', '${oid}', '${name}', '${item}', ${qty})" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Packing Slip</button>
-                    </td>
-                    <td class="p-4 text-center"><button type="button" onclick="dispatchOrder('${o.id}', '${o.merchantId || ''}', '${item}', ${qty})" class="bg-cyan-500 text-white text-xs font-bold px-3 py-1 rounded-lg hover:bg-cyan-400">Dispatch</button></td>
-                </tr>`;
-            }).join('');
-        }
-
-        function printDocument(type, oid, name, item, qty) {
-            const win = window.open('', '_blank', 'width=800,height=600');
-            const title = type === 'picklist' ? 'PICK LIST' : 'PACKING SLIP';
-            const color = type === 'picklist' ? '#dc2626' : '#0ea5e9';
-            win.document.write(`<html><head><title>${title} - ${oid}</title><style>body{font-family:sans-serif;padding:40px;color:#111}.header{border-bottom:3px solid ${color};padding-bottom:20px;margin-bottom:30px}.title{font-size:32px;font-weight:800;color:${color};margin:0}.info{display:flex;justify-content:space-between;margin-bottom:40px;font-size:14px}.box{border:1px dashed #999;padding:30px;text-align:center;margin-bottom:30px}.item{font-size:24px;font-weight:bold;margin-top:10px}.qty{font-size:48px;font-weight:800;color:${color}}</style></head><body>
-                <div class="header"><h1 class="title">${title}</h1></div>
-                <div class="info"><div><strong>Order ID:</strong> #${oid}</div><div><strong>Customer:</strong> ${name}</div></div>
-                <div class="box"><div style="font-size:14px;color:#666">ITEM TO ${type === 'picklist' ? 'PICK' : 'PACK'}</div><div class="item">${item}</div><div class="qty">${qty} PCS</div></div>
-                ${type === 'picklist' ? '<p style="font-size:12px;color:#666">* Picker Signature: ___________________________</p>' : '<p style="font-size:12px;color:#66px">Thank you for your order!</p>'}
-                <script>window.onload = function() { window.print(); }<\/script>
-            </body></html>`);
-            win.document.close();
-        }
-        async function dispatchOrder(orderId) {
-            if(!confirm('Dispatch this order? Rider is taking it out.')) return;
-            try {
-                // ONLY update the status. Stock is STILL in company possession until delivered.
-                await db.collection('orders').doc(orderId).update({ 
-                    status: 'out_for_delivery',
-                    shippedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                showT('Order dispatched! Stock will deduct automatically upon delivery.');
-            } catch(e) { 
-                showT('Error dispatching: ' + e.message, 'error'); 
-            }
-        }
-
-        // ===== REPORTS LOGIC =====
-        function renderReports() { switchReport(currentReport); }
-
-        function switchReport(type) {
-            currentReport = type;
-            document.querySelectorAll('.rpt-tab').forEach(t => t.classList.remove('active'));
-            const activeTab = document.getElementById('rpt-tab-' + type);
-            if(activeTab) activeTab.classList.add('active');
-            const c = document.getElementById('rpt-content');
-            let html = '';
-
-            if(type === 'inventory') {
-                html += `<h3 class="text-base font-bold text-white mb-4">Current Inventory Report</h3>
-                <div class="overflow-x-auto"><table class="w-full text-sm">
-                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">SKU</th><th class="p-3 text-right">Available</th><th class="p-3 text-right">Delivered</th><th class="p-3 text-right">Value (TZS)</th></tr></thead>
-                    <tbody class="divide-y divide-white/[0.05]">`;
-                allProducts.forEach(p => {
-                    const available = p.stock || 0;
-                    const deliveredCount = p.delivered || 0;
-                    const minStock = p.minStock || 0;
-                    const isOut = available <= 0;
-                    const isLow = !isOut && minStock > 0 && available <= minStock;
-                    
-                    let statusBadge = '';
-                    if(isOut) statusBadge = '<span class="text-xs font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded">OUT OF STOCK</span>';
-                    else if(isLow) statusBadge = '<span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded">LOW STOCK</span>';
-                    else statusBadge = '<span class="text-xs font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded">IN STOCK</span>';
-
-                    html += `<tr class="hover:bg-white/[0.02]">
-                        <td class="p-3 text-white font-medium">${p.name||'N/A'}</td>
-                        <td class="p-3 text-slate-400 font-mono text-xs">${p.sku||'—'}</td>
-                        <td class="p-3 text-slate-400">${p.warehouse||'Main'}</td>
-                        <td class="p-3 text-right font-bold ${isOut ? 'text-red-400' : isLow ? 'text-yellow-400' : 'text-white'}">${available}</td>
-                        <td class="p-3 text-right text-cyan-400 font-bold">${deliveredCount}</td>
-                        <td class="p-3 text-right text-slate-500">${minStock}</td>
-                        <td class="p-3 text-center">${statusBadge}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="adjustStock('${p.id}', '${(p.name||'').replace(/'/g, "\\'")}')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Adjust</button>
-                        </td>
-                    </tr>`;
-                });
-                html += `</tbody></table></div>`;
-            } 
-            else if(type === 'low') {
-                const items = allProducts.filter(p => p.stock > 0 && p.stock <= (p.minStock || 0));
-                html += `<h3 class="text-base font-bold text-white mb-4">Low Stock Report (${items.length} items)</h3>
-                <div class="overflow-x-auto"><table class="w-full text-sm">
-                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">Current</th><th class="p-3 text-right">Reorder Lvl</th><th class="p-3 text-right">Deficit</th></tr></thead>
-                    <tbody class="divide-y divide-white/[0.05]">`;
-                if(!items.length) html += `<tr><td colspan="4" class="p-4 text-center text-slate-500">No low stock items</td></tr>`;
-                items.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-right font-bold text-yellow-400">${p.stock||0}</td><td class="p-3 text-right text-slate-500">${p.minStock||0}</td><td class="p-3 text-right text-red-400">-${(p.minStock||0) - (p.stock||0)}</td></tr>`; });
-                html += `</tbody></table></div>`;
-            }
-            else if(type === 'out') {
-                const items = allProducts.filter(p => p.stock <= 0);
-                html += `<h3 class="text-base font-bold text-white mb-4">Out of Stock Report (${items.length} items)</h3>
-                <div class="overflow-x-auto"><table class="w-full text-sm">
-                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">SKU</th><th class="p-3 text-right">Last Delivered</th></tr></thead>
-                    <tbody class="divide-y divide-white/[0.05]">`;
-                if(!items.length) html += `<tr><td colspan="3" class="p-4 text-center text-slate-500">No out of stock items</td></tr>`;
-                items.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-slate-400 font-mono text-xs">${p.sku||'—'}</td><td class="p-3 text-right text-cyan-400">${p.delivered||0}</td></tr>`; });
-                html += `</tbody></table></div>`;
-            }
-            else if(type === 'expired' || type === 'damaged') {
-                const isExpired = type === 'expired';
-                const items = allProducts.filter(p => (isExpired ? p.expired : p.damaged) > 0);
-                html += `<h3 class="text-base font-bold text-white mb-4">${isExpired ? 'Expired' : 'Damaged'} Stock Report (${items.length} items)</h3>
-                <div class="overflow-x-auto"><table class="w-full text-sm">
-                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">Warehouse</th><th class="p-3 text-right">Qty</th></tr></thead>
-                    <tbody class="divide-y divide-white/[0.05]">`;
-                if(!items.length) html += `<tr><td colspan="3" class="p-4 text-center text-slate-500">No ${isExpired ? 'expired' : 'damaged'} items</td></tr>`;
-                items.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-slate-400">${p.warehouse||'Main'}</td><td class="p-3 text-right font-bold text-${isExpired ? 'orange' : 'pink'}-400">${isExpired ? p.expired : p.damaged}</td></tr>`; });
-                html += `</tbody></table></div>`;
-            }
-            else if(type === 'movement') {
-                html += `<h3 class="text-base font-bold text-white mb-4">Stock Movement Report</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div class="bg-white/[0.02] p-4 rounded-xl border border-white/10"><div class="text-xs text-slate-500 mb-1">Total Stock In (Available)</div><div class="text-2xl font-bold text-green-400">${allProducts.reduce((s,p)=>s+(p.stock||0),0)}</div></div>
-                    <div class="bg-white/[0.02] p-4 rounded-xl border border-white/10"><div class="text-xs text-slate-500 mb-1">Total Stock Out (Delivered)</div><div class="text-2xl font-bold text-red-400">${allProducts.reduce((s,p)=>s+(p.delivered||0),0)}</div></div>
-                </div>
-                <div class="overflow-x-auto"><table class="w-full text-sm">
-                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">In</th><th class="p-3 text-right">Out</th><th class="p-3 text-right">Current</th></tr></thead>
-                    <tbody class="divide-y divide-white/[0.05]">`;
-                allProducts.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-right text-green-400">${(p.stock||0) + (p.delivered||0)}</td><td class="p-3 text-right text-red-400">${p.delivered||0}</td><td class="p-3 text-right font-bold text-white">${p.stock||0}</td></tr>`; });
-                html += `</tbody></table></div>`;
-            }
-            else if(type === 'valuation') {
-                const totalVal = allProducts.reduce((s,p)=>s+((p.stock||0)*(p.costPrice||0)),0);
-                html += `<h3 class="text-base font-bold text-white mb-4">Stock Valuation Report (Total: TZS ${totalVal.toLocaleString()})</h3>
-                <div class="overflow-x-auto"><table class="w-full text-sm">
-                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">Qty</th><th class="p-3 text-right">Unit Cost (TZS)</th><th class="p-3 text-right">Total Value (TZS)</th></tr></thead>
-                    <tbody class="divide-y divide-white/[0.05]">`;
-                allProducts.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-right font-bold text-white">${p.stock||0}</td><td class="p-3 text-right text-slate-400">${(p.costPrice||0).toLocaleString()}</td><td class="p-3 text-right text-green-400">${((p.stock||0)*(p.costPrice||0)).toLocaleString()}</td></tr>`; });
-                html += `</tbody></table></div>`;
-            }
-            else if(type === 'audit') {
-                html += `<h3 class="text-base font-bold text-white mb-4">Inventory Audit Report</h3>
-                <div class="overflow-x-auto"><table class="w-full text-sm">
-                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">Warehouse</th><th class="p-3 text-right">System Qty</th><th class="p-3 text-right">Physical Count</th><th class="p-3 text-right">Variance</th></tr></thead>
-                    <tbody class="divide-y divide-white/[0.05]">`;
-                allProducts.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-slate-400">${p.warehouse||'Main'}</td><td class="p-3 text-right text-blue-400">${p.stock||0}</td><td class="p-3 text-right text-slate-500">—</td><td class="p-3 text-right text-slate-500">—</td></tr>`; });
-                html += `</tbody></table></div>`;
-            }
-            else if(type === 'fast' || type === 'slow') {
-                const isFast = type === 'fast';
-                const sorted = [...allProducts].sort((a,b) => isFast ? (b.delivered||0)-(a.delivered||0) : (a.delivered||0)-(b.delivered||0));
-                const items = sorted.slice(0, 10);
-                html += `<h3 class="text-base font-bold text-white mb-4">${isFast ? 'Fast' : 'Slow'} Moving Products (Top 10)</h3>
-                <div class="overflow-x-auto"><table class="w-full text-sm">
-                    <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">Delivered</th><th class="p-3 text-right">Current Stock</th></tr></thead>
-                    <tbody class="divide-y divide-white/[0.05]">`;
-                items.forEach(p => { html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-right font-bold text-${isFast ? 'green' : 'red'}-400">${p.delivered||0}</td><td class="p-3 text-right text-slate-400">${p.stock||0}</td></tr>`; });
-                html += `</tbody></table></div>`;
-            }
-            c.innerHTML = html;
-        }
-
-        function renderSettings() {
-            if(!window.currentUser) return;
-            document.getElementById('set-name').value = window.currentUser.name || '';
-            document.getElementById('set-email').value = window.currentUser.email || '';
-            document.getElementById('set-phone').value = window.currentUser.phone || '';
-        }
-
-        function saveStockSettings(e) {
-            e.preventDefault();
-            const name = document.getElementById('set-name').value.trim();
-            const phone = document.getElementById('set-phone').value.trim();
-            if(!name) return showT('Name is required', 'error');
-            db.collection('users').doc(window.currentUser.uid).update({ name: name, phone: phone })
-            .then(() => { showT('Profile updated!'); window.currentUser.name = name; window.currentUser.phone = phone; document.getElementById('header-name').textContent = name; document.getElementById('header-avatar').textContent = name.charAt(0).toUpperCase(); })
-            .catch(err => showT(err.message, 'error'));
-        }
-
-        function renderNotifications() {
-            const c = document.getElementById('notif-list-stock');
-            const alerts = allProducts.filter(p => p.stock <= (p.minStock || 0));
-            const badge = document.getElementById('notif-count-badge');
-            if(badge) { if(alerts.length > 0) { badge.classList.remove('hidden'); badge.textContent = alerts.length; } else { badge.classList.add('hidden'); } }
-            if(!alerts.length) { c.innerHTML = '<div class="text-center py-10 text-slate-500 text-sm">No new notifications. All stock levels are healthy!</div>'; return; }
-            c.innerHTML = alerts.map(p => {
-                const isOut = p.stock <= 0;
-                const msg = isOut ? `${p.name} is completely OUT OF STOCK.` : `${p.name} is low on stock (${p.stock} left, min: ${p.minStock || 0}).`;
-                return `<div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-start gap-3"><div class="w-9 h-9 rounded-lg ${isOut ? 'text-red-400 bg-red-500/10' : 'text-yellow-400 bg-yellow-500/10'} flex items-center justify-center flex-shrink-0"><span class="iconify text-lg" data-icon="${isOut ? 'mdi:alert-circle' : 'mdi:alert'}"></span></div><div class="flex-1"><div class="text-sm text-white font-medium">${msg}</div><div class="text-xs text-slate-500 mt-1">Merchant: ${p.merchantName || 'N/A'}</div></div></div>`;
-            }).join('');
-        }
-
-                function clearStockNotifs() {
-            document.getElementById('notif-list-stock').innerHTML = '<div class="text-center py-10 text-slate-500 text-sm">No new notifications.</div>';
-            const badge = document.getElementById('notif-count-badge');
-            if(badge) badge.classList.add('hidden');
-            showT('Notifications cleared');
-        }
-
-        // ===== ADJUST STOCK HELPER =====
-        async function adjustStock(productId, productName) {
-            const action = prompt(`Adjust stock for ${productName}.\nType "+5" to add 5, or "-3" to remove 3:`);
-            if(!action) return;
-            const match = action.trim().match(/^([+-]?\d+)$/);
-            if(!match) return showT('Invalid format. Use +5 or -3', 'error');
-            const qty = parseInt(match[1]);
-            if(qty === 0) return;
-            
-            try {
-                await db.collection('products').doc(productId).update({
-                    stock: firebase.firestore.FieldValue.increment(qty)
-                });
-                showT(`Stock adjusted by ${qty > 0 ? '+' : ''}${qty}!`);
-            } catch(e) { showT(e.message, 'error'); }
-        }
-
-        // ===== PLACEHOLDER FOR AUTO RESERVATIONS =====
-        function checkAutoReservations() {
+        if (!filtered.length) {
+            tbody.innerHTML = '<tr><td colspan="8" class="p-10 text-center text-slate-500 text-sm">No products found.</td></tr>';
             return;
         }
-    </script>
-</body>
-</html>
+
+        tbody.innerHTML = filtered.map(p => {
+            return '<tr class="hover:bg-white/[0.02] transition-colors">' +
+                '<td class="p-4 text-white font-medium">' + (p.name || 'N/A') + '</td>' +
+                '<td class="p-4 text-slate-400 font-mono text-xs">' + (p.sku || '—') + '</td>' +
+                '<td class="p-4 text-slate-400">' + (p.warehouse || 'Main') + '</td>' +
+                '<td class="p-4 text-right font-bold text-white">' + (p.stock || 0) + '</td>' +
+                '<td class="p-4 text-right text-cyan-400">' + (p.delivered || 0) + '</td>' +
+                '<td class="p-4 text-right text-slate-500">' + (p.minStock || 0) + '</td>' +
+                '<td class="p-4 text-center">' + getStockStatus(p) + '</td>' +
+                '<td class="p-4 text-center"><button onclick="adjustStock(\'' + p.id + '\', \'' + (p.name || '').replace(/'/g, "\\'") + '\')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Adjust</button></td>' +
+            '</tr>';
+        }).join('');
+    }
+
+    function renderWarehouses() {
+        const tbody = document.getElementById('wh-tbody');
+        if(!allWarehouses.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No warehouses found. Add one!</td></tr>'; return; }
+        tbody.innerHTML = allWarehouses.map(w => '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">'+(w.name||'N/A')+'</td><td class="p-4 text-slate-400">'+(w.location||'—')+'</td><td class="p-4 text-right text-slate-300">'+(w.capacity||'Unlimited')+'</td><td class="p-4 text-center"><button type="button" onclick="deleteItem(\'warehouses\',\''+w.id+'\')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>').join('');
+    }
+
+    function renderBins() {
+        const tbody = document.getElementById('bin-tbody');
+        if(!allBins.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No bins found. Add one!</td></tr>'; return; }
+        tbody.innerHTML = allBins.map(b => '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">'+(b.code||'N/A')+'</td><td class="p-4 text-slate-400">'+(b.warehouse||'—')+'</td><td class="p-4 text-slate-400">'+(b.notes||'—')+'</td><td class="p-4 text-center"><button type="button" onclick="deleteItem(\'bins\',\''+b.id+'\')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>').join('');
+    }
+
+    function renderCategories() {
+        const tbody = document.getElementById('cat-tbody');
+        if(!allCategories.length) { tbody.innerHTML = '<tr><td colspan="2" class="p-10 text-center text-slate-500 text-sm">No categories found. Add one!</td></tr>'; return; }
+        tbody.innerHTML = allCategories.map(c => '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">'+(c.name||'N/A')+'</td><td class="p-4 text-center"><button type="button" onclick="deleteItem(\'categories\',\''+c.id+'\')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>').join('');
+    }
+
+    function renderBrands() {
+        const tbody = document.getElementById('brand-tbody');
+        if(!allBrands.length) { tbody.innerHTML = '<tr><td colspan="2" class="p-10 text-center text-slate-500 text-sm">No brands found. Add one!</td></tr>'; return; }
+        tbody.innerHTML = allBrands.map(b => '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">'+(b.name||'N/A')+'</td><td class="p-4 text-center"><button type="button" onclick="deleteItem(\'brands\',\''+b.id+'\')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>').join('');
+    }
+
+    function renderUnits() {
+        const tbody = document.getElementById('unit-tbody');
+        if(!allUnits.length) { tbody.innerHTML = '<tr><td colspan="2" class="p-10 text-center text-slate-500 text-sm">No units found. Add one!</td></tr>'; return; }
+        tbody.innerHTML = allUnits.map(u => '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">'+(u.name||'N/A')+'</td><td class="p-4 text-center"><button type="button" onclick="deleteItem(\'units\',\''+u.id+'\')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>').join('');
+    }
+
+    function handleAddCategory(e) {
+        e.preventDefault();
+        var data = { name: document.getElementById('cat-name').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+        if(!data.name) return showT('Category name is required', 'error');
+        db.collection('categories').add(data).then(() => { showT('Category added!'); e.target.reset(); document.getElementById('add-cat-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+    }
+
+    function handleAddBrand(e) {
+        e.preventDefault();
+        var data = { name: document.getElementById('brand-name').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+        if(!data.name) return showT('Brand name is required', 'error');
+        db.collection('brands').add(data).then(() => { showT('Brand added!'); e.target.reset(); document.getElementById('add-brand-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+    }
+
+    function handleAddUnit(e) {
+        e.preventDefault();
+        var data = { name: document.getElementById('unit-name').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+        if(!data.name) return showT('Unit name is required', 'error');
+        db.collection('units').add(data).then(() => { showT('Unit added!'); e.target.reset(); document.getElementById('add-unit-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+    }
+
+    // ===== ORDERS =====
+    function filterOrders(status) {
+        currentOrderFilter = status;
+        ordersCurrentPage = 1;
+        document.querySelectorAll('.order-tab').forEach(b => b.className = 'order-tab bg-white/[0.05] text-slate-400 hover:bg-white/[0.1]');
+        const activeTab = document.getElementById('tab-' + status);
+        if(activeTab) activeTab.className = 'order-tab bg-cyan-500 text-white';
+        renderOrders();
+    }
+
+    function renderOrders() {
+        const tbody = document.getElementById('ord-tbody');
+        if(!allOrders.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No orders found.</td></tr>'; return; }
+        let filtered = allOrders;
+        if(currentOrderFilter !== 'all') {
+            filtered = allOrders.filter(o => (o.status || 'pending').toLowerCase() === currentOrderFilter);
+        }
+        const searchQuery = (document.getElementById('ord-search')?.value || '').toLowerCase();
+        if(searchQuery) {
+            filtered = filtered.filter(o => {
+                const name = o.customerName || o.customer || o.name || o.fullName || o.buyer || (o.address && o.address.name) || (o.shippingAddress && o.shippingAddress.name) || '';
+                const item = o.itemName || o.item || o.productName || o.product || '';
+                const oid = (o.id || '').toLowerCase();
+                return name.toLowerCase().includes(searchQuery) || item.toLowerCase().includes(searchQuery) || oid.includes(searchQuery);
+            });
+        }
+        if(!filtered.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No orders match your search/filter.</td></tr>';
+            document.getElementById('ord-page-info').textContent = '0-0 of 0';
+            document.getElementById('ord-prev').disabled = true;
+            document.getElementById('ord-next').disabled = true;
+            return;
+        }
+        const totalPages = Math.ceil(filtered.length / ordersPerPage);
+        if(ordersCurrentPage > totalPages) ordersCurrentPage = 1;
+        const startIndex = (ordersCurrentPage - 1) * ordersPerPage;
+        const endIndex = startIndex + ordersPerPage;
+        const paginatedOrders = filtered.slice(startIndex, endIndex);
+        tbody.innerHTML = paginatedOrders.map(o => {
+            const status = (o.status || 'pending').toLowerCase();
+            const statusColors = { pending: 'bg-slate-500/10 text-slate-400', confirmed: 'bg-blue-500/10 text-blue-400', processing: 'bg-yellow-500/10 text-yellow-400', out_for_delivery: 'bg-cyan-500/10 text-cyan-400', delivered: 'bg-green-500/10 text-green-400', cancelled: 'bg-red-500/10 text-red-400', returned: 'bg-orange-500/10 text-orange-400', wrong_number: 'bg-red-500/10 text-red-400', callback_requested: 'bg-purple-500/10 text-purple-400' };
+            const colorClass = statusColors[status] || 'bg-slate-500/10 text-slate-400';
+            const name = o.customerName || o.customer || o.name || o.fullName || o.buyer || (o.address && o.address.name) || (o.shippingAddress && o.shippingAddress.name) || 'N/A';
+            const item = o.itemName || o.item || o.productName || o.product || 'N/A';
+            const qty = o.qty || o.quantity || o.totalQty || 1;
+            return '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">#'+(o.id||'').substring(0,6)+'</td><td class="p-4 text-slate-400">'+name+'</td><td class="p-4 text-slate-400">'+item+'</td><td class="p-4 text-center"><span class="px-2 py-1 rounded-md '+colorClass+' text-xs font-bold uppercase">'+(o.status||'PENDING')+'</span></td><td class="p-4 text-right font-bold text-white">'+qty+'</td></tr>';
+        }).join('');
+        const startNum = startIndex + 1;
+        const endNum = Math.min(endIndex, filtered.length);
+        document.getElementById('ord-page-info').textContent = startNum + '-' + endNum + ' of ' + filtered.length;
+        document.getElementById('ord-prev').disabled = ordersCurrentPage === 1;
+        document.getElementById('ord-next').disabled = ordersCurrentPage === totalPages || totalPages === 0;
+    }
+
+    function changeOrderPageSize() { ordersPerPage = parseInt(document.getElementById('ord-per-page').value); ordersCurrentPage = 1; renderOrders(); }
+    function nextPageOrders() { ordersCurrentPage++; renderOrders(); }
+    function prevPageOrders() { if(ordersCurrentPage > 1) { ordersCurrentPage--; renderOrders(); } }
+
+    function renderReturns() {
+        const tbody = document.getElementById('ret-tbody');
+        const returns = allOrders.filter(o => (o.status || '').toLowerCase() === 'returned');
+        if(!returns.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No returned orders.</td></tr>'; return; }
+        tbody.innerHTML = returns.map(o => {
+            const item = o.itemName || o.item || o.productName || o.product || 'N/A';
+            const qty = o.qty || o.quantity || o.totalQty || 1;
+            return '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">#'+o.id.substring(0,6)+'</td><td class="p-4 text-slate-400">'+item+'</td><td class="p-4 text-right font-bold text-white">'+qty+'</td><td class="p-4 text-center"><button type="button" onclick="restockReturned(\''+o.id+'\')" class="text-green-400 hover:text-green-300 text-xs font-bold hover:underline">Restock</button></td></tr>';
+        }).join('');
+    }
+
+    function renderLowStock() {
+        const tbody = document.getElementById('ls-tbody');
+        const emptyEl = document.getElementById('ls-empty');
+        const lowItems = allProducts.filter(p => p.stock <= (p.minStock || 0));
+        if(!lowItems.length) { emptyEl.classList.remove('hidden'); tbody.innerHTML = ''; return; }
+        emptyEl.classList.add('hidden');
+        tbody.innerHTML = lowItems.map(p => { const deficit = (p.minStock || 0) - p.stock; return '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">'+(p.name||'N/A')+'</td><td class="p-4 text-right font-bold text-red-400">'+(p.stock||0)+'</td><td class="p-4 text-right text-slate-500">'+(p.minStock||0)+'</td><td class="p-4 text-center font-bold text-yellow-400">-'+(deficit > 0 ? deficit : 0)+'</td></tr>'; }).join('');
+    }
+
+    function renderDamagedExpired() {
+        const tbody = document.getElementById('de-tbody');
+        const items = allProducts.filter(p => (p.damaged || 0) > 0 || (p.expired || 0) > 0);
+        if(!items.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No damaged or expired items!</td></tr>'; return; }
+        tbody.innerHTML = items.map(p => '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">'+(p.name||'N/A')+'</td><td class="p-4 text-slate-400">'+(p.warehouse||'Main')+'</td><td class="p-4 text-right font-bold text-pink-400">'+(p.damaged||0)+'</td><td class="p-4 text-right font-bold text-orange-400">'+(p.expired||0)+'</td><td class="p-4 text-center"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Dispose</button></td></tr>').join('');
+    }
+
+    function populateProductSelects() {
+        ['si-product', 'so-product', 'sa-product', 'tr-product', 'po-product'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.innerHTML = '<option value="" disabled selected>-- Select Product --</option>' + allProducts.map(p => '<option value="'+p.id+'">'+(p.name)+' (Avail: '+(p.stock||0)+')</option>').join('');
+        });
+    }
+
+    function populateWarehouseSelects() {
+        const el = document.getElementById('bin-warehouse');
+        if(el) el.innerHTML = '<option value="" disabled selected>-- Select Warehouse --</option>' + allWarehouses.map(w => '<option value="'+w.name+'">'+w.name+'</option>').join('');
+    }
+
+    function populateMerchantSelects() {
+        var el = document.getElementById('ap-merchant');
+        if(el) el.innerHTML = '<option value="" disabled selected>Select Merchant</option>' + allMerchants.filter(u => u.role === 'merchant').map(m => '<option value="'+m.id+'">'+(m.shopName || m.name)+'</option>').join('');
+    }
+
+    function handleAddWarehouse(e) {
+        e.preventDefault();
+        var data = { name: document.getElementById('wh-name').value.trim(), location: document.getElementById('wh-location').value.trim(), capacity: parseInt(document.getElementById('wh-capacity').value) || 0, createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+        if(!data.name) return showT('Warehouse name is required', 'error');
+        db.collection('warehouses').add(data).then(() => { showT('Warehouse added!'); e.target.reset(); document.getElementById('add-warehouse-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+    }
+
+    function handleAddBin(e) {
+        e.preventDefault();
+        var data = { code: document.getElementById('bin-code').value.trim(), warehouse: document.getElementById('bin-warehouse').value, notes: document.getElementById('bin-notes').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+        if(!data.code || !data.warehouse) return showT('Bin Code and Warehouse are required', 'error');
+        db.collection('bins').add(data).then(() => { showT('Bin added!'); e.target.reset(); document.getElementById('add-bin-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+    }
+
+    function handleAddProduct(e) {
+        e.preventDefault();
+        var merchantSelect = document.getElementById('ap-merchant');
+        var data = {
+            name: document.getElementById('ap-name').value.trim(), sku: document.getElementById('ap-sku').value.trim(), warehouse: document.getElementById('ap-warehouse').value.trim() || 'Main Warehouse',
+            merchantId: merchantSelect.value, merchantName: merchantSelect.options[merchantSelect.selectedIndex].text,
+            stock: parseInt(document.getElementById('ap-stock').value) || 0, minStock: parseInt(document.getElementById('ap-minstock').value) || 10,
+            costPrice: parseInt(document.getElementById('ap-cost').value) || 0, sellingPrice: parseInt(document.getElementById('ap-price').value) || 0,
+            reserved: 0, damaged: 0, expired: 0, delivered: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        if(!data.name || !data.merchantId) return showT('Product Name and Merchant are required', 'error');
+        db.collection('products').add(data).then(() => { showT('Product added!'); e.target.reset(); document.getElementById('ap-stock').value = 50; document.getElementById('ap-minstock').value = 10; document.getElementById('add-product-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+    }
+
+    // ===== FIX #1: Removed extra { brace =====
+    function deleteItem(collection, id) {
+        if(!confirm('Are you sure you want to delete this permanently?')) return;
+        db.collection(collection).doc(id).delete().then(() => showT('Deleted!')).catch(err => showT(err.message, 'error'));
+    }
+
+    function restockReturned(orderId) {
+        const order = allOrders.find(o => o.id === orderId);
+        if(!order || !order.itemName) return showT('Cannot find item name to restock', 'error');
+        db.collection('products').where('name', '==', order.itemName).limit(1).get().then(snap => {
+            if(!snap.empty) {
+                snap.docs[0].ref.update({ stock: firebase.firestore.FieldValue.increment(order.qty || 1) }).then(() => {
+                    db.collection('orders').doc(orderId).update({ status: 'restocked' }).then(() => showT('Item restocked successfully!'));
+                });
+            } else { showT('Product not found in inventory', 'error'); }
+        });
+    }
+
+    function logHistory(prodId, prodName, type, qty, note) {
+        db.collection('stock_history').add({
+            productId: prodId, productName: prodName, type: type, qty: qty, note: note,
+            user: window.currentUser?.name || 'System',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    }
+
+    function handleStockIn(e) {
+        e.preventDefault();
+        const prodId = document.getElementById('si-product').value;
+        const qty = parseInt(document.getElementById('si-qty').value);
+        const batch = document.getElementById('si-batch').value;
+        const expiry = document.getElementById('si-expiry').value;
+        if(!prodId || !qty) return;
+        let updateData = { stock: firebase.firestore.FieldValue.increment(qty) };
+        if(batch) updateData.batchNo = batch;
+        if(expiry) updateData.expiryDate = expiry;
+        db.collection('products').doc(prodId).update(updateData)
+        .then(() => {
+            logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Stock In', qty, document.getElementById('si-note').value);
+            showT('Added ' + qty + ' to stock!'); e.target.reset();
+        })
+        .catch(err => showT(err.message, 'error'));
+    }
+
+    function handleStockOut(e) {
+        e.preventDefault();
+        const prodId = document.getElementById('so-product').value;
+        const qty = parseInt(document.getElementById('so-qty').value);
+        const reason = document.getElementById('so-reason').value;
+        if(!prodId || !qty) return;
+        let updateData = { stock: firebase.firestore.FieldValue.increment(-qty), delivered: firebase.firestore.FieldValue.increment(qty) };
+        if(reason === 'damaged') updateData.damaged = firebase.firestore.FieldValue.increment(qty);
+        if(reason === 'expired') updateData.expired = firebase.firestore.FieldValue.increment(qty);
+        db.collection('products').doc(prodId).update(updateData)
+        .then(() => {
+            logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Stock Out', qty, reason);
+            showT('Removed ' + qty + ' from stock!'); e.target.reset();
+        })
+        .catch(err => showT(err.message, 'error'));
+    }
+
+    function handleStockTransfer(e) {
+        e.preventDefault();
+        const prodId = document.getElementById('tr-product').value;
+        const qty = parseInt(document.getElementById('tr-qty').value);
+        const toWh = document.getElementById('tr-to').value;
+        if(!prodId || !qty) return;
+        db.collection('products').doc(prodId).update({ warehouse: toWh })
+        .then(() => {
+            logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Transfer', qty, 'To: ' + toWh);
+            showT('Transferred ' + qty + ' items to ' + toWh + '!'); e.target.reset();
+        })
+        .catch(err => showT(err.message, 'error'));
+    }
+
+    function handleStockAdjust(e) {
+        e.preventDefault();
+        const prodId = document.getElementById('sa-product').value;
+        const newQty = parseInt(document.getElementById('sa-qty').value);
+        const deliveredVal = document.getElementById('sa-delivered').value;
+        const reason = document.getElementById('sa-reason').value;
+        if(!prodId || newQty === undefined) return;
+        let updateData = { stock: newQty };
+        if(deliveredVal !== '') updateData.delivered = parseInt(deliveredVal);
+        const costVal = document.getElementById('sa-cost').value;
+        if(costVal !== '') updateData.costPrice = parseInt(costVal);
+        db.collection('products').doc(prodId).update(updateData)
+        .then(() => {
+            logHistory(prodId, allProducts.find(p=>p.id===prodId)?.name || 'N/A', 'Adjustment', newQty, reason);
+            showT('Stock adjusted to ' + newQty + '!'); e.target.reset();
+        })
+        .catch(err => showT(err.message, 'error'));
+    }
+
+    function renderHistory() {
+        const tbody = document.getElementById('hist-tbody');
+        if(!allHistory.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500 text-sm">No stock movements recorded yet.</td></tr>'; return; }
+        const sorted = [...allHistory].sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+        tbody.innerHTML = sorted.map(h => {
+            const date = h.timestamp ? new Date(h.timestamp.seconds * 1000).toLocaleString() : 'N/A';
+            const typeColors = { 'Stock In': 'text-green-400', 'Stock Out': 'text-red-400', 'Transfer': 'text-cyan-400', 'Adjustment': 'text-yellow-400' };
+            return '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-slate-400 text-xs">'+date+'</td><td class="p-4 text-white font-medium">'+(h.productName||'N/A')+'</td><td class="p-4 font-bold '+(typeColors[h.type] || 'text-slate-400')+'">'+(h.type||'N/A')+'</td><td class="p-4 text-right font-bold text-white">'+(h.qty||0)+'</td><td class="p-4 text-slate-400 text-xs">'+(h.note || '—')+' '+(h.user ? '('+h.user+')' : '')+'</td></tr>';
+        }).join('');
+    }
+
+    async function deductStockForOrder(order) {
+        if (!order.itemName || !order.merchantId || !order.qty) return;
+        try {
+            var snap = await db.collection('products').where('name', '==', order.itemName).where('merchantId', '==', order.merchantId).limit(1).get();
+            if (!snap.empty) {
+                var prodDoc = snap.docs[0];
+                var currentStock = prodDoc.data().stock || 0;
+                var newStock = Math.max(0, currentStock - order.qty);
+                await prodDoc.ref.update({ stock: newStock, delivered: firebase.firestore.FieldValue.increment(order.qty) });
+            }
+        } catch(e) { console.error("Error deducting stock:", e); }
+    }
+
+    // ===== SUPPLIERS =====
+    function renderSuppliers() {
+        const tbody = document.getElementById('sup-tbody');
+        if(!allSuppliers.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No suppliers found. Add one!</td></tr>'; return; }
+        tbody.innerHTML = allSuppliers.map(s => '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">'+(s.name||'N/A')+'</td><td class="p-4 text-slate-400">'+(s.phone||'—')+'</td><td class="p-4 text-slate-400">'+(s.email||'—')+'</td><td class="p-4 text-center"><button type="button" onclick="deleteItem(\'suppliers\',\''+s.id+'\')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>').join('');
+    }
+
+    function populateSupplierSelects() {
+        const el = document.getElementById('po-supplier');
+        if(el) el.innerHTML = '<option value="" disabled selected>-- Select Supplier --</option>' + allSuppliers.map(s => '<option value="'+s.name+'">'+s.name+'</option>').join('');
+    }
+
+    function handleAddSupplier(e) {
+        e.preventDefault();
+        var data = { name: document.getElementById('sup-name').value.trim(), phone: document.getElementById('sup-phone').value.trim(), email: document.getElementById('sup-email').value.trim(), createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+        if(!data.name) return showT('Supplier name is required', 'error');
+        db.collection('suppliers').add(data).then(() => { showT('Supplier added!'); e.target.reset(); document.getElementById('add-supplier-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+    }
+
+    // ===== PURCHASE ORDERS =====
+    function renderPurchaseOrders() {
+        const tbody = document.getElementById('po-tbody');
+        if(!allPurchaseOrders.length) { tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-slate-500 text-sm">No Purchase Orders found.</td></tr>'; return; }
+        tbody.innerHTML = allPurchaseOrders.map(p => {
+            const isPending = p.status === 'pending';
+            return '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">#'+(p.id||'').substring(0,6)+'</td><td class="p-4 text-slate-400">'+(p.supplier||'N/A')+'</td><td class="p-4 text-slate-400">'+(p.productName||'N/A')+'</td><td class="p-4 text-right font-bold text-white">'+(p.qty||0)+'</td><td class="p-4 text-center"><span class="px-2 py-1 rounded-md '+(isPending ? 'bg-yellow-500/10 text-yellow-400' : 'bg-green-500/10 text-green-400')+' text-xs font-bold uppercase">'+(p.status||'PENDING')+'</span></td><td class="p-4 text-center">'+(isPending ? '<button type="button" onclick="receivePO(\''+p.id+'\')" class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-lg hover:bg-green-400">Receive Stock</button>' : '<span class="text-slate-500 text-xs">Completed</span>')+'</td></tr>';
+        }).join('');
+    }
+
+    function handleAddPO(e) {
+        e.preventDefault();
+        var prodSelect = document.getElementById('po-product');
+        var data = {
+            supplier: document.getElementById('po-supplier').value,
+            productId: prodSelect.value,
+            productName: prodSelect.options[prodSelect.selectedIndex].text.split(' (')[0],
+            qty: parseInt(document.getElementById('po-qty').value) || 0,
+            status: 'pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        if(!data.supplier || !data.productId) return showT('Supplier and Product are required', 'error');
+        db.collection('purchase_orders').add(data).then(() => { showT('PO Created!'); e.target.reset(); document.getElementById('add-po-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+    }
+
+    function receivePO(poId) {
+        const po = allPurchaseOrders.find(p => p.id === poId);
+        if(!po || po.status !== 'pending') return;
+        if(!confirm('Receive ' + po.qty + ' of ' + po.productName + ' into inventory?')) return;
+        db.collection('products').doc(po.productId).update({ stock: firebase.firestore.FieldValue.increment(po.qty) })
+        .then(() => {
+            db.collection('purchase_orders').doc(poId).update({ status: 'received' })
+            .then(() => showT('Stock received successfully!'));
+        }).catch(err => showT(err.message, 'error'));
+    }
+
+    // ===== DISPATCH =====
+    function renderDispatch() {
+        const tbody = document.getElementById('disp-tbody');
+        const dispatchOrders = allOrders.filter(o => ['confirmed', 'ready', 'processing'].includes((o.status || '').toLowerCase()));
+        if(!dispatchOrders.length) { tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-slate-500 text-sm">No orders ready for dispatch.</td></tr>'; return; }
+        tbody.innerHTML = dispatchOrders.map(o => {
+            const name = o.customerName || o.customer || o.name || 'N/A';
+            const item = o.itemName || o.item || o.productName || o.product || 'N/A';
+            const qty = o.qty || o.quantity || o.totalQty || 1;
+            const oid = (o.id || '').substring(0,6);
+            return '<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">#'+oid+'</td><td class="p-4 text-slate-400">'+name+'</td><td class="p-4 text-slate-400">'+item+'</td><td class="p-4 text-right font-bold text-white">'+qty+'</td><td class="p-4 text-center flex gap-2 justify-center"><button onclick="printDocument(\'picklist\', \''+oid+'\', \''+name+'\', \''+item+'\', '+qty+')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Pick List</button><span class="text-slate-600">|</span><button onclick="printDocument(\'slip\', \''+oid+'\', \''+name+'\', \''+item+'\', '+qty+')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Packing Slip</button></td><td class="p-4 text-center"><button type="button" onclick="dispatchOrder(\''+o.id+'\')" class="bg-cyan-500 text-white text-xs font-bold px-3 py-1 rounded-lg hover:bg-cyan-400">Dispatch</button></td></tr>';
+        }).join('');
+    }
+
+    function printDocument(type, oid, name, item, qty) {
+        const win = window.open('', '_blank', 'width=800,height=600');
+        const title = type === 'picklist' ? 'PICK LIST' : 'PACKING SLIP';
+        const color = type === 'picklist' ? '#dc2626' : '#0ea5e9';
+        win.document.write('<html><head><title>'+title+' - '+oid+'</title><style>body{font-family:sans-serif;padding:40px;color:#111}.header{border-bottom:3px solid '+color+';padding-bottom:20px;margin-bottom:30px}.title{font-size:32px;font-weight:800;color:'+color+';margin:0}.info{display:flex;justify-content:space-between;margin-bottom:40px;font-size:14px}.box{border:1px dashed #999;padding:30px;text-align:center;margin-bottom:30px}.item{font-size:24px;font-weight:bold;margin-top:10px}.qty{font-size:48px;font-weight:800;color:'+color+'}</style></head><body><div class="header"><h1 class="title">'+title+'</h1></div><div class="info"><div><strong>Order ID:</strong> #'+oid+'</div><div><strong>Customer:</strong> '+name+'</div></div><div class="box"><div style="font-size:14px;color:#666">ITEM TO '+(type === 'picklist' ? 'PICK' : 'PACK')+'</div><div class="item">'+item+'</div><div class="qty">'+qty+' PCS</div></div>'+(type === 'picklist' ? '<p style="font-size:12px;color:#666">* Picker Signature: ___________________________</p>' : '<p style="font-size:12px;color:#666">Thank you for your order!</p>')+'<script>window.onload = function() { window.print(); }<\/script></body></html>');
+        win.document.close();
+    }
+
+    async function dispatchOrder(orderId) {
+        if(!confirm('Dispatch this order? Rider is taking it out.')) return;
+        try {
+            await db.collection('orders').doc(orderId).update({
+                status: 'out_for_delivery',
+                shippedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showT('Order dispatched! Stock will deduct automatically upon delivery.');
+        } catch(e) {
+            showT('Error dispatching: ' + e.message, 'error');
+        }
+    }
+
+    // ===== REPORTS =====
+    function renderReports() { switchReport(currentReport); }
+
+    function switchReport(type) {
+        currentReport = type;
+        document.querySelectorAll('.rpt-tab').forEach(t => t.classList.remove('active'));
+        const activeTab = document.getElementById('rpt-tab-' + type);
+        if(activeTab) activeTab.classList.add('active');
+        const c = document.getElementById('rpt-content');
+        let html = '';
+
+        if(type === 'inventory') {
+            html += '<h3 class="text-base font-bold text-white mb-4">Current Inventory Report</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">SKU</th><th class="p-3">Warehouse</th><th class="p-3 text-right">Available</th><th class="p-3 text-right">Delivered</th><th class="p-3 text-right">Reorder Lvl</th><th class="p-3 text-center">Status</th><th class="p-3 text-center">Action</th></tr></thead><tbody class="divide-y divide-white/[0.05]">';
+            allProducts.forEach(p => {
+                const available = p.stock || 0;
+                const deliveredCount = p.delivered || 0;
+                const minStock = p.minStock || 0;
+                const isOut = available <= 0;
+                const isLow = !isOut && minStock > 0 && available <= minStock;
+                let statusBadge = '';
+                if(isOut) statusBadge = '<span class="text-xs font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded">OUT OF STOCK</span>';
+                else if(isLow) statusBadge = '<span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded">LOW STOCK</span>';
+                else statusBadge = '<span class="text-xs font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded">IN STOCK</span>';
+                html += '<tr class="hover:bg-white/[0.02]"><td class="p-3 text-white font-medium">'+(p.name||'N/A')+'</td><td class="p-3 text-slate-400 font-mono text-xs">'+(p.sku||'—')+'</td><td class="p-3 text-slate-400">'+(p.warehouse||'Main')+'</td><td class="p-3 text-right font-bold '+(isOut ? 'text-red-400' : isLow ? 'text-yellow-400' : 'text-white')+'">'+available+'</td><td class="p-3 text-right text-cyan-400 font-bold">'+deliveredCount+'</td><td class="p-3 text-right text-slate-500">'+minStock+'</td><td class="p-3 text-center">'+statusBadge+'</td><td class="p-3 text-center"><button onclick="adjustStock(\''+p.id+'\', \''+(p.name||'').replace(/'/g, "\\'")+'\')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Adjust</button></td></tr>';
+            });
+            html += '</tbody></table></div>';
+        }
+        else if(type === 'low') {
+            const items = allProducts.filter(p => p.stock > 0 && p.stock <= (p.minStock || 0));
+            html += '<h3 class="text-base font-bold text-white mb-4">Low Stock Report ('+items.length+' items)</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">Current</th><th class="p-3 text-right">Reorder Lvl</th><th class="p-3 text-right">Deficit</th></tr></thead><tbody class="divide-y divide-white/[0.05]">';
+            if(!items.length) html += '<tr><td colspan="4" class="p-4 text-center text-slate-500">No low stock items</td></tr>';
+            items.forEach(p => { html += '<tr><td class="p-3 text-white">'+(p.name||'N/A')+'</td><td class="p-3 text-right font-bold text-yellow-400">'+(p.stock||0)+'</td><td class="p-3 text-right text-slate-500">'+(p.minStock||0)+'</td><td class="p-3 text-right text-red-400">-'+((p.minStock||0)-(p.stock||0))+'</td></tr>'; });
+            html += '</tbody></table></div>';
+        }
+        else if(type === 'out') {
+            const items = allProducts.filter(p => p.stock <= 0);
+            html += '<h3 class="text-base font-bold text-white mb-4">Out of Stock Report ('+items.length+' items)</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">SKU</th><th class="p-3 text-right">Last Delivered</th></tr></thead><tbody class="divide-y divide-white/[0.05]">';
+            if(!items.length) html += '<tr><td colspan="3" class="p-4 text-center text-slate-500">No out of stock items</td></tr>';
+            items.forEach(p => { html += '<tr><td class="p-3 text-white">'+(p.name||'N/A')+'</td><td class="p-3 text-slate-400 font-mono text-xs">'+(p.sku||'—')+'</td><td class="p-3 text-right text-cyan-400">'+(p.delivered||0)+'</td></tr>'; });
+            html += '</tbody></table></div>';
+        }
+        else if(type === 'expired' || type === 'damaged') {
+            const isExpired = type === 'expired';
+            const items = allProducts.filter(p => (isExpired ? p.expired : p.damaged) > 0);
+            html += '<h3 class="text-base font-bold text-white mb-4">'+(isExpired ? 'Expired' : 'Damaged')+' Stock Report ('+items.length+' items)</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">Warehouse</th><th class="p-3 text-right">Qty</th></tr></thead><tbody class="divide-y divide-white/[0.05]">';
+            if(!items.length) html += '<tr><td colspan="3" class="p-4 text-center text-slate-500">No '+(isExpired ? 'expired' : 'damaged')+' items</td></tr>';
+            items.forEach(p => { html += '<tr><td class="p-3 text-white">'+(p.name||'N/A')+'</td><td class="p-3 text-slate-400">'+(p.warehouse||'Main')+'</td><td class="p-3 text-right font-bold text-'+(isExpired ? 'orange' : 'pink')+'-400">'+(isExpired ? p.expired : p.damaged)+'</td></tr>'; });
+            html += '</tbody></table></div>';
+        }
+        else if(type === 'movement') {
+            html += '<h3 class="text-base font-bold text-white mb-4">Stock Movement Report</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><div class="bg-white/[0.02] p-4 rounded-xl border border-white/10"><div class="text-xs text-slate-500 mb-1">Total Stock In (Available)</div><div class="text-2xl font-bold text-green-400">'+allProducts.reduce((s,p)=>s+(p.stock||0),0)+'</div></div><div class="bg-white/[0.02] p-4 rounded-xl border border-white/10"><div class="text-xs text-slate-500 mb-1">Total Stock Out (Delivered)</div><div class="text-2xl font-bold text-red-400">'+allProducts.reduce((s,p)=>s+(p.delivered||0),0)+'</div></div></div><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">In</th><th class="p-3 text-right">Out</th><th class="p-3 text-right">Current</th></tr></thead><tbody class="divide-y divide-white/[0.05]">';
+            allProducts.forEach(p => { html += '<tr><td class="p-3 text-white">'+(p.name||'N/A')+'</td><td class="p-3 text-right text-green-400">'+((p.stock||0)+(p.delivered||0))+'</td><td class="p-3 text-right text-red-400">'+(p.delivered||0)+'</td><td class="p-3 text-right font-bold text-white">'+(p.stock||0)+'</td></tr>'; });
+            html += '</tbody></table></div>';
+        }
+        else if(type === 'valuation') {
+            const totalVal = allProducts.reduce((s,p)=>s+((p.stock||0)*(p.costPrice||0)),0);
+            html += '<h3 class="text-base font-bold text-white mb-4">Stock Valuation Report (Total: TZS '+totalVal.toLocaleString()+')</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">Qty</th><th class="p-3 text-right">Unit Cost (TZS)</th><th class="p-3 text-right">Total Value (TZS)</th></tr></thead><tbody class="divide-y divide-white/[0.05]">';
+            allProducts.forEach(p => { html += '<tr><td class="p-3 text-white">'+(p.name||'N/A')+'</td><td class="p-3 text-right font-bold text-white">'+(p.stock||0)+'</td><td class="p-3 text-right text-slate-400">'+(p.costPrice||0).toLocaleString()+'</td><td class="p-3 text-right text-green-400">'+((p.stock||0)*(p.costPrice||0)).toLocaleString()+'</td></tr>'; });
+            html += '</tbody></table></div>';
+        }
+        else if(type === 'audit') {
+            html += '<h3 class="text-base font-bold text-white mb-4">Inventory Audit Report</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">Warehouse</th><th class="p-3 text-right">System Qty</th><th class="p-3 text-right">Physical Count</th><th class="p-3 text-right">Variance</th></tr></thead><tbody class="divide-y divide-white/[0.05]">';
+            allProducts.forEach(p => { html += '<tr><td class="p-3 text-white">'+(p.name||'N/A')+'</td><td class="p-3 text-slate-400">'+(p.warehouse||'Main')+'</td><td class="p-3 text-right text-blue-400">'+(p.stock||0)+'</td><td class="p-3 text-right text-slate-500">—</td><td class="p-3 text-right text-slate-500">—</td></tr>'; });
+            html += '</tbody></table></div>';
+        }
+        else if(type === 'fast' || type === 'slow') {
+            const isFast = type === 'fast';
+            const sorted = [...allProducts].sort((a,b) => isFast ? (b.delivered||0)-(a.delivered||0) : (a.delivered||0)-(b.delivered||0));
+            const items = sorted.slice(0, 10);
+            html += '<h3 class="text-base font-bold text-white mb-4">'+(isFast ? 'Fast' : 'Slow')+' Moving Products (Top 10)</h3><div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3 text-right">Delivered</th><th class="p-3 text-right">Current Stock</th></tr></thead><tbody class="divide-y divide-white/[0.05]">';
+            items.forEach(p => { html += '<tr><td class="p-3 text-white">'+(p.name||'N/A')+'</td><td class="p-3 text-right font-bold text-'+(isFast ? 'green' : 'red')+'-400">'+(p.delivered||0)+'</td><td class="p-3 text-right text-slate-400">'+(p.stock||0)+'</td></tr>'; });
+            html += '</tbody></table></div>';
+        }
+        c.innerHTML = html;
+    }
+
+    function renderSettings() {
+        if(!window.currentUser) return;
+        document.getElementById('set-name').value = window.currentUser.name || '';
+        document.getElementById('set-email').value = window.currentUser.email || '';
+        document.getElementById('set-phone').value = window.currentUser.phone || '';
+    }
+
+    function saveStockSettings(e) {
+        e.preventDefault();
+        const name = document.getElementById('set-name').value.trim();
+        const phone = document.getElementById('set-phone').value.trim();
+        if(!name) return showT('Name is required', 'error');
+        db.collection('users').doc(window.currentUser.uid).update({ name: name, phone: phone })
+        .then(() => { showT('Profile updated!'); window.currentUser.name = name; window.currentUser.phone = phone; document.getElementById('header-name').textContent = name; document.getElementById('header-avatar').textContent = name.charAt(0).toUpperCase(); })
+        .catch(err => showT(err.message, 'error'));
+    }
+
+    function renderNotifications() {
+        const c = document.getElementById('notif-list-stock');
+        const alerts = allProducts.filter(p => p.stock <= (p.minStock || 0));
+        const badge = document.getElementById('notif-count-badge');
+        if(badge) { if(alerts.length > 0) { badge.classList.remove('hidden'); badge.textContent = alerts.length; } else { badge.classList.add('hidden'); } }
+        if(!alerts.length) { c.innerHTML = '<div class="text-center py-10 text-slate-500 text-sm">No new notifications. All stock levels are healthy!</div>'; return; }
+        c.innerHTML = alerts.map(p => {
+            const isOut = p.stock <= 0;
+            const msg = isOut ? (p.name||'')+' is completely OUT OF STOCK.' : (p.name||'')+' is low on stock ('+(p.stock||0)+' left, min: '+(p.minStock||0)+').';
+            return '<div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-start gap-3"><div class="w-9 h-9 rounded-lg '+(isOut ? 'text-red-400 bg-red-500/10' : 'text-yellow-400 bg-yellow-500/10')+' flex items-center justify-center flex-shrink-0"><span class="iconify text-lg" data-icon="'+(isOut ? 'mdi:alert-circle' : 'mdi:alert')+'"></span></div><div class="flex-1"><div class="text-sm text-white font-medium">'+msg+'</div><div class="text-xs text-slate-500 mt-1">Merchant: '+(p.merchantName || 'N/A')+'</div></div></div>';
+        }).join('');
+    }
+
+    function clearStockNotifs() {
+        document.getElementById('notif-list-stock').innerHTML = '<div class="text-center py-10 text-slate-500 text-sm">No new notifications.</div>';
+        const badge = document.getElementById('notif-count-badge');
+        if(badge) badge.classList.add('hidden');
+        showT('Notifications cleared');
+    }
+
+    async function adjustStock(productId, productName) {
+        const action = prompt('Adjust stock for '+productName+'.\nType "+5" to add 5, or "-3" to remove 3:');
+        if(!action) return;
+        const match = action.trim().match(/^([+-]?\d+)$/);
+        if(!match) return showT('Invalid format. Use +5 or -3', 'error');
+        const qty = parseInt(match[1]);
+        if(qty === 0) return;
+        try {
+            await db.collection('products').doc(productId).update({ stock: firebase.firestore.FieldValue.increment(qty) });
+            showT('Stock adjusted by ' + (qty > 0 ? '+' : '') + qty + '!');
+        } catch(e) { showT(e.message, 'error'); }
+    }
+</script>
