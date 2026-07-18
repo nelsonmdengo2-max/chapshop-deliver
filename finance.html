@@ -1,0 +1,606 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard — ChapShop Delivery</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+        body{background:#020617;}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f172a}::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+        .gradient-text{background:linear-gradient(to bottom,#fff,#fff,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.16,1,.3,1);white-space:nowrap;z-index:200}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+        .stat-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:1rem;padding:1.5rem;transition:all 0.2s}
+        .stat-card:hover{border-color:rgba(6,182,212,0.3)}
+        .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem;cursor:pointer;width:100%;text-align:left;border:none;background:none}
+        .sidebar-link:hover,.sidebar-link.active{background:rgba(16,185,129,0.1);color:#34d399}
+        .sb-header{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;padding:0 1rem;margin-top:1rem}
+        .data-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:12px;}
+        .dtable{width:100%;border-collapse:separate;border-spacing:0}
+        .dtable thead th{font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.05em;padding:14px 16px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.015)}
+        .dtable tbody td{font-size:13px;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.03);color:#94a3b8;vertical-align:middle}
+        .dtable tbody tr:hover{background:rgba(255,255,255,0.02)}
+    </style>
+</head>
+<body class="bg-[#020617] text-white min-h-screen">
+
+    <div id="toast" class="toast bg-[#0f172a] border border-green-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
+        <span id="toast-icon" class="iconify text-green-400 text-xl" data-icon="mdi:check-circle"></span>
+        <span id="toast-msg" class="text-sm font-medium">Success</span>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center">
+        <div class="w-full max-w-md px-6">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/20"><span class="iconify text-white text-3xl" data-icon="mdi:finance"></span></div>
+                <h1 class="text-2xl font-bold gradient-text">Finance & Accounts</h1>
+                <p class="text-slate-400 text-sm mt-1">ChapShop Delivery System</p>
+            </div>
+            <form method="POST" onsubmit="handleLogin(event)" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Admin/Finance Email</label><input type="email" name="email" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-green-500/50" placeholder="admin@chapshop.com"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Password</label><input type="password" name="password" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-green-500/50" placeholder="••••••••"></div>
+                <button type="submit" class="w-full bg-green-500 text-white font-semibold py-3 rounded-xl hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app-screen" class="hidden h-screen flex overflow-hidden">
+        
+        <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 lg:hidden" onclick="toggleSidebar()"></div>
+
+        <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0">
+            <div class="p-4 border-b border-white/[0.08] flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 bg-gradient-to-br from-green-500 to-green-700 rounded-lg flex items-center justify-center"><span class="iconify text-white text-lg" data-icon="mdi:finance"></span></div>
+                    <span class="font-bold text-white text-sm">ChapShop<span class="text-green-400 ml-1">Finance</span></span>
+                </div>
+            </div>
+            <nav class="p-2 flex-1 overflow-y-auto pb-4 space-y-1">
+                <div class="sb-header">Main</div>
+                <button class="sidebar-link active" onclick="switchView('dash', this)"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</button>
+                
+                <div class="sb-header">Revenue & Expenses</div>
+                <button class="sidebar-link" onclick="switchView('sales', this)"><span class="iconify text-lg" data-icon="mdi:chart-line"></span> Sales Revenue</button>
+                <button class="sidebar-link" onclick="switchView('expenses', this)"><span class="iconify text-lg" data-icon="mdi:cash-minus"></span> Expenses</button>
+                <button class="sidebar-link" onclick="switchView('profitloss', this)"><span class="iconify text-lg" data-icon="mdi:scale-balance"></span> Profit & Loss</button>
+                
+                <div class="sb-header">Payments & Invoices</div>
+                <button class="sidebar-link" onclick="switchView('invoices', this)"><span class="iconify text-lg" data-icon="mdi:file-document-outline"></span> Invoices</button>
+                <button class="sidebar-link" onclick="switchView('payments', this)"><span class="iconify text-lg" data-icon="mdi:credit-card-check-outline"></span> Payments</button>
+                <button class="sidebar-link" onclick="switchView('cust-payments', this)"><span class="iconify text-lg" data-icon="mdi:account-cash"></span> Customer Payments</button>
+                <button class="sidebar-link" onclick="switchView('sup-payments', this)"><span class="iconify text-lg" data-icon="mdi:truck-delivery"></span> Supplier Payments</button>
+                
+                <div class="sb-header">Accounts</div>
+                <button class="sidebar-link" onclick="switchView('receivable', this)"><span class="iconify text-lg" data-icon="mdi:account-arrow-right"></span> Accounts Receivable</button>
+                <button class="sidebar-link" onclick="switchView('payable', this)"><span class="iconify text-lg" data-icon="mdi:account-arrow-left"></span> Accounts Payable</button>
+                <button class="sidebar-link" onclick="switchView('merchants', this)"><span class="iconify text-lg" data-icon="mdi:storefront-outline"></span> Merchant Payouts</button>
+                <button class="sidebar-link" onclick="switchView('riders', this)"><span class="iconify text-lg" data-icon="mdi:moped"></span> Rider Cash Holdings</button>
+                
+                <div class="sb-header">Cash & Banking</div>
+                <button class="sidebar-link" onclick="switchView('cashflow', this)"><span class="iconify text-lg" data-icon="mdi:cash-refund"></span> Cash Flow</button>
+                <button class="sidebar-link" onclick="switchView('transactions', this)"><span class="iconify text-lg" data-icon="mdi:swap-horizontal"></span> Transactions</button>
+                
+                <div class="sb-header">Compliance & Reports</div>
+                <button class="sidebar-link" onclick="switchView('taxes', this)"><span class="iconify text-lg" data-icon="mdi:percent-outline"></span> Taxes</button>
+                <button class="sidebar-link" onclick="switchView('refunds', this)"><span class="iconify text-lg" data-icon="mdi:cash-refund"></span> Refunds</button>
+                <button class="sidebar-link" onclick="switchView('reports', this)"><span class="iconify text-lg" data-icon="mdi:file-chart"></span> Financial Reports</button>
+                <button class="sidebar-link" onclick="switchView('history', this)"><span class="iconify text-lg" data-icon="mdi:history"></span> Settlement History</button>
+                
+                <div class="sb-header">System</div>
+                <button class="sidebar-link" onclick="switchView('settings', this)"><span class="iconify text-lg" data-icon="mdi:cog-outline"></span> Settings</button>
+            </nav>
+            <div class="p-2 border-t border-white/[0.08] flex-shrink-0">
+                <button class="sidebar-link text-red-400 hover:bg-red-500/10 w-full" onclick="auth.signOut()"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</button>
+            </div>
+        </aside>
+
+        <main class="flex-1 lg:ml-64 flex flex-col h-full">
+            <header class="nav-blur bg-[#020617]/80 border-b border-white/[0.08] px-6 py-3 flex items-center justify-between flex-shrink-0">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
+                    <h1 id="page-title" class="font-bold text-white text-sm">Dashboard</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 font-bold text-xs" id="header-avatar">A</div>
+                    <span id="header-name" class="text-sm font-semibold text-white hidden sm:block">Admin</span>
+                </div>
+            </header> 
+            
+            <div class="p-6 flex-1 overflow-y-auto min-w-0">
+
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dash">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold text-green-400 uppercase">Total Revenue</span><span class="iconify text-green-400" data-icon="mdi:cash-multiple"></span></div><div id="kpi-gross-rev" class="text-xl font-bold text-white">TZS 0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold text-red-400 uppercase">Total Expenses</span><span class="iconify text-red-400" data-icon="mdi:cash-minus"></span></div><div id="kpi-expenses" class="text-xl font-bold text-red-400">TZS 0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold text-violet-400 uppercase">Net Profit</span><span class="iconify text-violet-400" data-icon="mdi:chart-line-variant"></span></div><div id="kpi-net-profit" class="text-xl font-bold text-violet-400">TZS 0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold text-yellow-400 uppercase">Pending Invoices</span><span class="iconify text-yellow-400" data-icon="mdi:file-clock-outline"></span></div><div id="kpi-pending-invoices" class="text-xl font-bold text-yellow-400">0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold text-orange-400 uppercase">Pending Payments</span><span class="iconify text-orange-400" data-icon="mdi:credit-card-clock-outline"></span></div><div id="kpi-pending-payments" class="text-xl font-bold text-orange-400">TZS 0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold text-cyan-400 uppercase">Cash Balance</span><span class="iconify text-cyan-400" data-icon="mdi:wallet"></span></div><div id="kpi-cash-balance" class="text-xl font-bold text-cyan-400">TZS 0</div></div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="lg:col-span-2 bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-base font-bold text-white mb-4">Revenue vs Expenses</h3>
+                            <div style="position:relative; height:300px;"><canvas id="finance-chart"></canvas></div>
+                        </div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-base font-bold text-white mb-4">Rider Cash (COD)</h3>
+                            <div id="rider-cash-summary" class="space-y-3 text-sm">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-base font-bold text-white mb-4">Merchant Payouts Summary</h3>
+                        <div id="merchant-payout-summary" class="space-y-3 text-sm">Loading...</div>
+                    </div>
+                </div> 
+
+                <!-- DYNAMIC VIEW CONTAINER -->
+                <div id="view-dynamic" class="hidden"></div>
+
+                <!-- MERCHANT PAYOUTS VIEW -->
+                <div id="view-merchants" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Merchant Outstanding Payouts</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <table class="dtable"><thead><tr><th>Merchant</th><th class="text-right">Gross Revenue</th><th class="text-right">Commission (10%)</th><th class="text-right">Refunds</th><th class="text-right">Already Paid</th><th class="text-right">Outstanding</th><th class="text-center">Action</th></tr></thead>
+                        <tbody id="merchants-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                </div> 
+
+                <!-- RIDER CASH VIEW -->
+                <div id="view-riders" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Rider Cash Holdings</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <table class="dtable"><thead><tr><th>Rider Name</th><th class="text-right">Delivered Orders</th><th class="text-right">Cash Collected</th><th class="text-right">Cash Settled</th><th class="text-right">Outstanding Cash</th><th class="text-center">Action</th></tr></thead>
+                        <tbody id="riders-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                </div> 
+
+                <!-- EXPENSES VIEW -->
+                <div id="view-expenses" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-lg font-bold text-white">Operating Expenses</h2>
+                        <button onclick="openExpenseModal()" class="bg-green-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-green-400 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:plus"></span> Add Expense</button>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <table class="dtable"><thead><tr><th>Date</th><th>Category</th><th>Description</th><th class="text-right">Amount</th><th class="text-center">Action</th></tr></thead>
+                        <tbody id="expenses-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                </div> 
+
+                <!-- SETTLEMENT HISTORY VIEW -->
+                <div id="view-history" class="hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Settlement History</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
+                        <table class="dtable"><thead><tr><th>Date</th><th>Type</th><th>Beneficiary</th><th class="text-right">Amount</th></tr></thead>
+                        <tbody id="history-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ADD EXPENSE MODAL -->
+    <div id="expense-modal" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-[#0f172a] border border-white/10 rounded-2xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-base font-bold text-white">Record New Expense</h3>
+                <button onclick="closeExpenseModal()" class="text-slate-400 hover:text-white"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
+            </div>
+            <form onsubmit="saveExpense(event)" class="space-y-4">
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Category *</label><select id="exp-cat" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-green-500/50"><option value="Salary">Salary</option><option value="Fuel">Fuel</option><option value="Maintenance">Maintenance</option><option value="Rent">Rent</option><option value="Marketing">Marketing</option><option value="Refund Payout">Refund Payout</option><option value="Other">Other</option></select></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Amount (TZS) *</label><input type="number" id="exp-amount" required min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-green-500/50" placeholder="e.g. 50000"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Description</label><input type="text" id="exp-desc" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-green-500/50" placeholder="e.g. Rider fuel for March"></div>
+                <button type="submit" class="w-full bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-400 transition-colors">Save Expense</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var fc={apiKey:"AIzaSyBjyRehaNQqt5ogt5U3tiw8NYr4TyuX2iI",authDomain:"chapshop-delivery-88fe1.firebaseapp.com",projectId:"chapshop-delivery-88fe1",storageBucket:"chapshop-delivery-88fe1.firebasestorage.app",messagingSenderId:"540757404981",appId:"1:540757404981:web:f5ae5d041dd260304eb07c"};
+        firebase.initializeApp(fc);var auth=firebase.auth(),db=firebase.firestore();
+
+        let allOrders = [], allUsers = [], allExpenses = [], allRefunds = [], allSettlements = [];
+        let finChart;
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerHTML = 'Signing in...'; btn.disabled = true;
+            auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value).catch(err => {
+                showT(err.message, "error"); btn.innerHTML = 'Sign In'; btn.disabled = false;
+            });
+        }
+
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                const doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists && doc.data().active && (doc.data().role === 'admin' || doc.data().role === 'finance')) {
+                    window.currentUser = { uid: user.uid, ...doc.data() };
+                    document.getElementById('header-name').textContent = doc.data().name || 'Admin';
+                    document.getElementById('header-avatar').textContent = (doc.data().name || 'A').charAt(0).toUpperCase();
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app-screen').classList.remove('hidden');
+                    loadData();
+                } else { 
+                    showT("Access Denied. Admins/Finance only.", "error");
+                    auth.signOut(); 
+                }
+            } else {
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('app-screen').classList.add('hidden');
+            }
+        });
+
+        function loadData() {
+            db.collection('orders').onSnapshot(snap => { allOrders = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll(); });
+            db.collection('users').onSnapshot(snap => { allUsers = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll(); });
+            db.collection('expenses').onSnapshot(snap => { allExpenses = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll(); });
+            db.collection('refunds').onSnapshot(snap => { allRefunds = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll(); });
+            db.collection('settlements').onSnapshot(snap => { allSettlements = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAll(); });
+        }
+
+        function renderAll() {
+            renderDashboard(); renderMerchants(); renderRiders(); renderExpenses(); renderHistory();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        }
+
+        function switchView(view, el) {
+            document.querySelectorAll('[id^="view-"]').forEach(v => v.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            if(el) el.classList.add('active');
+            document.getElementById('page-title').innerText = el ? el.innerText.trim() : 'Dashboard';
+            if(window.innerWidth < 1024) toggleSidebar(); 
+            
+            if(view === 'dash' || view === 'merchants' || view === 'riders' || view === 'expenses' || view === 'history') {
+                document.getElementById('view-' + view).classList.remove('hidden');
+            } else {
+                document.getElementById('view-dynamic').classList.remove('hidden');
+                renderDynamicView(view);
+            }
+        }
+        
+        function showT(m, t) {
+            t = t || "success";
+            var el = document.getElementById('toast'), ic = document.getElementById('toast-icon'), ms = document.getElementById('toast-msg');
+            ms.textContent = m; ic.setAttribute('data-icon', t === 'error' ? 'mdi:alert-circle' : 'mdi:check-circle');
+            ic.className = 'iconify text-xl ' + (t === 'error' ? 'text-red-400' : 'text-green-400');
+            el.classList.add('show'); setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function fmtM(n){return'TZS '+Number(n||0).toLocaleString()}
+        function fmtDate(ts){ if(!ts) return 'N/A'; try { return new Date(ts.seconds * 1000).toLocaleString(); } catch(e) { return 'N/A'; } }
+
+        // ===== DASHBOARD =====
+        function renderDashboard() {
+            const delOrders = allOrders.filter(o => o.status === 'delivered');
+            const grossRev = delOrders.reduce((s,o) => s + (o.totalAmount||0), 0);
+            const comm = Math.round(grossRev * 0.1);
+            const exp = allExpenses.reduce((s,e) => s + (e.amount||0), 0);
+            const ref = allRefunds.filter(r => r.status === 'approved' || r.status === 'processed').reduce((s,r) => s + (r.amount||0), 0);
+            const netProfit = comm - exp - ref;
+
+            document.getElementById('kpi-gross-rev').textContent = fmtM(grossRev);
+            document.getElementById('kpi-expenses').textContent = fmtM(exp + ref);
+            document.getElementById('kpi-net-profit').textContent = fmtM(netProfit);
+            document.getElementById('kpi-pending-invoices').textContent = allOrders.filter(o => o.status === 'pending' || o.status === 'accepted').length;
+            document.getElementById('kpi-pending-payments').textContent = fmtM(0);
+            document.getElementById('kpi-cash-balance').textContent = fmtM(comm - exp);
+
+            if (typeof Chart !== 'undefined') {
+                if(finChart) finChart.destroy();
+                const ctx = document.getElementById('finance-chart');
+                if(ctx) {
+                    finChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'], datasets: [
+                            { label: 'Revenue', data: [grossRev*0.1, grossRev*0.2, grossRev*0.15, grossRev*0.25, grossRev*0.1, grossRev*0.15, grossRev], backgroundColor: 'rgba(16, 185, 129, 0.5)', borderColor: 'rgb(16, 185, 129)', borderWidth: 1, borderRadius: 4 },
+                            { label: 'Expenses', data: [exp*0.1, exp*0.2, exp*0.15, exp*0.25, exp*0.1, exp*0.15, exp+ref], backgroundColor: 'rgba(239, 68, 68, 0.5)', borderColor: 'rgb(239, 68, 68)', borderWidth: 1, borderRadius: 4 }
+                        ]},
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { x: { ticks: { color: '#475569' }, grid: { display: false } }, y: { ticks: { color: '#475569', callback: function(v){ if(v>=1e6)return(v/1e6).toFixed(1)+'M'; if(v>=1e3)return(v/1e3).toFixed(0)+'K'; return v } }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+                    });
+                }
+            }
+
+            const riders = allUsers.filter(u => u.role === 'rider' || u.role === 'shipping');
+            let riderHtml = ''; let totalOutstanding = 0;
+            riders.slice(0, 5).forEach(r => {
+                const rDel = delOrders.filter(o => o.riderId === r.id);
+                const cashCollected = rDel.reduce((s,o) => s + (o.totalAmount||0), 0);
+                const settled = allSettlements.filter(s => s.riderId === r.id).reduce((s,s2) => s + (s2.amount||0), 0);
+                const outstanding = cashCollected - settled; totalOutstanding += outstanding;
+                riderHtml += `<div class="flex justify-between items-center text-sm"><span class="text-slate-300">${r.name}</span><span class="font-bold text-yellow-400">${fmtM(outstanding)}</span></div>`;
+            });
+            riderHtml += `<div class="flex justify-between items-center text-sm pt-3 mt-3 border-t border-white/[0.05]"><span class="font-bold text-white">Total Cash to Collect</span><span class="font-bold text-red-400">${fmtM(totalOutstanding)}</span></div>`;
+            document.getElementById('rider-cash-summary').innerHTML = riderHtml || '<p class="text-slate-500 text-sm">No riders.</p>';
+
+            const merchants = allUsers.filter(u => u.role === 'merchant');
+            let mercHtml = ''; let totalOutstandingMerc = 0;
+            merchants.slice(0, 5).forEach(m => {
+                const mDel = delOrders.filter(o => o.merchantId === m.id);
+                const mRev = mDel.reduce((s,o) => s + (o.totalAmount||0), 0);
+                const mComm = Math.round(mRev * 0.1);
+                const mRef = allRefunds.filter(r => r.merchantId === m.id && (r.status === 'approved' || r.status === 'processed')).reduce((s,r) => s + (r.amount||0), 0);
+                const mPaid = allSettlements.filter(s => s.merchantId === m.id).reduce((s,s2) => s + (s2.amount||0), 0);
+                const outstanding = (mRev - mComm - mRef) - mPaid; totalOutstandingMerc += outstanding;
+                mercHtml += `<div class="flex justify-between items-center text-sm"><span class="text-slate-300">${m.shopName || m.name}</span><span class="font-bold text-yellow-400">${fmtM(outstanding)}</span></div>`;
+            });
+            mercHtml += `<div class="flex justify-between items-center text-sm pt-3 mt-3 border-t border-white/[0.05]"><span class="font-bold text-white">Total Payouts Due</span><span class="font-bold text-red-400">${fmtM(totalOutstandingMerc)}</span></div>`;
+            document.getElementById('merchant-payout-summary').innerHTML = mercHtml || '<p class="text-slate-500 text-sm">No merchants.</p>';
+        }
+
+        // ===== MERCHANTS =====
+        function renderMerchants() {
+            const tbody = document.getElementById('merchants-tbody');
+            if(!tbody) return; const merchants = allUsers.filter(u => u.role === 'merchant');
+            if(!merchants.length) { tbody.innerHTML = '<tr><td colspan="7" class="p-10 text-center text-slate-500">No merchants found.</td></tr>'; return; }
+            tbody.innerHTML = merchants.map(m => {
+                const mDel = allOrders.filter(o => o.merchantId === m.id && o.status === 'delivered');
+                const mRev = mDel.reduce((s,o) => s + (o.totalAmount||0), 0);
+                const mComm = Math.round(mRev * 0.1);
+                const mRef = allRefunds.filter(r => r.merchantId === m.id && (r.status === 'approved' || r.status === 'processed')).reduce((s,r) => s + (r.amount||0), 0);
+                const mPaid = allSettlements.filter(s => s.merchantId === m.id).reduce((s,s2) => s + (s2.amount||0), 0);
+                const outstanding = (mRev - mComm - mRef) - mPaid;
+                return `<tr class="hover:bg-white/[0.02]"><td class="p-4 text-white font-medium">${m.shopName || m.name}</td><td class="p-4 text-right text-slate-300">${fmtM(mRev)}</td><td class="p-4 text-right text-red-400">-${fmtM(mComm)}</td><td class="p-4 text-right text-orange-400">-${fmtM(mRef)}</td><td class="p-4 text-right text-green-400">${fmtM(mPaid)}</td><td class="p-4 text-right font-bold text-white">${fmtM(outstanding)}</td><td class="p-4 text-center"><button onclick="settleMerchant('${m.id}', ${outstanding})" class="bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold px-3 py-1 rounded-lg hover:bg-green-500/30">Settle</button></td></tr>`;
+            }).join('');
+        }
+
+        async function settleMerchant(merchantId, outstandingAmount) {
+            if(outstandingAmount <= 0) return showT('No outstanding amount for this merchant', 'error');
+            if(!confirm(`Confirm that you have paid this merchant ${fmtM(outstandingAmount)}?`)) return;
+            try { await db.collection('settlements').add({ merchantId: merchantId, amount: outstandingAmount, type: 'merchant_payout', settledBy: window.currentUser.uid, settledAt: firebase.firestore.FieldValue.serverTimestamp() }); showT('Merchant settlement recorded!'); } catch(err) { showT(err.message, 'error'); }
+        }
+
+        // ===== RIDERS =====
+        function renderRiders() {
+            const tbody = document.getElementById('riders-tbody');
+            if(!tbody) return; const riders = allUsers.filter(u => u.role === 'rider' || u.role === 'shipping');
+            if(!riders.length) { tbody.innerHTML = '<tr><td colspan="6" class="p-10 text-center text-slate-500">No riders found.</td></tr>'; return; }
+            tbody.innerHTML = riders.map(r => {
+                const rDel = allOrders.filter(o => o.riderId === r.id && o.status === 'delivered');
+                const cashCollected = rDel.reduce((s,o) => s + (o.totalAmount||0), 0);
+                const settled = allSettlements.filter(s => s.riderId === r.id).reduce((s,s2) => s + (s2.amount||0), 0);
+                const outstanding = cashCollected - settled;
+                return `<tr class="hover:bg-white/[0.02]"><td class="p-4 text-white font-medium">${r.name}</td><td class="p-4 text-right text-slate-300">${rDel.length}</td><td class="p-4 text-right text-cyan-400">${fmtM(cashCollected)}</td><td class="p-4 text-right text-green-400">${fmtM(settled)}</td><td class="p-4 text-right font-bold text-yellow-400">${fmtM(outstanding)}</td><td class="p-4 text-center"><button onclick="settleRider('${r.id}', ${outstanding})" class="bg-green-500/20 text-green-400 border border-green-500/30 text-xs font-bold px-3 py-1 rounded-lg hover:bg-green-500/30">Settle Cash</button></td></tr>`;
+            }).join('');
+        }
+
+        async function settleRider(riderId, outstandingAmount) {
+            if(outstandingAmount <= 0) return showT('Rider has no outstanding cash', 'error');
+            if(!confirm(`Confirm that the rider has handed over ${fmtM(outstandingAmount)} in cash?`)) return;
+            try { await db.collection('settlements').add({ riderId: riderId, amount: outstandingAmount, type: 'rider_cash', settledBy: window.currentUser.uid, settledAt: firebase.firestore.FieldValue.serverTimestamp() }); showT('Rider cash settlement recorded!'); } catch(err) { showT(err.message, 'error'); }
+        }
+
+        // ===== HISTORY =====
+        function renderHistory() {
+            const tbody = document.getElementById('history-tbody');
+            if(!tbody) return;
+            if(!allSettlements.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500">No settlements recorded yet.</td></tr>'; return; }
+            const sorted = [...allSettlements].sort((a,b) => (b.settledAt?.seconds || 0) - (a.settledAt?.seconds || 0));
+            tbody.innerHTML = sorted.map(s => {
+                const date = s.settledAt ? new Date(s.settledAt.seconds * 1000).toLocaleString() : 'N/A';
+                let benName = 'Unknown';
+                if(s.merchantId) { const m = allUsers.find(u => u.id === s.merchantId); if(m) benName = m.shopName || m.name; }
+                if(s.riderId) { const r = allUsers.find(u => u.id === s.riderId); if(r) benName = r.name; }
+                const typeBadge = s.type === 'rider_cash' ? '<span class="px-2 py-1 rounded-md bg-violet-500/10 text-violet-400 text-xs font-bold uppercase">Rider Cash</span>' : '<span class="px-2 py-1 rounded-md bg-cyan-500/10 text-cyan-400 text-xs font-bold uppercase">Merchant Payout</span>';
+                return `<tr class="hover:bg-white/[0.02]"><td class="p-4 text-slate-400 text-xs">${date}</td><td class="p-4">${typeBadge}</td><td class="p-4 text-white font-medium">${benName}</td><td class="p-4 text-right font-bold text-green-400">${fmtM(s.amount)}</td></tr>`;
+            }).join('');
+        }
+
+        // ===== EXPENSES =====
+        function renderExpenses() {
+            const tbody = document.getElementById('expenses-tbody');
+            if(!tbody) return;
+            if(!allExpenses.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-500">No expenses recorded.</td></tr>'; return; }
+            const sorted = [...allExpenses].sort((a,b) => (b.settledAt?.seconds || 0) - (a.settledAt?.seconds || 0));
+            tbody.innerHTML = sorted.map(e => {
+                return `<tr class="hover:bg-white/[0.02]"><td class="p-4 text-slate-400 text-xs">${e.settledAt ? new Date(e.settledAt.seconds * 1000).toLocaleDateString() : 'N/A'}</td><td class="p-4 text-white font-medium">${e.category || 'N/A'}</td><td class="p-4 text-slate-300">${e.description || '—'}</td><td class="p-4 text-right font-bold text-red-400">-${fmtM(e.amount)}</td><td class="p-4 text-center"><button onclick="deleteExpense('${e.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`;
+            }).join('');
+        }
+
+        function openExpenseModal() { document.getElementById('expense-modal').classList.remove('hidden'); }
+        function closeExpenseModal() { document.getElementById('expense-modal').classList.add('hidden'); }
+
+        async function saveExpense(e) {
+            e.preventDefault();
+            const data = { category: document.getElementById('exp-cat').value, amount: parseInt(document.getElementById('exp-amount').value) || 0, description: document.getElementById('exp-desc').value.trim(), settledAt: firebase.firestore.FieldValue.serverTimestamp(), addedBy: window.currentUser.uid };
+            try { await db.collection('expenses').add(data); showT('Expense recorded!'); closeExpenseModal(); e.target.reset(); } catch(err) { showT(err.message, 'error'); }
+        }
+
+        async function deleteExpense(id) {
+            if(!confirm('Delete this expense record?')) return;
+            try { await db.collection('expenses').doc(id).delete(); showT('Expense deleted!'); } catch(err) { showT(err.message, 'error'); }
+        }
+
+        // ===== DYNAMIC VIEWS (Fully Functional) =====
+        function renderDynamicView(view) {
+            const c = document.getElementById('view-dynamic');
+            let html = '';
+
+            if(view === 'sales') {
+                const del = allOrders.filter(o => o.status === 'delivered');
+                html += `<h2 class="text-lg font-bold text-white mb-6">Sales Revenue</h2><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><table class="dtable"><thead><tr><th>Date</th><th>Order ID</th><th>Customer</th><th>Merchant</th><th class="text-right">Amount</th></tr></thead><tbody class="divide-y divide-white/[0.05]">`;
+                if(!del.length) html += '<tr><td colspan="5" class="p-10 text-center text-slate-500">No sales revenue yet.</td></tr>';
+                del.slice(0,100).reverse().forEach(o => {
+                    html += `<tr><td class="p-4 text-xs text-slate-400">${fmtDate(o.deliveredAt || o.createdAt)}</td><td class="p-4 font-mono text-cyan-400 text-xs">#${o.id.slice(-6).toUpperCase()}</td><td class="p-4 text-white">${o.customerName||''}</td><td class="p-4 text-slate-400">${o.merchantName||''}</td><td class="p-4 text-right font-bold text-green-400">${fmtM(o.totalAmount)}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+            } 
+            
+            else if(view === 'profitloss') {
+                const del = allOrders.filter(o => o.status === 'delivered');
+                const rev = del.reduce((s,o) => s + (o.totalAmount||0), 0);
+                const cogs = Math.round(rev * 0.9); // Merchant Payout
+                const grossProfit = rev - cogs; // Commission
+                const opExp = allExpenses.filter(e => e.category !== 'Refund Payout').reduce((s,e) => s + (e.amount||0), 0);
+                const ref = allRefunds.filter(r => r.status === 'approved' || r.status === 'processed').reduce((s,r) => s + (r.amount||0), 0);
+                const netProfit = grossProfit - opExp - ref;
+
+                html += `<h2 class="text-lg font-bold text-white mb-6">Profit & Loss Statement</h2><div class="max-w-2xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">`;
+                html += `<div class="flex justify-between text-lg font-bold text-white border-b border-white/[0.08] pb-2"><span>Total Revenue</span><span>${fmtM(rev)}</span></div>`;
+                html += `<div class="flex justify-between text-sm text-slate-400"><span>Cost of Goods Sold (Merchant Payouts)</span><span>- ${fmtM(cogs)}</span></div>`;
+                html += `<div class="flex justify-between text-md font-bold text-cyan-400 border-b border-white/[0.08] pb-2"><span>Gross Profit (Commission)</span><span>${fmtM(grossProfit)}</span></div>`;
+                html += `<div class="flex justify-between text-sm text-slate-400"><span>Operating Expenses</span><span>- ${fmtM(opExp)}</span></div>`;
+                html += `<div class="flex justify-between text-sm text-slate-400"><span>Refunds Paid</span><span>- ${fmtM(ref)}</span></div>`;
+                html += `<div class="flex justify-between text-lg font-bold text-violet-400 pt-2 border-t border-white/[0.08]"><span>Net Profit</span><span>${fmtM(netProfit)}</span></div>`;
+                html += `</div>`;
+            } 
+            
+            else if(view === 'invoices' || view === 'cust-payments') {
+                const inv = allOrders.filter(o => o.status === 'pending' || o.status === 'accepted' || o.status === 'confirmed');
+                html += `<h2 class="text-lg font-bold text-white mb-6">${view === 'invoices' ? 'Pending Invoices' : 'Customer Payments (Pending)'}</h2><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><table class="dtable"><thead><tr><th>Order ID</th><th>Customer</th><th class="text-right">Amount Due</th><th class="text-center">Status</th></tr></thead><tbody class="divide-y divide-white/[0.05]">`;
+                if(!inv.length) html += '<tr><td colspan="4" class="p-10 text-center text-slate-500">No pending invoices.</td></tr>';
+                inv.forEach(o => {
+                    html += `<tr><td class="p-4 font-mono text-cyan-400 text-xs">#${o.id.slice(-6).toUpperCase()}</td><td class="p-4 text-white">${o.customerName||''}</td><td class="p-4 text-right font-bold text-yellow-400">${fmtM(o.totalAmount)}</td><td class="p-4 text-center text-xs uppercase text-orange-400">${o.status}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+            } 
+            
+            else if(view === 'payments' || view === 'sup-payments') {
+                html += `<h2 class="text-lg font-bold text-white mb-6">${view === 'payments' ? 'Payments Ledger' : 'Supplier (Merchant) Payments'}</h2><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><table class="dtable"><thead><tr><th>Date</th><th>Payee</th><th>Type</th><th class="text-right">Amount Paid</th></tr></thead><tbody class="divide-y divide-white/[0.05]">`;
+                let pmts = allSettlements;
+                if(view === 'sup-payments') pmts = pmts.filter(s => s.type === 'merchant_payout');
+                if(!pmts.length) html += '<tr><td colspan="4" class="p-10 text-center text-slate-500">No payments recorded.</td></tr>';
+                pmts.slice().reverse().forEach(s => {
+                    let name = 'Unknown'; if(s.merchantId) { const m = allUsers.find(u => u.id === s.merchantId); if(m) name = m.shopName || m.name; } if(s.riderId) { const r = allUsers.find(u => u.id === s.riderId); if(r) name = r.name; }
+                    html += `<tr><td class="p-4 text-xs text-slate-400">${fmtDate(s.settledAt)}</td><td class="p-4 text-white">${name}</td><td class="p-4 text-xs uppercase text-cyan-400">${s.type.replace('_',' ')}</td><td class="p-4 text-right font-bold text-red-400">- ${fmtM(s.amount)}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+            } 
+            
+            else if(view === 'receivable') {
+                html += `<h2 class="text-lg font-bold text-white mb-6">Accounts Receivable (Rider COD)</h2><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><table class="dtable"><thead><tr><th>Rider</th><th class="text-right">Cash Holding</th></tr></thead><tbody class="divide-y divide-white/[0.05]">`;
+                allUsers.filter(u => u.role === 'rider' || u.role === 'shipping').forEach(r => {
+                    const cash = allOrders.filter(o => o.riderId === r.id && o.status === 'delivered').reduce((s,o) => s + (o.totalAmount||0), 0);
+                    const settled = allSettlements.filter(s => s.riderId === r.id).reduce((s,s2) => s + (s2.amount||0), 0);
+                    const out = cash - settled;
+                    html += `<tr><td class="p-4 text-white font-medium">${r.name}</td><td class="p-4 text-right font-bold text-yellow-400">${fmtM(out)}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+            } 
+            
+            else if(view === 'payable') {
+                html += `<h2 class="text-lg font-bold text-white mb-6">Accounts Payable (Merchant Dues)</h2><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><table class="dtable"><thead><tr><th>Merchant</th><th class="text-right">Outstanding</th></tr></thead><tbody class="divide-y divide-white/[0.05]">`;
+                allUsers.filter(u => u.role === 'merchant').forEach(m => {
+                    const mDel = allOrders.filter(o => o.merchantId === m.id && o.status === 'delivered');
+                    const mRev = mDel.reduce((s,o) => s + (o.totalAmount||0), 0);
+                    const mComm = Math.round(mRev * 0.1);
+                    const mRef = allRefunds.filter(r => r.merchantId === m.id && (r.status === 'approved' || r.status === 'processed')).reduce((s,r) => s + (r.amount||0), 0);
+                    const mPaid = allSettlements.filter(s => s.merchantId === m.id).reduce((s,s2) => s + (s2.amount||0), 0);
+                    const out = (mRev - mComm - mRef) - mPaid;
+                    html += `<tr><td class="p-4 text-white font-medium">${m.shopName || m.name}</td><td class="p-4 text-right font-bold text-red-400">${fmtM(out)}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+            } 
+            
+            else if(view === 'cashflow') {
+                const inflow = allSettlements.filter(s => s.type === 'rider_cash').reduce((s,s2) => s + (s2.amount||0), 0);
+                const outflow = allSettlements.filter(s => s.type === 'merchant_payout').reduce((s,s2) => s + (s2.amount||0), 0) + allExpenses.reduce((s,e) => s + (e.amount||0), 0);
+                const balance = inflow - outflow;
+                html += `<h2 class="text-lg font-bold text-white mb-6">Cash Flow Statement</h2><div class="max-w-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">`;
+                html += `<div class="flex justify-between text-md font-bold text-green-400 border-b border-white/[0.08] pb-2"><span>Cash Inflow (Rider COD)</span><span>+ ${fmtM(inflow)}</span></div>`;
+                html += `<div class="flex justify-between text-md font-bold text-red-400 border-b border-white/[0.08] pb-2"><span>Cash Outflow (Payouts + Expenses)</span><span>- ${fmtM(outflow)}</span></div>`;
+                html += `<div class="flex justify-between text-lg font-bold text-white pt-2"><span>Net Cash Balance</span><span>${fmtM(balance)}</span></div>`;
+                html += `</div>`;
+            } 
+            
+            else if(view === 'transactions') {
+                let txns = [];
+                allOrders.filter(o => o.status === 'delivered').forEach(o => txns.push({date: o.deliveredAt || o.createdAt, desc: `Sale: ${o.itemName} (${o.customerName})`, type: 'Income', amount: o.totalAmount}));
+                allExpenses.forEach(e => txns.push({date: e.settledAt, desc: `Expense: ${e.category} (${e.description||''})`, type: 'Expense', amount: -e.amount}));
+                allSettlements.forEach(s => { let name='Unknown'; if(s.merchantId){const m=allUsers.find(u=>u.id===s.merchantId); if(m)name=m.shopName||m.name;} if(s.riderId){const r=allUsers.find(u=>u.id===s.riderId); if(r)name=r.name;} txns.push({date: s.settledAt, desc: `Settlement: ${name} (${s.type})`, type: 'Transfer', amount: -s.amount}); });
+                txns.sort((a,b) => (b.date?.seconds || 0) - (a.date?.seconds || 0));
+
+                html += `<h2 class="text-lg font-bold text-white mb-6">Unified Transactions Ledger</h2><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><table class="dtable"><thead><tr><th>Date</th><th>Description</th><th>Type</th><th class="text-right">Amount</th></tr></thead><tbody class="divide-y divide-white/[0.05]">`;
+                if(!txns.length) html += '<tr><td colspan="4" class="p-10 text-center text-slate-500">No transactions yet.</td></tr>';
+                txns.slice(0,150).forEach(t => {
+                    let color = 'text-white'; if(t.type === 'Income') color = 'text-green-400'; if(t.type === 'Expense' || t.type === 'Transfer') color = 'text-red-400';
+                    html += `<tr><td class="p-4 text-xs text-slate-400">${fmtDate(t.date)}</td><td class="p-4 text-white">${t.desc}</td><td class="p-4 text-xs uppercase ${color}">${t.type}</td><td class="p-4 text-right font-bold ${color}">${fmtM(t.amount)}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+            } 
+            
+            else if(view === 'taxes') {
+                const rev = allOrders.filter(o => o.status === 'delivered').reduce((s,o) => s + (o.totalAmount||0), 0);
+                const comm = Math.round(rev * 0.1);
+                const vat = Math.round(comm * 0.18); // Assume 18% VAT on commission
+                html += `<h2 class="text-lg font-bold text-white mb-6">Tax Estimates (VAT 18%)</h2><div class="max-w-xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">`;
+                html += `<div class="flex justify-between text-sm text-slate-400"><span>Gross Commission Revenue</span><span>${fmtM(comm)}</span></div>`;
+                html += `<div class="flex justify-between text-md font-bold text-yellow-400 border-t border-white/[0.08] pt-2"><span>Estimated VAT (18%)</span><span>${fmtM(vat)}</span></div>`;
+                html += `<p class="text-xs text-slate-500 mt-4">Note: This is an automated estimate based on platform commission. Consult a tax professional for filing.</p>`;
+                html += `</div>`;
+            } 
+            
+            else if(view === 'refunds') {
+                html += `<h2 class="text-lg font-bold text-white mb-6">Refunds Log</h2><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><table class="dtable"><thead><tr><th>Date</th><th>Order ID</th><th>Reason</th><th class="text-right">Amount</th><th class="text-center">Status</th></tr></thead><tbody class="divide-y divide-white/[0.05]">`;
+                if(!allRefunds.length) html += '<tr><td colspan="5" class="p-10 text-center text-slate-500">No refunds recorded.</td></tr>';
+                allRefunds.slice().reverse().forEach(r => {
+                    html += `<tr><td class="p-4 text-xs text-slate-400">${fmtDate(r.processedAt || r.createdAt)}</td><td class="p-4 font-mono text-cyan-400 text-xs">#${(r.orderId||'').slice(-6).toUpperCase()}</td><td class="p-4 text-slate-400">${r.reason || 'N/A'}</td><td class="p-4 text-right font-bold text-red-400">- ${fmtM(r.amount)}</td><td class="p-4 text-center text-xs uppercase text-orange-400">${r.status}</td></tr>`;
+                });
+                html += `</tbody></table></div>`;
+            } 
+            
+            else if(view === 'reports') {
+                html += `<h2 class="text-lg font-bold text-white mb-6">Financial Reports</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-4">`;
+                const reports = [
+                    {name: 'Profit & Loss Statement', icon: 'mdi:file-chart', action: "switchView('profitloss', null)"},
+                    {name: 'Cash Flow Statement', icon: 'mdi:cash-refund', action: "switchView('cashflow', null)"},
+                    {name: 'Transactions Ledger', icon: 'mdi:swap-horizontal', action: "switchView('transactions', null)"}
+                ];
+                reports.forEach(r => {
+                    html += `<button onclick="${r.action}" class="data-card p-6 text-left hover:border-green-500/30 transition-colors"><span class="iconify text-3xl text-green-400 mb-3" data-icon="${r.icon}"></span><h3 class="text-base font-bold text-white">${r.name}</h3><p class="text-xs text-slate-500 mt-1">Click to view live report</p></button>`;
+                });
+                html += `</div>`;
+            } 
+            
+            else if(view === 'settings') {
+                html += `<h2 class="text-lg font-bold text-white mb-6">Finance Settings</h2><div class="max-w-lg bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-4">`;
+                html += `<div><label class="text-xs font-semibold text-slate-400 uppercase">Finance Manager Name</label><input type="text" id="set-name" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="${window.currentUser?.name || ''}"></div>`;
+                html += `<div><label class="text-xs font-semibold text-slate-400 uppercase">Email</label><input type="email" id="set-email" disabled class="w-full mt-1 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-slate-500" value="${window.currentUser?.email || ''}"></div>`;
+                html += `<button onclick="saveProfile()" class="bg-green-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-green-400 text-sm">Save Profile</button>`;
+                html += `</div>`;
+            }
+
+            c.innerHTML = html;
+        }
+
+        async function saveProfile() {
+            const name = document.getElementById('set-name').value.trim();
+            if(!name) return showT('Name is required', 'error');
+            try { await db.collection('users').doc(window.currentUser.uid).update({ name: name }); window.currentUser.name = name; document.getElementById('header-name').textContent = name; showT('Profile updated!'); } catch(e) { showT(e.message, 'error'); }
+        }
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(reg => console.log('Service Worker registered successfully.'))
+            .catch(err => console.log('Service Worker registration failed:', err));
+        });
+      }
+    </script>
+</body>
+</html>

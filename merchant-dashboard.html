@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Merchant Dashboard — ChapShop Delivery</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
     <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEwaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,6 +119,8 @@
                 <button onclick="switchTab('dashboard')" class="sidebar-link active w-full text-left" id="nav-dashboard"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> <span data-i18n="dashboard">Dashboard</span></button>
                 <button onclick="switchTab('upload')" class="sidebar-link w-full text-left" id="nav-upload"><span class="iconify text-lg" data-icon="mdi:plus-circle-outline"></span> New Order</button>
                 <button onclick="switchTab('orders')" class="sidebar-link w-full text-left" id="nav-orders"><span class="iconify text-lg" data-icon="mdi:package-variant-closed"></span> <span data-i18n="orders">All Orders</span></button>
+                <button onclick="switchTab('customers')" class="sidebar-link w-full text-left" id="nav-customers"><span class="iconify text-lg" data-icon="mdi:account-group-outline"></span> Customers (CRM)</button>
+                <button onclick="switchTab('chapdrop')" class="sidebar-link w-full text-left" id="nav-chapdrop"><span class="iconify text-lg" data-icon="mdi:rocket-launch"></span> Chapdrop Marketplace</button>
                 
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]" data-i18n="catalog_menu">Catalog</div>
                 <button onclick="switchTab('products')" class="sidebar-link w-full text-left" id="nav-products"><span class="iconify text-lg" data-icon="mdi:shape-outline"></span> <span data-i18n="products">Products</span></button>
@@ -127,6 +131,8 @@
                 <button onclick="switchTab('trend')" class="sidebar-link w-full text-left" id="nav-trend"><span class="iconify text-lg" data-icon="mdi:chart-timeline-variant"></span> <span data-i18n="trend">Sales Trend</span></button>
                 <button onclick="switchTab('reports')" class="sidebar-link w-full text-left" id="nav-reports"><span class="iconify text-lg" data-icon="mdi:chart-bar"></span> <span data-i18n="reports">Reports</span></button>
                 <button onclick="switchTab('settlements')" class="sidebar-link w-full text-left" id="nav-settlements"><span class="iconify text-lg" data-icon="mdi:cash-check"></span> <span data-i18n="settlements">Settlements</span></button>
+                <button onclick="switchTab('promotions')" class="sidebar-link w-full text-left" id="nav-promotions"><span class="iconify text-lg" data-icon="mdi:ticket-percent"></span> Promotions</button>
+                <button onclick="switchTab('marketing')" class="sidebar-link w-full text-left" id="nav-marketing"><span class="iconify text-lg" data-icon="mdi:bullhorn"></span> WhatsApp Marketing</button>
 <button onclick="switchTab('refunds')" class="sidebar-link w-full text-left" id="nav-refunds"><span class="iconify text-lg" data-icon="mdi:cash-refund"></span> Refunds & Deductions</button>
                 <button onclick="switchTab('notifications')" class="sidebar-link w-full text-left relative" id="nav-notifications"><span class="iconify text-lg" data-icon="mdi:bell-outline"></span> <span data-i18n="notifications">Notifications</span> <span id="notif-badge" class="hidden absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span></button>
 
@@ -232,8 +238,9 @@
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Unit Price (TZS)</label><input type="number" id="order-price" min="0" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" oninput="calcMerchantTotal()" placeholder="0"></div>
-                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Total Amount (TZS)</label><input type="number" id="order-total" min="0" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-cyan-400 font-bold focus:outline-none focus:border-cyan-500/50" placeholder="0"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Discount Code</label><input type="text" id="order-discount" oninput="calcMerchantTotal()" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. WELCOME10"></div>
                             </div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Total Amount (TZS)</label><input type="number" id="order-total" min="0" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-cyan-400 font-bold focus:outline-none focus:border-cyan-500/50" placeholder="0"></div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name</label><input type="text" id="order-cust-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Juma"></div>
                                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><input type="tel" id="order-cust-phone" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="+255..."></div>
@@ -290,6 +297,21 @@
                 
                 <!-- PRODUCTS -->
                 <div id="panel-products" class="tab-panel hidden">
+                    <!-- BUNDLE BUILDER -->
+                    <div class="bg-cyan-500/5 border border-cyan-500/20 rounded-2xl p-6 mb-6">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:package-variant-closed-plus"></span> Create Product Bundle</h3>
+                        <p class="text-xs text-slate-400 mb-4">Combine multiple products into one. Stock will be deducted from individual items when a bundle is ordered.</p>
+                        <form id="bundle-form" class="space-y-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Bundle Name *</label><input type="text" id="bundle-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" placeholder="e.g. Power Combo Pack"></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Select Product 1 *</label><select id="bundle-p1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></select></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Select Product 2 *</label><select id="bundle-p2" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></select></div>
+                            </div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Bundle Price (TZS) *</label><input type="number" id="bundle-price" required min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" placeholder="Special price for the combo"></div>
+                            <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 text-sm">Save Bundle</button>
+                        </form>
+                    </div>
+
                     <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
                         <h3 class="text-lg font-bold text-white mb-6">Add New Product</h3>
                         <form id="product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -570,6 +592,57 @@ Content-Type: application/json</pre>
                     </div>
                 </div> <!-- This closes the Integrations panel -->
 
+                <!-- CUSTOMERS (CRM) -->
+                <div id="panel-customers" class="tab-panel hidden">
+                    <div class="mb-4 relative max-w-sm"><span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="cust-search" oninput="renderCustomers()" placeholder="Search name or phone..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                    <div id="customers-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+
+                <!-- PROMOTIONS -->
+                <div id="panel-promotions" class="tab-panel hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-4">Create Discount Code</h3>
+                            <form id="promo-form" class="space-y-4" onsubmit="saveDiscount(event)">
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Code (e.g. WELCOME10)</label><input type="text" id="promo-code" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div>
+                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Discount Percentage (%)</label><input type="number" id="promo-percent" required min="1" max="100" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div>
+                                <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400">Save Code</button>
+                            </form>
+                        </div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-lg font-bold text-white mb-4">Active Codes</h3>
+                            <div id="promo-list" class="space-y-3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WHATSAPP MARKETING -->
+                <div id="panel-marketing" class="tab-panel hidden">
+                    <div class="max-w-2xl bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4">WhatsApp Broadcast</h3>
+                        <p class="text-xs text-slate-500 mb-4">Send a promotional message to all your past customers. Clicking send will open WhatsApp with your message ready for each customer.</p>
+                        <textarea id="broadcast-msg" rows="4" class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" placeholder="Hello! We have a new product..."></textarea>
+                        <button onclick="generateBroadcastLinks()" class="w-full mt-4 bg-green-500 text-white font-bold py-3 rounded-xl hover:bg-green-400 flex items-center justify-center gap-2"><span class="iconify" data-icon="mdi:whatsapp"></span> Generate Send Links</button>
+                        <div id="broadcast-list" class="mt-6 space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- CHAPDROP MARKETPLACE -->
+                <div id="panel-chapdrop" class="tab-panel hidden">
+                    <div class="bg-cyan-500/5 border border-cyan-500/20 rounded-2xl p-6 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-1 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:rocket-launch"></span> Chapdrop Marketplace</h3>
+                            <p class="text-xs text-slate-400">Browse our pre-stocked winning products. Import them to your store with one click and set your own selling price!</p>
+                        </div>
+                    </div>
+                    <div id="chapdrop-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="text-center py-10 col-span-full">
+                            <span class="iconify text-4xl text-cyan-400 animate-spin inline-block" data-icon="mdi:loading"></span>
+                            <p class="text-slate-500 text-sm mt-4">Loading winning products...</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- PROFILE/SETTINGS -->
                 <div id="panel-profile" class="tab-panel hidden">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -686,7 +759,7 @@ Content-Type: application/json</pre>
     </div> <!-- This closes the <div id="app-screen"> -->
 
     <script>
-        let myOrders = [], myProducts = [], myRefunds = [], filteredOrders = [], lastOrderCount = 0, settlePeriod = 'all', salesChart = null, selectedCategory = 'all', localZones = [];
+        let myOrders = [], myProducts = [], myRefunds = [], filteredOrders = [], lastOrderCount = 0, settlePeriod = 'all', salesChart = null, selectedCategory = 'all', localZones = [], myCustomers = [], myDiscounts = [];
 let currentPage = 1, pageSize = 15;
                      
 					 
@@ -872,6 +945,9 @@ let currentPage = 1, pageSize = 15;
             document.getElementById('set-email').value = window.currentUser.email || '';
               
             localZones = window.currentUser.deliveryZones || [];
+            myDiscounts = window.currentUser.discounts || [];
+            renderPromotions();
+            loadChapdrop(); // Load the Chapdrop Marketplace
             renderZones(); renderZoneDatalist(); renderApiKey();
             loadData();
         }
@@ -898,7 +974,7 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
         function setTrendPeriod(val,from,to){trendPeriod=val;trendFrom=from||null;trendTo=to||null;var c=document.getElementById('trend-period-btns');if(c)c.querySelectorAll('.date-btn').forEach(function(b){b.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'});if(event&&event.target)event.target.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';renderSalesChart()}
         function filterTrend(arr,f){if(!arr)return[];if(trendPeriod==='custom'&&trendFrom&&trendTo){return arr.filter(function(o){if(!o[f])return false;try{var d=o[f].toDate(),a=new Date(trendFrom+'T00:00:00'),b=new Date(trendTo+'T23:59:59');return d>=a&&d<=b}catch(e){return false}})}if(trendPeriod==='all')return arr;var now=new Date(),s,e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59);if(trendPeriod==='today')s=new Date(now.getFullYear(),now.getMonth(),now.getDate());if(trendPeriod==='week'){var d=now.getDay();s=new Date(now.getFullYear(),now.getMonth(),now.getDate()-(d===0?6:d-1))}if(trendPeriod==='month')s=new Date(now.getFullYear(),now.getMonth(),1);if(trendPeriod==='year')s=new Date(now.getFullYear(),0,1);return arr.filter(function(o){return o[f]&&o[f].toDate()>=s&&o[f].toDate()<=e})}
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
-        function switchTab(t) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden')); document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active')); document.getElementById('panel-'+t).classList.remove('hidden'); document.getElementById('nav-'+t).classList.add('active'); if(window.innerWidth < 1024) toggleSidebar(); if(t==='trend') renderSalesChart(); if(t==='catalog') renderCatalog(); }
+        function switchTab(t) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden')); document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active')); document.getElementById('panel-'+t).classList.remove('hidden'); document.getElementById('nav-'+t).classList.add('active'); if(window.innerWidth < 1024) toggleSidebar(); if(t==='trend') renderSalesChart(); if(t==='catalog') renderCatalog(); if(t==='customers') renderCustomers(); if(t==='marketing') renderMarketing(); }
 
         var dashPeriod='today',dashFrom=null,dashTo=null;
         function setDashPeriod(val,from,to){dashPeriod=val;dashFrom=from||null;dashTo=to||null;var c=document.getElementById('dash-period-btns');if(c)c.querySelectorAll('.date-btn').forEach(function(b){b.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'});if(event&&event.target)event.target.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';updateDashboard()}
@@ -975,6 +1051,7 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
 
         function exportCSV(){if(!filteredOrders.length)return showT("No data","error");var csv='ID,Customer Name,Customer Phone,City,Address,SKU,Product,Qty,Unit Price,Amount,Currency,Status,Agent Name,Rider Name,Merchant,Placed At,Accepted At,Confirmed At,Out for Delivery At,Delivered At\n';filteredOrders.forEach(function(o){csv+=['#'+o.id.slice(-6).toUpperCase(),'"'+(o.customerName||'').replace(/"/g,'""')+'"','"'+(o.customerPhone||'')+'"','"'+(o.customerCity||'')+'"','"'+(o.customerAddress||'').replace(/"/g,'""')+'"',o.productSku||'','"'+(o.itemName||'').replace(/"/g,'""')+'"',o.qty||1,o.productPrice||0,o.totalAmount||0,o.currency||'TZS',o.status||'','"'+(o.processedByName||'')+'"','"'+(o.riderName||'')+'"','"'+(o.merchantName||'')+'"',o.createdAt?fmtDate(o.createdAt):'',o.acceptedAt?fmtDate(o.acceptedAt):'',o.confirmedAt?fmtDate(o.confirmedAt):'',o.outForDeliveryAt?fmtDate(o.outForDeliveryAt):'',o.deliveredAt?fmtDate(o.deliveredAt):''].join(',')+'\n'});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='chapshop_orders_'+new Date().toISOString().slice(0,10)+'.csv';a.click();showT("CSV exported with full details!")}
 
+        function fmtDur(s){ if(!s||s<=0) return '0s'; if(s<60) return Math.round(s)+'s'; var m=Math.floor(s/60),sec=Math.round(s%60); return m+'m '+sec+'s'; }
         function renderOrdersTable() {
             const tb = document.getElementById('orders-table-body');
             if(!filteredOrders.length) { 
@@ -991,7 +1068,7 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             const end = start + pageSize;
             const paginatedItems = filteredOrders.slice(start, end);
 
-            tb.innerHTML = paginatedItems.map(o=>{
+                        tb.innerHTML = paginatedItems.map(o=>{
                 var showBtns=['pending','accepted','confirmed','out_for_delivery'].indexOf(o.status)!==-1;
                 return '<tr class="hover:bg-white/[0.02]">'+
                     '<td class="px-4 py-3 font-mono text-cyan-400 text-xs">#'+o.id.slice(-6).toUpperCase()+'</td>'+
@@ -1000,18 +1077,18 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                     '<td class="px-4 py-3 text-xs text-slate-300">'+o.itemName+' <span class="text-slate-500">('+(o.productSku||'')+')</span></td>'+
                     '<td class="px-4 py-3 text-sm font-semibold">TZS '+Number(o.totalAmount).toLocaleString()+'</td>'+
                     '<td class="px-4 py-3">'+getStatusBadge(o.status)+'</td>'+
-                    '<td class="px-4 py-3 text-xs text-orange-400">'+(o.processedByName||'—')+'</td>'+
+                    '<td class="px-4 py-3 text-xs text-orange-400">'+(o.processedByName||'—')+(o.callAttempts?'<div class="text-slate-500 mt-1 flex items-center gap-1"><span class="iconify" data-icon="mdi:phone"></span> '+o.callAttempts+' calls</div>':'')+(o.callDuration?'<div class="text-slate-500 flex items-center gap-1"><span class="iconify" data-icon="mdi:timer-outline"></span> '+fmtDur(o.callDuration)+'</div>':'')+(o.callRecordingUrl?'<div class="mt-1"><audio controls style="height: 30px; width: 180px;" src="'+o.callRecordingUrl+'"></audio></div>':'')+'</td>'+
                     '<td class="px-4 py-3 text-xs text-violet-400">'+(o.riderName||'—')+'</td>'+
                     '<td class="px-4 py-3 text-xs text-slate-500">'+formatDate(o.createdAt)+'</td>'+
                     '<td class="px-4 py-3"><div class="flex gap-1">'+
                         '<button onclick="viewOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400" title="View"><span class="iconify text-sm" data-icon="mdi:eye"></span></button>'+
+                        '<button onclick="printOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400" title="Print Invoice"><span class="iconify text-sm" data-icon="mdi:printer"></span></button>'+
                         '<button onclick="editMerchantOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-yellow-400" title="Edit"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button>'+
                         '<button onclick="archiveMerchantOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-indigo-400" title="Archive"><span class="iconify text-sm" data-icon="mdi:archive-arrow-down-outline"></span></button>'+
                         '<button onclick="deleteMerchantOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Delete"><span class="iconify text-sm" data-icon="mdi:delete"></span></button>'+
                         (showBtns?'<button onclick="requestCancel(\''+o.id+'\')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Request Cancel"><span class="iconify text-sm" data-icon="mdi:close-circle"></span></button>':'')+
                     '</div></td></tr>';
             }).join('');
-            
             updatePaginationUI(filteredOrders.length, start, end);
         }
 
@@ -1146,7 +1223,19 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
         function calcMerchantTotal() {
             var qty = parseInt(document.getElementById('order-qty').value) || 0;
             var price = parseInt(document.getElementById('order-price').value) || 0;
-            document.getElementById('order-total').value = qty * price;
+            var subtotal = qty * price;
+            
+            var discInput = document.getElementById('order-discount');
+            if(discInput) {
+                var code = discInput.value.trim().toUpperCase();
+                var disc = myDiscounts.find(d => d.code === code);
+                if(disc) {
+                    var discountAmt = Math.round(subtotal * (disc.percent / 100));
+                    subtotal -= discountAmt;
+                    showT(`Discount applied: -TZS ${discountAmt.toLocaleString()}`);
+                }
+            }
+            document.getElementById('order-total').value = subtotal;
         }
 
        function renderProducts(){renderCategoryFilter();var c=document.getElementById('products-list');var list=selectedCategory==='all'?myProducts:myProducts.filter(function(p){return p.category===selectedCategory});if(!list.length){c.innerHTML='<p class="text-slate-500 col-span-3 text-center py-8">No products'+(selectedCategory!=='all'?' in this category':'')+'.</p>';return}c.innerHTML=list.map(function(p){return'<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><div class="h-32 bg-slate-800 flex items-center justify-center overflow-hidden">'+(p.image?'<img src="'+p.image+'" class="w-full h-full object-cover">':'<span class="iconify text-4xl text-slate-600" data-icon="mdi:image-off-outline"></span>')+'</div><div class="p-4"><div class="flex justify-between items-start mb-2"><div><div class="font-bold text-white">'+p.name+'</div><div class="text-xs text-slate-500">'+(p.category||'No Category')+' · '+(p.sku||'No SKU')+'</div></div><div class="flex gap-1"><button onclick="editProduct(\''+p.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button><button onclick="if(confirm(\'Delete?\'))db.collection(\'products\').doc(\''+p.id+'\').delete().then(()=>showT(\'Deleted\')).catch(e=>showT(e.message,\'error\'))" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-red-400"><span class="iconify text-sm" data-icon="mdi:delete"></span></button></div></div><div class="text-xs text-slate-400 line-clamp-2 mb-3">'+(p.description||'No description')+'</div><div class="flex justify-between text-xs font-bold"><span class="text-cyan-400">TZS '+Number(p.price).toLocaleString()+'</span><span class="'+(p.stock<=0?'text-red-400':p.minStock&&p.stock<=p.minStock?'text-yellow-400':'text-green-400')+'">'+p.stock+' in stock</span></div></div></div>'}).join('')}
@@ -1225,7 +1314,40 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             logs.sort((a,b) => (b.at?.seconds||0) - (a.at?.seconds||0));
             h.innerHTML = logs.length ? logs.slice(0,20).map(l=>`<div class="flex justify-between items-center p-2 bg-black/20 rounded"><div><span class="font-semibold text-white">${l.productName}</span><span class="ml-2 ${l.type==='in'?'text-green-400':'text-red-400'} uppercase font-bold">(${l.type})</span></div><div class="text-right"><div class="text-slate-300">${l.qty} pcs</div></div></div>`).join('') : '<p class="text-slate-500">No history yet.</p>';
         } // FORM SUBMISSIONS
-                function addVariantOption() {
+                document.getElementById('bundle-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const p1Id = document.getElementById('bundle-p1').value;
+            const p2Id = document.getElementById('bundle-p2').value;
+            const p1 = myProducts.find(p => p.id === p1Id);
+            const p2 = myProducts.find(p => p.id === p2Id);
+            
+            if(!p1 || !p2 || p1Id === p2Id) return showT('Please select two different products', 'error');
+            
+            const bundleName = document.getElementById('bundle-name').value.trim();
+            const bundlePrice = parseInt(document.getElementById('bundle-price').value) || 0;
+            
+            try {
+                await db.collection('products').add({
+                    merchantId: uid(),
+                    name: bundleName,
+                    price: bundlePrice,
+                    sku: 'BUNDLE-' + Date.now(),
+                    isBundle: true,
+                    bundleItems: [
+                        { id: p1.id, name: p1.name, qty: 1 },
+                        { id: p2.id, name: p2.name, qty: 1 }
+                    ],
+                    stock: 9999, // Bundles are always available if child items have stock
+                    minStock: 0,
+                    category: 'Bundles',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showT('Bundle created successfully!');
+                e.target.reset();
+            } catch(err) { showT(err.message, 'error'); }
+        });
+
+        function addVariantOption() {
             const container = document.getElementById('variant-options-container');
             const div = document.createElement('div');
             div.className = 'flex gap-2 items-center';
@@ -1311,8 +1433,9 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                     status: 'pending', 
                     createdAt: firebase.firestore.FieldValue.serverTimestamp() 
                 }); 
-                const newStock = Math.max(0, product.stock - qty); 
-                await db.collection('products').doc(pid).update({ stock: newStock, stockLog: firebase.firestore.FieldValue.arrayUnion({type: 'out', qty: qty, note: 'Order #Pending', at: new Date()}) }); 
+                // DO NOT deduct stock here. 
+                // Stock will be deducted AUTOMATICALLY when the Shipping Dept marks the order as 'delivered'.
+                // If the order is returned, stock will be AUTOMATICALLY restored.
                 showT("Order Submitted!"); 
                 this.reset(); 
                 document.getElementById('order-date').value = new Date().toISOString().split('T')[0]; 
@@ -1493,10 +1616,184 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
         function previewCSV(input){if(!input.files[0])return;var reader=new FileReader();reader.onload=function(e){var lines=e.target.result.split('\n').filter(function(l){return l.trim()});if(lines.length<2){showT('CSV is empty','error');return}var h=lines[0].split(',').map(function(x){return x.trim().toLowerCase().replace(/"/g,'')});var ni=h.indexOf('customer_name'),pi=h.indexOf('customer_phone'),ci=h.indexOf('city'),ai=h.indexOf('address'),pri=h.indexOf('product_name'),si=h.indexOf('sku'),qi=h.indexOf('qty'),ri=h.indexOf('price');if(ni===-1||pi===-1){showT('CSV must have customer_name and customer_phone columns','error');return}pendingCSV=[];for(var i=1;i<lines.length;i++){var cols=parseCSVLine(lines[i]);var name=(cols[ni]||'').replace(/"/g,'').trim();var phone=(cols[pi]||'').replace(/"/g,'').trim();if(!name||!phone)continue;pendingCSV.push({name:name,phone:phone,city:(cols[ci]||'').replace(/"/g,'').trim(),address:(cols[ai]||'').replace(/"/g,'').trim(),product:(cols[pri]||'').replace(/"/g,'').trim(),sku:(cols[si]||'').replace(/"/g,'').trim(),qty:parseInt(cols[qi])||1,price:parseInt(cols[ri])||0})}renderCSVPreview()};reader.readAsText(input.files[0])}
         function renderCSVPreview(){var c=document.getElementById('csv-preview'),rows=document.getElementById('csv-rows'),cnt=document.getElementById('csv-count');if(!pendingCSV.length){showT('No valid rows found','error');return}c.classList.remove('hidden');cnt.textContent=pendingCSV.length+' orders ready to import';rows.innerHTML=pendingCSV.map(function(r){return'<tr><td class="px-3 py-2 text-white">'+r.name+'</td><td class="px-3 py-2 text-slate-400">'+r.phone+'</td><td class="px-3 py-2 text-slate-400">'+(r.city||'—')+'</td><td class="px-3 py-2 text-slate-300">'+(r.product||'—')+'</td><td class="px-3 py-2 text-white">'+r.qty+'</td><td class="px-3 py-2 text-cyan-400 font-bold">TZS '+(r.price*r.qty).toLocaleString()+'</td><td class="px-3 py-2"><span class="text-green-400 text-[10px] font-bold">✓ Valid</span></td></tr>'}).join('')}
         async function importCSV(){if(!pendingCSV.length)return;var btn=document.getElementById('csv-import-btn'),res=document.getElementById('csv-result');btn.disabled=true;btn.innerHTML='<span class="iconify inline animate-spin" data-icon="mdi:loading"></span> Importing...';var ok=0,fail=0;for(var i=0;i<pendingCSV.length;i++){var r=pendingCSV[i];try{await db.collection('orders').add({merchantId:uid(),merchantName:window.currentUser.shopName,customerName:r.name,customerPhone:r.phone,customerCity:r.city,customerAddress:r.address,orderDate:new Date(),productId:'',productSku:r.sku,productName:r.product,productDesc:'',productImage:'',productPrice:r.price,itemName:r.product||'Imported Product',qty:r.qty,totalAmount:r.price*r.qty,currency:'TZS',status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});ok++}catch(e){fail++}}btn.disabled=false;btn.innerHTML='<span class="iconify inline mr-1" data-icon="mdi:check-circle"></span> Import All';res.classList.remove('hidden');res.className='mt-4 p-4 rounded-xl text-sm font-semibold '+(fail===0?'bg-green-500/10 text-green-400 border border-green-500/20':'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20');res.innerHTML='<span class="iconify inline mr-1" data-icon="mdi:check-circle"></span> '+ok+' orders imported successfully'+(fail>0?', '+fail+' failed':'');pendingCSV=[];document.getElementById('csv-input').value=''}
-        function viewOrder(id){var o=myOrders.find(function(x){return x.id===id});if(!o)return;var steps=[{l:'Order Placed',done:true,t:o.createdAt},{l:'Accepted',done:['accepted','confirmed','no_answer','cancelled','out_for_delivery','delivered','returned'].indexOf(o.status)!==-1,t:o.acceptedAt},{l:'Confirmed',done:['confirmed','out_for_delivery','delivered','returned'].indexOf(o.status)!==-1,t:o.confirmedAt},{l:'Out for Delivery',done:['out_for_delivery','delivered','returned'].indexOf(o.status)!==-1,t:o.outForDeliveryAt},{l:o.status==='returned'?'Returned':'Delivered',done:o.status==='delivered'||o.status==='returned',t:o.deliveredAt||o.returnedAt}];var h='<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Order #'+o.id.slice(-6).toUpperCase()+'</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white p-1"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><div class="flex items-center gap-3 mb-5">'+getStatusBadge(o.status)+'</div><div class="space-y-4"><div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Customer</div><div class="text-white text-sm">'+(o.customerName||'')+'</div><div class="text-slate-400 text-sm">'+(o.customerPhone||'')+(o.customerCity?' · '+o.customerCity:'')+'</div>'+(o.customerAddress?'<div class="text-slate-500 text-xs">'+o.customerAddress+'</div>':'')+'</div><div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Order Details</div><div class="text-white text-sm">'+(o.itemName||'')+' x'+(o.qty||1)+'</div><div class="text-cyan-400 font-bold text-lg">TZS '+Number(o.totalAmount||0).toLocaleString()+'</div></div>'+(o.processedByName?'<div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Agent</div><div class="text-orange-400 text-sm">'+o.processedByName+'</div></div>':'')+(o.riderName?'<div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Rider</div><div class="text-violet-400 text-sm">'+o.riderName+'</div></div>':'')+'</div><div class="mt-5 pt-5 border-t border-white/[0.08]"><div class="text-xs font-bold text-slate-500 uppercase mb-4">Tracking</div><div class="space-y-0">'+steps.map(function(st,i){var last=i===steps.length-1;return'<div class="tl-step"><div class="flex flex-col items-center"><div class="tl-dot '+(st.done?'done':'')+'"></div>'+(!last?'<div class="tl-line"></div>':'')+'</div><div class="pb-6"><div class="text-sm font-semibold '+(st.done?'text-white':'text-slate-600')+'">'+st.l+'</div><div class="text-xs text-slate-600">'+(st.t?formatDate(st.t):'—')+'</div></div></div>'}).join('')+'</div></div></div></div>';document.body.insertAdjacentHTML('beforeend',h)}
+        function viewOrder(id){var o=myOrders.find(function(x){return x.id===id});if(!o)return;var steps=[{l:'Order Placed',done:true,t:o.createdAt},{l:'Accepted',done:['accepted','confirmed','no_answer','cancelled','out_for_delivery','delivered','returned'].indexOf(o.status)!==-1,t:o.acceptedAt},{l:'Confirmed',done:['confirmed','out_for_delivery','delivered','returned'].indexOf(o.status)!==-1,t:o.confirmedAt},{l:'Out for Delivery',done:['out_for_delivery','delivered','returned'].indexOf(o.status)!==-1,t:o.outForDeliveryAt},{l:o.status==='returned'?'Returned':'Delivered',done:o.status==='delivered'||o.status==='returned',t:o.deliveredAt||o.returnedAt}];var h='<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Order #'+o.id.slice(-6).toUpperCase()+'</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white p-1"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><div class="flex items-center gap-3 mb-5">'+getStatusBadge(o.status)+'</div><div class="space-y-4"><div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Customer</div><div class="text-white text-sm">'+(o.customerName||'')+'</div><div class="text-slate-400 text-sm">'+(o.customerPhone||'')+(o.customerCity?' · '+o.customerCity:'')+'</div>'+(o.customerAddress?'<div class="text-slate-500 text-xs">'+o.customerAddress+'</div>':'')+'</div><div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Order Details</div><div class="text-white text-sm">'+(o.itemName||'')+' x'+(o.qty||1)+'</div><div class="text-cyan-400 font-bold text-lg">TZS '+Number(o.totalAmount||0).toLocaleString()+'</div></div>'+(o.processedByName?'<div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Agent</div><div class="text-orange-400 text-sm">'+o.processedByName+'</div></div>':'')+(o.riderName?'<div><div class="text-xs font-bold text-slate-500 uppercase mb-1">Rider</div><div class="text-violet-400 text-sm">'+o.riderName+'</div></div>':'')+'</div><div class="mt-5 pt-5 border-t border-white/[0.08]"><div class="text-xs font-bold text-slate-500 uppercase mb-4">Tracking</div><div class="space-y-0">'+steps.map(function(st,i){var last=i===steps.length-1;return'<div class="tl-step"><div class="flex flex-col items-center"><div class="tl-dot '+(st.done?'done':'')+'"></div>'+(!last?'<div class="tl-line"></div>':'')+'</div><div class="pb-6"><div class="text-sm font-semibold '+(st.done?'text-white':'text-slate-600')+'">'+st.l+'</div><div class="text-xs text-slate-600">'+(st.t?formatDate(st.t):'—')+'</div></div></div>'}).join('')+'</div></div>'+(o.callNotes?'<div class="mt-5 pt-5 border-t border-white/[0.08]"><div class="text-xs font-bold text-slate-500 uppercase mb-2 flex items-center gap-1"><span class="iconify" data-icon="mdi:note-text-outline"></span> Agent Call Notes</div><div class="bg-white/[0.02] border border-white/[0.05] rounded-lg p-3 text-sm text-slate-300 italic">"'+o.callNotes+'"</div></div>':'')+'</div></div>';document.body.insertAdjacentHTML('beforeend',h)}
         function printOrder(id){var o=myOrders.find(function(x){return x.id===id});if(!o)return;var h='<div class="print-slip" id="print-slip"><div class="print-slip-box"><div class="print-actions"><button type="button" onclick="document.getElementById(\'print-slip\').remove();window.print()" style="padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:#06b6d4;color:#fff">Print</button><button type="button" onclick="document.getElementById(\'print-slip\').remove()" style="padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:#e2e8f0;color:#333">Close</button></div><div style="text-align:center;margin-bottom:16px"><h2>ChapShop Delivery</h2><div style="font-size:12px;color:#666">Delivery Slip</div></div><div class="ps-big">#'+o.id.slice(-6).toUpperCase()+'</div><div class="ps-row"><span class="ps-label">Date</span><span class="ps-val">'+formatDate(o.createdAt)+'</span></div><div class="ps-row"><span class="ps-label">Status</span><span class="ps-val" style="color:#06b6d4;text-transform:uppercase;font-weight:800">'+(o.status||'').replace(/_/g,' ')+'</span></div><div style="border-top:2px solid #111;margin:12px 0"></div><div style="font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Customer</div><div class="ps-row"><span class="ps-label">Name</span><span class="ps-val">'+(o.customerName||'—')+'</span></div><div class="ps-row"><span class="ps-label">Phone</span><span class="ps-val" style="font-size:15px">'+(o.customerPhone||'—')+'</span></div>'+(o.customerCity?'<div class="ps-row"><span class="ps-label">City</span><span class="ps-val">'+o.customerCity+'</span></div>':'')+(o.customerAddress?'<div class="ps-row"><span class="ps-label">Address</span><span class="ps-val">'+o.customerAddress+'</span></div>':'')+'<div style="border-top:2px solid #111;margin:12px 0"></div><div class="ps-row"><span class="ps-label">Item</span><span class="ps-val">'+(o.itemName||'—')+'</span></div><div class="ps-row"><span class="ps-label">Quantity</span><span class="ps-val">'+(o.qty||1)+'</span></div>'+(o.productPrice?'<div class="ps-row"><span class="ps-label">Unit Price</span><span class="ps-val">TZS '+Number(o.productPrice).toLocaleString()+'</span></div>':'')+'<div style="border-top:2px solid #111;margin:12px 0"></div><div class="ps-row ps-total"><span class="ps-label">Total Amount</span><span class="ps-val">TZS '+Number(o.totalAmount||0).toLocaleString()+'</span></div>'+(o.merchantName?'<div style="border-top:2px solid #111;margin:12px 0"></div><div class="ps-row"><span class="ps-label">Merchant</span><span class="ps-val">'+o.merchantName+'</span></div>':'')+(o.riderName?'<div class="ps-row"><span class="ps-label">Rider</span><span class="ps-val">'+o.riderName+'</span></div>':'')+'<div class="ps-footer">ChapShop Delivery System<br>Computer-generated delivery slip</div></div></div>';document.body.insertAdjacentHTML('beforeend',h)}
         function setSettlePeriod(p,btn){settlePeriod=p;document.querySelectorAll('#settle-btns .date-btn').forEach(function(b){b.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'});if(btn)btn.className='date-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';renderSettlements()}
         function renderSettlements(){var c=document.getElementById('settle-list');if(!c)return;var list=myOrders;var now=new Date(),s,e;if(settlePeriod==='today'){s=new Date(now.getFullYear(),now.getMonth(),now.getDate());e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59)}else if(settlePeriod==='week'){var d=now.getDay();s=new Date(now.getFullYear(),now.getMonth(),now.getDate()-(d===0?6:d-1));e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59)}else if(settlePeriod==='month'){s=new Date(now.getFullYear(),now.getMonth(),1);e=new Date(now.getFullYear(),now.getMonth(),now.getDate(),23,59,59)}if(s)list=list.filter(function(o){return o.createdAt&&o.createdAt.toDate()>=s&&o.createdAt.toDate()<=e});var del=list.filter(function(o){return o.status==='delivered'});var gross=del.reduce(function(s,o){return s+(o.totalAmount||0)},0);var comm=Math.round(gross*0.1);var net=gross-comm;document.getElementById('st-gross').textContent='TZS '+gross.toLocaleString();document.getElementById('st-comm').textContent='-TZS '+comm.toLocaleString();var pel=document.getElementById('st-payout');pel.textContent='TZS '+net.toLocaleString();pel.className='text-2xl font-bold '+(net>=0?'text-green-400':'text-red-400');if(!del.length){c.innerHTML='<p class="text-slate-500 text-center py-8">No delivered orders for this period.</p>';return}c.innerHTML=del.map(function(o){return'<div class="bg-white/[0.02] border border-white/[0.08] rounded-xl p-4 flex items-center justify-between"><div><span class="font-mono text-cyan-400 font-bold text-sm">#'+o.id.slice(-6).toUpperCase()+'</span><div class="text-slate-400 text-sm mt-0.5">'+(o.customerName||'')+' · '+(o.itemName||'')+' x'+(o.qty||1)+'</div></div><div class="text-right"><div class="text-white font-bold">TZS '+(o.totalAmount||0).toLocaleString()+'</div><div class="text-slate-500 text-xs">'+formatDate(o.createdAt)+'</div></div></div>'}).join('')}
+        // ===== CHAPDROP MARKETPLACE =====
+        let chapdropProducts = [];
+        function loadChapdrop() {
+            db.collection('chapdrop_products').onSnapshot(snap => {
+                chapdropProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderChapdrop();
+            });
+        }
+        function renderChapdrop() {
+            const grid = document.getElementById('chapdrop-grid');
+            if(!grid) return;
+            if(!chapdropProducts.length) { grid.innerHTML = '<p class="text-slate-500 text-center py-8 col-span-full">No winning products available right now. Check back soon!</p>'; return; }
+            
+            grid.innerHTML = chapdropProducts.map(p => {
+                // Check if merchant already imported this product
+                const imported = myProducts.find(mp => mp.chapdropId === p.id);
+                const statusHtml = imported 
+                    ? '<span class="text-xs font-bold text-green-400 bg-green-500/10 px-2 py-1 rounded-md">Imported</span>' 
+                    : `<button onclick="openImportModal('${p.id}')" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-cyan-500/30">Import & Set Price</button>`;
+
+                return `<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden flex flex-col">
+                    <div class="h-40 bg-slate-800 flex items-center justify-center overflow-hidden">
+                        ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<span class="iconify text-5xl text-slate-700" data-icon="mdi:package-variant"></span>`}
+                    </div>
+                    <div class="p-4 flex flex-col flex-1">
+                        <h3 class="text-sm font-bold text-white mb-1 truncate">${p.name||'Product'}</h3>
+                        <p class="text-xs text-slate-500 mb-3 flex-1">${p.description || 'Winning product ready to sell.'}</p>
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <div class="text-[10px] text-slate-500 uppercase">Base Cost</div>
+                                <div class="text-sm font-bold text-red-400">TZS ${(p.baseCost||0).toLocaleString()}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[10px] text-slate-500 uppercase">Suggested Price</div>
+                                <div class="text-sm font-bold text-green-400">TZS ${(p.suggestedPrice||0).toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div class="mt-auto text-center">
+                            ${statusHtml}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        function openImportModal(prodId) {
+            const p = chapdropProducts.find(x => x.id === prodId);
+            if(!p) return;
+            
+            var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:400px">';
+            h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Import Product</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
+            h += '<div class="bg-white/[0.02] p-3 rounded-xl mb-4 flex items-center gap-3"><div class="w-12 h-12 bg-slate-800 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">'+(p.image?`<img src="${p.image}" class="w-full h-full object-cover">`:'')+'</div><div><div class="text-sm font-bold text-white">'+p.name+'</div><div class="text-xs text-red-400">Base Cost: TZS '+(p.baseCost||0).toLocaleString()+'</div></div></div>';
+            h += '<form id="import-form" class="space-y-4">';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Your Selling Price (TZS) *</label><input type="number" id="imp-price" required min="'+(p.baseCost||0)+'" value="'+(p.suggestedPrice||0)+'" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white"></div>';
+            h += '<div class="bg-cyan-500/10 border border-cyan-500/20 p-3 rounded-xl text-xs text-cyan-300 flex items-center justify-between"><span>Your Profit Per Sale:</span><span id="imp-profit" class="font-bold">TZS 0</span></div>';
+            h += '<button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 text-sm">Import to My Store</button>';
+            h += '</form></div></div>';
+            
+            document.body.insertAdjacentHTML('beforeend', h);
+            
+            // Calculate profit live
+            const priceInput = document.getElementById('imp-price');
+            const profitEl = document.getElementById('imp-profit');
+            const updateProfit = () => { profitEl.textContent = 'TZS ' + ((parseInt(priceInput.value)||0) - (p.baseCost||0)).toLocaleString(); };
+            priceInput.addEventListener('input', updateProfit);
+            updateProfit();
+
+            document.getElementById('import-form').addEventListener('submit', function(e){
+                e.preventDefault();
+                const sellPrice = parseInt(document.getElementById('imp-price').value) || 0;
+                if(sellPrice < (p.baseCost||0)) return showT('Selling price cannot be lower than base cost', 'error');
+                
+                // Save to merchant's products
+                db.collection('products').add({
+                    merchantId: uid(),
+                    name: p.name,
+                    sku: p.sku || 'CHAPDROP-' + Date.now(),
+                    chapdropId: p.id, // Link to master catalog
+                    isChapdrop: true,
+                    baseCost: p.baseCost || 0, // What merchant pays ChapShop
+                    price: sellPrice, // What customer pays
+                    stock: 9999, // ChapShop handles stock, so it's always available for the merchant
+                    minStock: 0,
+                    description: p.description,
+                    image: p.image,
+                    category: 'Chapdrop',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    showT('Product imported to your store successfully!');
+                    document.querySelector('.modal-overlay').remove();
+                }).catch(err => showT(err.message, 'error'));
+            });
+        }
+
+        // ===== CUSTOMERS CRM =====
+        function processCustomers() {
+            myCustomers = [];
+            myOrders.forEach(o => {
+                if(!o.customerPhone) return;
+                var existing = myCustomers.find(c => c.phone === o.customerPhone);
+                if(!existing) {
+                    myCustomers.push({ name: o.customerName, phone: o.customerPhone, city: o.customerCity, orders: 1, total: o.totalAmount||0 });
+                } else {
+                    existing.orders++;
+                    existing.total += (o.totalAmount||0);
+                }
+            });
+        }
+        function renderCustomers() {
+            processCustomers();
+            const c = document.getElementById('customers-list');
+            const s = (document.getElementById('cust-search')?.value || '').toLowerCase();
+            let list = myCustomers.filter(cu => (cu.name||'').toLowerCase().includes(s) || (cu.phone||'').includes(s));
+            if(!list.length) { c.innerHTML = '<p class="text-slate-500 col-span-3 text-center py-8">No customers found.</p>'; return; }
+            c.innerHTML = list.map(cu => `<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-5"><div class="flex items-center gap-3 mb-3"><div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-bold text-xl">${(cu.name||'C').charAt(0).toUpperCase()}</div><div><div class="text-white font-bold">${cu.name||'N/A'}</div><div class="text-slate-500 text-xs">${cu.phone}</div></div></div><div class="grid grid-cols-2 gap-2 mb-3"><div class="bg-white/[0.02] p-2 rounded-lg text-center"><div class="text-sm font-bold text-white">${cu.orders}</div><div class="text-[10px] text-slate-500">Orders</div></div><div class="bg-white/[0.02] p-2 rounded-lg text-center"><div class="text-sm font-bold text-cyan-400">TZS ${(cu.total||0).toLocaleString()}</div><div class="text-[10px] text-slate-500">Spent</div></div></div><button onclick="quickReOrder('${cu.phone}')" class="w-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 text-xs font-bold py-2 rounded-lg hover:bg-cyan-500/30">Quick Re-Order</button></div>`).join('');
+        }
+        function quickReOrder(phone) {
+            const cu = myCustomers.find(c => c.phone === phone);
+            if(!cu) return;
+            switchTab('upload');
+            document.getElementById('order-cust-name').value = cu.name || '';
+            document.getElementById('order-cust-phone').value = cu.phone || '';
+            document.getElementById('order-city').value = cu.city || '';
+            showT("Customer details auto-filled!");
+        }
+
+        // ===== PROMOTIONS =====
+        function renderPromotions() {
+            const c = document.getElementById('promo-list');
+            if(!c) return;
+            if(!myDiscounts.length) { c.innerHTML = '<p class="text-slate-500 text-sm">No active codes.</p>'; return; }
+            c.innerHTML = myDiscounts.map((d, i) => `<div class="flex items-center justify-between bg-white/[0.02] p-3 rounded-lg"><div><span class="font-mono text-cyan-400 font-bold text-sm">${d.code}</span><div class="text-xs text-slate-500">${d.percent}% off</div></div><button onclick="deleteDiscount(${i})" class="text-red-400 text-xs font-bold hover:underline">Delete</button></div>`).join('');
+        }
+        function saveDiscount(e) {
+            e.preventDefault();
+            var code = document.getElementById('promo-code').value.trim().toUpperCase();
+            var percent = parseInt(document.getElementById('promo-percent').value) || 0;
+            if(!code || percent <= 0) return showT('Invalid code or percent', 'error');
+            myDiscounts.push({ code, percent });
+            db.collection('users').doc(uid()).update({ discounts: myDiscounts }).then(() => {
+                showT('Discount code saved!');
+                renderPromotions();
+                e.target.reset();
+            }).catch(err => showT(err.message, 'error'));
+        }
+        function deleteDiscount(index) {
+            myDiscounts.splice(index, 1);
+            db.collection('users').doc(uid()).update({ discounts: myDiscounts }).then(() => {
+                showT('Code deleted!');
+                renderPromotions();
+            });
+        }
+
+        // ===== WHATSAPP MARKETING =====
+        function renderMarketing() {
+            processCustomers();
+            document.getElementById('broadcast-list').innerHTML = '';
+        }
+        function generateBroadcastLinks() {
+            const msg = document.getElementById('broadcast-msg').value.trim();
+            if(!msg) return showT('Please type a message', 'error');
+            if(!myCustomers.length) return showT('You have no customers yet', 'error');
+            
+            const list = document.getElementById('broadcast-list');
+            const encMsg = encodeURIComponent(msg);
+            let html = '<p class="text-xs text-slate-400 mb-2">Click each name to open WhatsApp with the message pre-filled:</p>';
+            
+            myCustomers.forEach(cu => {
+                const cleanPhone = (cu.phone || '').replace(/[^0-9]/g, '');
+                const waPhone = cleanPhone.startsWith('0') ? '255' + cleanPhone.substring(1) : cleanPhone;
+                html += `<a href="https://wa.me/${waPhone}?text=${encMsg}" target="_blank" class="flex items-center gap-3 bg-white/[0.02] border border-white/[0.05] p-3 rounded-xl hover:bg-white/[0.04]"><span class="iconify text-2xl text-green-400" data-icon="mdi:whatsapp"></span><div><div class="text-white text-sm font-medium">${cu.name}</div><div class="text-slate-500 text-xs">${cu.phone}</div></div></a>`;
+            });
+            list.innerHTML = html;
+        }
+
         function requestCancel(id){if(!confirm('Request cancellation for this order?'))return;db.collection('orders').doc(id).update({status:'cancel_requested'}).then(function(){showT('Cancellation requested — admin will review');renderOrdersTable()}).catch(function(e){showT(e.message,'error')})}
 
         function renderRefunds() {
@@ -1651,6 +1948,7 @@ function onOpen() {
             });
         }
 
+        function fmtDur(s){ if(!s||s<=0) return '0s'; if(s<60) return Math.round(s)+'s'; var m=Math.floor(s/60),sec=Math.round(s%60); return m+'m '+sec+'s'; }
         function loadReport(type) {
             const c = document.getElementById('report-content');
             if(type === 'fast' || type === 'slow') {
@@ -1663,6 +1961,15 @@ function onOpen() {
                 c.innerHTML = `<h4 class="font-bold text-white mb-4">Stock Valuation</h4><div class="text-3xl font-bold text-cyan-400 mb-2">TZS ${Number(totalVal).toLocaleString()}</div><p class="text-slate-400 text-sm">Total value of current inventory.</p>`;
             }
         }
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(reg => console.log('Service Worker registered successfully.'))
+            .catch(err => console.log('Service Worker registration failed:', err));
+        });
+      }
     </script>
 </body>
 </html>

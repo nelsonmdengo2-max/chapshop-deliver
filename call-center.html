@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Call Center — ChapShop Delivery</title>
-    <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEwaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
+    <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEhaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -290,6 +292,7 @@
         var myCallsPage = 1, myCallsPageSize = 20;
         var COMMISSION_PER_CONFIRMATION = 500;
         var timerInterval = null, timerSeconds = 0, activeTimerId = null;
+        var mediaRecorder = null, audioChunks = [];
         var knownOrderIds = new Set(), audioCtx, isOnBreak = false;
         var isClaiming = false;
         var shipFilter = 'all';
@@ -523,40 +526,59 @@
         }
         function addTag(el, text) { var ta = el.closest('form').querySelector('textarea'); if(ta.value.includes(text)) { ta.value = ta.value.replace(text+', ', ''); el.style.borderColor=''; el.style.color=''; } else { ta.value += text + ', '; el.style.borderColor='#06b6d4'; el.style.color='#22d3ee'; } }
 
-        function startTimer(id) {
+        async function startTimer(id) {
             if(timerInterval) { showT("Finish current call first", "error"); return; }
             activeTimerId = id; timerSeconds = 0;
             
-            // Increment the call attempts in Firebase
             db.collection('orders').doc(id).update({ callAttempts: firebase.firestore.FieldValue.increment(1) }).catch(function(){});
 
-            // Start the interval
+            // 1. Request Microphone Access
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.start(); // Start recording audio
+            } catch(err) {
+                showT("Microphone access denied. Cannot record call.", "error");
+                console.error("Mic error:", err);
+            }
+
+            // 2. Start the timer
             timerInterval = setInterval(() => { 
                 timerSeconds++; 
                 const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0'); 
                 const s = (timerSeconds % 60).toString().padStart(2, '0'); 
-                
-                // Find the display element on the screen RIGHT NOW
                 const disp = document.getElementById('timer-display-'+id);
                 if(disp) disp.textContent = `${m}:${s}`; 
             }, 1000);
         }
 
-        function stopTimer() {
+                        function stopTimer() {
             clearInterval(timerInterval); timerInterval = null; 
             var duration = timerSeconds; 
             timerSeconds = 0; 
             
+            // Stop recording and just save the duration (No Storage upload needed for Free Plan)
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                // Turn off microphone
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Save the talk time to Firestore
             if(activeTimerId) {
+                db.collection('orders').doc(activeTimerId).update({
+                    callDuration: firebase.firestore.FieldValue.increment(duration)
+                }).catch(function(e){ console.error("Error saving duration:", e); });
+
                 var btn = document.getElementById('timer-btn-'+activeTimerId), label = document.getElementById('timer-label-'+activeTimerId), display = document.getElementById('timer-display-'+activeTimerId);
                 if(btn) { btn.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/30'); btn.classList.remove('bg-red-500/20', 'text-red-400', 'border-red-500/30'); label.textContent = 'Start Call'; }
                 if(display) { display.classList.add('hidden'); display.classList.remove('sm:flex'); }
-                
-                // SAVE THE TALK TIME TO DATABASE IMMEDIATELY
-                var idToUpdate = activeTimerId;
-                db.collection('orders').doc(idToUpdate).update({
-                    callDuration: firebase.firestore.FieldValue.increment(duration)
-                }).catch(function(e){ console.error("Error saving call duration: ", e); });
             }
             activeTimerId = null; 
             return duration;
@@ -1072,6 +1094,15 @@
             }
             c.innerHTML = '<div class="flex flex-col md:flex-row items-center justify-between gap-4"><div class="flex items-center gap-4"><span class="text-4xl">👑</span><div><div class="text-[10px] text-yellow-400 uppercase font-bold tracking-wider">Top Call Center Agent - ' + now.toLocaleString('default', { month: 'long' }) + '</div><div class="text-xl font-extrabold text-yellow-400">' + winner.name + ' ' + (isMe ? '(You!) 🎉' : '') + '</div></div></div><div class="grid grid-cols-3 gap-6 text-center w-full md:w-auto"><div><div class="text-lg font-extrabold text-green-400">' + winner.delivered + '</div><div class="text-[10px] text-slate-500 uppercase">Delivered</div></div><div><div class="text-lg font-extrabold text-cyan-400">' + winner.confRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Confirm Rate</div></div><div><div class="text-lg font-extrabold text-violet-400">' + winner.delRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Delivery Rate</div></div></div></div>';
         }
+    </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(reg => console.log('Service Worker registered successfully.'))
+            .catch(err => console.log('Service Worker registration failed:', err));
+        });
+      }
     </script>
 </body>
 </html>

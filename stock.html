@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Stock Management — ChapShop Delivery</title>
+       <title>Advanced Stock Management — ChapShop Delivery</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
@@ -643,8 +645,9 @@
                 document.getElementById('app-screen').classList.add('hidden');
             }
         });
+		        function checkAutoReservations() { return; }
 
-        function loadData() {
+                function loadData() {
             db.collection('products').onSnapshot(snap => {
                 allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 renderKPIs(); renderCharts(); renderDashboardTable(); renderCurrentStock(); renderLowStock(); renderDamagedExpired(); populateProductSelects();
@@ -673,10 +676,9 @@
                 allUnits = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 renderUnits();
             });
-                db.collection('orders').onSnapshot(snap => {
+            db.collection('orders').onSnapshot(snap => {
                 allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 renderOrders(); renderReturns(); renderDispatch();
-                checkAutoReservations();
             });
             db.collection('suppliers').onSnapshot(snap => {
                 allSuppliers = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -691,7 +693,7 @@
                 renderHistory();
             });
         }
-
+        
         function toggleSidebar() {
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('sidebar-overlay');
@@ -825,13 +827,32 @@
             tbody.innerHTML = allProducts.map(p => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${p.name||'N/A'}</td><td class="p-4 text-slate-400 font-mono text-xs">${p.sku||'—'}</td><td class="p-4 text-slate-400">${p.warehouse||'Main'}</td><td class="p-4 text-right font-bold text-white">${p.stock||0}</td><td class="p-4 text-right text-blue-400">${p.reserved||0}</td><td class="p-4 text-right text-slate-500">${p.minStock||0}</td><td class="p-4 text-center">${getStockStatus(p)}</td><td class="p-4 text-center"><button class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">View</button></td></tr>`).join('');
         }
 
-        function renderCurrentStock() {
-            const tbody = document.getElementById('cs-tbody');
-            const search = (document.getElementById('cs-search').value || '').toLowerCase();
-            const filtered = allProducts.filter(p => (p.name||'').toLowerCase().includes(search) || (p.sku||'').toLowerCase().includes(search));
-            tbody.innerHTML = filtered.map(p => `<tr class="hover:bg-white/[0.02] transition-colors"><td class="p-4 text-white font-medium">${p.name||'N/A'}</td><td class="p-4 text-slate-400 font-mono text-xs">${p.sku||'—'}</td><td class="p-4 text-slate-400">${p.warehouse||'Main'}</td><td class="p-4 text-right font-bold text-white">${p.stock||0}</td><td class="p-4 text-right font-bold text-cyan-400">${p.delivered||0}</td><td class="p-4 text-right text-slate-500">${p.minStock||0}</td><td class="p-4 text-center">${getStockStatus(p)}</td><td class="p-4 text-center"><button type="button" onclick="deleteItem('products','${p.id}')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td></tr>`).join('');
-        }
+                        function renderDashboardTable() {
+            const tbody = document.getElementById('dash-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = allProducts.map(p => {
+                const totalStock = (p.stock||0) + (p.delivered||0);
+                const remaining = p.stock||0;
+                return `<tr class="hover:bg-white/[0.02] transition-colors">
+                    <td class="p-4 text-white font-medium">${p.name||'N/A'}</td>
+                    <td class="p-4 text-slate-400 font-mono text-xs">${p.sku||'—'}</td>
+                    <td class="p-4 text-slate-400">${p.warehouse||'Main'}</td>
+                    <td class="p-4 text-right font-bold text-slate-300">${totalStock}</td>
+                    <td class="p-4 text-right font-bold text-cyan-400">${p.delivered||0}</td>
+                    <td class="p-4 text-right font-bold text-green-400">${remaining}</td>
+                    <td class="p-4 text-center">${getStockStatus(p)}</td>
+                </tr>`;
+            }).join('');
 
+            // Force update headers
+            const table = tbody.parentElement;
+            if(table && table.tagName === 'TABLE') {
+                const thead = table.querySelector('thead');
+                if(thead) {
+                    thead.innerHTML = `<tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">SKU</th><th class="p-3">Warehouse</th><th class="p-3 text-right">Total Stock</th><th class="p-3 text-right">Delivered</th><th class="p-3 text-right">Remaining Stock</th><th class="p-3 text-center">Status</th></tr>`;
+                }
+            }
+        }
         function renderWarehouses() {
             const tbody = document.getElementById('wh-tbody');
             if(!allWarehouses.length) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center text-slate-500 text-sm">No warehouses found. Add one!</td></tr>'; return; }
@@ -1019,10 +1040,10 @@
                 reserved: 0, damaged: 0, expired: 0, delivered: 0, createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             if(!data.name || !data.merchantId) return showT('Product Name and Merchant are required', 'error');
-            db.collection('products').add(data).then(() => { showT('Product added!'); e.target.reset(); document.getElementById('ap-stock').value = 50; document.getElementById('ap-minstock').value = 10; document.getElementById('add-product-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
+         db.collection('products').add(data).then(() => { showT('Product added!'); e.target.reset(); document.getElementById('ap-stock').value = 50; document.getElementById('ap-minstock').value = 10; document.getElementById('add-product-form').classList.add('hidden'); }).catch(err => showT(err.message, 'error'));
         }
 
-        function deleteItem(collection, id) {
+        function deleteItem(collection, id) { {
             if(!confirm('Are you sure you want to delete this permanently?')) return;
             db.collection(collection).doc(id).delete().then(() => showT('Deleted!')).catch(err => showT(err.message, 'error'));
         }
@@ -1243,19 +1264,18 @@
             </body></html>`);
             win.document.close();
         }
-        async function dispatchOrder(orderId, merchantId, itemName, qty) {
-            if(!confirm('Dispatch this order? This will deduct stock and mark as Out for Delivery.')) return;
+        async function dispatchOrder(orderId) {
+            if(!confirm('Dispatch this order? Rider is taking it out.')) return;
             try {
-                var snap = await db.collection('products').where('name', '==', itemName).limit(1).get();
-                if (!snap.empty) {
-                    var prodDoc = snap.docs[0];
-                    var currentStock = prodDoc.data().stock || 0;
-                    var newStock = Math.max(0, currentStock - qty);
-                    await prodDoc.ref.update({ stock: newStock, delivered: firebase.firestore.FieldValue.increment(qty) });
-                }
-                await db.collection('orders').doc(orderId).update({ status: 'out_for_delivery' });
-                showT('Order dispatched successfully!');
-            } catch(e) { showT('Error dispatching: ' + e.message, 'error'); }
+                // ONLY update the status. Stock is STILL in company possession until delivered.
+                await db.collection('orders').doc(orderId).update({ 
+                    status: 'out_for_delivery',
+                    shippedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showT('Order dispatched! Stock will deduct automatically upon delivery.');
+            } catch(e) { 
+                showT('Error dispatching: ' + e.message, 'error'); 
+            }
         }
 
         // ===== REPORTS LOGIC =====
@@ -1275,7 +1295,29 @@
                     <thead><tr class="text-left text-slate-500 uppercase text-xs border-b border-white/10"><th class="p-3">Product</th><th class="p-3">SKU</th><th class="p-3 text-right">Available</th><th class="p-3 text-right">Delivered</th><th class="p-3 text-right">Value (TZS)</th></tr></thead>
                     <tbody class="divide-y divide-white/[0.05]">`;
                 allProducts.forEach(p => {
-                    html += `<tr><td class="p-3 text-white">${p.name||'N/A'}</td><td class="p-3 text-slate-400 font-mono text-xs">${p.sku||'—'}</td><td class="p-3 text-right font-bold text-white">${p.stock||0}</td><td class="p-3 text-right text-cyan-400">${p.delivered||0}</td><td class="p-3 text-right text-green-400">${((p.stock||0) * (p.costPrice||0)).toLocaleString()}</td></tr>`;
+                    const available = p.stock || 0;
+                    const deliveredCount = p.delivered || 0;
+                    const minStock = p.minStock || 0;
+                    const isOut = available <= 0;
+                    const isLow = !isOut && minStock > 0 && available <= minStock;
+                    
+                    let statusBadge = '';
+                    if(isOut) statusBadge = '<span class="text-xs font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded">OUT OF STOCK</span>';
+                    else if(isLow) statusBadge = '<span class="text-xs font-bold text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded">LOW STOCK</span>';
+                    else statusBadge = '<span class="text-xs font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded">IN STOCK</span>';
+
+                    html += `<tr class="hover:bg-white/[0.02]">
+                        <td class="p-3 text-white font-medium">${p.name||'N/A'}</td>
+                        <td class="p-3 text-slate-400 font-mono text-xs">${p.sku||'—'}</td>
+                        <td class="p-3 text-slate-400">${p.warehouse||'Main'}</td>
+                        <td class="p-3 text-right font-bold ${isOut ? 'text-red-400' : isLow ? 'text-yellow-400' : 'text-white'}">${available}</td>
+                        <td class="p-3 text-right text-cyan-400 font-bold">${deliveredCount}</td>
+                        <td class="p-3 text-right text-slate-500">${minStock}</td>
+                        <td class="p-3 text-center">${statusBadge}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="adjustStock('${p.id}', '${(p.name||'').replace(/'/g, "\\'")}')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Adjust</button>
+                        </td>
+                    </tr>`;
                 });
                 html += `</tbody></table></div>`;
             } 
@@ -1383,11 +1425,33 @@
             }).join('');
         }
 
-        function clearStockNotifs() {
+                function clearStockNotifs() {
             document.getElementById('notif-list-stock').innerHTML = '<div class="text-center py-10 text-slate-500 text-sm">No new notifications.</div>';
             const badge = document.getElementById('notif-count-badge');
             if(badge) badge.classList.add('hidden');
             showT('Notifications cleared');
+        }
+
+        // ===== ADJUST STOCK HELPER =====
+        async function adjustStock(productId, productName) {
+            const action = prompt(`Adjust stock for ${productName}.\nType "+5" to add 5, or "-3" to remove 3:`);
+            if(!action) return;
+            const match = action.trim().match(/^([+-]?\d+)$/);
+            if(!match) return showT('Invalid format. Use +5 or -3', 'error');
+            const qty = parseInt(match[1]);
+            if(qty === 0) return;
+            
+            try {
+                await db.collection('products').doc(productId).update({
+                    stock: firebase.firestore.FieldValue.increment(qty)
+                });
+                showT(`Stock adjusted by ${qty > 0 ? '+' : ''}${qty}!`);
+            } catch(e) { showT(e.message, 'error'); }
+        }
+
+        // ===== PLACEHOLDER FOR AUTO RESERVATIONS =====
+        function checkAutoReservations() {
+            return;
         }
     </script>
 </body>

@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapdrop Portal — Winning Products & Fulfillment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+	     /* Mobile Sidebar Toggle */
+        #sidebar { transition: transform 0.3s ease-in-out, width 0.3s ease-in-out; }
+        #sidebar-overlay { transition: opacity 0.3s ease-in-out; }
+
+        /* Desktop Collapse Logic */
+        #sidebar.collapsed { width: 5rem; }
+        #sidebar.collapsed .sidebar-text, #sidebar.collapsed .sb-header, #sidebar.collapsed .sidebar-header-text { display: none; }
+        #sidebar.collapsed .sidebar-link { justify-content: center; padding: 0.65rem; }
+        #sidebar.collapsed .sidebar-logo { justify-content: center; }
+        #sidebar.collapsed #collapse-icon { transform: rotate(180deg); }
+        @media (min-width: 1024px) {
+            main.collapsed { margin-left: 5rem !important; }
+        }
+        *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
+        body{background:#f8fafc;}
+        .nav-blur{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+        .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;border-radius:0.75rem;color:#94a3b8;font-weight:500;transition:all .2s;font-size:0.875rem;cursor:pointer;width:100%;text-align:left;border:none;background:none}
+        .sidebar-link:hover,.sidebar-link.active{background:rgba(6,182,212,0.1);color:#22d3ee}
+        .sb-header{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;padding:0 1rem;margin-top:1rem}
+        .product-card{transition:all 0.2s ease}
+        .product-card:hover{border-color:rgba(6,182,212,0.5);transform:translateY(-2px)}
+        .input-light{background:#ffffff;border:1px solid #cbd5e1;border-radius:12px;padding:12px 16px;font-size:14px;color:#0f172a;width:100%}
+        .input-light:focus{outline:none;border-color:#06b6d4;box-shadow:0 0 0 3px rgba(6,182,212,0.1)}
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex">
+
+    <!-- Mobile Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- LEFT SIDEBAR (REMAINS DARK) -->
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 flex flex-col -translate-x-full lg:translate-x-0">
+        <div class="p-4 border-b border-white/[0.08] flex-shrink-0 flex items-center justify-between">
+            <div class="flex items-center gap-3 sidebar-logo">
+                <div class="w-9 h-9 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-lg flex items-center justify-center flex-shrink-0"><span class="iconify text-white text-lg" data-icon="mdi:rocket-launch"></span></div>
+                <span class="font-bold text-white text-sm sidebar-header-text">chap<span class="text-cyan-400 ml-1">drop</span></span>
+            </div>
+            <!-- Desktop Collapse Button -->
+            <button onclick="toggleCollapse()" class="hidden lg:flex text-slate-400 hover:text-white p-1 rounded-md hover:bg-white/5">
+                <span id="collapse-icon" class="iconify text-xl transition-transform" data-icon="mdi:chevron-left"></span>
+            </button>
+            <!-- Mobile Close Button -->
+            <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white">
+                <span class="iconify text-2xl" data-icon="mdi:close"></span>
+            </button>
+        </div>
+        <nav class="p-4 space-y-1 flex-1 overflow-y-auto">
+            <div class="sb-header">Main</div>
+            <button onclick="switchView('dashboard'); closeMobile()" class="sidebar-link" id="nav-dashboard"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> <span class="sidebar-text">Dashboard & Analytics</span></button>
+            <button onclick="switchView('marketplace'); closeMobile()" class="sidebar-link active" id="nav-marketplace"><span class="iconify text-lg" data-icon="mdi:store-search"></span> <span class="sidebar-text">Marketplace</span></button>
+            <button onclick="switchView('import-list'); closeMobile()" class="sidebar-link" id="nav-import-list"><span class="iconify text-lg" data-icon="mdi:import"></span> <span class="sidebar-text">Import List</span></button>
+            <button onclick="switchView('wishlist'); closeMobile()" class="sidebar-link" id="nav-wishlist"><span class="iconify text-lg" data-icon="mdi:heart-outline"></span> <span class="sidebar-text">My Wishlist</span></button>
+
+            <div class="sb-header">Orders & Fulfillment</div>
+            <button onclick="switchView('suppliers'); closeMobile()" class="sidebar-link" id="nav-suppliers"><span class="iconify text-lg" data-icon="mdi:truck-fast"></span> <span class="sidebar-text">Suppliers</span></button>
+
+            <div class="sb-header">Tools</div>
+            <button onclick="switchView('store-link'); closeMobile()" class="sidebar-link" id="nav-store-link"><span class="iconify text-lg" data-icon="mdi:link-variant"></span> <span class="sidebar-text">My Store Link</span></button>
+            <button onclick="switchView('settings'); closeMobile()" class="sidebar-link" id="nav-settings"><span class="iconify text-lg" data-icon="mdi:cog-outline"></span> <span class="sidebar-text">Settings</span></button>
+        </nav>
+        <div class="p-4 border-t border-white/[0.08] flex-shrink-0">
+            <a href="index.html" class="sidebar-link text-slate-400 hover:bg-white/[0.05]"><span class="iconify text-lg" data-icon="mdi:arrow-left"></span> <span class="sidebar-text">Back to Website</span></a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT (WHITE BACKGROUND) -->
+    <main class="flex-1 lg:ml-64 flex flex-col h-screen overflow-hidden">
+        
+        <!-- Top Header -->
+        <header class="nav-blur bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="lg:hidden text-slate-500 hover:text-slate-900"><span class="iconify text-2xl" data-icon="mdi:menu"></span></button>
+                <h1 id="page-title" class="font-bold text-slate-900 text-sm">Marketplace</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="auth-status" class="text-xs text-slate-500 hidden sm:block">Not logged in</span>
+                <button onclick="openLoginModal()" id="login-btn" class="bg-cyan-500 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-cyan-600 transition-colors">Merchant Login</button>
+            </div>
+        </header>
+
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-y-auto p-6 md:p-8">
+
+                       <!-- VIEW: MARKETPLACE -->
+                      <!-- VIEW: MARKETPLACE -->
+            <div id="view-marketplace" class="view-panel">
+                                <!-- Intro Card -->
+                <div class="bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl p-6 md:p-8 text-white mb-8 shadow-lg">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2">Welcome to the Chapdrop Marketplace</h2>
+                    <p class="text-sm md:text-base opacity-90 max-w-2xl">Browse our curated catalog of winning products. We handle the inventory, fulfillment, and delivery. You just focus on marketing and sales. Start your dropshipping business today with $0 upfront cost.</p>
+                </div>
+
+                <!-- How It Works Guide -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 max-w-4xl mx-auto">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-sm">
+                        <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center mx-auto mb-3"><span class="iconify text-2xl text-cyan-600" data-icon="mdi:import"></span></div>
+                        <h4 class="text-sm font-bold text-slate-900 mb-1">1. Import Product</h4>
+                        <p class="text-xs text-slate-500">Choose a winning product and set your selling price.</p>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-sm">
+                        <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center mx-auto mb-3"><span class="iconify text-2xl text-cyan-600" data-icon="mdi:facebook-ad"></span></div>
+                        <h4 class="text-sm font-bold text-slate-900 mb-1">2. Drive Traffic</h4>
+                        <p class="text-xs text-slate-500">Run ads or share your store link to get orders.</p>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 text-center shadow-sm">
+                        <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center mx-auto mb-3"><span class="iconify text-2xl text-cyan-600" data-icon="mdi:truck-fast"></span></div>
+                        <h4 class="text-sm font-bold text-slate-900 mb-1">3. We Deliver</h4>
+                        <p class="text-xs text-slate-500">ChapShop handles packing, COD delivery, and payouts.</p>
+                    </div>
+                </div>
+
+                <!-- Search & Sort Bar -->
+                <div class="flex flex-col md:flex-row gap-4 mb-8 max-w-4xl mx-auto">
+                    <div class="relative flex-1">
+                        <span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" data-icon="mdi:magnify"></span>
+                        <input type="text" id="search-input" oninput="searchProducts()" placeholder="Search winning products..." class="input-light pl-12 pr-4 py-3 w-full shadow-sm border-slate-300 text-sm">
+                    </div>
+                    <div class="relative md:w-56">
+                        <span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" data-icon="mdi:sort-variant"></span>
+                        <select id="sort-select" onchange="sortProducts()" class="input-light pl-12 pr-4 py-3 w-full shadow-sm border-slate-300 text-sm appearance-none cursor-pointer">
+                            <option value="default">Sort by: Default</option>
+                            <option value="newest">Sort by: Newest</option>
+                            <option value="price-low">Sort by: Price (Low to High)</option>
+                            <option value="price-high">Sort by: Price (High to Low)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 3-COLUMN LAYOUT: LEFT MENU | MIDDLE PROMO | RIGHT CATEGORIES -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-10">
+                    
+                    <!-- LEFT SIDE: PANELS MENU -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm sticky top-24">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">Explore Panels</h3>
+                            <nav class="flex flex-col gap-1">
+                                <a href="#trending-section" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors cursor-pointer">
+                                    <span class="iconify text-lg" data-icon="mdi:fire"></span> Trending Products
+                                </a>
+                                <a href="#new-section" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors cursor-pointer">
+                                    <span class="iconify text-lg" data-icon="mdi:sparkles"></span> New Products
+                                </a>
+                                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors cursor-pointer">
+                                    <span class="iconify text-lg" data-icon="mdi:video"></span> Video Products
+                                </a>
+                                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors cursor-pointer">
+                                    <span class="iconify text-lg" data-icon="mdi:tag"></span> Super Deals
+                                </a>
+                                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors cursor-pointer">
+                                    <span class="iconify text-lg" data-icon="mdi:store"></span> E-commerce Platform
+                                </a>
+                                <a href="#recommended-section" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors cursor-pointer">
+                                    <span class="iconify text-lg" data-icon="mdi:star"></span> Recommended
+                                </a>
+                                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors cursor-pointer">
+                                    <span class="iconify text-lg" data-icon="mdi:flag-variant"></span> African Trending
+                                </a>
+                                <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-slate-700 hover:bg-cyan-50 hover:text-cyan-600 transition-colors cursor-pointer">
+                                    <span class="iconify text-lg" data-icon="mdi:music-note"></span> TikTok Analytics
+                                </a>
+                            </nav>
+                        </div>
+                    </div>
+
+                    <!-- MIDDLE: AUTOPLAY PROMOTION CAROUSEL -->
+                    <div class="lg:col-span-2">
+                        <div class="relative h-80 md:h-96 rounded-2xl overflow-hidden shadow-lg group">
+                            <!-- Slide 1 -->
+                            <div class="promo-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-100" style="background-image: url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80'); background-size: cover; background-position: center;">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-8">
+                                    <h3 class="text-2xl font-bold text-white mb-2">Scale Your E-commerce</h3>
+                                    <p class="text-sm text-gray-200 mb-4 max-w-md">Leverage our logistics network to deliver everywhere in Tanzania. Fast, reliable, COD.</p>
+                                    <button class="bg-cyan-500 text-white text-xs font-bold px-4 py-2 rounded-lg w-fit hover:bg-cyan-600">Learn More</button>
+                                </div>
+                            </div>
+                            <!-- Slide 2 -->
+                            <div class="promo-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0" style="background-image: url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80'); background-size: cover; background-position: center;">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-8">
+                                    <h3 class="text-2xl font-bold text-white mb-2">Winning Products Ready</h3>
+                                    <p class="text-sm text-gray-200 mb-4 max-w-md">Import pre-stocked winning products to your store with one click. Zero inventory cost.</p>
+                                    <button class="bg-cyan-500 text-white text-xs font-bold px-4 py-2 rounded-lg w-fit hover:bg-cyan-600">Start Importing</button>
+                                </div>
+                            </div>
+                            <!-- Slide 3 -->
+                            <div class="promo-slide absolute inset-0 transition-opacity duration-700 ease-in-out opacity-0" style="background-image: url('https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80'); background-size: cover; background-position: center;">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-8">
+                                    <h3 class="text-2xl font-bold text-white mb-2">24h COD Remittance</h3>
+                                    <p class="text-sm text-gray-200 mb-4 max-w-md">Get your cash collected from customers and remitted to your account within 24 hours.</p>
+                                    <button class="bg-cyan-500 text-white text-xs font-bold px-4 py-2 rounded-lg w-fit hover:bg-cyan-600">Join Now</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Carousel Dots -->
+                            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                                <span class="dot w-2 h-2 rounded-full bg-white cursor-pointer transition-all" onclick="currentSlide(0)"></span>
+                                <span class="dot w-2 h-2 rounded-full bg-white/40 cursor-pointer transition-all" onclick="currentSlide(1)"></span>
+                                <span class="dot w-2 h-2 rounded-full bg-white/40 cursor-pointer transition-all" onclick="currentSlide(2)"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT SIDE: CATEGORIES -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 px-2">All Categories</h3>
+                            <div class="flex flex-col gap-1">
+                                <div onclick="filterByCategory('Men\'s Clothing')" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-cyan-50 hover:text-cyan-600 cursor-pointer transition-colors">
+                                    <span class="text-xl">👔</span> Men's Clothing
+                                </div>
+                                <div onclick="filterByCategory('Home & Garden')" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-cyan-50 hover:text-cyan-600 cursor-pointer transition-colors">
+                                    <span class="text-xl">🏠</span> Home & Garden
+                                </div>
+                                <div onclick="filterByCategory('Health & Beauty')" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-cyan-50 hover:text-cyan-600 cursor-pointer transition-colors">
+                                    <span class="text-xl">💄</span> Health & Beauty
+                                </div>
+                                <div onclick="filterByCategory('Jewelry & Watches')" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-cyan-50 hover:text-cyan-600 cursor-pointer transition-colors">
+                                    <span class="text-xl">💎</span> Jewelry & Watches
+                                </div>
+                                <div onclick="filterByCategory('Bags & Shoes')" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-cyan-50 hover:text-cyan-600 cursor-pointer transition-colors">
+                                    <span class="text-xl">👜</span> Bags & Shoes
+                                </div>
+                                <div onclick="filterByCategory('Phones & Electronics')" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-cyan-50 hover:text-cyan-600 cursor-pointer transition-colors">
+                                    <span class="text-xl">📱</span> Phones & Electronics
+                                </div>
+                                <div onclick="filterByCategory('Gaming & Accessories')" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-cyan-50 hover:text-cyan-600 cursor-pointer transition-colors">
+                                    <span class="text-xl">🎮</span> Gaming & Accessories
+                                </div>
+                                <div onclick="filterByCategory('Sports & Outdoors')" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-600 hover:bg-cyan-50 hover:text-cyan-600 cursor-pointer transition-colors">
+                                    <span class="text-xl">⚽</span> Sports & Outdoors
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- FILTERED CATEGORY RESULTS (Hidden by default) -->
+                <div id="filtered-view" class="hidden mb-10">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 id="filtered-title" class="text-lg font-bold text-slate-900">Category Results</h3>
+                        <button onclick="clearFilter()" class="text-xs font-bold text-cyan-600 hover:underline flex items-center gap-1"><span class="iconify" data-icon="mdi:arrow-left"></span> Back to All</button>
+                    </div>
+                    <div id="filtered-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+                    <div id="no-filtered" class="text-center py-10 hidden">
+                        <p class="text-slate-500 text-sm">No products found in this category yet.</p>
+                    </div>
+                </div>
+
+                <!-- Ads Spy Section Removed -->
+
+                <!-- Trending Products -->
+                <div id="trending-section" class="mb-10 scroll-mt-24">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">🔥 Trending Products</h3>
+                    <div id="loading-trending" class="text-center py-10">
+                        <span class="iconify text-4xl text-cyan-500 animate-spin inline-block" data-icon="mdi:loading"></span>
+                    </div>
+                    <div id="trending-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 hidden"></div>
+                    <div id="no-trending" class="text-center py-10 hidden">
+                        <p class="text-slate-500 text-sm">No trending products available right now.</p>
+                    </div>
+                    <div class="text-center mt-6">
+                        <button onclick="showAllProducts('Trending')" class="bg-slate-100 text-slate-700 font-bold text-sm px-6 py-2.5 rounded-lg hover:bg-slate-200 transition-colors">View All Products</button>
+                    </div>
+                </div>
+
+                <!-- New Products -->
+                <div id="new-section" class="mb-10 scroll-mt-24">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">✨ New Products</h3>
+                    <div id="loading-new" class="text-center py-10">
+                        <span class="iconify text-4xl text-cyan-500 animate-spin inline-block" data-icon="mdi:loading"></span>
+                    </div>
+                    <div id="new-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 hidden"></div>
+                    <div id="no-new" class="text-center py-10 hidden">
+                        <p class="text-slate-500 text-sm">No new products available right now.</p>
+                    </div>
+                    <div class="text-center mt-6">
+                        <button onclick="showAllProducts('New')" class="bg-slate-100 text-slate-700 font-bold text-sm px-6 py-2.5 rounded-lg hover:bg-slate-200 transition-colors">View All Products</button>
+                    </div>
+                </div>
+
+                <!-- Recommended Products -->
+                <div id="recommended-section" class="mb-10 scroll-mt-24">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Recommended Products for E-commerce Platform in Tanzania market</h3>
+                    <div id="loading-recommended" class="text-center py-10">
+                        <span class="iconify text-4xl text-cyan-500 animate-spin inline-block" data-icon="mdi:loading"></span>
+                    </div>
+                    <div id="recommended-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 hidden"></div>
+                    <div id="no-recommended" class="text-center py-10 hidden">
+                        <p class="text-slate-500 text-sm">No recommended products available right now.</p>
+                    </div>
+                    <div class="text-center mt-6">
+                        <button onclick="showAllProducts('Recommended')" class="bg-slate-100 text-slate-700 font-bold text-sm px-6 py-2.5 rounded-lg hover:bg-slate-200 transition-colors">View All Products</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- VIEW: DASHBOARD -->
+            <div id="view-dashboard" class="view-panel hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Dashboard & Analytics</h2>
+                        <p class="text-sm text-slate-500">Welcome back! Here is your store's performance at a glance.</p>
+                    </div>
+                    <a href="merchant-dashboard.html" class="bg-slate-900 text-white font-bold text-sm px-4 py-2 rounded-lg hover:bg-slate-800 flex items-center gap-2 transition-colors">
+                        <span class="iconify" data-icon="mdi:open-in-new"></span> Open Full Merchant Dashboard
+                    </a>
+                </div>
+
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-cyan-50 rounded-lg flex items-center justify-center"><span class="iconify text-xl text-cyan-600" data-icon="mdi:import"></span></div>
+                            <span id="kpi-imported" class="text-2xl font-extrabold text-slate-900">0</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Imported Products</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center"><span class="iconify text-xl text-green-600" data-icon="mdi:cloud-check-outline"></span></div>
+                            <span id="kpi-published" class="text-2xl font-extrabold text-slate-900">0</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Published Live</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center"><span class="iconify text-xl text-blue-600" data-icon="mdi:package-variant-closed"></span></div>
+                            <span id="kpi-orders" class="text-2xl font-extrabold text-slate-900">0</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Orders</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center"><span class="iconify text-xl text-emerald-600" data-icon="mdi:cash-multiple"></span></div>
+                            <span id="kpi-revenue" class="text-2xl font-extrabold text-slate-900">TZS 0</span>
+                        </div>
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Revenue (Delivered)</div>
+                    </div>
+                </div>
+
+                <!-- Chart & Recent Orders -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Revenue Chart -->
+                    <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                        <h3 class="text-base font-bold text-slate-900 mb-4">Revenue Overview (Last 7 Days)</h3>
+                        <div style="position:relative; height:250px;"><canvas id="revenue-chart"></canvas></div>
+                    </div>
+
+                    <!-- Recent Orders -->
+                    <div class="lg:col-span-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                        <h3 class="text-base font-bold text-slate-900 mb-4">Recent Orders</h3>
+                        <div id="recent-orders-list" class="space-y-3">
+                            <p class="text-sm text-slate-400 text-center py-8">No recent orders.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                        <!-- VIEW: IMPORT LIST -->
+            <div id="view-import-list" class="view-panel hidden">
+                
+                <!-- Intro Banner -->
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-6 md:p-8 text-white mb-8 shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold mb-2">Your Import List</h2>
+                        <p class="text-sm md:text-base opacity-90 max-w-2xl">Review your imported products, adjust your selling prices, and push them live to your store whenever you're ready.</p>
+                    </div>
+                    <span class="iconify text-6xl text-cyan-400 opacity-50 hidden md:block" data-icon="mdi:clipboard-list-outline"></span>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="goToMarketplaceWithLoader(this)" class="bg-cyan-500 text-white font-bold text-sm px-4 py-2 rounded-lg hover:bg-cyan-600 flex items-center gap-1.5 transition-colors">
+                            <span id="add-prod-icon" class="iconify" data-icon="mdi:plus"></span> Add Products
+                        </button>
+                        <button onclick="pushAllToStore()" class="bg-slate-900 text-white font-bold text-sm px-4 py-2 rounded-lg hover:bg-slate-800 flex items-center gap-1.5 transition-colors">
+                            <span class="iconify" data-icon="mdi:cloud-upload"></span> Push All to Store
+                        </button>
+                        <button onclick="loadImportList()" class="bg-white border border-slate-300 text-slate-700 font-bold text-sm px-4 py-2 rounded-lg hover:bg-slate-50 flex items-center gap-1.5 transition-colors">
+                            <span class="iconify" data-icon="mdi:refresh"></span> Refresh
+                        </button>
+                        <button onclick="filterStatus('draft')" class="bg-yellow-100 text-yellow-700 border border-yellow-200 font-bold text-sm px-4 py-2 rounded-lg hover:bg-yellow-200 flex items-center gap-1.5 transition-colors">
+                            <span class="iconify" data-icon="mdi:file-document-edit-outline"></span> Drafts
+                        </button>
+                        <button onclick="filterStatus('scheduled')" class="bg-blue-100 text-blue-700 border border-blue-200 font-bold text-sm px-4 py-2 rounded-lg hover:bg-blue-200 flex items-center gap-1.5 transition-colors">
+                            <span class="iconify" data-icon="mdi:clock-outline"></span> Scheduled
+                        </button>
+                        <button onclick="filterStatus('published')" class="bg-green-100 text-green-700 border border-green-200 font-bold text-sm px-4 py-2 rounded-lg hover:bg-green-200 flex items-center gap-1.5 transition-colors">
+                            <span class="iconify" data-icon="mdi:cloud-check-outline"></span> Published
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Items</div>
+                        <div id="stat-total" class="text-3xl font-extrabold text-slate-900">0</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Drafts</div>
+                        <div id="stat-drafts" class="text-3xl font-extrabold text-yellow-500">0</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Scheduled</div>
+                        <div id="stat-scheduled" class="text-3xl font-extrabold text-blue-500">0</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Published</div>
+                        <div id="stat-published" class="text-3xl font-extrabold text-green-500">0</div>
+                    </div>
+                </div>
+
+                <!-- Products Table -->
+                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-50 border-b border-slate-200">
+                                <tr class="text-left text-slate-500 uppercase text-xs">
+                                    <th class="p-4">Product</th>
+                                    <th class="p-4 text-right">Base Cost</th>
+                                    <th class="p-4 text-right">Selling Price</th>
+                                    <th class="p-4 text-center">Profit</th>
+                                    <th class="p-4 text-center">Status</th>
+                                    <th class="p-4 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="import-tbody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+                    <div id="import-login-prompt" class="p-10 text-center hidden">
+                        <span class="iconify text-5xl text-slate-300 mx-auto block mb-4" data-icon="mdi:lock-outline"></span>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Login Required</h3>
+                        <p class="text-sm text-slate-500 mb-4">Please log in to your merchant account to view and manage your imported products.</p>
+                                      <button onclick="openLoginModal()" id="login-btn" class="bg-cyan-500 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-cyan-600 transition-colors">Merchant Login</button>
+                    </div>
+                    <div id="import-empty" class="p-10 text-center hidden">
+                        <span class="iconify text-5xl text-slate-300 mx-auto block mb-4" data-icon="mdi:package-variant"></span>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">Your Import List is Empty</h3>
+                        <p class="text-sm text-slate-500 mb-4">Browse the marketplace and import winning products to get started.</p>
+                        <button onclick="goToMarketplaceWithLoader(this)" class="inline-block bg-cyan-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-cyan-600 text-sm">Browse Marketplace</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SUPPLIERS -->
+            <div id="view-suppliers" class="view-panel hidden">
+                <h2 class="text-2xl font-bold text-slate-900 mb-2">Suppliers & Fulfillment</h2>
+                <p class="text-sm text-slate-500 mb-8">Our infrastructure ensures your orders are processed and delivered with the highest speed and reliability.</p>
+
+                <!-- Fulfillment Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm text-center">
+                        <div class="w-10 h-10 bg-cyan-50 rounded-full flex items-center justify-center mx-auto mb-3"><span class="iconify text-xl text-cyan-600" data-icon="mdi:clock-fast"></span></div>
+                        <div class="text-2xl font-extrabold text-slate-900">2-4 hrs</div>
+                        <div class="text-xs text-slate-500 mt-1">Avg. Processing Time</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm text-center">
+                        <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3"><span class="iconify text-xl text-green-600" data-icon="mdi:check-decagram"></span></div>
+                        <div class="text-2xl font-extrabold text-slate-900">98.5%</div>
+                        <div class="text-xs text-slate-500 mt-1">Dispatch Success Rate</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm text-center">
+                        <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3"><span class="iconify text-xl text-blue-600" data-icon="mdi:truck-check"></span></div>
+                        <div class="text-2xl font-extrabold text-slate-900">24 hours</div>
+                        <div class="text-xs text-slate-500 mt-1">Avg. Delivery Time</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm text-center">
+                        <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-3"><span class="iconify text-xl text-orange-600" data-icon="mdi:cash-refund"></span></div>
+                        <div class="text-2xl font-extrabold text-slate-900">24 hours</div>
+                        <div class="text-xs text-slate-500 mt-1">COD Remittance</div>
+                    </div>
+                </div>
+
+                <!-- Warehouse Directory -->
+                <h3 class="text-lg font-bold text-slate-900 mb-4">Our Warehouse Network</h3>
+                <div id="suppliers-loading" class="text-center py-10">
+                    <span class="iconify text-4xl text-cyan-500 animate-spin inline-block" data-icon="mdi:loading"></span>
+                </div>
+                <div id="suppliers-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden"></div>
+            </div>
+
+            <!-- VIEW: STORE LINK -->
+            <div id="view-store-link" class="view-panel hidden">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6">My Store Link</h2>
+                <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-8 text-center max-w-lg mx-auto">
+                    <div class="w-14 h-14 bg-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-4"><span class="iconify text-3xl text-cyan-600" data-icon="mdi:storefront-outline"></span></div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Share Your Store</h3>
+                    <p class="text-sm text-slate-500 mb-6">Share this link with your customers on WhatsApp, Instagram, or Facebook. Anyone who clicks it will see your published products and can place an order instantly!</p>
+                    
+                    <div class="flex gap-2 max-w-sm mx-auto">
+                        <input type="text" id="store-url-input" readonly class="input-light text-cyan-600 font-mono text-xs cursor-pointer">
+                        <button onclick="copyStoreUrl()" class="bg-cyan-500 text-white font-bold text-sm px-4 rounded-lg hover:bg-cyan-600 transition-colors whitespace-nowrap">Copy</button>
+                    </div>
+                    <p id="copy-msg" class="text-xs text-green-600 mt-3 opacity-0 transition-opacity">Copied to clipboard!</p>
+                </div>
+            </div>
+
+            <!-- VIEW: WISHLIST -->
+            <div id="view-wishlist" class="view-panel hidden">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6">My Wishlist</h2>
+                <div id="wishlist-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"></div>
+                <div id="wishlist-empty" class="p-10 text-center hidden">
+                    <span class="iconify text-5xl text-slate-300 mx-auto block mb-4" data-icon="mdi:heart-outline"></span>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">Your Wishlist is Empty</h3>
+                    <p class="text-sm text-slate-500 mb-4">Click the heart icon on products you like to save them here for later.</p>
+                    <button onclick="switchView('marketplace')" class="inline-block bg-cyan-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-cyan-600 text-sm">Browse Marketplace</button>
+                </div>
+            </div>
+
+            <!-- VIEW: SETTINGS -->
+            <div id="view-settings" class="view-panel hidden">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6">Account Settings</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Profile Form -->
+                    <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                        <h3 class="text-base font-bold text-slate-900 mb-4">Profile Information</h3>
+                        <form id="settings-form" onsubmit="saveChapdropSettings(event)" class="space-y-4">
+                            <div>
+                                <label class="text-xs font-semibold text-slate-500 uppercase">Shop Name</label>
+                                <input type="text" id="set-shop-name" class="input-light mt-1" placeholder="Your Shop Name">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-slate-500 uppercase">Contact Name</label>
+                                <input type="text" id="set-contact-name" class="input-light mt-1" placeholder="Your Name">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-slate-500 uppercase">Phone Number</label>
+                                <input type="text" id="set-phone" class="input-light mt-1" placeholder="+255...">
+                            </div>
+                            <div>
+                                <label class="text-xs font-semibold text-slate-500 uppercase">Email (Read-only)</label>
+                                <input type="email" id="set-email" readonly class="input-light mt-1 bg-slate-50 cursor-not-allowed text-slate-400">
+                            </div>
+                            <button type="submit" class="bg-cyan-500 text-white font-bold px-6 py-3 rounded-lg hover:bg-cyan-600 text-sm flex items-center gap-2">
+                                <span class="iconify" data-icon="mdi:content-save"></span> Save Changes
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Store Link & Payout Info -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                            <h3 class="text-base font-bold text-slate-900 mb-4">Public Store Link</h3>
+                            <p class="text-xs text-slate-500 mb-4">Share this link with your customers.</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="settings-store-url" readonly class="input-light text-cyan-600 font-mono text-xs cursor-pointer">
+                                <button onclick="copySettingsUrl()" class="bg-slate-900 text-white font-bold px-4 rounded-lg hover:bg-slate-800 transition-colors whitespace-nowrap">Copy</button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                            <h3 class="text-base font-bold text-slate-900 mb-4">Payout Details</h3>
+                            <p class="text-xs text-slate-500 mb-4">Manage how you receive your COD remittances. Please contact support to update your bank or M-Pesa details.</p>
+                            <a href="https://wa.me/255768799110?text=Hi%20ChapShop,%20I%20want%20to%20update%20my%20payout%20details." target="_blank" class="bg-green-500 text-white font-bold px-4 py-2.5 rounded-lg hover:bg-green-600 text-sm flex items-center justify-center gap-2 w-full">
+                                <span class="iconify" data-icon="mdi:whatsapp"></span> Update via WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Import Modal -->
+    <div id="import-modal" class="hidden fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-slate-900">Import to Your Store</h3>
+                <button onclick="closeImportModal()" class="text-slate-400 hover:text-slate-900"><span class="iconify text-2xl" data-icon="mdi:close"></span></button>
+            </div>
+            <form id="import-form" onsubmit="confirmImport(event)" class="space-y-4">
+                <input type="hidden" id="imp-id">
+                <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center gap-3">
+                    <div id="imp-img" class="w-12 h-12 bg-slate-200 rounded-lg flex-shrink-0 overflow-hidden"></div>
+                    <div>
+                        <div id="imp-name" class="text-sm font-bold text-slate-900"></div>
+                        <div id="imp-cost" class="text-xs text-red-500"></div>
+                    </div>
+                </div>
+                <div><label class="text-xs font-semibold text-slate-500 uppercase">Your Selling Price (TZS) *</label><input type="number" id="imp-price" required class="input-light mt-1"></div>
+                <div class="bg-cyan-50 border border-cyan-100 p-3 rounded-xl text-xs text-cyan-700 flex items-center justify-between"><span>Your Profit Per Sale:</span><span id="imp-profit" class="font-bold">TZS 0</span></div>
+                <button type="submit" id="imp-btn" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-600 text-sm">Import to Store</button>
+            </form>
+        </div>
+    </div>
+        <!-- App Wrapper (Hidden until login) -->
+    <div id="app-wrapper" class="hidden">
+
+    <!-- LEFT SIDEBAR (REMAINS DARK) -->
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 flex flex-col -translate-x-full lg:translate-x-0">
+
+    </div> <!-- End App Wrapper -->
+
+    <!-- Access Gate (Solid Wall) -->
+    <div id="access-gate" class="fixed inset-0 z-[200] bg-slate-900 flex items-center justify-center p-4 text-center">
+        <div class="max-w-md">
+            <div class="w-16 h-16 bg-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-cyan-500/30">
+                <span class="iconify text-white text-3xl" data-icon="mdi:rocket-launch"></span>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">Welcome to Chapdrop</h2>
+            <p class="text-slate-300 mb-8">Please log in or create a free merchant account to access our winning products marketplace.</p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button onclick="openLoginModal()" class="bg-cyan-500 text-white font-bold px-6 py-3 rounded-lg hover:bg-cyan-600 transition-colors text-sm">Merchant Login</button>
+                <a href="merchants.html" class="bg-white text-slate-900 font-bold px-6 py-3 rounded-lg hover:bg-slate-100 transition-colors text-sm">Register Free</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="hidden fixed inset-0 z-[210] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 rounded-2xl p-8 w-full max-w-sm shadow-2xl text-center">
+            <div class="w-14 h-14 bg-cyan-100 rounded-2xl flex items-center justify-center mx-auto mb-4"><span class="iconify text-3xl text-cyan-600" data-icon="mdi:login"></span></div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">Merchant Login</h3>
+            <p class="text-xs text-slate-500 mb-6">Log in to import products and access your dashboard.</p>
+            <form onsubmit="handleQuickLogin(event)" class="space-y-4 text-left">
+                <input type="email" id="quick-email" required placeholder="Email" class="input-light text-sm">
+                <input type="password" id="quick-pass" required placeholder="Password" class="input-light text-sm">
+                <button type="submit" id="quick-login-btn" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-600 text-sm transition-colors">Sign In</button>
+            </form>
+            <button onclick="document.getElementById('login-modal').classList.add('hidden')" class="mt-4 text-xs text-slate-400 hover:text-slate-900">Cancel</button>
+        </div>
+    </div>
+        <script>
+        var fc={apiKey:"AIzaSyBjyRehaNQqt5ogt5U3tiw8NYr4TyuX2iI",authDomain:"chapshop-delivery-88fe1.firebaseapp.com",projectId:"chapshop-delivery-88fe1",storageBucket:"chapshop-delivery-88fe1.firebasestorage.app",messagingSenderId:"540757404981",appId:"1:540757404981:web:f5ae5d041dd260304eb07c"};
+        firebase.initializeApp(fc);var auth=firebase.auth(),db=firebase.firestore();
+
+        let chapdropProducts = [];
+        let currentUser = null;
+        let merchantProducts = [];
+        let importedProducts = [];
+        let wishlist = [];
+
+        function fmtM(n){return'TZS '+Number(n||0).toLocaleString()}
+
+        // --- SIDEBAR LOGIC ---
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('sidebar-overlay');
+            sb.classList.toggle('-translate-x-full');
+            if (sb.classList.contains('-translate-x-full')) {
+                ov.classList.add('hidden');
+            } else {
+                ov.classList.remove('hidden');
+            }
+        }
+
+        function closeMobile() {
+            // Close sidebar on mobile after clicking a link
+            if (window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebar-overlay').classList.add('hidden');
+            }
+        }
+
+        function toggleCollapse() {
+            const sb = document.getElementById('sidebar');
+            const main = document.querySelector('main');
+            sb.classList.toggle('collapsed');
+            main.classList.toggle('collapsed');
+        }
+        function switchView(viewId) {
+            document.querySelectorAll('.view-panel').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + viewId).classList.remove('hidden');
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('nav-' + viewId).classList.add('active');
+            
+            const titles = {
+                dashboard: "Dashboard & Analytics",
+                marketplace: "Marketplace",
+                'import-list': "Import List",
+                suppliers: "Suppliers & Fulfillment",
+                'store-link': "My Store Link",
+                settings: "Settings"
+            };
+            document.getElementById('page-title').innerText = titles[viewId] || "Chapdrop";
+            
+            if(viewId === 'suppliers') loadSuppliers();
+        }
+
+                // Check Auth State
+        auth.onAuthStateChanged(async user => {
+            const gate = document.getElementById('access-gate');
+            
+            if(user) {
+                // User is logged in, hide the gate
+                gate.classList.add('hidden');
+                currentUser = user;
+                const doc = await db.collection('users').doc(user.uid).get();
+                if(doc.exists && doc.data().role === 'merchant') {
+                    document.getElementById('auth-status').textContent = 'Logged in as: ' + (doc.data().shopName || doc.data().name);
+                    document.getElementById('login-btn').textContent = 'Go to Dashboard';
+                    document.getElementById('login-btn').setAttribute('onclick', "window.location.href='merchant.html'");
+                    
+                    db.collection('products').where('merchantId', '==', user.uid).onSnapshot(snap => {
+                        merchantProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                        renderProducts();
+                        loadImportList(); // Load the import list table
+                    });
+                    
+                    // Fetch Wishlist
+                    db.collection('users').doc(user.uid).onSnapshot(doc => {
+                        wishlist = doc.exists && doc.data().wishlist ? doc.data().wishlist : [];
+                        renderProducts(); // Re-render to show filled hearts
+                        renderWishlist();
+                    });
+                } else {
+                    // Logged in but not a merchant
+                    currentUser = null;
+                    renderProducts();
+                }
+            } else {
+                // User is logged out, SHOW THE GATE
+                gate.classList.remove('hidden');
+                currentUser = null;
+                renderProducts();
+            }
+        });
+		
+		        // --- SETTINGS LOGIC ---
+        function loadSettings() {
+            if(!currentUser) return;
+            
+            // Fetch latest user data
+            db.collection('users').doc(currentUser.uid).get().then(doc => {
+                if(doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('set-shop-name').value = data.shopName || '';
+                    document.getElementById('set-contact-name').value = data.name || '';
+                    document.getElementById('set-phone').value = data.phone || '';
+                    document.getElementById('set-email').value = data.email || '';
+                    document.getElementById('settings-store-url').value = window.location.origin + '/store.html?merchant=' + currentUser.uid;
+                }
+            });
+        }
+
+        async function saveChapdropSettings(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = 'Saving...';
+            
+            const data = {
+                shopName: document.getElementById('set-shop-name').value.trim(),
+                name: document.getElementById('set-contact-name').value.trim(),
+                phone: document.getElementById('set-phone').value.trim()
+            };
+            
+            try {
+                await db.collection('users').doc(currentUser.uid).update(data);
+                alert("Profile updated successfully!");
+                // Update header name
+                document.getElementById('auth-status').textContent = 'Logged in as: ' + data.shopName;
+            } catch(err) {
+                alert(err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="iconify" data-icon="mdi:content-save"></span> Save Changes';
+            }
+        }
+
+        function copySettingsUrl() {
+            const input = document.getElementById('settings-store-url');
+            input.select();
+            input.setSelectionRange(0, 99999); // For mobile
+            document.execCommand('copy');
+            alert("Store link copied to clipboard!");
+        }
+        // --- DASHBOARD LOGIC ---
+        let dashChart = null;
+        async function loadDashboard() {
+            if (!currentUser) return;
+
+            try {
+                // 1. Fetch all orders for this merchant
+                var snap = await db.collection('orders').where('merchantId', '==', currentUser.uid).get();
+                var orders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+
+                // 2. Calculate Stats
+                let delivered = orders.filter(o => o.status === 'delivered');
+                let revenue = delivered.reduce((s, o) => s + (o.totalAmount || 0), 0);
+                let published = merchantProducts.filter(p => p.status === 'published').length;
+
+                // 3. Update KPI Cards
+                document.getElementById('kpi-imported').textContent = merchantProducts.length;
+                document.getElementById('kpi-published').textContent = published;
+                document.getElementById('kpi-orders').textContent = orders.length;
+                document.getElementById('kpi-revenue').textContent = fmtM(revenue);
+
+                // 4. Render Recent Orders (Top 5)
+                const roList = document.getElementById('recent-orders-list');
+                if (orders.length > 0) {
+                    // Sort by date descending
+                    orders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                    const recent = orders.slice(0, 5);
+                    roList.innerHTML = recent.map(o => {
+                        const statusColor = o.status === 'delivered' ? 'bg-green-100 text-green-700' : o.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700';
+                        return `<div class="flex items-center justify-between gap-2 pb-3 border-b border-slate-100 last:border-0">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-bold text-slate-900 truncate">${o.itemName || 'Product'}</div>
+                                <div class="text-xs text-slate-400 truncate">${o.customerName || 'Customer'}</div>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <div class="text-sm font-bold text-slate-900">${fmtM(o.totalAmount)}</div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${statusColor} uppercase">${o.status || 'Pending'}</span>
+                            </div>
+                        </div>`;
+                    }).join('');
+                } else {
+                    roList.innerHTML = '<p class="text-sm text-slate-400 text-center py-8">No orders yet. Share your store link!</p>';
+                }
+
+                // 5. Render Revenue Chart
+                renderRevenueChart(delivered);
+
+            } catch(e) {
+                console.error("Dashboard Load Error:", e);
+            }
+        }
+
+        function renderRevenueChart(deliveredOrders) {
+            const ctx = document.getElementById('revenue-chart');
+            if (!ctx) return;
+
+            // Get last 7 days labels and data
+            const days = [];
+            const data = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateString = d.toISOString().split('T')[0];
+                days.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
+                
+                // Sum revenue for that day
+                const dayRevenue = deliveredOrders.filter(o => {
+                    if (!o.deliveredAt) return false;
+                    return o.deliveredAt.toDate().toISOString().split('T')[0] === dateString;
+                }).reduce((s, o) => s + (o.totalAmount || 0), 0);
+                
+                data.push(dayRevenue);
+            }
+
+            if (dashChart) dashChart.destroy();
+            dashChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: days,
+                    datasets: [{
+                        label: 'Revenue (TZS)',
+                        data: data,
+                        backgroundColor: '#06b6d4',
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            ticks: { color: '#94a3b8', callback: function(value) { return value >= 1000 ? (value/1000) + 'K' : value } },
+                            grid: { color: '#f1f5f9' } 
+                        },
+                        x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+        // --- MARKETPLACE LOGIC ---
+        async function loadProducts() {
+            try {
+                var snap = await db.collection('chapdrop_products').get();
+                chapdropProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            } catch(e) {
+                console.error("Database Error:", e);
+                chapdropProducts = []; // Ensure it's empty so placeholders show
+            } finally {
+                document.getElementById('loading-trending').classList.add('hidden');
+                document.getElementById('loading-new').classList.add('hidden');
+                document.getElementById('loading-recommended').classList.add('hidden');
+                renderProducts();
+            }
+        }
+        function copyStoreUrl() {
+            const input = document.getElementById('store-url-input');
+            if(!currentUser) {
+                alert("Please log in to get your store link.");
+                return;
+            }
+            const url = window.location.origin + '/store.html?merchant=' + currentUser.uid;
+            input.value = url;
+            input.select();
+            document.execCommand('copy');
+            
+            const msg = document.getElementById('copy-msg');
+            msg.style.opacity = '1';
+            setTimeout(() => msg.style.opacity = '0', 2000);
+        }
+                function generateProductCard(p) {
+            const alreadyImported = merchantProducts.find(mp => mp.chapdropId === p.id);
+            let btnHtml = '';
+            
+            if(!currentUser) {
+                btnHtml = `<button onclick="event.stopPropagation(); openLoginModal()" class="bg-white text-cyan-600 text-xs font-bold px-4 py-2 rounded-lg hover:bg-cyan-50 transition-colors flex items-center gap-1.5"><span class="iconify" data-icon="mdi:login"></span> Login to Import</button>`;
+            } else if(alreadyImported) {
+                btnHtml = `<div class="bg-green-500 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-1.5 cursor-default"><span class="iconify" data-icon="mdi:check"></span> Imported</div>`;
+            } else {
+                btnHtml = `<button onclick="event.stopPropagation(); openImportModal('${p.id}')" class="bg-cyan-500 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-cyan-600 transition-colors flex items-center gap-1.5"><span class="iconify" data-icon="mdi:import"></span> Import to List</button>`;
+            }
+
+            // Trust Badges (Simulated)
+            const orders = p.orders || Math.floor(Math.random() * 500) + 15;
+            const badgeHtml = orders > 250 ? `<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-md z-10 flex items-center gap-1 shadow-md"><span class="iconify" data-icon="mdi:fire"></span> Hot</div>` : '';
+            
+            // Wishlist Heart Logic
+            const isWishlisted = wishlist.includes(p.id);
+            const heartIcon = isWishlisted ? 'mdi:heart' : 'mdi:heart-outline';
+            const heartColor = isWishlisted ? 'text-red-500' : 'text-white hover:text-red-500';
+            const heartHtml = currentUser ? `<button onclick="event.stopPropagation(); toggleWishlist('${p.id}')" class="absolute top-2 right-2 bg-black/40 backdrop-blur-sm p-1.5 rounded-full z-10 transition-colors"><span class="iconify text-lg ${heartColor}" data-icon="${heartIcon}"></span></button>` : '';
+
+            return `<div onclick="openDetailModal('${p.id}')" class="product-card bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-sm group cursor-pointer">
+                <div class="relative h-40 bg-slate-100 flex items-center justify-center overflow-hidden">
+                    ${badgeHtml}
+                    ${heartHtml}
+                    ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">` : `<span class="iconify text-5xl text-slate-300" data-icon="mdi:image-off-outline"></span>`}
+                    
+                    <!-- Hover Overlay -->
+                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                            ${btnHtml}
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 flex flex-col flex-1">
+                    <h3 class="text-sm font-bold text-slate-900 mb-1 truncate">${p.name||'Product'}</h3>
+                    <div class="text-[10px] text-slate-400 flex items-center gap-1 mb-3"><span class="iconify" data-icon="mdi:cart-outline"></span> ${orders} orders</div>
+                    <div class="flex items-center justify-between mt-auto pt-2 border-t border-slate-100">
+                        <div><div class="text-[10px] text-slate-400 uppercase">Base Cost</div><div class="text-sm font-bold text-red-500">${fmtM(p.baseCost)}</div></div>
+                        <div class="text-right"><div class="text-[10px] text-slate-400 uppercase">Sugg. Price</div><div class="text-sm font-bold text-green-600">${fmtM(p.suggestedPrice)}</div></div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function renderProducts() {
+                const placeholderHtml = Array(8).fill().map(() => `
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col shadow-sm relative">
+                    <div class="absolute top-3 right-3 bg-slate-100 text-slate-400 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider z-10">Pending</div>
+                    <div class="h-40 bg-slate-50 flex items-center justify-center border-b border-slate-100">
+                        <span class="iconify text-6xl text-slate-200" data-icon="mdi-package-variant-closed"></span>
+                    </div>
+                    <div class="p-4 flex flex-col flex-1">
+                        <h3 class="text-sm font-bold text-slate-300 mb-1 truncate">New Winning Product</h3>
+                        <p class="text-xs text-slate-300 mb-3 flex-1">New winning products are being sourced and will be uploaded here soon.</p>
+                        <div class="flex items-center justify-between mb-3 mt-auto pt-3 border-t border-slate-100">
+                            <div><div class="text-[10px] text-slate-300 uppercase">Base Cost</div><div class="text-sm font-bold text-slate-300">TZS 0</div></div>
+                            <div class="text-right"><div class="text-[10px] text-slate-300 uppercase">Sugg. Price</div><div class="text-sm font-bold text-slate-300">TZS 0</div></div>
+                        </div>
+                        <div class="bg-slate-100 text-slate-400 border border-slate-200 text-xs font-bold px-3 py-2.5 rounded-lg text-center cursor-default">Import to List</div>
+                    </div>
+                </div>
+            `).join('');
+			
+			
+            if(chapdropProducts.length === 0) {
+                document.getElementById('trending-grid').classList.remove('hidden');
+                document.getElementById('trending-grid').innerHTML = placeholderHtml;
+                document.getElementById('new-grid').classList.remove('hidden');
+                document.getElementById('new-grid').innerHTML = placeholderHtml;
+                document.getElementById('recommended-grid').classList.remove('hidden');
+                document.getElementById('recommended-grid').innerHTML = placeholderHtml;
+                return;
+            }
+
+            const trending = chapdropProducts.slice(0, 8);
+            const newProds = chapdropProducts.slice(8, 16);
+            const recommended = chapdropProducts.slice(16, 24);
+
+            const tGrid = document.getElementById('trending-grid');
+            const nGrid = document.getElementById('new-grid');
+            const rGrid = document.getElementById('recommended-grid');
+            
+            if(trending.length > 0) {
+                tGrid.classList.remove('hidden');
+                tGrid.innerHTML = trending.map(generateProductCard).join('');
+                if(trending.length < 8) tGrid.innerHTML += Array(8 - trending.length).fill(placeholderHtml).join('');
+            } else { tGrid.classList.remove('hidden'); tGrid.innerHTML = placeholderHtml; }
+
+            if(newProds.length > 0) {
+                nGrid.classList.remove('hidden');
+                nGrid.innerHTML = newProds.map(generateProductCard).join('');
+                if(newProds.length < 8) nGrid.innerHTML += Array(8 - newProds.length).fill(placeholderHtml).join('');
+            } else { nGrid.classList.remove('hidden'); nGrid.innerHTML = placeholderHtml; }
+
+            if(recommended.length > 0) {
+                rGrid.classList.remove('hidden');
+                rGrid.innerHTML = recommended.map(generateProductCard).join('');
+                if(recommended.length < 8) rGrid.innerHTML += Array(8 - recommended.length).fill(placeholderHtml).join('');
+            } else { rGrid.classList.remove('hidden'); rGrid.innerHTML = placeholderHtml; }
+        }
+
+        function openImportModal(prodId) {
+            const p = chapdropProducts.find(x => x.id === prodId);
+            if(!p) return;
+            document.getElementById('imp-id').value = p.id;
+            document.getElementById('imp-name').textContent = p.name;
+            document.getElementById('imp-cost').textContent = 'Base Cost: ' + fmtM(p.baseCost);
+            document.getElementById('imp-img').innerHTML = p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : '';
+            document.getElementById('imp-price').value = p.suggestedPrice || 0;
+            
+            const updateProfit = () => {
+                const profit = (parseInt(document.getElementById('imp-price').value)||0) - (p.baseCost||0);
+                document.getElementById('imp-profit').textContent = 'TZS ' + profit.toLocaleString();
+            };
+            document.getElementById('imp-price').oninput = updateProfit;
+            updateProfit();
+
+            document.getElementById('import-modal').classList.remove('hidden');
+        }
+
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.add('hidden');
+        }
+
+        function confirmImport(e) {
+            e.preventDefault();
+            const btn = document.getElementById('imp-btn');
+            btn.disabled = true;
+            btn.innerHTML = 'Importing...';
+
+            const prodId = document.getElementById('imp-id').value;
+            const p = chapdropProducts.find(x => x.id === prodId);
+            const sellPrice = parseInt(document.getElementById('imp-price').value) || 0;
+
+            if(sellPrice < p.baseCost) {
+                alert("Selling price cannot be lower than base cost!");
+                btn.disabled = false;
+                btn.innerHTML = 'Import to Store';
+                return;
+            }
+
+            db.collection('products').add({
+                merchantId: currentUser.uid,
+                name: p.name,
+                sku: p.sku || 'CHAPDROP-' + Date.now(),
+                chapdropId: p.id,
+                isChapdrop: true,
+                status: 'draft', // Set as draft so it appears in the Import List
+                baseCost: p.baseCost,
+                price: sellPrice,
+                stock: 9999,
+                minStock: 0,
+                description: p.description,
+                image: p.image,
+                category: p.category || 'Chapdrop',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                alert('Product imported successfully! Check your Import List.');
+                closeImportModal();
+                btn.disabled = false;
+                btn.innerHTML = 'Import to Store';
+            }).catch(err => {
+                alert(err.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Import to Store';
+            });
+        }
+        // --- SUPPLIERS LOGIC ---
+        async function loadSuppliers() {
+            try {
+                // Fetch real warehouses from your Firebase WMS
+                var snap = await db.collection('warehouses').get();
+                var warehouses = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                
+                document.getElementById('suppliers-loading').classList.add('hidden');
+                const grid = document.getElementById('suppliers-grid');
+                grid.classList.remove('hidden');
+
+                if (warehouses.length === 0) {
+                    // Fallback if admin hasn't added warehouses yet
+                    grid.innerHTML = `
+                        <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center"><span class="iconify text-xl text-cyan-600" data-icon="mdi:warehouse"></span></div>
+                                <h3 class="font-bold text-slate-900">ChapShop Main Warehouse</h3>
+                            </div>
+                            <p class="text-sm text-slate-500 mb-4">Our primary fulfillment center in Dar es Salaam. All Chapdrop products are pre-stocked here for instant dispatch.</p>
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                <span class="text-xs font-bold text-green-600">Active & Operational</span>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Render real warehouses
+                grid.innerHTML = warehouses.map(w => `
+                    <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center"><span class="iconify text-xl text-cyan-600" data-icon="mdi:warehouse"></span></div>
+                            <div>
+                                <h3 class="font-bold text-slate-900">${w.name || 'Warehouse'}</h3>
+                                <div class="text-xs text-slate-400">${w.location || 'Tanzania'}</div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-500 mb-4">Capacity: ${w.capacity || 'Unlimited'} units. This facility handles receiving, storage, pick & pack, and dispatch for all Chapdrop orders.</p>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            <span class="text-xs font-bold text-green-600">Active & Operational</span>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch(e) {
+                console.error("Error loading suppliers:", e);
+            }
+        }
+        // --- IMPORT LIST LOGIC ---
+        function loadImportList() {
+            const tbody = document.getElementById('import-tbody');
+            const loginPrompt = document.getElementById('import-login-prompt');
+            const emptyState = document.getElementById('import-empty');
+            
+            if (!currentUser) {
+                tbody.innerHTML = '';
+                loginPrompt.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                updateImportStats([]);
+                return;
+            }
+
+            loginPrompt.classList.add('hidden');
+            
+            db.collection('products').where('merchantId', '==', currentUser.uid).where('isChapdrop', '==', true).onSnapshot(snap => {
+                importedProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderImportList();
+            });
+        }
+
+        function renderImportList() {
+            const tbody = document.getElementById('import-tbody');
+            const emptyState = document.getElementById('import-empty');
+            
+            if (importedProducts.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                updateImportStats([]);
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            updateImportStats(importedProducts);
+
+            tbody.innerHTML = importedProducts.map(p => {
+                const profit = (p.price || 0) - (p.baseCost || 0);
+                const statusColor = p.status === 'published' ? 'bg-green-100 text-green-700' : p.status === 'scheduled' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700';
+                const statusText = p.status ? p.status.charAt(0).toUpperCase() + p.status.slice(1) : 'Draft';
+
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
+                                    ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<span class="iconify text-slate-300" data-icon="mdi:image-off"></span>`}
+                                </div>
+                                <span class="font-bold text-slate-900 truncate">${p.name}</span>
+                            </div>
+                        </td>
+                        <td class="p-4 text-right text-red-500 font-medium">${fmtM(p.baseCost)}</td>
+                        <td class="p-4 text-right font-bold text-slate-900">${fmtM(p.price)}</td>
+                        <td class="p-4 text-center text-green-600 font-bold">${fmtM(profit)}</td>
+                        <td class="p-4 text-center">
+                            <span class="px-2 py-1 rounded-md text-xs font-bold ${statusColor}">${statusText}</span>
+                        </td>
+                        <td class="p-4 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="editImportedPrice('${p.id}')" title="Edit Price" class="p-2 text-slate-500 hover:bg-slate-200 rounded-lg"><span class="iconify" data-icon="mdi:pencil"></span></button>
+                                <button onclick="pushToStore('${p.id}')" title="Push to Store" class="p-2 text-cyan-600 hover:bg-cyan-100 rounded-lg"><span class="iconify" data-icon="mdi:cloud-upload"></span></button>
+                                <button onclick="removeImported('${p.id}')" title="Remove" class="p-2 text-red-500 hover:bg-red-100 rounded-lg"><span class="iconify" data-icon="mdi:trash-can"></span></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateImportStats(prods) {
+            document.getElementById('stat-total').textContent = prods.length;
+            document.getElementById('stat-drafts').textContent = prods.filter(p => !p.status || p.status === 'draft').length;
+            document.getElementById('stat-scheduled').textContent = prods.filter(p => p.status === 'scheduled').length;
+            document.getElementById('stat-published').textContent = prods.filter(p => p.status === 'published').length;
+        }
+
+        function goToMarketplaceWithLoader(btn) {
+            btn.disabled = true;
+            const icon = btn.querySelector('.iconify');
+            const originalIcon = icon.getAttribute('data-icon');
+            icon.setAttribute('data-icon', 'mdi:loading');
+            icon.classList.add('animate-spin');
+            
+            setTimeout(() => {
+                switchView('marketplace');
+                btn.disabled = false;
+                icon.setAttribute('data-icon', originalIcon);
+                icon.classList.remove('animate-spin');
+            }, 1200);
+        }
+
+        function filterStatus(status) {
+            const tbody = document.getElementById('import-tbody');
+            let filtered = [];
+            
+            if (status === 'draft') {
+                filtered = importedProducts.filter(p => !p.status || p.status === 'draft');
+            } else {
+                filtered = importedProducts.filter(p => p.status === status);
+            }
+            
+            if (filtered.length === 0) {
+                alert(`You have no ${status} products.`);
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(p => {
+                const profit = (p.price || 0) - (p.baseCost || 0);
+                const statusColor = status === 'published' ? 'bg-green-100 text-green-700' : status === 'scheduled' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700';
+                const statusText = status.charAt(0).toUpperCase() + status.slice(1);
+                
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
+                                    ${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : `<span class="iconify text-slate-300" data-icon="mdi:image-off"></span>`}
+                                </div>
+                                <span class="font-bold text-slate-900 truncate">${p.name}</span>
+                            </div>
+                        </td>
+                        <td class="p-4 text-right text-red-500 font-medium">${fmtM(p.baseCost)}</td>
+                        <td class="p-4 text-right font-bold text-slate-900">${fmtM(p.price)}</td>
+                        <td class="p-4 text-center text-green-600 font-bold">${fmtM(profit)}</td>
+                        <td class="p-4 text-center"><span class="px-2 py-1 rounded-md text-xs font-bold ${statusColor}">${statusText}</span></td>
+                        <td class="p-4 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="editImportedPrice('${p.id}')" title="Edit Price" class="p-2 text-slate-500 hover:bg-slate-200 rounded-lg"><span class="iconify" data-icon="mdi:pencil"></span></button>
+                                <button onclick="pushToStore('${p.id}')" title="Push to Store" class="p-2 text-cyan-600 hover:bg-cyan-100 rounded-lg"><span class="iconify" data-icon="mdi:cloud-upload"></span></button>
+                                <button onclick="removeImported('${p.id}')" title="Remove" class="p-2 text-red-500 hover:bg-red-100 rounded-lg"><span class="iconify" data-icon="mdi:trash-can"></span></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            const newTr = document.createElement('tr');
+            newTr.innerHTML = `<td colspan="6" class="p-3 bg-slate-50 border-b border-slate-200 text-center"><button onclick="renderImportList()" class="text-xs font-bold text-cyan-600 hover:underline flex items-center gap-1 mx-auto"><span class="iconify" data-icon="mdi:arrow-left"></span> Back to All Products</button></td>`;
+            tbody.insertBefore(newTr, tbody.firstChild);
+        }
+
+        function editImportedPrice(prodId) {
+            const p = importedProducts.find(x => x.id === prodId);
+            if(!p) return;
+            
+            const newPrice = prompt(`Edit selling price for ${p.name}`, p.price);
+            if (newPrice !== null && !isNaN(newPrice) && parseInt(newPrice) >= (p.baseCost || 0)) {
+                db.collection('products').doc(prodId).update({ price: parseInt(newPrice) })
+                .then(() => alert("Price updated!"))
+                .catch(err => alert(err.message));
+            } else if (newPrice !== null) {
+                alert("Price cannot be lower than base cost.");
+            }
+        }
+
+        function pushToStore(prodId) {
+            if(!confirm("Push this product to your store? It will be visible for customers to buy.")) return;
+            db.collection('products').doc(prodId).update({ status: 'published' })
+            .then(() => alert("Product pushed to store successfully!"))
+            .catch(err => alert(err.message));
+        }
+
+        function pushAllToStore() {
+            if(importedProducts.length === 0) return alert("You have no products to push.");
+            if(!confirm("Push ALL draft products to your store?")) return;
+            
+            const batch = db.batch();
+            importedProducts.forEach(p => {
+                if (p.status !== 'published') {
+                    batch.update(db.collection('products').doc(p.id), { status: 'published' });
+                }
+            });
+            
+            batch.commit()
+            .then(() => alert("All products pushed to store!"))
+            .catch(err => alert(err.message));
+        }
+
+        function removeImported(prodId) {
+            if(!confirm("Remove this product from your import list?")) return;
+            db.collection('products').doc(prodId).delete()
+            .then(() => alert("Product removed."))
+            .catch(err => alert(err.message));
+        }
+
+        // --- VIEW ALL & CATEGORY FILTER LOGIC ---
+        function showAllProducts(title) {
+            document.getElementById('trending-section').classList.add('hidden');
+            document.getElementById('new-section').classList.add('hidden');
+            document.getElementById('recommended-section').classList.add('hidden');
+            
+            const fView = document.getElementById('filtered-view');
+            fView.classList.remove('hidden');
+            
+            document.getElementById('filtered-title').innerText = "All " + title + " Products";
+            
+            const fGrid = document.getElementById('filtered-grid');
+            const fNo = document.getElementById('no-filtered');
+            
+            if(chapdropProducts.length === 0) {
+                fGrid.innerHTML = '';
+                fNo.classList.remove('hidden');
+            } else {
+                fNo.classList.add('hidden');
+                fGrid.innerHTML = chapdropProducts.map(generateProductCard).join('');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function filterByCategory(category) {
+            document.getElementById('trending-section').classList.add('hidden');
+            document.getElementById('new-section').classList.add('hidden');
+            document.getElementById('recommended-section').classList.add('hidden');
+            
+            const fView = document.getElementById('filtered-view');
+            fView.classList.remove('hidden');
+            
+            document.getElementById('filtered-title').innerText = category + " Products";
+            
+            const filtered = chapdropProducts.filter(p => p.category === category);
+            const fGrid = document.getElementById('filtered-grid');
+            const fNo = document.getElementById('no-filtered');
+            
+            if(filtered.length === 0) {
+                fGrid.innerHTML = '';
+                fNo.classList.remove('hidden');
+            } else {
+                fNo.classList.add('hidden');
+                fGrid.innerHTML = filtered.map(generateProductCard).join('');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function clearFilter() {
+            document.getElementById('filtered-view').classList.add('hidden');
+            document.getElementById('trending-section').classList.remove('hidden');
+            document.getElementById('new-section').classList.remove('hidden');
+            document.getElementById('recommended-section').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+		        // --- QUICK LOGIN LOGIC ---
+        function openLoginModal() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        async function handleQuickLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('quick-login-btn');
+            const email = document.getElementById('quick-email').value;
+            const pass = document.getElementById('quick-pass').value;
+            
+            btn.disabled = true;
+            btn.innerHTML = 'Signing in...';
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                // The onAuthStateChanged listener will automatically close the modal 
+                // and update the UI to show "Import to List" buttons!
+                document.getElementById('login-modal').classList.add('hidden');
+            } catch(err) {
+                alert(err.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Sign In';
+            }
+        }
+		
+        // --- SORT LOGIC ---
+        function sortProducts() {
+            const criteria = document.getElementById('sort-select').value;
+            if (criteria === 'newest') {
+                chapdropProducts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            } else if (criteria === 'price-low') {
+                chapdropProducts.sort((a, b) => (a.baseCost || 0) - (b.baseCost || 0));
+            } else if (criteria === 'price-high') {
+                chapdropProducts.sort((a, b) => (b.baseCost || 0) - (a.baseCost || 0));
+            }
+            // Re-render the main sections
+            renderProducts();
+        }
+
+        // --- WISHLIST LOGIC ---
+        async function toggleWishlist(prodId) {
+            if (!currentUser) return;
+            
+            if (wishlist.includes(prodId)) {
+                wishlist = wishlist.filter(id => id !== prodId);
+            } else {
+                wishlist.push(prodId);
+            }
+            
+            // Update local UI immediately
+            renderProducts();
+            renderWishlist();
+            
+            // Save to Firebase
+            try {
+                await db.collection('users').doc(currentUser.uid).update({ wishlist: wishlist });
+            } catch(e) {
+                console.error("Error saving wishlist:", e);
+            }
+        }
+
+        function renderWishlist() {
+            const grid = document.getElementById('wishlist-grid');
+            const emptyState = document.getElementById('wishlist-empty');
+            if(!grid) return;
+            
+            const wishlistedProds = chapdropProducts.filter(p => wishlist.includes(p.id));
+            
+            if (wishlistedProds.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            grid.innerHTML = wishlistedProds.map(generateProductCard).join('');
+        }
+        // --- QUICK LOGIN LOGIC ---
+        function openLoginModal() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+
+        async function handleQuickLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('quick-login-btn');
+            const email = document.getElementById('quick-email').value;
+            const pass = document.getElementById('quick-pass').value;
+            
+            btn.disabled = true;
+            btn.innerHTML = 'Signing in...';
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                // The onAuthStateChanged listener will automatically close the modal 
+                // and update the UI to show "Import to List" buttons!
+                document.getElementById('login-modal').classList.add('hidden');
+            } catch(err) {
+                alert(err.message);
+                btn.disabled = false;
+                btn.innerHTML = 'Sign In';
+            }
+        }
+        // --- AUTOPLAY CAROUSEL LOGIC ---
+ 
+        let slideIndex = 0;
+        const slides = document.getElementsByClassName("promo-slide");
+        const dots = document.getElementsByClassName("dot");
+
+        function showSlides() {
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.opacity = "0";  
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) {slideIndex = 1}    
+            
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace("bg-white", "bg-white/40");
+                dots[i].className = dots[i].className.replace("w-4", "w-2");
+            }
+            
+            slides[slideIndex-1].style.opacity = "1";  
+            dots[slideIndex-1].className = dots[slideIndex-1].className.replace("bg-white/40", "bg-white");
+            dots[slideIndex-1].className = dots[slideIndex-1].className.replace("w-2", "w-4");
+            
+            setTimeout(showSlides, 4000); 
+        }
+
+        function currentSlide(n) {
+            slideIndex = n;
+            showSlides();
+        }
+
+        // Start the carousel and load products
+        showSlides();
+        loadProducts();
+    </script>
+</body>
+</html>

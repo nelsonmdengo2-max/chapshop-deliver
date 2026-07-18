@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Manager — ChapShop Delivery</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
     <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEwaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -224,6 +226,13 @@
                     <div class="sb-children" id="sec-stock">
                         <button type="button" data-tab="stock-create" data-panel="stock-create" data-title="Create Stock Account" class="sb-child">Create Stock Staff Account</button>
                     </div>
+
+                <div class="sb-section">
+                    <button type="button" class="sb-header" data-section="chapdrop"><span class="iconify text-lg" data-icon="mdi:rocket-launch"></span><span class="sb-label">Chapdrop Marketplace</span><span class="iconify sb-arrow" data-icon="mdi:chevron-down"></span></button>
+                    <div class="sb-children" id="sec-chapdrop">
+                        <button type="button" data-tab="chapdrop" data-panel="chapdrop" data-title="Chapdrop Catalog" class="sb-child">Master Catalog</button>
+                    </div>
+                </div>
                 </div>
 
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Follow Up</div>
@@ -252,6 +261,14 @@
                         <button type="button" data-tab="reports" data-panel="reports" data-report="revenue" data-title="Revenue Reports" class="sb-child">Revenue Reports</button>
                         <button type="button" data-tab="revenue-expenses" data-panel="revenue-expenses" data-title="Revenue vs Expenses" class="sb-child">Revenue vs Expenses</button>
                     </div>
+
+                <div class="sb-section">
+                    <button type="button" class="sb-header" data-section="finance"><span class="iconify text-lg" data-icon="mdi:finance"></span><span class="sb-label">Finance & Accounts</span><span class="iconify sb-arrow" data-icon="mdi:chevron-down"></span></button>
+                    <div class="sb-children" id="sec-finance">
+                        <button type="button" data-tab="finance" data-panel="finance" data-title="Financial Dashboard" class="sb-child">Dashboard</button>
+                        <button type="button" data-tab="finance-create" data-panel="finance-create" data-title="Create Finance Account" class="sb-child">Create Finance Manager</button>
+                    </div>
+                </div>
                 </div>
 
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">System</div>
@@ -735,7 +752,53 @@
                 <!-- PERMISSIONS -->
                 <div id="panel-permissions" class="tab-panel hidden"><div id="permissions-content">Loading...</div></div>
 
-                                <!-- AUDIT LOG -->
+                <!-- CHAPDROP CATALOG -->
+                <div id="panel-chapdrop" class="tab-panel hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                        <div class="lg:col-span-1 bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 h-fit">
+                            <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:package-variant-closed-plus"></span> Add Winning Product</h3>
+                            <form id="chapdrop-form" class="space-y-4">
+                                <div><label class="form-label">Product Name *</label><input type="text" id="cd-name" required class="input-dark" placeholder="e.g. Ginseng Five Treasure"></div>
+                                <div><label class="form-label">Category *</label>
+                                    <select id="cd-category" required class="input-dark">
+                                        <option value="">Select Category</option>
+                                        <option value="Men's Clothing">Men's Clothing</option>
+                                        <option value="Home & Garden">Home & Garden</option>
+                                        <option value="Health & Beauty">Health & Beauty</option>
+                                        <option value="Jewelry & Watches">Jewelry & Watches</option>
+                                        <option value="Bags & Shoes">Bags & Shoes</option>
+                                        <option value="Pet Supplies">Pet Supplies</option>
+                                        <option value="Toys & Kids">Toys & Kids</option>
+                                        <option value="Sports & Outdoors">Sports & Outdoors</option>
+                                        <option value="Phones & Electronics">Phones & Electronics</option>
+                                        <option value="Computer & Office">Computer & Office</option>
+                                        <option value="Automotive">Automotive</option>
+                                        <option value="Home Improvement">Home Improvement</option>
+                                        <option value="Gaming & Accessories">Gaming & Accessories</option>
+                                    </select>
+                                </div>
+                                <div><label class="form-label">Description</label><textarea id="cd-desc" rows="2" class="input-dark" placeholder="Short marketing description..."></textarea></div>
+                                <div><label class="form-label">Image URL *</label><input type="text" id="cd-image" required class="input-dark" placeholder="https://..."></div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div><label class="form-label">Base Cost (TZS) *</label><input type="number" id="cd-cost" required min="0" class="input-dark" placeholder="0"></div>
+                                    <div><label class="form-label">Suggested Price (TZS) *</label><input type="number" id="cd-price" required min="0" class="input-dark" placeholder="0"></div>
+                                </div>
+                                <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 text-sm flex items-center justify-center gap-2"><span class="iconify" data-icon="mdi:upload"></span> Upload to Marketplace</button>
+                            </form>
+                        </div>
+                        <div class="lg:col-span-2 bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-base font-bold text-white mb-4">Master Catalog</h3>
+                            <div class="overflow-x-auto">
+                                <table class="dtable min-w-[600px]">
+                                    <thead><tr><th>Product</th><th class="text-right">Base Cost</th><th class="text-right">Sugg. Price</th><th class="text-center">Action</th></tr></thead>
+                                    <tbody id="chapdrop-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AUDIT LOG -->
                 <div id="panel-audit" class="tab-panel hidden">
                     <div class="flex flex-col md:flex-row gap-3 mb-5 items-start md:items-center justify-between">
                         <div class="flex gap-2 flex-wrap">
@@ -758,6 +821,51 @@
                     </div>
                     <div id="audit-log-list">Loading...</div>
                 </div>
+                                <!-- FINANCE -->
+                <div id="panel-finance" class="tab-panel hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="perf-card"><div class="perf-accent bg-gradient-to-r from-green-500 to-transparent"></div><div class="text-[11px] font-bold text-green-400/60 uppercase tracking-wider mb-3">Gross Revenue</div><div id="fin-gross-rev" class="text-3xl font-extrabold text-white tracking-tight">TZS 0</div></div>
+                        <div class="perf-card"><div class="perf-accent bg-gradient-to-r from-cyan-500 to-transparent"></div><div class="text-[11px] font-bold text-cyan-400/60 uppercase tracking-wider mb-3">Company Profit (10%)</div><div id="fin-profit" class="text-3xl font-extrabold text-white tracking-tight">TZS 0</div></div>
+                        <div class="perf-card"><div class="perf-accent bg-gradient-to-r from-red-500 to-transparent"></div><div class="text-[11px] font-bold text-red-400/60 uppercase tracking-wider mb-3">Total Expenses & Refunds</div><div id="fin-expenses" class="text-3xl font-extrabold text-white tracking-tight">TZS 0</div></div>
+                        <div class="perf-card"><div class="perf-accent bg-gradient-to-r from-violet-500 to-transparent"></div><div class="text-[11px] font-bold text-violet-400/60 uppercase tracking-wider mb-3">Net Profit</div><div id="fin-net-profit" class="text-3xl font-extrabold text-white tracking-tight">TZS 0</div></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-base font-bold text-white mb-4">Merchant Outstanding Payouts</h3>
+                            <div class="overflow-x-auto">
+                                <table class="dtable min-w-[500px]">
+                                    <thead><tr><th>Merchant</th><th class="text-right">Outstanding</th><th class="text-center">Action</th></tr></thead>
+                                    <tbody id="fin-merchants-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-base font-bold text-white mb-4">Rider Cash Holdings (COD)</h3>
+                            <div class="overflow-x-auto">
+                                <table class="dtable min-w-[500px]">
+                                    <thead><tr><th>Rider</th><th class="text-right">Outstanding Cash</th><th class="text-center">Action</th></tr></thead>
+                                    <tbody id="fin-riders-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CREATE FINANCE ACCOUNT -->
+                <div id="panel-finance-create" class="tab-panel hidden">
+                    <div class="max-w-lg"><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:finance"></span> Create Finance Manager Account</h3>
+                        <form id="finance-form" class="space-y-4">
+                            <div><label class="form-label">Full Name *</label><input type="text" id="finance-name" required class="input-dark" placeholder="Finance Manager Name"></div>
+                            <div><label class="form-label">Email *</label><input type="email" id="finance-email" required class="input-dark" placeholder="finance@chapshop.com"></div>
+                            <div><label class="form-label">Password *</label><input type="password" id="finance-pass" required minlength="6" class="input-dark" placeholder="Min 6 characters"></div>
+                            <div><label class="form-label">Phone</label><input type="text" id="finance-phone" class="input-dark" placeholder="+255..."></div>
+                            <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Create Finance Account</button>
+                        </form>
+                    </div></div>
+                </div>
+
                 <!-- SETTINGS -->
                 <div id="panel-settings" class="tab-panel hidden"><div id="settings-content">Loading...</div></div>
             </div>
@@ -837,8 +945,8 @@ document.querySelectorAll('.sb-header[data-section]').forEach(function(btn){btn.
  $('menu-btn').addEventListener('click',function(){$('sidebar').classList.toggle('-translate-x-full');$('sidebar-overlay').classList.toggle('hidden')});
 
 /* ===== TABS ===== */
-document.querySelectorAll('[data-tab]').forEach(function(btn){btn.addEventListener('click',function(){var tab=this.getAttribute('data-tab'),panel=this.getAttribute('data-panel')||tab,title=this.getAttribute('data-title');orderStatusFilter=this.getAttribute('data-status-filter')||null;reportType=this.getAttribute('data-report')||null;settingType=this.getAttribute('data-setting')||null;document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.add('hidden')});document.querySelectorAll('.sb-dashboard,.sb-child').forEach(function(l){l.classList.remove('active')});var p=$('panel-'+panel);if(p)p.classList.remove('hidden');this.classList.add('active');var T={'dashboard':['Dashboard','System overview'],'merchant-create':['Create Merchant Account',''],'merchants':['All Merchants',''],'merchant-perf':['Merchant Performance',''],'orders':['All Orders',''],'shipping':['Shipments',''],'tracking':['Order Tracking',''],'ship-create':['Create Shipping Account',''],'ship-monitor':['Delivery Monitoring',''],'ship-returns':['Returns Management',''],'cc-create':['Create Agent Account',''],'callcenter':['All Agents',''],'cc-perf':['Agent Performance',''],'tickets':['Support Tickets',''],'customers':['Customers',''],'settlements':['Merchant Settlements',''],'reports':['Reports & Analytics',''],'users':['All Users',''],'roles':['Roles',''],'permissions':['Permissions',''],'settings':['Settings',''],'audit':['Audit Log',''],'refunds':['Refund Management',''],'rider-workload':['Rider Workload',''],'revenue-expenses':['Revenue vs Expenses','']};var t=title?[title,'']:(T[tab]||['Dashboard','']);$('page-title').textContent=t[0];$('page-subtitle').textContent=t[1];var ob=$('orders-back-btn');if(ob)ob.classList.toggle('hidden',!orderStatusFilter);
-var renders={'merchants':renderMerchants,'merchant-perf':renderMerchantPerf,'orders':renderAdminOrders,'shipping':renderShipping,'tracking':renderTracking,'ship-monitor':renderShipMon,'ship-returns':renderReturns,'callcenter':renderCCAgents,'cc-perf':renderCCPerf,'tickets':renderTickets,'customers':renderCustomers,'settlements':renderSettlements,'reports':renderReports,'users':renderUsers,'roles':renderRoles,'permissions':renderPermissions,'settings':renderSettings,'audit':renderAuditLog,'refunds':renderRefunds,'rider-workload':renderRiderWorkload,'revenue-expenses':renderRevExp};if(renders[tab])renders[tab]();if(window.innerWidth<1024)closeSidebar()})});
+document.querySelectorAll('[data-tab]').forEach(function(btn){btn.addEventListener('click',function(){var tab=this.getAttribute('data-tab'),panel=this.getAttribute('data-panel')||tab,title=this.getAttribute('data-title');orderStatusFilter=this.getAttribute('data-status-filter')||null;reportType=this.getAttribute('data-report')||null;settingType=this.getAttribute('data-setting')||null;document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.add('hidden')});document.querySelectorAll('.sb-dashboard,.sb-child').forEach(function(l){l.classList.remove('active')});var p=$('panel-'+panel);if(p)p.classList.remove('hidden');this.classList.add('active');var T={'dashboard':['Dashboard','System overview'],'merchant-create':['Create Merchant Account',''],'merchants':['All Merchants',''],'merchant-perf':['Merchant Performance',''],'orders':['All Orders',''],'shipping':['Shipments',''],'tracking':['Order Tracking',''],'ship-create':['Create Shipping Account',''],'ship-monitor':['Delivery Monitoring',''],'ship-returns':['Returns Management',''],'cc-create':['Create Agent Account',''],'callcenter':['All Agents',''],'cc-perf':['Agent Performance',''],'tickets':['Support Tickets',''],'customers':['Customers',''],'settlements':['Merchant Settlements',''],'reports':['Reports & Analytics',''],'users':['All Users',''],'roles':['Roles',''],'permissions':['Permissions',''],'settings':['Settings',''],'audit':['Audit Log',''],'refunds':['Refund Management',''],'rider-workload':['Rider Workload',''],'revenue-expenses':['Revenue vs Expenses',''],'finance':['Financial Dashboard','Track profit & settlements'],'finance-create':['Create Finance Account',''],'chapdrop':['Chapdrop Catalog','Manage winning products']};var t=title?[title,'']:(T[tab]||['Dashboard','']);$('page-title').textContent=t[0];$('page-subtitle').textContent=t[1];var ob=$('orders-back-btn');if(ob)ob.classList.toggle('hidden',!orderStatusFilter);
+var renders={'merchants':renderMerchants,'merchant-perf':renderMerchantPerf,'orders':renderAdminOrders,'shipping':renderShipping,'tracking':renderTracking,'ship-monitor':renderShipMon,'ship-returns':renderReturns,'callcenter':renderCCAgents,'cc-perf':renderCCPerf,'tickets':renderTickets,'customers':renderCustomers,'settlements':renderSettlements,'reports':renderReports,'users':renderUsers,'roles':renderRoles,'permissions':renderPermissions,'settings':renderSettings,'audit':renderAuditLog,'refunds':renderRefunds,'rider-workload':renderRiderWorkload,'revenue-expenses':renderRevExp,'finance':renderFinance,'chapdrop':renderChapdrop};if(renders[tab])renders[tab]();if(window.innerWidth<1024)closeSidebar()})});
 function clearOrderFilter(){orderStatusFilter=null;var ob=$('orders-back-btn');if(ob)ob.classList.add('hidden');var df=$('admin-order-filter');if(df)df.value='';clearBulk();renderAdminOrders()}
 
 /* ===== FIRESTORE ===== */
@@ -927,6 +1035,61 @@ function renderSettlements(){var c=$('settlements-list');if(!c)return;var merch=
 function renderReports(){var c=$('reports-content');if(!c)return;var type=reportType||'revenue';var list=byPeriod(allOrders,'createdAt',reportPeriod);if(type==='merchant'){var rows=allUsers.filter(function(u){return u.role==='merchant'}).map(function(u){var r=getMPDataP(u,list);return r});c.innerHTML='<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'+rows.map(function(r){return'<div class="perf-card"><div class="perf-accent bg-gradient-to-r from-cyan-500 to-transparent"></div><div class="flex items-center gap-3 mb-4"><div class="w-11 h-11 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold">'+(r.u.name||'M').charAt(0)+'</div><div><div class="text-white font-bold">'+(r.u.shopName||r.u.name)+'</div><div class="text-sm text-slate-500">'+r.t+' orders</div></div></div><div class="grid grid-cols-4 gap-3 text-center"><div><div class="text-xl font-extrabold text-green-400">'+r.d+'</div><div class="text-xs text-slate-500">Delivered</div></div><div><div class="text-xl font-extrabold text-cyan-400">'+r.rate+'%</div><div class="text-xs text-slate-500">Success</div></div><div><div class="text-xl font-extrabold text-yellow-400">'+r.p+'</div><div class="text-xs text-slate-500">Pending</div></div><div><div class="text-base font-extrabold text-cyan-400">'+fmtM(r.rev)+'</div><div class="text-xs text-slate-500">Revenue</div></div></div></div>'}).join('')+'</div>'}else if(type==='shipping'){var rows=allUsers.filter(function(u){return u.role==='shipping'||u.role==='shipping_manager'}).map(function(u){var rO=list.filter(function(o){return o.riderId===u.id});var d=rO.filter(function(o){return o.status==='delivered'}).length,ret=rO.filter(function(o){return o.status==='returned'}).length,act=rO.filter(function(o){return o.status==='out_for_delivery'}).length;return{u:u,t:rO.length,d:d,ret:ret,act:act,rev:rO.filter(function(o){return o.status==='delivered'}).reduce(function(s,o){return s+(o.totalAmount||0)},0)}});c.innerHTML='<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'+rows.map(function(r){return'<div class="perf-card"><div class="perf-accent bg-gradient-to-r from-violet-500 to-transparent"></div><div class="flex items-center gap-3 mb-4"><div class="w-11 h-11 rounded-xl bg-violet-500/10 flex items-center justify-center text-violet-400 font-bold">'+(r.u.name||'S').charAt(0)+'</div><div><div class="text-white font-bold">'+r.u.name+' <span class="badge bg-violet-500/10 text-violet-400 border border-violet-500/20 text-[10px]">'+(r.u.role==='shipping_manager'?'Manager':'Staff')+'</span></div><div class="text-sm text-slate-500">'+r.t+' assignments</div></div></div><div class="grid grid-cols-4 gap-3 text-center"><div><div class="text-xl font-extrabold text-green-400">'+r.d+'</div><div class="text-xs text-slate-500">Delivered</div></div><div><div class="text-xl font-extrabold text-violet-400">'+r.act+'</div><div class="text-xs text-slate-500">Active</div></div><div><div class="text-xl font-extrabold text-red-400">'+r.ret+'</div><div class="text-xs text-slate-500">Returned</div></div><div><div class="text-base font-extrabold text-cyan-400">'+fmtM(r.rev)+'</div><div class="text-xs text-slate-500">Revenue</div></div></div></div>'}).join('')+'</div>'}else if(type==='callcenter'){var rows=allUsers.filter(function(u){return u.role==='call_center'}).map(function(u){var aO=list.filter(function(o){return o.processedBy===u.id});var h=aO.filter(function(o){return['confirmed','no_answer','delivered','cancelled','wrong_number','callback_requested','out_of_region'].indexOf(o.status)!==-1});var d=aO.filter(function(o){return o.status==='delivered'}).length;var ts=aO.reduce(function(s,o){return s+(o.callDuration||0)},0);return{u:u,h:h.length,d:d,rate:h.length?Math.round(d/h.length*100):0,avg:h.length?Math.round(ts/h.length):0,total:ts}});c.innerHTML='<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'+rows.map(function(r){var bc=r.rate>=60?'bg-green-500':r.rate>=30?'bg-yellow-500':'bg-red-500';return'<div class="perf-card"><div class="perf-accent bg-gradient-to-r from-orange-500 to-transparent"></div><div class="flex items-center gap-3 mb-4"><div class="w-11 h-11 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 font-bold">'+(r.u.name||'C').charAt(0)+'</div><div><div class="text-white font-bold">'+r.u.name+'</div><div class="text-sm text-slate-500">'+r.h+' calls handled</div></div></div><div class="grid grid-cols-4 gap-3 text-center"><div><div class="text-xl font-extrabold text-green-400">'+r.d+'</div><div class="text-xs text-slate-500">Converted</div></div><div><div class="text-xl font-extrabold text-yellow-400">'+fmtDur(r.avg)+'</div><div class="text-xs text-slate-500">Avg Time</div></div><div><div class="text-xl font-extrabold text-orange-400">'+r.rate+'%</div><div class="text-xs text-slate-500">Success</div></div><div><div class="text-xl font-extrabold text-cyan-400">'+fmtDur(r.total)+'</div><div class="text-xs text-slate-500">Total Talk</div></div></div><div class="progress-bar mt-3"><div class="fill '+bc+'" style="width:'+r.rate+'%"></div></div></div>'}).join('')+'</div>'}else{var totalRev=list.filter(function(o){return o.status==='delivered'}).reduce(function(s,o){return s+(o.totalAmount||0)},0);var todayRev=allOrders.filter(function(o){return o.status==='delivered'&&isToday(o.createdAt)}).reduce(function(s,o){return s+(o.totalAmount||0)},0);var sc={};list.forEach(function(o){sc[o.status]=(sc[o.status]||0)+1});var colors={pending:'bg-yellow-500',accepted:'bg-blue-500',confirmed:'bg-cyan-500',delivered:'bg-green-500',cancelled:'bg-red-500',returned:'bg-slate-500',no_answer:'bg-orange-500',out_for_delivery:'bg-violet-500'};c.innerHTML='<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"><div class="perf-card"><div class="perf-accent bg-gradient-to-r from-cyan-500 to-transparent"></div><div class="text-xs font-bold text-cyan-400/60 uppercase mb-2">Total Revenue</div><div class="text-3xl font-extrabold text-white">'+fmtM(totalRev)+'</div></div><div class="perf-card"><div class="perf-accent bg-gradient-to-r from-green-500 to-transparent"></div><div class="text-xs font-bold text-green-400/60 uppercase mb-2">Today Revenue</div><div class="text-3xl font-extrabold text-white">'+fmtM(todayRev)+'</div></div><div class="perf-card"><div class="perf-accent bg-gradient-to-r from-violet-500 to-transparent"></div><div class="text-xs font-bold text-violet-400/60 uppercase mb-2">Total Orders</div><div class="text-3xl font-extrabold text-white">'+list.length+'</div></div></div><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-base font-bold text-white mb-5">Order Status Breakdown</h3><div class="space-y-4">'+Object.keys(sc).sort(function(a,b){return sc[b]-sc[a]}).map(function(s){var pct=list.length?Math.round(sc[s]/list.length*100):0;return'<div class="flex items-center gap-4"><div class="w-28 text-sm text-slate-400 font-medium">'+s.replace(/_/g,' ')+'</div><div class="flex-1 bg-white/[0.03] rounded-full h-3 overflow-hidden"><div class="'+(colors[s]||'bg-slate-500')+' h-full rounded-full" style="width:'+pct+'%"></div></div><div class="w-24 text-right text-sm text-white font-bold">'+sc[s]+' <span class="text-slate-500 font-normal">('+pct+'%)</span></div></div>'}).join('')+'</div></div>'}}
 function getMPDataP(u,list){var mO=list.filter(function(o){return o.merchantId===u.id||o.merchantName===(u.shopName||u.name)});var d=mO.filter(function(o){return o.status==='delivered'}).length;return{u:u,t:mO.length,d:d,p:mO.filter(function(o){return o.status==='pending'||o.status==='accepted'}).length,c:mO.filter(function(o){return o.status==='cancelled'}).length,r:mO.filter(function(o){return o.status==='returned'}).length,rev:mO.filter(function(o){return o.status==='delivered'}).reduce(function(s,o){return s+(o.totalAmount||0)},0),rate:mO.length?Math.round(d/mO.length*100):0}}
 function dlReport(){var type=reportType||'revenue';var list=byPeriod(allOrders,'createdAt',reportPeriod);if(type==='merchant'){dlCSV('merchant-report-'+reportPeriod+'.csv',['Merchant','Shop','Total','Delivered','Pending','Cancelled','Returned','Revenue','Success%'],allUsers.filter(function(u){return u.role==='merchant'}).map(function(u){var r=getMPDataP(u,list);return[r.u.name,r.u.shopName||'',r.t,r.d,r.p,r.c,r.r,r.rev,r.rate+'%']}))}else if(type==='shipping'){dlCSV('shipping-report-'+reportPeriod+'.csv',['Name','Role','Total','Delivered','Active','Returned','Revenue'],allUsers.filter(function(u){return u.role==='shipping'||u.role==='shipping_manager'}).map(function(u){var rO=list.filter(function(o){return o.riderId===u.id});return[u.name,u.role,rO.length,rO.filter(function(o){return o.status==='delivered'}).length,rO.filter(function(o){return o.status==='out_for_delivery'}).length,rO.filter(function(o){return o.status==='returned'}).length,rO.filter(function(o){return o.status==='delivered'}).reduce(function(s,o){return s+(o.totalAmount||0)},0)]}))}else if(type==='callcenter'){dlCSV('cc-report-'+reportPeriod+'.csv',['Agent','Calls','Confirmed','No Reply','Wrong#','Cancelled','Callback','OutRegion','Conversion%','Avg Call'],allUsers.filter(function(u){return u.role==='call_center'}).map(function(u){var aO=list.filter(function(o){return o.processedBy===u.id});var h=aO.filter(function(o){return['confirmed','no_answer','delivered','cancelled','wrong_number','callback_requested','out_of_region'].indexOf(o.status)!==-1});var d=aO.filter(function(o){return o.status==='delivered'}).length;var ts=aO.reduce(function(s,o){return s+(o.callDuration||0)},0);return[u.name,h.length,d,aO.filter(function(o){return o.status==='no_answer'}).length,aO.filter(function(o){return o.status==='wrong_number'}).length,aO.filter(function(o){return o.status==='cancelled'}).length,aO.filter(function(o){return o.status==='callback_requested'}).length,aO.filter(function(o){return o.status==='out_of_region'}).length,h.length?Math.round(d/h.length*100)+'%':'0%',h.length?fmtDur(Math.round(ts/h.length)):'0s']}))}else{var sc={};list.forEach(function(o){sc[o.status]=(sc[o.status]||0)+1});dlCSV('revenue-report-'+reportPeriod+'.csv',['Status','Count','Percentage'],Object.keys(sc).sort(function(a,b){return sc[b]-sc[a]}).map(function(s){return[s,sc[s],list.length?Math.round(sc[s]/list.length*100)+'%':'0%']}))}}
+
+/* ===== FINANCE DASHBOARD ===== */
+var allSettlements=[],settlementListenerStarted=false;
+function startSettlementListener(){if(settlementListenerStarted)return;settlementListenerStarted=true;db.collection('settlements').onSnapshot(function(s){allSettlements=snapDocs(s);renderFinance()})}
+function renderFinance(){
+    var c=$('panel-finance');if(!c)return;startSettlementListener();startRefundListener();startExpenseListener();
+    var del=allOrders.filter(function(o){return o.status==='delivered'});
+    var gross=del.reduce(function(s,o){return s+(o.totalAmount||0)},0);
+    var comm=Math.round(gross*0.1);
+    var exp=expenseLogs.reduce(function(s,e){return s+(e.amount||0)},0);
+    var ref=refundLogs.filter(function(r){return r.status==='approved'||r.status==='processed'}).reduce(function(s,r){return s+(r.amount||0)},0);
+    var net=comm-exp-ref;
+    setEl('fin-gross-rev',fmtM(gross));setEl('fin-profit',fmtM(comm));setEl('fin-expenses',fmtM(exp+ref));setEl('fin-net-profit',fmtM(net));
+
+    var mt=$('fin-merchants-tbody');
+    if(mt){
+        var merchants=allUsers.filter(function(u){return u.role==='merchant'});
+        if(!merchants.length){mt.innerHTML='<tr><td colspan="3" class="text-center text-slate-500 py-4">No merchants.</td></tr>'}
+        else{
+            mt.innerHTML=merchants.map(function(m){
+                var mDel=del.filter(function(o){return o.merchantId===m.id});
+                var mRev=mDel.reduce(function(s,o){return s+(o.totalAmount||0)},0);
+                var mComm=Math.round(mRev*0.1);
+                var mRef=refundLogs.filter(function(r){return r.merchantId===m.id&&(r.status==='approved'||r.status==='processed')}).reduce(function(s,r){return s+(r.amount||0)},0);
+                var mPaid=allSettlements.filter(function(s){return s.merchantId===m.id}).reduce(function(s,s2){return s+(s2.amount||0)},0);
+                var out=(mRev-mComm-mRef)-mPaid;
+                return '<tr><td class="text-white font-medium">'+(m.shopName||m.name)+'</td><td class="text-right font-bold text-yellow-400">'+fmtM(out)+'</td><td class="text-center"><button type="button" class="btn-sm green" onclick="settleMerchant(\''+m.id+'\', '+out+')">Settle</button></td></tr>';
+            }).join('');
+        }
+    }
+
+    var rt=$('fin-riders-tbody');
+    if(rt){
+        var riders=allUsers.filter(function(u){return u.role==='rider'||u.role==='shipping'});
+        if(!riders.length){rt.innerHTML='<tr><td colspan="3" class="text-center text-slate-500 py-4">No riders.</td></tr>'}
+        else{
+            rt.innerHTML=riders.map(function(r){
+                var rDel=del.filter(function(o){return o.riderId===r.id});
+                var cash=rDel.reduce(function(s,o){return s+(o.totalAmount||0)},0);
+                var paid=allSettlements.filter(function(s){return s.riderId===r.id}).reduce(function(s,s2){return s+(s2.amount||0)},0);
+                var out=cash-paid;
+                return '<tr><td class="text-white font-medium">'+r.name+'</td><td class="text-right font-bold text-yellow-400">'+fmtM(out)+'</td><td class="text-center"><button type="button" class="btn-sm green" onclick="settleRider(\''+r.id+'\', '+out+')">Settle Cash</button></td></tr>';
+            }).join('');
+        }
+    }
+}
+async function settleMerchant(mid,amt){if(amt<=0)return showT('No outstanding amount','error');if(!confirm('Confirm you have paid this merchant '+fmtM(amt)+'?'))return;try{await db.collection('settlements').add({merchantId:mid,amount:amt,type:'merchant_payout',settledBy:window.currentUser.uid,settledAt:firebase.firestore.FieldValue.serverTimestamp()});showT('Merchant settlement recorded!');logAudit('settlement','merchant',mid,fmtM(amt),'Paid merchant')}catch(e){showT(e.message,'error')}}
+async function settleRider(rid,amt){if(amt<=0)return showT('Rider has no outstanding cash','error');if(!confirm('Confirm rider has handed over '+fmtM(amt)+' in cash?'))return;try{await db.collection('settlements').add({riderId:rid,amount:amt,type:'rider_cash',settledBy:window.currentUser.uid,settledAt:firebase.firestore.FieldValue.serverTimestamp()});showT('Rider cash settlement recorded!');logAudit('settlement','rider',rid,fmtM(amt),'Collected cash from rider')}catch(e){showT(e.message,'error')}}
+
+/* ===== CHAPDROP CATALOG ===== */
+var allChapdrop=[],chapdropListenerStarted=false;
+function startChapdropListener(){if(chapdropListenerStarted)return;chapdropListenerStarted=true;db.collection('chapdrop_products').onSnapshot(function(s){allChapdrop=snapDocs(s);renderChapdrop()})}
+function renderChapdrop(){var c=$('panel-chapdrop');if(!c)return;startChapdropListener();var tb=$('chapdrop-tbody');if(!tb)return;if(!allChapdrop.length){tb.innerHTML='<tr><td colspan="4" class="text-center text-slate-500 py-8">No winning products uploaded yet.</td></tr>';return}tb.innerHTML=allChapdrop.map(function(p){return '<tr><td class="text-white font-medium">'+p.name+'</td><td class="text-right text-red-400">'+fmtM(p.baseCost)+'</td><td class="text-right text-green-400">'+fmtM(p.suggestedPrice)+'</td><td class="text-center"><button onclick="deleteChapdrop(\''+p.id+'\')" class="btn-sm red" style="padding:4px 10px;font-size:11px">Delete</button></td></tr>'}).join('')}
+ $('chapdrop-form').addEventListener('submit',function(e){e.preventDefault();var btn=e.target.querySelector('button[type="submit"]');var orig=btn.innerHTML;btn.innerHTML='<span class="iconify animate-spin" data-icon="mdi:loading"></span> Uploading...';btn.disabled=true;var data={name:$('cd-name').value.trim(),category:$('cd-category').value,description:$('cd-desc').value.trim(),image:$('cd-image').value.trim(),baseCost:parseInt($('cd-cost').value)||0,suggestedPrice:parseInt($('cd-price').value)||0,createdAt:firebase.firestore.FieldValue.serverTimestamp()};db.collection('chapdrop_products').add(data).then(function(){showT('Product added to marketplace!');e.target.reset();logAudit('settings_updated','chapdrop',data.name,'Added Chapdrop Product','Added '+data.name+' to marketplace')}).catch(function(err){showT(err.message,'error')}).finally(function(){btn.innerHTML=orig;btn.disabled=false})});
+function deleteChapdrop(id){if(!confirm('Delete this product from the marketplace?'))return;db.collection('chapdrop_products').doc(id).delete().then(function(){showT('Product deleted!')}).catch(function(err){showT(err.message,'error')})}
 
 /* ===== USERS ===== */
 function renderUsers(){var c=$('users-list');if(!c)return;var list=allUsers.filter(function(u){return u.role!=='admin'});if(!list.length){c.innerHTML=empty('mdi:shield-key-outline','No users.');return}var rc={'merchant':'bg-cyan-500/10 text-cyan-400','call_center':'bg-orange-500/10 text-orange-400','shipping':'bg-violet-500/10 text-violet-400','shipping_manager':'bg-violet-500/10 text-violet-400','rider':'bg-emerald-500/10 text-emerald-400','stock':'bg-amber-500/10 text-amber-400','follow_up':'bg-pink-500/10 text-pink-400'};c.innerHTML=list.map(function(u){var r=rc[u.role]||'bg-slate-500/10 text-slate-400';return'<div class="data-card p-4 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl '+(r.split(' ')[0])+' flex items-center justify-center '+(r.split(' ')[1])+' font-bold text-lg">'+(u.name||'U').charAt(0).toUpperCase()+'</div><div><div class="text-white font-bold">'+u.name+(u.approved===false?' <span class="badge bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">PENDING</span>':'')+'</div><div class="text-slate-500 text-sm">'+u.email+(u.shopName?' · '+u.shopName:'')+'</div></div></div><div class="flex items-center gap-3"><span class="badge '+r+'">'+u.role.replace(/_/g,' ')+'</span><button type="button" class="p-2 rounded-lg hover:bg-white/[0.04] '+(u.active?'text-green-400':'text-red-400')+'" data-toggle="'+u.id+'" data-state="'+!u.active+'"><span class="iconify text-xl" data-icon="'+(u.active?'mdi:toggle-switch':'mdi:toggle-switch-off-outline')+'"></span></button><button type="button" class="p-2 rounded-lg hover:bg-red-500/10 text-slate-500 hover:text-red-400" data-delete="'+u.id+'"><span class="iconify text-xl" data-icon="mdi:delete-outline"></span></button></div></div>'}).join('')}
@@ -1209,7 +1372,41 @@ document.addEventListener('click',function(e){
     btn=e.target.closest('[data-delete-order]');
     if(btn){if(confirm('Delete this order permanently?')){var doId=btn.getAttribute('data-delete-order');db.collection('orders').doc(doId).delete().then(function(){showT('Order deleted!');logAudit('order_deleted','order',doId,'#'+doId.slice(-6).toUpperCase(),'Deleted order permanently')}).catch(function(er){showT(er.message,'error')})}return}
     btn=e.target.closest('[data-edit-order]');
-    if(btn){var oid=btn.getAttribute('data-edit-order'),o=allOrders.find(function(x){return x.id===oid});if(!o)return;var agents=allUsers.filter(function(u){return u.role==='call_center'&&u.active});var riders=allUsers.filter(function(u){return(u.role==='shipping'||u.role==='shipping_manager')&&u.active});var statuses=['pending','accepted','confirmed','no_answer','wrong_number','callback_requested','out_of_region','out_for_delivery','delivered','returned','cancelled'];$('modal-container').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Order #'+o.id.slice(-6).toUpperCase()+'</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="edit-order-form" class="space-y-4"><div><label class="form-label">Customer Name</label><input type="text" id="eo-name" class="input-dark" value="'+(o.customerName||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Phone</label><input type="text" id="eo-phone" class="input-dark" value="'+(o.customerPhone||'')+'"></div><div><label class="form-label">City</label><input type="text" id="eo-city" class="input-dark" value="'+(o.customerCity||'')+'"></div></div><div><label class="form-label">Address</label><input type="text" id="eo-address" class="input-dark" value="'+(o.customerAddress||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Status</label><select id="eo-status" class="input-dark">'+statuses.map(function(s){return'<option value="'+s+'" class="bg-slate-900"'+(o.status===s?' selected':'')+'>'+s.replace(/_/g,' ')+'</option>'}).join('')+'</select></div><div><label class="form-label">Amount (TZS)</label><input type="number" id="eo-amount" class="input-dark" value="'+(o.totalAmount||0)+'"></div></div><div><label class="form-label">Assign to Agent</label><select id="eo-agent" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+agents.map(function(a){return'<option value="'+a.id+'" class="bg-slate-900"'+(o.processedBy===a.id?' selected':'')+'>'+a.name+'</option>'}).join('')+'</select></div><div><label class="form-label">Assign to Rider</label><select id="eo-rider" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+riders.map(function(r){return'<option value="'+r.id+'" class="bg-slate-900"'+(o.riderId===r.id?' selected':'')+'>'+r.name+'</option>'}).join('')+'</select></div><button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Save Changes</button></form></div></div>';document.getElementById('edit-order-form').addEventListener('submit',function(ev){ev.preventDefault();var up={customerName:$('eo-name').value,customerPhone:$('eo-phone').value,customerCity:$('eo-city').value,customerAddress:$('eo-address').value,status:$('eo-status').value,totalAmount:parseInt($('eo-amount').value)||0};var ag=$('eo-agent').value;if(ag){var agObj=allUsers.find(function(u){return u.id===ag});up.processedBy=ag;up.processedByName=agObj?agObj.name:''}else{up.processedBy=firebase.firestore.FieldValue.delete();up.processedByName=firebase.firestore.FieldValue.delete()}var rd=$('eo-rider').value;if(rd){var rdObj=allUsers.find(function(u){return u.id===rd});up.riderId=rd;up.riderName=rdObj?rdObj.name:''}else{up.riderId=firebase.firestore.FieldValue.delete();up.riderName=firebase.firestore.FieldValue.delete()}db.collection('orders').doc(oid).update(up).then(function(){showT('Order updated!');if(up.status==='delivered'&&o.status!=='delivered'){autoMinusStock(o)};closeModal()}).catch(function(er){showT(er.message,'error')})});return}
+    if(btn){var oid=btn.getAttribute('data-edit-order'),o=allOrders.find(function(x){return x.id===oid});if(!o)return;var agents=allUsers.filter(function(u){return u.role==='call_center'&&u.active});var riders=allUsers.filter(function(u){return(u.role==='shipping'||u.role==='shipping_manager')&&u.active});var statuses=['pending','accepted','confirmed','no_answer','wrong_number','callback_requested','out_of_region','out_for_delivery','delivered','returned','cancelled'];$('modal-container').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Order #'+o.id.slice(-6).toUpperCase()+'</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="edit-order-form" class="space-y-4"><div><label class="form-label">Customer Name</label><input type="text" id="eo-name" class="input-dark" value="'+(o.customerName||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Phone</label><input type="text" id="eo-phone" class="input-dark" value="'+(o.customerPhone||'')+'"></div><div><label class="form-label">City</label><input type="text" id="eo-city" class="input-dark" value="'+(o.customerCity||'')+'"></div></div><div><label class="form-label">Address</label><input type="text" id="eo-address" class="input-dark" value="'+(o.customerAddress||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Status</label><select id="eo-status" class="input-dark">'+statuses.map(function(s){return'<option value="'+s+'" class="bg-slate-900"'+(o.status===s?' selected':'')+'>'+s.replace(/_/g,' ')+'</option>'}).join('')+'</select></div><div><label class="form-label">Amount (TZS)</label><input type="number" id="eo-amount" class="input-dark" value="'+(o.totalAmount||0)+'"></div></div><div><label class="form-label">Assign to Agent</label><select id="eo-agent" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+agents.map(function(a){return'<option value="'+a.id+'" class="bg-slate-900"'+(o.processedBy===a.id?' selected':'')+'>'+a.name+'</option>'}).join('')+'</select></div><div><label class="form-label">Assign to Rider</label><select id="eo-rider" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+riders.map(function(r){return'<option value="'+r.id+'" class="bg-slate-900"'+(o.riderId===r.id?' selected':'')+'>'+r.name+'</option>'}).join('')+'</select></div><button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Save Changes</button></form></div></div>';document.getElementById('edit-order-form').addEventListener('submit',async function(ev){
+    ev.preventDefault();
+    var up={customerName:$('eo-name').value,customerPhone:$('eo-phone').value,customerCity:$('eo-city').value,customerAddress:$('eo-address').value,status:$('eo-status').value,totalAmount:parseInt($('eo-amount').value)||0};
+    var ag=$('eo-agent').value;if(ag){var agObj=allUsers.find(function(u){return u.id===ag});up.processedBy=ag;up.processedByName=agObj?agObj.name:''}else{up.processedBy=firebase.firestore.FieldValue.delete();up.processedByName=firebase.firestore.FieldValue.delete()}
+    var rd=$('eo-rider').value;if(rd){var rdObj=allUsers.find(function(u){return u.id===rd});up.riderId=rd;up.riderName=rdObj?rdObj.name:''}else{up.riderId=firebase.firestore.FieldValue.delete();up.riderName=firebase.firestore.FieldValue.delete()}
+
+    // --- AUTOMATIC STOCK DEDUCTION LOGIC ---
+    if (o.itemName && o.status !== up.status) {
+        try {
+            var snap = await db.collection('products').where('name', '==', o.itemName).limit(1).get();
+            if (!snap.empty) {
+                var prodDoc = snap.docs[0];
+                var prodUpdate = {};
+                var qty = o.qty || 1;
+
+                if ((up.status === 'out_for_delivery' || up.status === 'delivered') && o.stockDeducted !== true) {
+                    prodUpdate.stock = firebase.firestore.FieldValue.increment(-qty);
+                    up.stockDeducted = true;
+                }
+                if (up.status === 'delivered') {
+                    prodUpdate.delivered = firebase.firestore.FieldValue.increment(qty);
+                }
+                if ((up.status === 'returned' || up.status === 'cancelled') && o.stockDeducted === true) {
+                    prodUpdate.stock = firebase.firestore.FieldValue.increment(qty);
+                    up.stockDeducted = false;
+                }
+                if (Object.keys(prodUpdate).length > 0) {
+                    await prodDoc.ref.update(prodUpdate);
+                }
+            }
+        } catch(e) { console.error("Admin stock adjust error:", e); }
+    }
+
+    db.collection('orders').doc(oid).update(up).then(function(){showT('Order updated!');closeModal()}).catch(function(er){showT(er.message,'error')})
+});return}
     btn=e.target.closest('[data-assign-order]');
     if(btn){var oid=btn.getAttribute('data-assign-order'),agents=allUsers.filter(function(u){return u.role==='call_center'&&u.active});if(!agents.length){showT('No active agents available','error');return}$('modal-container').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Assign Agent</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="assign-form" class="space-y-4"><div><label class="form-label">Select Agent</label><select id="as-agent" class="input-dark" required>'+agents.map(function(a){return'<option value="'+a.id+'" class="bg-slate-900">'+a.name+' ('+a.email+')</option>'}).join('')+'</select></div><button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Assign</button></form></div></div>';document.getElementById('assign-form').addEventListener('submit',function(ev){ev.preventDefault();var ag=$('as-agent').value,agObj=allUsers.find(function(u){return u.id===ag});db.collection('orders').doc(oid).update({processedBy:ag,processedByName:agObj?agObj.name:''}).then(function(){showT('Agent assigned!');logAudit('order_assigned','order',oid,'#'+oid.slice(-6).toUpperCase(),'Assigned to agent '+(agObj?agObj.name:''))}).catch(function(er){showT(er.message,'error')})});return}
     btn=e.target.closest('[data-print-order]');
@@ -1417,6 +1614,36 @@ function togglePass(id,btn){
             });
         });
 
+        /* ===== CREATE FINANCE ACCOUNT ===== */
+        $('finance-form').addEventListener('submit', function(e){
+            e.preventDefault();
+            var btn=this.querySelector('button[type="submit"]'),orig=btn.innerHTML;
+            btn.innerHTML='<span class="iconify animate-spin" data-icon="mdi:loading"></span> Creating...';
+            btn.disabled=true;btn.classList.add('opacity-70');
+            var email=$('finance-email').value.trim(),pass=$('finance-pass').value,name=$('finance-name').value.trim();
+            if(pass.length<6){showT('Password must be at least 6 characters','error');btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70');return}
+            createUser(email,pass).then(function(uid){
+                return db.collection('users').doc(uid).set({
+                    name:name,
+                    email:email,
+                    role:'finance',
+                    phone:$('finance-phone').value.trim()||'',
+                    active:true,
+                    createdAt:firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }).then(function(uid){
+                showT('Finance account created successfully!');
+                logAudit('user_created','user',uid,'Finance: '+name,'Created finance account — '+email);
+                this.reset();
+            }.bind(this)).catch(function(err){
+                var msg=err.message;
+                if(msg.indexOf('EMAIL_EXISTS')!==-1)msg='This email is already registered';
+                showT(msg,'error');
+            }).finally(function(){
+                btn.innerHTML=orig;btn.disabled=false;btn.classList.remove('opacity-70');
+            });
+        });
+
         /* ===== CREATE FOLLOW-UP ACCOUNT ===== */
         $('followup-form').addEventListener('submit', function(e){
             e.preventDefault();
@@ -1545,7 +1772,7 @@ function togglePass(id,btn){
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.replace(/[&<>"']/g, m => map[m]);
         }
-		        async function autoMinusStock(order) {
+		                        async function autoMinusStock(order) {
             if (!order.itemName || !order.merchantId || !order.qty) return;
             try {
                 var snap = await db.collection('products').where('name', '==', order.itemName).where('merchantId', '==', order.merchantId).limit(1).get();
@@ -1553,10 +1780,23 @@ function togglePass(id,btn){
                     var prodDoc = snap.docs[0];
                     var currentStock = prodDoc.data().stock || 0;
                     var newStock = Math.max(0, currentStock - order.qty);
-                    await prodDoc.ref.update({ stock: newStock });
+                    // Deduct Available Stock AND Increment Delivered Count
+                    await prodDoc.ref.update({ 
+                        stock: newStock,
+                        delivered: firebase.firestore.FieldValue.increment(order.qty)
+                    });
                 }
             } catch(e) { console.error("Stock deduct error:", e); }
         }
 </script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(reg => console.log('Service Worker registered successfully.'))
+            .catch(err => console.log('Service Worker registration failed:', err));
+        });
+      }
+    </script>
 </body>
 </html>

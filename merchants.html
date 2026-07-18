@@ -35,6 +35,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script>
+        var fc={apiKey:"AIzaSyBjyRehaNQqt5ogt5U3tiw8NYr4TyuX2iI",authDomain:"chapshop-delivery-88fe1.firebaseapp.com",projectId:"chapshop-delivery-88fe1",storageBucket:"chapshop-delivery-88fe1.firebasestorage.app",messagingSenderId:"540757404981",appId:"1:540757404981:web:f5ae5d041dd260304eb07c"};
+        firebase.initializeApp(fc);var auth=firebase.auth(),db=firebase.firestore();
+    </script>
 
     <style>
         * { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -266,7 +273,7 @@
         </div>
     </footer>
 
-    <!-- NO SUPABASE — Pure Local Storage -->
+        <!-- FIREBASE AUTH & FIRESTORE -->
     <script>
     // =============================================
     // TRANSLATIONS
@@ -424,54 +431,7 @@
     });
 
     // =============================================
-    // LOCAL STORAGE AUTH — No Supabase needed!
-    // =============================================
-    function getMerchants(){ return JSON.parse(localStorage.getItem('chapshop_merchants')||'[]'); }
-    function saveMerchants(m){ localStorage.setItem('chapshop_merchants',JSON.stringify(m)); }
-
-    function localSignUp(name,business,email,phone,country,password){
-        var merchants=getMerchants();
-        for(var i=0;i<merchants.length;i++){
-            if(merchants[i].email===email) return {error:{message:T[currentLang].error_email_exists}};
-        }
-        var userObj={id:'local-'+Date.now(),name:name,business:business,email:email,phone:phone,country:country,password:password,created_at:new Date().toISOString()};
-        merchants.push(userObj);
-        saveMerchants(merchants);
-
-        // Also send to WhatsApp as backup notification
-        var waMsg='🆕 *NEW MERCHANT SIGNUP*\n━━━━━━━━━━━━━━\n\n';
-        waMsg+='👤 *Name:* '+name+'\n';
-        waMsg+='🏢 *Business:* '+business+'\n';
-        waMsg+='📧 *Email:* '+email+'\n';
-        waMsg+='📞 *Phone:* '+phone+'\n';
-        waMsg+='🌍 *Country:* '+country+'\n';
-        waMsg+='\n🕐 '+new Date().toLocaleString('en-GB',{timeZone:'Africa/Dar_es_Salaam'});
-        var waUrl='https://wa.me/255768799110?text='+encodeURIComponent(waMsg);
-        // Open in background tab
-        var link=document.createElement('a'); link.href=waUrl; link.target='_blank'; link.rel='noopener'; link.click();
-
-        return {data:{user:userObj}};
-    }
-
-    function localLogin(email,password){
-        var merchants=getMerchants();
-        for(var i=0;i<merchants.length;i++){
-            if(merchants[i].email===email && merchants[i].password===password){
-                var userData={id:merchants[i].id,name:merchants[i].name,business:merchants[i].business,email:merchants[i].email,phone:merchants[i].phone,country:merchants[i].country};
-                localStorage.setItem('chapshop_logged_in',JSON.stringify(userData));
-                return {data:{user:userData}};
-            }
-        }
-        return {error:{message:T[currentLang].error_invalid}};
-    }
-
-    function localGetUser(){
-        var user=localStorage.getItem('chapshop_logged_in');
-        return user?{data:{user:JSON.parse(user)}}:{data:{user:null}};
-    }
-
-    // =============================================
-    // FORM HANDLERS
+    // FORM HANDLERS (FIREBASE)
     // =============================================
     document.getElementById('signupForm').onsubmit=function(e){
         e.preventDefault();
@@ -482,28 +442,52 @@
         });
         if(!allValid) return;
 
-        var result=localSignUp(
-            document.getElementById('sName').value.trim(),
-            document.getElementById('sBusiness').value.trim(),
-            document.getElementById('sEmail').value.trim(),
-            document.getElementById('sPhone').value.trim(),
-            document.getElementById('sCountry').value,
-            document.getElementById('sPassword').value
-        );
+        var name=document.getElementById('sName').value.trim();
+        var business=document.getElementById('sBusiness').value.trim();
+        var email=document.getElementById('sEmail').value.trim();
+        var phone=document.getElementById('sPhone').value.trim();
+        var country=document.getElementById('sCountry').value;
+        var password=document.getElementById('sPassword').value;
 
-        if(result.error){ showToast(result.error.message,'error'); return; }
+        var btn=document.getElementById('signupBtn');
+        btn.disabled=true;
+        document.getElementById('signupBtnText').textContent='Creating...';
 
-        // Show success animation
-        document.getElementById('signupBox').style.display='none';
-        document.getElementById('successBox').classList.add('visible');
-
-        // Pre-fill login email
-        document.getElementById('lEmail').value=document.getElementById('sEmail').value;
-
-        // Clear signup form
-        document.getElementById('signupForm').reset();
-
-        showToast(t.toast_created,'success');
+        // 1. Create Auth Account
+        auth.createUserWithEmailAndPassword(email, password)
+        .then(function(userCredential) {
+            var uid = userCredential.user.uid;
+            
+            // 2. Save to Firestore Database
+            return db.collection('users').doc(uid).set({
+                name: name,
+                shopName: business,
+                email: email,
+                phone: phone,
+                country: country,
+                role: 'merchant',
+                active: false, // Admin must approve
+                approved: false,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        })
+        .then(function() {
+            // 3. Show success animation
+            document.getElementById('signupBox').style.display='none';
+            document.getElementById('successBox').classList.add('visible');
+            document.getElementById('lEmail').value=email;
+            document.getElementById('signupForm').reset();
+            showToast(t.toast_created,'success');
+        })
+        .catch(function(error) {
+            var msg = error.message;
+            if(error.code === 'auth/email-already-in-use') msg = t.error_email_exists;
+            showToast(msg, 'error');
+        })
+        .finally(function() {
+            btn.disabled=false;
+            document.getElementById('signupBtnText').textContent=t.btn_create;
+        });
     };
 
     document.getElementById('loginForm').onsubmit=function(e){
@@ -518,28 +502,69 @@
         });
         if(!allValid) return;
 
-        var result=localLogin(email,password);
+        var btn=document.getElementById('loginBtn');
+        btn.disabled=true;
+        document.getElementById('loginBtnText').textContent='Logging in...';
 
-        if(result.error){
-            document.getElementById('loginErrorMsg').textContent=result.error.message;
+        auth.signInWithEmailAndPassword(email, password)
+        .then(function() {
+            document.getElementById('loginError').style.display='none';
+            showToast(t.toast_welcome,'success');
+            // Redirect is handled by onAuthStateChanged below
+        })
+        .catch(function(error) {
+            document.getElementById('loginErrorMsg').textContent=t.error_invalid;
             document.getElementById('loginError').style.display='flex';
-            return;
-        }
-
-        document.getElementById('loginError').style.display='none';
-        showToast(t.toast_welcome,'success');
-        setTimeout(function(){ window.location.href='dashboard.html'; }, 800);
+            btn.disabled=false;
+            document.getElementById('loginBtnText').textContent=t.btn_login;
+        });
     };
+
+    // =============================================
+    // AUTH STATE LISTENER (REDIRECTS TO DASHBOARD)
+    // =============================================
+    auth.onAuthStateChanged(async function(user) {
+        if (user) {
+            // User is logged in, check if they are a merchant
+            try {
+                var doc = await db.collection('users').doc(user.uid).get();
+                if (doc.exists) {
+                    var data = doc.data();
+                    if (data.role === 'merchant') {
+                        
+                        // Check if they came from the Chapdrop Marketplace
+                        var urlParams = new URLSearchParams(window.location.search);
+                        var chapdropRedirect = urlParams.get('redirect');
+                        
+                        if (chapdropRedirect === 'chapdrop') {
+                            // Send them back to the Marketplace to start importing!
+                            window.location.href = 'chapdrop-store.html';
+                            return;
+                        }
+
+                        // Normal merchant login flow
+                        if (data.active && data.approved) {
+                            // Redirect to the real Merchant Dashboard!
+                            window.location.href = 'merchant.html';
+                        } else {
+                            // Not approved yet
+                            document.getElementById('loginErrorMsg').textContent = 'Your account is pending admin approval.';
+                            document.getElementById('loginError').style.display='flex';
+                            auth.signOut(); // Log them out so they don't get stuck
+                        }
+                    }
+                }
+            } catch(e) {
+                console.error("Error checking user role:", e);
+            }
+        }
+    });
 
     // =============================================
     // INIT
     // =============================================
     function init(){
-        var result=localGetUser();
-        if(result.data && result.data.user){
-            window.location.href='dashboard.html';
-            return;
-        }
+        // The onAuthStateChanged listener handles all redirects now.
         setLanguage(currentLang);
     }
 
