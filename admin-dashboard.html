@@ -171,6 +171,7 @@
                         <button type="button" data-tab="merchants" data-panel="merchants" class="sb-child">All Merchants</button>
                         <button type="button" data-tab="merchant-perf" data-panel="merchant-perf" data-title="Merchant Performance" class="sb-child">Merchant Performance</button>
                         <button type="button" data-tab="settlements" data-panel="settlements" class="sb-child">Settlements</button>
+                        <button type="button" data-tab="announcements" data-panel="announcements" data-title="Merchant Announcements" class="sb-child">Announcements</button>
                     </div>
                 </div>
 
@@ -196,6 +197,7 @@
                         <button type="button" data-tab="ship-monitor" data-panel="ship-monitor" data-title="Delivery Monitoring" class="sb-child">Delivery Monitoring</button>
                         <button type="button" data-tab="rider-workload" data-panel="rider-workload" data-title="Rider Workload" class="sb-child">Rider Workload</button>
                         <button type="button" data-tab="ship-returns" data-panel="ship-returns" data-title="Returns Management" class="sb-child">Returns Management</button>
+                        <button type="button" data-tab="sla" data-panel="sla" data-title="SLA Breach Monitor" class="sb-child">SLA Breach Monitor</button>
                     </div>
                 </div>
 
@@ -206,6 +208,7 @@
                         <button type="button" data-tab="cc-create" data-panel="cc-create" data-title="Create Agent Account" class="sb-child">Create Agent Account</button>
                         <button type="button" data-tab="callcenter" data-panel="callcenter" class="sb-child">All Agents</button>
                         <button type="button" data-tab="cc-perf" data-panel="cc-perf" data-title="Agent Performance" class="sb-child">Agent Performance</button>
+                        <button type="button" data-tab="cc-audio" data-panel="cc-audio" data-title="Call Activity & Audio" class="sb-child">Call Activity & Audio</button>
                         <button type="button" data-tab="orders" data-panel="orders" data-status-filter="escalations" data-title="Escalations" class="sb-child">Escalations</button>
                                               <button type="button" data-tab="tickets" data-panel="tickets" class="sb-child">Support Tickets</button>
                                                                       <button type="button" data-tab="livechat" data-panel="livechat" data-title="Live Chat Support" class="sb-child">Live Chat</button>
@@ -215,7 +218,8 @@
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Riders</div>
                 <div class="sb-section">
                     <button type="button" class="sb-header" data-section="riders"><span class="iconify text-lg" data-icon="mdi:moped"></span><span class="sb-label">Rider Management</span><span class="iconify sb-arrow" data-icon="mdi:chevron-down"></span></button>
-                    <div class="sb-children" id="sec-riders">
+                                 <div class="sb-children" id="sec-riders">
+                        <button type="button" data-tab="all-riders" data-panel="all-riders" data-title="All Riders" class="sb-child">All Riders</button>
                         <button type="button" data-tab="rider-create" data-panel="rider-create" data-title="Create Rider Account" class="sb-child">Create Rider Account</button>
                     </div>
                 </div>
@@ -223,8 +227,10 @@
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Inventory</div>
                 <div class="sb-section">
                     <button type="button" class="sb-header" data-section="stock"><span class="iconify text-lg" data-icon="mdi:warehouse"></span><span class="sb-label">Stock Management</span><span class="iconify sb-arrow" data-icon="mdi:chevron-down"></span></button>
-                    <div class="sb-children" id="sec-stock">
-                        <button type="button" data-tab="stock-create" data-panel="stock-create" data-title="Create Stock Account" class="sb-child">Create Stock Staff Account</button>
+                                       <div class="sb-children" id="sec-stock">
+                        <button type="button" data-tab="stock-levels" data-panel="stock-levels" data-title="Merchant Stock Levels" class="sb-child">Merchant Stock Levels</button>
+                        <button type="button" data-tab="all-stock" data-panel="all-stock" data-title="All Stock Staff" class="sb-child">All Stock Staff</button>
+                        <button type="button" data-tab="stock-create" data-panel="stock-create" data-title="Create Stock Staff Account" class="sb-child">Create Stock Staff Account</button>
                     </div>
 
                 <div class="sb-section">
@@ -238,7 +244,10 @@
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Follow Up</div>
                 <div class="sb-section">
                     <button type="button" class="sb-header" data-section="followup"><span class="iconify text-lg" data-icon="mdi:phone-follow"></span><span class="sb-label">Follow-Up Management</span><span class="iconify sb-arrow" data-icon="mdi:chevron-down"></span></button>
-                    <div class="sb-children" id="sec-followup">
+                                       <div class="sb-children" id="sec-followup">
+                        <button type="button" data-tab="all-followup" data-panel="all-followup" data-title="All Follow-Up Agents" class="sb-child">All Follow-Up Agents</button>
+                        <button type="button" data-tab="followup-perf" data-panel="followup-perf" data-title="Follow-Up Performance" class="sb-child">Follow-Up Performance</button>
+                        <button type="button" data-tab="followup-audio" data-panel="followup-audio" data-title="Follow-Up Call Activity" class="sb-child">Call Activity & Audio</button>
                         <button type="button" data-tab="followup-create" data-panel="followup-create" data-title="Create Follow-Up Account" class="sb-child">Create Follow-Up Account</button>
                     </div>
                 </div>
@@ -260,6 +269,7 @@
                         <button type="button" data-tab="reports" data-panel="reports" data-report="callcenter" data-title="Call Center Reports" class="sb-child">Call Center Reports</button>
                         <button type="button" data-tab="reports" data-panel="reports" data-report="revenue" data-title="Revenue Reports" class="sb-child">Revenue Reports</button>
                         <button type="button" data-tab="revenue-expenses" data-panel="revenue-expenses" data-title="Revenue vs Expenses" class="sb-child">Revenue vs Expenses</button>
+                        <button type="button" data-tab="product-returns" data-panel="product-returns" data-title="Product Return Rate" class="sb-child">Product Return Rate</button>
                     </div>
 
                 <div class="sb-section">
@@ -357,6 +367,10 @@
                         <div class="stat-card flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-green-500/10 flex items-center justify-center"><span class="iconify text-green-400 text-xl" data-icon="mdi:check-circle-outline"></span></div><div><div id="sum-delivered" class="text-xl font-extrabold text-white">0</div><div class="text-xs text-slate-500">Delivered</div></div></div>
                         <div class="stat-card flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-orange-500/10 flex items-center justify-center"><span class="iconify text-orange-400 text-xl" data-icon="mdi:headset"></span></div><div><div id="sum-cc-agents" class="text-xl font-extrabold text-white">0</div><div class="text-xs text-slate-500">CC Agents</div></div></div>
                         <div class="stat-card flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-red-500/10 flex items-center justify-center"><span class="iconify text-red-400 text-xl" data-icon="mdi:ticket-outline"></span></div><div><div id="sum-tickets" class="text-xl font-extrabold text-white">0</div><div class="text-xs text-slate-500">Open Issues</div></div></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><span class="iconify text-red-400" data-icon="mdi:alert-circle"></span> SLA Breaches (Stuck Orders)</h3>
+                        <div id="dash-sla-list" class="space-y-2">Loading...</div>
                     </div>
                     <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-lg font-bold text-white mb-4">Recent Activity</h3><div id="recent-activity" class="space-y-2">Loading...</div></div>
                 </div>
@@ -493,14 +507,35 @@
 <div id="panel-orders" class="tab-panel hidden">
     <div id="orders-back-btn" class="hidden mb-5"><button type="button" onclick="clearOrderFilter()" class="back-btn"><span class="iconify" data-icon="mdi:arrow-left"></span> Show All Orders</button></div>
     <div class="flex flex-col md:flex-row gap-3 mb-5">
-        <div class="relative flex-1 max-w-sm"><span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="admin-order-search" oninput="renderAdminOrders()" placeholder="Search ID, phone, name..." class="input-dark pl-11"></div>
-        <select id="admin-order-filter" onchange="renderAdminOrders()" class="input-dark" style="width:auto;max-width:200px"><option value="">All Statuses</option><option value="pending">Pending</option><option value="accepted">Accepted</option><option value="confirmed">Confirmed</option><option value="no_answer">No Answer</option><option value="cancelled">Cancelled</option><option value="out_for_delivery">Out for Delivery</option><option value="delivered">Delivered</option><option value="returned">Returned</option></select>
+        <div class="relative flex-1 max-w-sm"><span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="admin-order-search" oninput="adminOrdersPage=1;renderAdminOrders()" placeholder="Search ID, phone, name..." class="input-dark pl-11"></div>
+        <select id="admin-order-filter" onchange="adminOrdersPage=1;renderAdminOrders()" class="input-dark" style="width:auto;max-width:200px"><option value="">All Statuses</option><option value="pending">Pending</option><option value="accepted">Accepted</option><option value="confirmed">Confirmed</option><option value="no_answer">No Answer</option><option value="cancelled">Cancelled</option><option value="out_for_delivery">Out for Delivery</option><option value="delivered">Delivered</option><option value="returned">Returned</option></select>
         <button type="button" data-create-order class="bg-cyan-500 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/20 text-sm flex items-center gap-2 whitespace-nowrap">
     <span class="iconify text-lg" data-icon="mdi:plus-circle"></span>
     Create Order
 </button>
     </div>
-    <div id="bulk-bar" class="bulk-bar" style="display:none"><div class="bulk-check" onclick="toggleBulkAll()"><span class="iconify text-white text-sm" data-icon="mdi:check"></span></div><span class="bulk-count" id="bulk-count">0 selected</span><div class="flex gap-2 ml-auto flex-wrap"><button type="button" onclick="bulkAction('rider')" class="btn-sm cyan" style="font-size:11px;padding:5px 10px"><span class="iconify text-sm" data-icon="mdi:account-arrow-right"></span> Assign Rider</button><button type="button" onclick="bulkAction('status')" class="btn-sm green" style="font-size:11px;padding:5px 10px"><span class="iconify text-sm" data-icon="mdi:flag"></span> Change Status</button><button type="button" onclick="bulkAction('delete')" class="btn-sm red" style="font-size:11px;padding:5px 10px"><span class="iconify text-sm" data-icon="mdi:delete"></span> Delete</button><button type="button" onclick="clearBulk()" class="text-slate-500 hover:text-white text-xs font-semibold">✕ Clear</button></div></div><div id="admin-orders-table" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"></div>
+    <div id="bulk-bar" class="bulk-bar" style="display:none"><div class="bulk-check" onclick="toggleBulkAll()"><span class="iconify text-white text-sm" data-icon="mdi:check"></span></div><span class="bulk-count" id="bulk-count">0 selected</span><div class="flex gap-2 ml-auto flex-wrap"><button type="button" onclick="bulkAction('rider')" class="btn-sm cyan" style="font-size:11px;padding:5px 10px"><span class="iconify text-sm" data-icon="mdi:account-arrow-right"></span> Assign Rider</button><button type="button" onclick="bulkAction('status')" class="btn-sm green" style="font-size:11px;padding:5px 10px"><span class="iconify text-sm" data-icon="mdi:flag"></span> Change Status</button><button type="button" onclick="bulkAction('delete')" class="btn-sm red" style="font-size:11px;padding:5px 10px"><span class="iconify text-sm" data-icon="mdi:delete"></span> Delete</button><button type="button" onclick="clearBulk()" class="text-slate-500 hover:text-white text-xs font-semibold">✕ Clear</button></div></div>
+    
+    <div id="admin-orders-table" class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"></div>
+    
+    <!-- PAGINATION FOOTER -->
+    <div class="flex flex-col md:flex-row gap-3 mt-4 items-center justify-between text-xs text-slate-400">
+        <div class="flex items-center gap-2">
+            <span>Rows per page:</span>
+            <select id="admin-orders-page-size" onchange="changeAdminOrderPageSize(this.value)" class="input-dark" style="width:auto;max-width:80px;padding:6px 10px">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div id="admin-orders-pagination-info" class="text-slate-500">Showing 0 to 0 of 0</div>
+        <div class="flex gap-2">
+            <button id="admin-orders-prev-btn" onclick="prevAdminOrdersPage()" class="btn-sm" style="padding:5px 12px" disabled>Previous</button>
+            <button id="admin-orders-next-btn" onclick="nextAdminOrdersPage()" class="btn-sm" style="padding:5px 12px" disabled>Next</button>
+        </div>
+    </div>
 </div>                <!-- REFUNDS -->
                 <div id="panel-refunds" class="tab-panel hidden">
                     <div class="flex flex-col md:flex-row gap-3 mb-5 items-start md:items-center justify-between">
@@ -616,7 +651,21 @@
                     </div>
                     <div id="cc-perf-list" class="space-y-3">Loading...</div>
                 </div>
-                              <!-- TICKETS -->
+                              <!-- CALL ACTIVITY & AUDIO -->
+                <div id="panel-cc-audio" class="tab-panel hidden">
+                    <div class="mb-5 flex flex-col md:flex-row gap-3">
+                        <select id="cc-audio-filter" onchange="renderCCAudio()" class="input-dark" style="max-width: 250px;">
+                            <option value="">All Agents</option>
+                        </select>
+                        <div class="relative flex-1 max-w-sm">
+                            <span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
+                            <input type="text" id="cc-audio-search" oninput="renderCCAudio()" placeholder="Search order, phone, name..." class="input-dark pl-11">
+                        </div>
+                    </div>
+                    <div id="cc-audio-list" class="space-y-3">Loading...</div>
+                </div>
+
+                <!-- TICKETS -->
                 <div id="panel-tickets" class="tab-panel hidden"><div id="tickets-list" class="space-y-3">Loading...</div></div>
                 
                 <!-- LIVE CHAT -->
@@ -640,6 +689,26 @@
                             </form>
                         </div>
                     </div>
+                </div>
+
+                <!-- ALL RIDERS -->
+                <div id="panel-all-riders" class="tab-panel hidden">
+                    <div id="all-riders-list" class="space-y-3">Loading...</div>
+                </div>
+
+                <!-- MERCHANT STOCK LEVELS -->
+                <div id="panel-stock-levels" class="tab-panel hidden">
+                    <div id="stock-levels-list" class="space-y-3">Loading...</div>
+                </div>
+
+                <!-- ALL STOCK STAFF -->
+                <div id="panel-all-stock" class="tab-panel hidden">
+                    <div id="all-stock-list" class="space-y-3">Loading...</div>
+                </div>
+
+                <!-- ALL FOLLOW-UP AGENTS -->
+                <div id="panel-all-followup" class="tab-panel hidden">
+                    <div id="all-followup-list" class="space-y-3">Loading...</div>
                 </div>
 
                 <!-- CREATE RIDER ACCOUNT -->
@@ -668,6 +737,34 @@
                             <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Create Stock Account</button>
                         </form>
                     </div></div>
+                </div>
+
+                <!-- FOLLOW-UP PERFORMANCE -->
+                <div id="panel-followup-perf" class="tab-panel hidden">
+                    <div class="flex flex-col md:flex-row gap-3 mb-5 items-start md:items-center justify-between">
+                        <div class="flex gap-2 flex-wrap" id="fuperf-period-btns">
+                            <button type="button" class="tab-btn active" onclick="setPeriod(this,'fuperf-period-btns','ccPerfPeriod','today')">Today</button>
+                            <button type="button" class="tab-btn" onclick="setPeriod(this,'fuperf-period-btns','ccPerfPeriod','week')">This Week</button>
+                            <button type="button" class="tab-btn" onclick="setPeriod(this,'fuperf-period-btns','ccPerfPeriod','month')">This Month</button>
+                            <button type="button" class="tab-btn" onclick="setPeriod(this,'fuperf-period-btns','ccPerfPeriod','year')">This Year</button>
+                        </div>
+                        <button type="button" onclick="dlFUPerf()" class="btn-sm green"><span class="iconify" data-icon="mdi:download"></span> CSV</button>
+                    </div>
+                    <div id="fu-perf-list" class="space-y-3">Loading...</div>
+                </div>
+
+                <!-- FOLLOW-UP CALL ACTIVITY & AUDIO -->
+                <div id="panel-followup-audio" class="tab-panel hidden">
+                    <div class="mb-5 flex flex-col md:flex-row gap-3">
+                        <select id="fu-audio-filter" onchange="renderFUAudio()" class="input-dark" style="max-width: 250px;">
+                            <option value="">All Follow-Up Agents</option>
+                        </select>
+                        <div class="relative flex-1 max-w-sm">
+                            <span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
+                            <input type="text" id="fu-audio-search" oninput="renderFUAudio()" placeholder="Search order, phone, name..." class="input-dark pl-11">
+                        </div>
+                    </div>
+                    <div id="fu-audio-list" class="space-y-3">Loading...</div>
                 </div>
 
                 <!-- CREATE FOLLOW-UP ACCOUNT -->
@@ -699,6 +796,37 @@
                     </div></div>
                     <div id="settlements-list" class="space-y-3">Loading...</div>
                 </div>
+                <!-- SLA BREACH MONITOR -->
+                <div id="panel-sla" class="tab-panel hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="stat-card border-yellow-500/20"><div class="text-xs font-bold text-yellow-400 uppercase mb-1">Stuck in Call Center (>24h)</div><div id="sla-cc" class="text-2xl font-extrabold text-white">0</div></div>
+                        <div class="stat-card border-red-500/20"><div class="text-xs font-bold text-red-400 uppercase mb-1">Stuck in Shipping (>48h)</div><div id="sla-ship" class="text-2xl font-extrabold text-white">0</div></div>
+                    </div>
+                    <div id="sla-list" class="space-y-3">Loading...</div>
+                </div>
+
+                <!-- MERCHANT ANNOUNCEMENTS -->
+                <div id="panel-announcements" class="tab-panel hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-base font-bold text-white mb-4">Broadcast Message</h3>
+                            <form id="announce-form" class="space-y-4">
+                                <div><label class="form-label">Message</label><textarea id="ann-msg" required rows="4" class="input-dark" placeholder="e.g. ChapShop will be closed on Friday for Eid..."></textarea></div>
+                                <button type="submit" class="btn-sm cyan w-full justify-center">Broadcast to All Merchants</button>
+                            </form>
+                        </div>
+                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                            <h3 class="text-base font-bold text-white mb-4">Active Announcements</h3>
+                            <div id="ann-list" class="space-y-3">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT RETURN RATE -->
+                <div id="panel-product-returns" class="tab-panel hidden">
+                    <div id="prod-returns-list" class="space-y-3">Loading...</div>
+                </div>
+
                 <!-- REPORTS -->
                 <div id="panel-reports" class="tab-panel hidden">
                     <div class="flex flex-col md:flex-row gap-3 mb-5 items-start md:items-center justify-between">
@@ -880,7 +1008,8 @@ firebase.initializeApp(fc);var auth=firebase.auth(),db=firebase.firestore();
 try{db.enablePersistence({synchronizeTabs:true})}catch(e){}
 var isAppRunning=false;
 /* ===== STATE ===== */
-var allOrders=[],allUsers=[],orderStatusFilter=null,reportType=null,settingType=null;
+var allOrders=[],allUsers=[],allProducts=[],orderStatusFilter=null,reportType=null,settingType=null;
+var adminOrdersPage=1, adminOrdersPageSize=10;
 var settlementPeriod='all',perfPeriod='today',ccPerfPeriod='today',shipMonPeriod='today',reportPeriod='month',dashPeriod='today',dashFrom=null,dashTo=null,refundPeriod='all',refundLogs=[],refundListenerStarted=false,rePeriod='month',expenseLogs=[],expenseListenerStarted=false;
 
 /* ===== UTILS ===== */
@@ -945,15 +1074,124 @@ document.querySelectorAll('.sb-header[data-section]').forEach(function(btn){btn.
  $('menu-btn').addEventListener('click',function(){$('sidebar').classList.toggle('-translate-x-full');$('sidebar-overlay').classList.toggle('hidden')});
 
 /* ===== TABS ===== */
-document.querySelectorAll('[data-tab]').forEach(function(btn){btn.addEventListener('click',function(){var tab=this.getAttribute('data-tab'),panel=this.getAttribute('data-panel')||tab,title=this.getAttribute('data-title');orderStatusFilter=this.getAttribute('data-status-filter')||null;reportType=this.getAttribute('data-report')||null;settingType=this.getAttribute('data-setting')||null;document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.add('hidden')});document.querySelectorAll('.sb-dashboard,.sb-child').forEach(function(l){l.classList.remove('active')});var p=$('panel-'+panel);if(p)p.classList.remove('hidden');this.classList.add('active');var T={'dashboard':['Dashboard','System overview'],'merchant-create':['Create Merchant Account',''],'merchants':['All Merchants',''],'merchant-perf':['Merchant Performance',''],'orders':['All Orders',''],'shipping':['Shipments',''],'tracking':['Order Tracking',''],'ship-create':['Create Shipping Account',''],'ship-monitor':['Delivery Monitoring',''],'ship-returns':['Returns Management',''],'cc-create':['Create Agent Account',''],'callcenter':['All Agents',''],'cc-perf':['Agent Performance',''],'tickets':['Support Tickets',''],'customers':['Customers',''],'settlements':['Merchant Settlements',''],'reports':['Reports & Analytics',''],'users':['All Users',''],'roles':['Roles',''],'permissions':['Permissions',''],'settings':['Settings',''],'audit':['Audit Log',''],'refunds':['Refund Management',''],'rider-workload':['Rider Workload',''],'revenue-expenses':['Revenue vs Expenses',''],'finance':['Financial Dashboard','Track profit & settlements'],'finance-create':['Create Finance Account',''],'chapdrop':['Chapdrop Catalog','Manage winning products']};var t=title?[title,'']:(T[tab]||['Dashboard','']);$('page-title').textContent=t[0];$('page-subtitle').textContent=t[1];var ob=$('orders-back-btn');if(ob)ob.classList.toggle('hidden',!orderStatusFilter);
-var renders={'merchants':renderMerchants,'merchant-perf':renderMerchantPerf,'orders':renderAdminOrders,'shipping':renderShipping,'tracking':renderTracking,'ship-monitor':renderShipMon,'ship-returns':renderReturns,'callcenter':renderCCAgents,'cc-perf':renderCCPerf,'tickets':renderTickets,'customers':renderCustomers,'settlements':renderSettlements,'reports':renderReports,'users':renderUsers,'roles':renderRoles,'permissions':renderPermissions,'settings':renderSettings,'audit':renderAuditLog,'refunds':renderRefunds,'rider-workload':renderRiderWorkload,'revenue-expenses':renderRevExp,'finance':renderFinance,'chapdrop':renderChapdrop};if(renders[tab])renders[tab]();if(window.innerWidth<1024)closeSidebar()})});
-function clearOrderFilter(){orderStatusFilter=null;var ob=$('orders-back-btn');if(ob)ob.classList.add('hidden');var df=$('admin-order-filter');if(df)df.value='';clearBulk();renderAdminOrders()}
+document.querySelectorAll('[data-tab]').forEach(function(btn){btn.addEventListener('click',function(){var tab=this.getAttribute('data-tab'),panel=this.getAttribute('data-panel')||tab,title=this.getAttribute('data-title');orderStatusFilter=this.getAttribute('data-status-filter')||null;reportType=this.getAttribute('data-report')||null;settingType=this.getAttribute('data-setting')||null;document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.add('hidden')});document.querySelectorAll('.sb-dashboard,.sb-child').forEach(function(l){l.classList.remove('active')});var p=$('panel-'+panel);if(p)p.classList.remove('hidden');this.classList.add('active');var T={'dashboard':['Dashboard','System overview'],'merchant-create':['Create Merchant Account',''],'merchants':['All Merchants',''],'merchant-perf':['Merchant Performance',''],'orders':['All Orders',''],'shipping':['Shipments',''],'tracking':['Order Tracking',''],'ship-create':['Create Shipping Account',''],'ship-monitor':['Delivery Monitoring',''],'ship-returns':['Returns Management',''],'cc-create':['Create Agent Account',''],'callcenter':['All Agents',''],'cc-perf':['Agent Performance',''],'cc-audio':['Call Activity & Audio','Listen to recordings & view notes'],'followup-perf':['Follow-Up Performance',''],'followup-audio':['Follow-Up Call Activity','Listen to recordings & view notes'],'tickets':['Support Tickets',''],'customers':['Customers',''],'settlements':['Merchant Settlements',''],'reports':['Reports & Analytics',''],'users':['All Users',''],'roles':['Roles',''],'permissions':['Permissions',''],'settings':['Settings',''],'audit':['Audit Log',''],'refunds':['Refund Management',''],'rider-workload':['Rider Workload',''],'revenue-expenses':['Revenue vs Expenses',''],'finance':['Financial Dashboard','Track profit & settlements'],'finance-create':['Create Finance Account',''],'chapdrop':['Chapdrop Catalog','Manage winning products'],'all-riders':['All Riders','Manage delivery staff'],'stock-levels':['Merchant Stock Levels','View original, delivered & remaining stock'],'all-stock':['All Stock Staff','Manage warehouse staff'],'all-followup':['All Follow-Up Agents','Manage follow-up staff'],'sla':['SLA Breach Monitor',''],'announcements':['Merchant Announcements',''],'product-returns':['Product Return Rate','']};var t=title?[title,'']:(T[tab]||['Dashboard','']);$('page-title').textContent=t[0];$('page-subtitle').textContent=t[1];var ob=$('orders-back-btn');if(ob)ob.classList.toggle('hidden',!orderStatusFilter);
+var renders={'merchants':renderMerchants,'merchant-perf':renderMerchantPerf,'orders':renderAdminOrders,'shipping':renderShipping,'tracking':renderTracking,'ship-monitor':renderShipMon,'ship-returns':renderReturns,'callcenter':renderCCAgents,'cc-perf':renderCCPerf,'cc-audio':renderCCAudio,'followup-perf':renderFUPerf,'followup-audio':renderFUAudio,'tickets':renderTickets,'customers':renderCustomers,'settlements':renderSettlements,'reports':renderReports,'users':renderUsers,'roles':renderRoles,'permissions':renderPermissions,'settings':renderSettings,'audit':renderAuditLog,'refunds':renderRefunds,'rider-workload':renderRiderWorkload,'revenue-expenses':renderRevExp,'finance':renderFinance,'chapdrop':renderChapdrop,'all-riders':function(){renderStaffList('rider','all-riders-list')},'stock-levels':renderStockLevels,'all-stock':function(){renderStaffList('stock','all-stock-list')},'all-followup':function(){renderStaffList('follow_up','all-followup-list')},'sla':renderSLA,'announcements':renderAnnouncements,'product-returns':renderProductReturns};if(renders[tab])renders[tab]();if(window.innerWidth<1024)closeSidebar()})});
+function clearOrderFilter(){orderStatusFilter=null;var ob=$('orders-back-btn');if(ob)ob.classList.add('hidden');var df=$('admin-order-filter');if(df)df.value='';clearBulk();adminOrdersPage=1;renderAdminOrders()}
+
+/* ===== ADMIN ORDERS PAGINATION ===== */
+function changeAdminOrderPageSize(size) { adminOrdersPageSize = parseInt(size); adminOrdersPage = 1; renderAdminOrders(); }
+function nextAdminOrdersPage() { adminOrdersPage++; renderAdminOrders(); }
+function prevAdminOrdersPage() { adminOrdersPage--; renderAdminOrders(); }
 
 /* ===== FIRESTORE ===== */
-function startListeners(){db.collection('users').onSnapshot(function(s){allUsers=snapDocs(s);renderAllU()});db.collection('orders').orderBy('createdAt','desc').onSnapshot(function(s){allOrders=snapDocs(s);renderAllO()});lastOrderCount=allOrders.length;renderAdminChats()}
+var allSettings={};
+function startListeners(){db.collection('users').onSnapshot(function(s){allUsers=snapDocs(s);renderAllU()});db.collection('orders').orderBy('createdAt','desc').onSnapshot(function(s){allOrders=snapDocs(s);renderAllO()});db.collection('products').onSnapshot(function(s){allProducts=snapDocs(s);renderStockLevels()});db.collection('settings').onSnapshot(function(s){allSettings={};s.docs.forEach(function(d){allSettings[d.id]=d.data()});renderFinance();renderSettings()});db.collection('announcements').orderBy('createdAt','desc').onSnapshot(function(s){allAnnouncements=snapDocs(s);renderAnnouncements()});lastOrderCount=allOrders.length;renderAdminChats()}
 function snapDocs(s){return s.docs.map(function(d){return{id:d.id,...d.data()}})}
-function renderAllU(){renderMerchants();renderMerchantPerf();renderCCAgents();renderCCPerf();renderShipMon();renderReturns();renderCustomers();renderUsers();renderRoles();renderPermissions();updateDash()}
-function renderAllO(){trackNotifs();updateDash();renderRecent();renderAdminOrders();renderShipping();renderTracking();renderTickets();renderSettlements();renderReports();renderCustomers();renderMerchantPerf();renderCCPerf();renderShipMon();renderReturns()}
+function renderAllU(){renderMerchants();renderMerchantPerf();renderCCAgents();renderCCPerf();renderShipMon();renderReturns();renderCustomers();renderUsers();renderRoles();renderPermissions();renderStaffList('rider','all-riders-list');renderStaffList('stock','all-stock-list');renderStaffList('follow_up','all-followup-list');renderFUPerf();renderFUAudio();updateDash()}
+
+        /* ===== SLA BREACH MONITOR ===== */
+var allAnnouncements=[];
+function renderSLA(){
+    var c=$('sla-list');if(!c)return;
+    var now=Date.now();
+    var list=allOrders.filter(function(o){
+        if(o.status==='pending'||o.status==='accepted'){
+            try{ return (now - o.createdAt.toDate().getTime()) > 24*60*60*1000; }catch(e){return false}
+        }
+        if(o.status==='out_for_delivery'){
+            try{ return (now - o.outForDeliveryAt.toDate().getTime()) > 48*60*60*1000; }catch(e){return false}
+        }
+        return false;
+    });
+    setEl('sla-cc',list.filter(function(o){return o.status==='pending'||o.status==='accepted'}).length);
+    setEl('sla-ship',list.filter(function(o){return o.status==='out_for_delivery'}).length);
+    
+    var dashC=$('dash-sla-list');
+    if(dashC) dashC.innerHTML = list.slice(0,5).map(function(o){ return '<div class="data-card p-3 flex items-center justify-between"><div><span class="font-mono text-cyan-400 font-bold text-sm">#'+o.id.slice(-6).toUpperCase()+'</span> <span class="text-white text-sm ml-2">'+(o.customerName||'')+'</span></div>'+badge(o.status)+'</div>' }).join('') || '<p class="text-slate-500 text-sm">No stuck orders. All good!</p>';
+    
+    if(!list.length){c.innerHTML=empty('mdi:check-circle-outline','No SLA breaches. All orders are moving on time.');return}
+    c.innerHTML=list.map(function(o){
+        return '<div class="data-card p-4 flex items-center justify-between"><div><span class="font-mono text-cyan-400 font-bold">#'+o.id.slice(-6).toUpperCase()+'</span> <span class="text-white font-medium ml-2">'+(o.customerName||'')+'</span> <span class="text-slate-500 text-sm ml-2">'+(o.itemName||'')+'</span></div><div class="flex items-center gap-3">'+badge(o.status)+'<span class="text-xs text-red-400 font-bold">STUCK</span></div></div>';
+    }).join('');
+}
+
+/* ===== ANNOUNCEMENTS ===== */
+function renderAnnouncements(){
+    var c=$('ann-list');if(!c)return;
+    if(!allAnnouncements.length){c.innerHTML=empty('mdi:bullhorn','No active announcements.');return}
+    c.innerHTML=allAnnouncements.map(function(a){
+        return '<div class="data-card p-4 flex items-start justify-between"><div><div class="text-sm text-white font-medium mb-1">'+a.message+'</div><div class="text-xs text-slate-500">'+fmtDate(a.createdAt)+'</div></div><button type="button" class="btn-sm red" style="padding:4px 10px;font-size:11px" data-delete-announcement="'+a.id+'">Delete</button></div>';
+    }).join('');
+}
+ $('announce-form').addEventListener('submit',function(e){
+    e.preventDefault();
+    var msg=$('ann-msg').value.trim();if(!msg)return;
+    db.collection('announcements').add({message:msg,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:window.currentUser.uid}).then(function(){
+        showT('Announcement broadcasted to all merchants!');
+        $('ann-msg').value='';
+        logAudit('settings_updated','announcement','','Broadcast',msg);
+    }).catch(function(e){showT(e.message,'error')});
+});
+
+/* ===== PRODUCT RETURN RATE ===== */
+function renderProductReturns(){
+    var c=$('prod-returns-list');if(!c)return;
+    var map={};
+    allOrders.forEach(function(o){
+        if(!o.itemName)return;
+        if(!map[o.itemName])map[o.itemName]={name:o.itemName,total:0,delivered:0,returned:0};
+        map[o.itemName].total++;
+        if(o.status==='delivered')map[o.itemName].delivered++;
+        if(o.status==='returned')map[o.itemName].returned++;
+    });
+    var rows=Object.values(map).filter(function(r){return r.total>=3}); // Only show products with at least 3 orders
+    rows.sort(function(a,b){return (b.returned/b.total)-(a.returned/a.total)});
+    if(!rows.length){c.innerHTML=empty('mdi:package-variant-closed','Not enough data for product return rates.');return}
+    c.innerHTML='<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto"><table class="dtable min-w-[700px]"><thead><tr><th>Product Name</th><th class="text-right">Total Ordered</th><th class="text-right">Delivered</th><th class="text-right">Returned</th><th class="text-right">Return Rate</th></tr></thead><tbody>'+
+    rows.map(function(r){
+        var rate=r.total?Math.round(r.returned/r.total*100):0;
+        var color=rate>=50?'text-red-400':rate>=30?'text-yellow-400':'text-green-400';
+        return '<tr><td class="text-white font-medium">'+r.name+'</td><td class="text-right">'+r.total+'</td><td class="text-right text-green-400">'+r.delivered+'</td><td class="text-right text-red-400">'+r.returned+'</td><td class="text-right font-bold '+color+'">'+rate+'%</td></tr>';
+    }).join('')+
+    '</tbody></table></div>';
+}
+
+/* ===== MERCHANT STOCK LEVELS ===== */
+        function renderStockLevels(){
+            var c=$('stock-levels-list');if(!c)return;
+            if(!allProducts.length){c.innerHTML=empty('mdi:warehouse','No products found in the system.');return}
+            
+            c.innerHTML='<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto"><table class="dtable min-w-[900px]"><thead><tr><th>Merchant</th><th>Product</th><th>SKU</th><th class="text-right">Original Stock</th><th class="text-right">Delivered</th><th class="text-right">Returned</th><th class="text-right">Remaining</th></tr></thead><tbody>'+
+            allProducts.map(function(p){
+                var stock=Number(p.stock||0);
+                var delivered=Number(p.delivered||0);
+                var returned=Number(p.returnedStock||0);
+                var remain=stock-delivered+returned;
+                var remColor=remain<=0?'text-red-400':(p.minStock&&remain<=p.minStock?'text-yellow-400':'text-green-400');
+                return '<tr>'+
+                    '<td class="text-cyan-300 font-medium">'+(p.merchantName||'—')+'</td>'+
+                    '<td class="text-white font-medium">'+(p.name||'—')+'</td>'+
+                    '<td class="text-slate-500 text-xs font-mono">'+(p.sku||'—')+'</td>'+
+                    '<td class="text-right font-bold text-white">'+stock.toLocaleString()+'</td>'+
+                    '<td class="text-right font-semibold text-blue-400">'+delivered.toLocaleString()+'</td>'+
+                    '<td class="text-right font-semibold text-pink-400">'+returned.toLocaleString()+'</td>'+
+                    '<td class="text-right font-bold '+remColor+'">'+remain.toLocaleString()+'</td>'+
+                '</tr>';
+            }).join('')+
+            '</tbody></table></div>';
+        }
+
+        /* ===== RENDER STAFF LIST (RIDERS, STOCK, FOLLOW-UP) ===== */
+        function renderStaffList(role, containerId) {
+            var c=$(containerId);if(!c)return;
+            var list=allUsers.filter(function(u){return u.role===role});
+            if(!list.length){c.innerHTML=empty('mdi:account-search','No staff found. Use the Create tab to add one.');return}
+            c.innerHTML=list.map(function(u){
+                var act='<button type="button" class="p-2 rounded-lg hover:bg-white/[0.04] '+(u.active?'text-green-400':'text-red-400')+'" data-toggle="'+u.id+'" data-state="'+!u.active+'"><span class="iconify text-xl" data-icon="'+(u.active?'mdi:toggle-switch':'mdi:toggle-switch-off-outline')+'"></span></button><button type="button" class="p-2 rounded-lg hover:bg-red-500/10 text-slate-500 hover:text-red-400" data-delete="'+u.id+'"><span class="iconify text-xl" data-icon="mdi:delete-outline"></span></button>';
+                return '<div class="data-card p-4 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-bold text-lg flex-shrink-0">'+(u.name||'S').charAt(0).toUpperCase()+'</div><div><div class="text-white font-bold">'+u.name+(u.active?'':' <span class="badge bg-red-500/10 text-red-400 border border-red-500/20 text-[10px]">DISABLED</span>')+'</div><div class="text-slate-500 text-sm">'+u.email+(u.phone?' · '+u.phone:'')+'</div></div></div><div class="flex items-center gap-2">'+act+'</div></div>';
+            }).join('');
+        }
+function renderAllO(){trackNotifs();updateDash();renderRecent();renderAdminOrders();renderShipping();renderTracking();renderTickets();renderSettlements();renderReports();renderCustomers();renderMerchantPerf();renderCCPerf();renderShipMon();renderReturns();renderSLA();renderProductReturns()}
 
 /* ===== DASHBOARD ===== */
 function updateDash(){var dp=filterDash(allOrders,'createdAt');var tr=dp.filter(function(o){return o.status==='delivered'}).reduce(function(s,o){return s+(o.totalAmount||0)},0);setEl('perf-revenue',fmtM(tr));var sh=dp.filter(function(o){return['confirmed','out_for_delivery','delivered','returned'].indexOf(o.status)!==-1}),dl=sh.filter(function(o){return o.status==='delivered'}),rt=sh.filter(function(o){return o.status==='returned'});setEl('perf-success',sh.length?Math.round(dl.length/sh.length*100)+'%':'0%');var avg=dl.reduce(function(s,o){try{if(o.deliveredAt&&o.createdAt)return s+(o.deliveredAt.toDate()-o.createdAt.toDate())}catch(e){}return s},0);setEl('perf-avgtime',dl.length?Math.round(avg/dl.length/60000)+'m':'N/A');setEl('perf-satisfaction',sh.length?Math.round((sh.length-rt.length)/sh.length*100)+'%':'0%');var mc=allUsers.filter(function(u){return u.role==='merchant'});setEl('sum-merchants',mc.length);setEl('sum-active-merchants',mc.filter(function(u){return u.active&&u.approved!==false}).length);setEl('sum-today-orders',dp.length);setEl('sum-pending',allOrders.filter(function(o){return o.status==='pending'||o.status==='accepted'}).length);setEl('sum-shipping',allOrders.filter(function(o){return o.status==='confirmed'||o.status==='out_for_delivery'}).length);setEl('sum-delivered',dl.length);setEl('sum-cc-agents',allUsers.filter(function(u){return u.role==='call_center'}).length);setEl('sum-tickets',allOrders.filter(function(o){return['no_answer','wrong_number','callback_requested','returned','cancelled'].indexOf(o.status)!==-1}).length)}
@@ -980,8 +1218,26 @@ function renderAdminOrders(){
     else if(orderStatusFilter==='escalations')list=list.filter(function(o){return['cancelled','returned','wrong_number','out_of_region'].indexOf(o.status)!==-1});
     if(s)list=list.filter(function(o){return o.id.toLowerCase().indexOf(s)!==-1||(o.customerPhone||'').indexOf(s)!==-1||(o.customerName||'').toLowerCase().indexOf(s)!==-1||(o.processedByName||'').toLowerCase().indexOf(s)!==-1||(o.riderName||'').toLowerCase().indexOf(s)!==-1||(o.merchantName||'').toLowerCase().indexOf(s)!==-1});
     if(df)list=list.filter(function(o){return o.status===df});
-    if(!list.length){c.innerHTML=empty('mdi:package-variant-closed','No orders found.');return}
-    c.innerHTML='<div class="overflow-x-auto"><table class="dtable min-w-[1250px]"><thead><tr><th style="width:40px;padding-left:16px"><div class="bulk-check" onclick="toggleBulkAll()" style="margin:0 auto"></div></th><th>ID</th><th>Merchant</th><th>Customer</th><th>Item</th><th>Agent</th><th>Rider</th><th class="text-right">Amount</th><th>Duration</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>'+list.map(function(o){
+    
+    // PAGINATION LOGIC
+    var totalOrders = list.length;
+    var totalPages = Math.ceil(totalOrders / adminOrdersPageSize);
+    if (adminOrdersPage > totalPages && totalPages > 0) adminOrdersPage = 1;
+    if (adminOrdersPage < 1) adminOrdersPage = 1;
+    
+    if(!totalOrders){
+        c.innerHTML=empty('mdi:package-variant-closed','No orders found.');
+        var infoEmpty=$('admin-orders-pagination-info'); if(infoEmpty) infoEmpty.textContent='Showing 0 to 0 of 0';
+        var prevEmpty=$('admin-orders-prev-btn'); if(prevEmpty) prevEmpty.disabled=true;
+        var nextEmpty=$('admin-orders-next-btn'); if(nextEmpty) nextEmpty.disabled=true;
+        return;
+    }
+    
+    var startIdx = (adminOrdersPage - 1) * adminOrdersPageSize;
+    var endIdx = startIdx + adminOrdersPageSize;
+    var paginatedList = list.slice(startIdx, endIdx);
+    
+    c.innerHTML='<div class="overflow-x-auto"><table class="dtable min-w-[1250px]"><thead><tr><th style="width:40px;padding-left:16px"><div class="bulk-check" onclick="toggleBulkAll()" style="margin:0 auto"></div></th><th>ID</th><th>Merchant</th><th>Customer</th><th>Item</th><th>Agent</th><th>Rider</th><th class="text-right">Amount</th><th>Duration</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody>'+paginatedList.map(function(o){
         var mLink=o.merchantId?'<button type="button" class="text-cyan-400 hover:text-cyan-300 font-medium text-sm" data-view-merchant="'+o.merchantId+'">'+(o.merchantName||'Unknown')+'</button>':'<span class="text-slate-500">Unknown</span>';
        return'<tr>'+
             '<td style="padding-left:16px"><div class="bulk-check'+(bulkSelected[o.id]?' checked':'')+'" data-bulk-id="'+o.id+'" onclick="event.stopPropagation();toggleBulkSelect(\''+o.id+'\')">'+(bulkSelected[o.id]?'<span class="iconify text-white text-sm" data-icon="mdi:check"></span>':'')+'</div></td>'+
@@ -997,7 +1253,20 @@ function renderAdminOrders(){
             '<td class="text-slate-500 text-sm whitespace-nowrap">'+fmtDate(o.createdAt)+'</td>'+
             '<td><div class="flex gap-1"><button type="button" class="btn-sm cyan" style="padding:4px 8px" data-edit-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button><button type="button" class="btn-sm red" style="padding:4px 8px" data-delete-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:delete"></span></button><button type="button" class="btn-sm green" style="padding:4px 8px" data-assign-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:account-arrow-right"></span></button><button type="button" class="btn-sm" style="padding:4px 8px;color:#94a3b8;border-color:rgba(148,163,184,0.25);background:rgba(148,163,184,0.06)" data-print-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:printer"></span></button></div></td>'+
         '</tr>'
-    }).join('')+'</tbody></table></div>'
+    }).join('')+'</tbody></table></div>';
+    
+    // UPDATE PAGINATION FOOTER
+    var actualEnd = Math.min(endIdx, totalOrders);
+    var info = $('admin-orders-pagination-info');
+    if(info) info.textContent = 'Showing ' + (startIdx + 1) + ' to ' + actualEnd + ' of ' + totalOrders;
+    
+    var sizeSelect = $('admin-orders-page-size');
+    if(sizeSelect) sizeSelect.value = adminOrdersPageSize;
+    
+    var prevBtn = $('admin-orders-prev-btn');
+    if(prevBtn) prevBtn.disabled = (adminOrdersPage === 1);
+    var nextBtn = $('admin-orders-next-btn');
+    if(nextBtn) nextBtn.disabled = (adminOrdersPage >= totalPages);
 }
 
 /* ===== SHIPPING ===== */
@@ -1021,6 +1290,127 @@ function renderCCAgents(){var c=$('cc-list');if(!c)return;var list=allUsers.filt
 function getCCData(u){var aO=byPeriod(aOrders(u),'createdAt',ccPerfPeriod);var h=aO.filter(function(o){return['confirmed','no_answer','delivered','cancelled','wrong_number','callback_requested','out_of_region'].indexOf(o.status)!==-1});var d=aO.filter(function(o){return o.status==='delivered'}).length;var ts=aO.reduce(function(s,o){return s+(o.callDuration||0)},0);return{u:u,h:h.length,d:d,na:aO.filter(function(o){return o.status==='no_answer'}).length,wn:aO.filter(function(o){return o.status==='wrong_number'}).length,cn:aO.filter(function(o){return o.status==='cancelled'}).length,cr:aO.filter(function(o){return o.status==='callback_requested'}).length,or:aO.filter(function(o){return o.status==='out_of_region'}).length,rate:h.length?Math.round(d/h.length*100):0,avg:h.length?Math.round(ts/h.length):0,total:ts}}
 function renderCCPerf(){var c=$('cc-perf-list');if(!c)return;var rows=allUsers.filter(function(u){return u.role==='call_center'}).map(getCCData);if(!rows.length){c.innerHTML=empty('mdi:chart-bar','No agent data.');return}c.innerHTML=rows.map(function(r){var bc=r.rate>=60?'bg-green-500':r.rate>=30?'bg-yellow-500':'bg-red-500';return'<div class="data-card p-5"><div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 font-bold text-lg">'+(r.u.name||'C').charAt(0).toUpperCase()+'</div><div><div class="text-white font-bold">'+r.u.name+'</div><div class="text-slate-500 text-sm">'+r.u.email+'</div></div></div><div class="text-right"><div class="text-lg font-extrabold text-cyan-400">'+r.rate+'%</div><div class="text-xs text-slate-500">Conversion</div></div></div><div class="grid grid-cols-8 gap-2 text-center mb-3"><div><div class="text-lg font-extrabold text-white">'+r.h+'</div><div class="text-[10px] text-slate-500">Calls</div></div><div><div class="text-lg font-extrabold text-green-400">'+r.d+'</div><div class="text-[10px] text-slate-500">Confirmed</div></div><div><div class="text-lg font-extrabold text-orange-400">'+r.na+'</div><div class="text-[10px] text-slate-500">No Reply</div></div><div><div class="text-lg font-extrabold text-pink-400">'+r.wn+'</div><div class="text-[10px] text-slate-500">Wrong#</div></div><div><div class="text-lg font-extrabold text-red-400">'+r.cn+'</div><div class="text-[10px] text-slate-500">Cancel</div></div><div><div class="text-lg font-extrabold text-indigo-400">'+r.cr+'</div><div class="text-[10px] text-slate-500">Callback</div></div><div><div class="text-lg font-extrabold text-gray-400">'+r.or+'</div><div class="text-[10px] text-slate-500">OutRegion</div></div><div><div class="text-lg font-extrabold text-yellow-400">'+fmtDur(r.avg)+'</div><div class="text-[10px] text-slate-500">Avg</div></div></div><div class="progress-bar"><div class="fill '+bc+'" style="width:'+r.rate+'%"></div></div></div>'}).join('')}
 function dlCCPerf(){var h=['Agent','Email','Calls','Confirmed','No Reply','Wrong#','Cancelled','Callback','OutRegion','Conversion%','Avg Call','Total Talk'];var rows=allUsers.filter(function(u){return u.role==='call_center'}).map(function(u){var r=getCCData(u);return[r.u.name,r.u.email,r.h,r.d,r.na,r.wn,r.cn,r.cr,r.or,r.rate+'%',fmtDur(r.avg),fmtDur(r.total)]});dlCSV('cc-perf-'+ccPerfPeriod+'.csv',h,rows)}
+
+/* ===== CALL ACTIVITY & AUDIO ===== */
+function renderCCAudio(){
+    var c=$('cc-audio-list');if(!c)return;
+    
+    // Populate agent filter
+    var af=$('cc-audio-filter');
+    if(af){
+        var agents=allUsers.filter(function(u){return u.role==='call_center'});
+        var currentVal=af.value;
+        af.innerHTML='<option value="">All Agents</option>'+agents.map(function(a){return'<option value="'+a.id+'" '+(a.id===currentVal?'selected':'')+'>'+a.name+'</option>'}).join('');
+    }
+
+    var agentFilter=af?af.value:'';
+    var s=($('cc-audio-search')||{}).value||'';
+    s=s.toLowerCase();
+
+    var list=allOrders.filter(function(o){
+        if(!o.processedBy) return false; // Only orders handled by agents
+        if(agentFilter && o.processedBy!==agentFilter) return false;
+        if(s){
+            if(o.id.toLowerCase().indexOf(s)===-1 && (o.customerName||'').toLowerCase().indexOf(s)===-1 && (o.customerPhone||'').indexOf(s)===-1) return false;
+        }
+        return true;
+    }).sort(function(a,b){ return (b.updatedAt&&b.updatedAt.seconds||0) - (a.updatedAt&&a.updatedAt.seconds||0); });
+
+    if(!list.length){c.innerHTML=empty('mdi:phone-log','No call activity found.');return}
+
+    c.innerHTML=list.slice(0,150).map(function(o){
+        var agentName=o.processedByName||'Unknown';
+        var attempts=o.callAttempts||0;
+        var duration=fmtDur(o.callDuration||0);
+        var notes=o.callNotes||'No notes written.';
+        var audioHtml = o.callRecordingUrl ? '<audio controls style="height: 32px; width: 100%; max-width: 300px;" src="'+o.callRecordingUrl+'"></audio>' : '<span class="text-xs text-slate-600">No recording available</span>';
+        
+        return '<div class="data-card p-4">'+
+            '<div class="flex flex-col md:flex-row justify-between mb-3 gap-2">'+
+                '<div class="flex items-center gap-3">'+
+                    '<span class="font-mono text-cyan-400 font-bold text-sm">#'+o.id.slice(-6).toUpperCase()+'</span>'+
+                    '<span class="text-white font-medium text-sm">'+(o.customerName||'')+'</span>'+
+                    '<span class="text-slate-500 text-xs hidden sm:inline">'+(o.customerPhone||'')+'</span>'+
+                '</div>'+
+                '<div class="flex items-center gap-2">'+badge(o.status)+'</div>'+
+            '</div>'+
+            '<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 pt-3 border-t border-white/[0.05] text-sm">'+
+                '<div><span class="text-slate-500">Agent:</span> <span class="text-orange-400 font-medium">'+agentName+'</span></div>'+
+                '<div><span class="text-slate-500">Attempts:</span> <span class="text-yellow-400 font-medium">'+attempts+'x</span></div>'+
+                '<div><span class="text-slate-500">Duration:</span> <span class="text-cyan-400 font-medium">'+duration+'</span></div>'+
+                '<div><span class="text-slate-500">Date:</span> <span class="text-slate-400 font-medium">'+fmtDate(o.updatedAt)+'</span></div>'+
+            '</div>'+
+            '<div class="bg-black/20 rounded-lg p-3 mb-3">'+
+                '<div class="text-[10px] uppercase font-bold text-slate-500 mb-1">Agent Notes</div>'+
+                '<div class="text-sm text-slate-300 italic">"'+escapeHtmlAdmin(notes)+'"</div>'+
+            '</div>'+
+            '<div class="flex items-center gap-3">'+
+                '<span class="text-[10px] uppercase font-bold text-slate-500 flex-shrink-0">Recording:</span>'+
+                audioHtml+
+            '</div>'+
+        '</div>';
+    }).join('');
+}
+
+/* ===== FOLLOW-UP PERFORMANCE & AUDIO ===== */
+function getFUData(u){var aO=byPeriod(aOrders(u),'createdAt',ccPerfPeriod);var h=aO.filter(function(o){return['confirmed','no_answer','delivered','cancelled','wrong_number','callback_requested','out_of_region'].indexOf(o.status)!==-1});var d=aO.filter(function(o){return o.status==='delivered'}).length;var ts=aO.reduce(function(s,o){return s+(o.callDuration||0)},0);return{u:u,h:h.length,d:d,na:aO.filter(function(o){return o.status==='no_answer'}).length,wn:aO.filter(function(o){return o.status==='wrong_number'}).length,cn:aO.filter(function(o){return o.status==='cancelled'}).length,cr:aO.filter(function(o){return o.status==='callback_requested'}).length,or:aO.filter(function(o){return o.status==='out_of_region'}).length,rate:h.length?Math.round(d/h.length*100):0,avg:h.length?Math.round(ts/h.length):0,total:ts}}
+function renderFUPerf(){var c=$('fu-perf-list');if(!c)return;var rows=allUsers.filter(function(u){return u.role==='follow_up'}).map(getFUData);if(!rows.length){c.innerHTML=empty('mdi:chart-bar','No follow-up agent data.');return}c.innerHTML=rows.map(function(r){var bc=r.rate>=60?'bg-green-500':r.rate>=30?'bg-yellow-500':'bg-red-500';return'<div class="data-card p-5"><div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-400 font-bold text-lg">'+(r.u.name||'F').charAt(0).toUpperCase()+'</div><div><div class="text-white font-bold">'+r.u.name+'</div><div class="text-slate-500 text-sm">'+r.u.email+'</div></div></div><div class="text-right"><div class="text-lg font-extrabold text-cyan-400">'+r.rate+'%</div><div class="text-xs text-slate-500">Conversion</div></div></div><div class="grid grid-cols-8 gap-2 text-center mb-3"><div><div class="text-lg font-extrabold text-white">'+r.h+'</div><div class="text-[10px] text-slate-500">Calls</div></div><div><div class="text-lg font-extrabold text-green-400">'+r.d+'</div><div class="text-[10px] text-slate-500">Confirmed</div></div><div><div class="text-lg font-extrabold text-orange-400">'+r.na+'</div><div class="text-[10px] text-slate-500">No Reply</div></div><div><div class="text-lg font-extrabold text-pink-400">'+r.wn+'</div><div class="text-[10px] text-slate-500">Wrong#</div></div><div><div class="text-lg font-extrabold text-red-400">'+r.cn+'</div><div class="text-[10px] text-slate-500">Cancel</div></div><div><div class="text-lg font-extrabold text-indigo-400">'+r.cr+'</div><div class="text-[10px] text-slate-500">Callback</div></div><div><div class="text-lg font-extrabold text-gray-400">'+r.or+'</div><div class="text-[10px] text-slate-500">OutRegion</div></div><div><div class="text-lg font-extrabold text-yellow-400">'+fmtDur(r.avg)+'</div><div class="text-[10px] text-slate-500">Avg</div></div></div><div class="progress-bar"><div class="fill '+bc+'" style="width:'+r.rate+'%"></div></div></div>'}).join('')}
+function dlFUPerf(){var h=['Agent','Email','Calls','Confirmed','No Reply','Wrong#','Cancelled','Callback','OutRegion','Conversion%','Avg Call','Total Talk'];var rows=allUsers.filter(function(u){return u.role==='follow_up'}).map(function(u){var r=getFUData(u);return[r.u.name,r.u.email,r.h,r.d,r.na,r.wn,r.cn,r.cr,r.or,r.rate+'%',fmtDur(r.avg),fmtDur(r.total)]});dlCSV('followup-perf-'+ccPerfPeriod+'.csv',h,rows)}
+
+function renderFUAudio(){
+    var c=$('fu-audio-list');if(!c)return;
+    var af=$('fu-audio-filter');
+    if(af){
+        var agents=allUsers.filter(function(u){return u.role==='follow_up'});
+        var currentVal=af.value;
+        af.innerHTML='<option value="">All Follow-Up Agents</option>'+agents.map(function(a){return'<option value="'+a.id+'" '+(a.id===currentVal?'selected':'')+'>'+a.name+'</option>'}).join('');
+    }
+    var agentFilter=af?af.value:'';
+    var s=($('fu-audio-search')||{}).value||'';
+    s=s.toLowerCase();
+    var list=allOrders.filter(function(o){
+        if(!o.processedBy) return false;
+        var isFUAgent = allUsers.find(u => u.id === o.processedBy && u.role === 'follow_up');
+        if(!isFUAgent) return false;
+        if(agentFilter && o.processedBy!==agentFilter) return false;
+        if(s){
+            if(o.id.toLowerCase().indexOf(s)===-1 && (o.customerName||'').toLowerCase().indexOf(s)===-1 && (o.customerPhone||'').indexOf(s)===-1) return false;
+        }
+        return true;
+    }).sort(function(a,b){ return (b.updatedAt&&b.updatedAt.seconds||0) - (a.updatedAt&&a.updatedAt.seconds||0); });
+    if(!list.length){c.innerHTML=empty('mdi:phone-log','No follow-up call activity found.');return}
+    c.innerHTML=list.slice(0,150).map(function(o){
+        var agentName=o.processedByName||'Unknown';
+        var attempts=o.callAttempts||0;
+        var duration=fmtDur(o.callDuration||0);
+        var notes=o.callNotes||'No notes written.';
+        var audioHtml = o.callRecordingUrl ? '<audio controls style="height: 32px; width: 100%; max-width: 300px;" src="'+o.callRecordingUrl+'"></audio>' : '<span class="text-xs text-slate-600">No recording available</span>';
+        return '<div class="data-card p-4">'+
+            '<div class="flex flex-col md:flex-row justify-between mb-3 gap-2">'+
+                '<div class="flex items-center gap-3">'+
+                    '<span class="font-mono text-cyan-400 font-bold text-sm">#'+o.id.slice(-6).toUpperCase()+'</span>'+
+                    '<span class="text-white font-medium text-sm">'+(o.customerName||'')+'</span>'+
+                    '<span class="text-slate-500 text-xs hidden sm:inline">'+(o.customerPhone||'')+'</span>'+
+                '</div>'+
+                '<div class="flex items-center gap-2">'+badge(o.status)+'</div>'+
+            '</div>'+
+            '<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3 pt-3 border-t border-white/[0.05] text-sm">'+
+                '<div><span class="text-slate-500">Agent:</span> <span class="text-pink-400 font-medium">'+agentName+'</span></div>'+
+                '<div><span class="text-slate-500">Attempts:</span> <span class="text-yellow-400 font-medium">'+attempts+'x</span></div>'+
+                '<div><span class="text-slate-500">Duration:</span> <span class="text-cyan-400 font-medium">'+duration+'</span></div>'+
+                '<div><span class="text-slate-500">Date:</span> <span class="text-slate-400 font-medium">'+fmtDate(o.updatedAt)+'</span></div>'+
+            '</div>'+
+            '<div class="bg-black/20 rounded-lg p-3 mb-3">'+
+                '<div class="text-[10px] uppercase font-bold text-slate-500 mb-1">Agent Notes</div>'+
+                '<div class="text-sm text-slate-300 italic">"'+escapeHtmlAdmin(notes)+'"</div>'+
+            '</div>'+
+            '<div class="flex items-center gap-3">'+
+                '<span class="text-[10px] uppercase font-bold text-slate-500 flex-shrink-0">Recording:</span>'+
+                audioHtml+
+            '</div>'+
+        '</div>';
+    }).join('');
+}
 
 /* ===== TICKETS ===== */
 function renderTickets(){var c=$('tickets-list');if(!c)return;var list=allOrders.filter(function(o){return['no_answer','wrong_number','callback_requested','returned','cancelled'].indexOf(o.status)!==-1});if(!list.length){c.innerHTML=empty('mdi:ticket-outline','All clear!');return}c.innerHTML=list.map(function(o){return'<div class="data-card p-4"><div class="flex items-center justify-between mb-2"><span class="font-mono text-cyan-400 font-bold text-sm">#'+o.id.slice(-6).toUpperCase()+'</span>'+badge(o.status)+'</div><div class="text-white font-medium">'+(o.customerName||'')+' · '+(o.customerPhone||'')+'</div><div class="text-slate-500 text-sm mt-1">'+(o.itemName||'')+' x'+(o.qty||1)+' · '+fmtM(o.totalAmount)+'</div><div class="text-slate-500 text-sm">Agent: '+(o.processedByName||'Unassigned')+'</div></div>'}).join('')}
@@ -1046,8 +1436,11 @@ function renderFinance(){
     var comm=Math.round(gross*0.1);
     var exp=expenseLogs.reduce(function(s,e){return s+(e.amount||0)},0);
     var ref=refundLogs.filter(function(r){return r.status==='approved'||r.status==='processed'}).reduce(function(s,r){return s+(r.amount||0)},0);
-    var net=comm-exp-ref;
-    setEl('fin-gross-rev',fmtM(gross));setEl('fin-profit',fmtM(comm));setEl('fin-expenses',fmtM(exp+ref));setEl('fin-net-profit',fmtM(net));
+    var retCost = allSettings.general && allSettings.general.returnCost ? allSettings.general.returnCost : 2000;
+    var returnedCount = allOrders.filter(function(o){return o.status==='returned'}).length;
+    var totalReturnCost = returnedCount * retCost;
+    var trueNet = comm - exp - ref - totalReturnCost;
+    setEl('fin-gross-rev',fmtM(gross));setEl('fin-profit',fmtM(comm));setEl('fin-expenses',fmtM(exp+ref+totalReturnCost));setEl('fin-net-profit',fmtM(trueNet));
 
     var mt=$('fin-merchants-tbody');
     if(mt){
@@ -1101,8 +1494,9 @@ function renderRoles(){var c=$('roles-content');if(!c)return;var roles=[{n:'Merc
 function renderPermissions(){var c=$('permissions-content');if(!c)return;var perms=[{m:'Merchant Management',r:{admin:'Full Access',merchant:'Own Shop',call_center:'None',shipping:'None'}},{m:'Order Management',r:{admin:'Full Access',merchant:'Own Orders',call_center:'Process & View',shipping:'View Assigned'}},{m:'Shipping',r:{admin:'Full Access',merchant:'View Only',call_center:'View Only',shipping:'Full Access'}},{m:'Call Center',r:{admin:'Full Access',merchant:'None',call_center:'Own Data',shipping:'None'}},{m:'Reports',r:{admin:'All',merchant:'Own',call_center:'Own',shipping:'Own'}},{m:'Settings',r:{admin:'Full Access',merchant:'None',call_center:'None',shipping:'None'}}];c.innerHTML='<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden"><table class="dtable"><thead><tr><th>Module</th><th>Admin</th><th>Merchant</th><th>Call Center</th><th>Shipping</th></tr></thead><tbody>'+perms.map(function(p){return'<tr><td class="text-white font-semibold">'+p.m+'</td>'+Object.keys(p.r).map(function(r){var l=p.r[r],cl=l==='Full Access'||l==='All'?'text-green-400':l==='None'?'text-red-400':l==='View Only'?'text-slate-500':'text-cyan-400';return'<td class="'+cl+' font-medium">'+l+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>'}
 
 /* ===== SETTINGS ===== */
-function renderSettings(){var c=$('settings-content');if(!c)return;var type=settingType||'general';if(type==='general'){c.innerHTML='<div class="max-w-2xl"><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-5"><h3 class="text-base font-bold text-white mb-2">General Settings</h3><div><label class="form-label">Platform Name</label><input type="text" id="set-platform" class="input-dark" value="ChapShop Delivery"></div><div><label class="form-label">Admin Email</label><input type="email" id="set-admin-email" class="input-dark" value="'+(window.currentUser?window.currentUser.email:'')+'"></div><div><label class="form-label">Default Commission Rate (%)</label><input type="number" id="set-commission" class="input-dark" value="10"></div><div><label class="form-label">Currency</label><select id="set-currency" class="input-dark"><option value="TZS" class="bg-slate-900">TZS</option></select></div><button type="button" onclick="saveSettings(\'general\')" class="btn-sm cyan mt-2">Save</button></div></div>'}else if(type==='shipping'){c.innerHTML='<div class="max-w-2xl"><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-5"><h3 class="text-base font-bold text-white mb-2">Shipping Settings</h3><div><label class="form-label">Default Delivery Fee (TZS)</label><input type="number" id="set-delivery-fee" class="input-dark" value="5000"></div><div><label class="form-label">Max Delivery Radius (km)</label><input type="number" id="set-radius" class="input-dark" value="30"></div><div><label class="form-label">Auto-assign Riders</label><select id="set-auto-assign" class="input-dark"><option value="yes" class="bg-slate-900">Yes</option><option value="no" class="bg-slate-900">No</option></select></div><button type="button" onclick="saveSettings(\'shipping\')" class="btn-sm cyan mt-2">Save</button></div></div>'}else{c.innerHTML='<div class="max-w-2xl"><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-5"><h3 class="text-base font-bold text-white mb-2">Merchant Settings</h3><div><label class="form-label">Auto-approve New Merchants</label><select id="set-auto-approve" class="input-dark"><option value="no" class="bg-slate-900">No - Manual Approval</option><option value="yes" class="bg-slate-900">Yes - Auto-approve</option></select></div><div><label class="form-label">Default Commission (%)</label><input type="number" id="set-merchant-comm" class="input-dark" value="10"></div><div><label class="form-label">Min Order Amount (TZS)</label><input type="number" id="set-min-order" class="input-dark" value="1000"></div><button type="button" onclick="saveSettings(\'merchant\')" class="btn-sm cyan mt-2">Save</button></div></div>'}}
-function saveSettings(type){var data={};try{if(type==='general'){data={platformName:$('set-platform').value,adminEmail:$('set-admin-email').value,commissionRate:parseInt($('set-commission').value)||10,currency:$('set-currency').value}}else if(type==='shipping'){data={deliveryFee:parseInt($('set-delivery-fee').value)||5000,maxRadius:parseInt($('set-radius').value)||30,autoAssign:$('set-auto-assign').value==='yes'}}else{data={autoApprove:$('set-auto-approve').value==='yes',merchantCommission:parseInt($('set-merchant-comm').value)||10,minOrderAmount:parseInt($('set-min-order').value)||1000}}db.collection('settings').doc(type).set({...data,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).then(function(){showT('Settings saved!');logAudit('settings_updated','setting',type,type+' settings','Updated '+type+' settings')}).catch(function(e){showT(e.message,'error')})}catch(e){showT(e.message,'error')}}
+function renderSettings(){var c=$('settings-content');if(!c)return;var type=settingType||'general';if(type==='general'){var retCost = allSettings.general && allSettings.general.returnCost ? allSettings.general.returnCost : 2000;
+c.innerHTML='<div class="max-w-2xl"><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-5"><h3 class="text-base font-bold text-white mb-2">General Settings</h3><div><label class="form-label">Platform Name</label><input type="text" id="set-platform" class="input-dark" value="'+(allSettings.general&&allSettings.general.platformName?allSettings.general.platformName:'ChapShop Delivery')+'"></div><div><label class="form-label">Admin Email</label><input type="email" id="set-admin-email" class="input-dark" value="'+(window.currentUser?window.currentUser.email:'')+'"></div><div><label class="form-label">Default Commission Rate (%)</label><input type="number" id="set-commission" class="input-dark" value="'+(allSettings.general&&allSettings.general.commissionRate?allSettings.general.commissionRate:10)+'"></div><div><label class="form-label">Average Return Cost (TZS) <span class="text-red-400">(Used for True Profit)</span></label><input type="number" id="set-return-cost" class="input-dark" value="'+retCost+'"></div><div><label class="form-label">Currency</label><select id="set-currency" class="input-dark"><option value="TZS" class="bg-slate-900">TZS</option></select></div><button type="button" onclick="saveSettings(\'general\')" class="btn-sm cyan mt-2">Save</button></div></div>'}else if(type==='shipping'){c.innerHTML='<div class="max-w-2xl"><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-5"><h3 class="text-base font-bold text-white mb-2">Shipping Settings</h3><div><label class="form-label">Default Delivery Fee (TZS)</label><input type="number" id="set-delivery-fee" class="input-dark" value="5000"></div><div><label class="form-label">Max Delivery Radius (km)</label><input type="number" id="set-radius" class="input-dark" value="30"></div><div><label class="form-label">Auto-assign Riders</label><select id="set-auto-assign" class="input-dark"><option value="yes" class="bg-slate-900">Yes</option><option value="no" class="bg-slate-900">No</option></select></div><button type="button" onclick="saveSettings(\'shipping\')" class="btn-sm cyan mt-2">Save</button></div></div>'}else{c.innerHTML='<div class="max-w-2xl"><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 space-y-5"><h3 class="text-base font-bold text-white mb-2">Merchant Settings</h3><div><label class="form-label">Auto-approve New Merchants</label><select id="set-auto-approve" class="input-dark"><option value="no" class="bg-slate-900">No - Manual Approval</option><option value="yes" class="bg-slate-900">Yes - Auto-approve</option></select></div><div><label class="form-label">Default Commission (%)</label><input type="number" id="set-merchant-comm" class="input-dark" value="10"></div><div><label class="form-label">Min Order Amount (TZS)</label><input type="number" id="set-min-order" class="input-dark" value="1000"></div><button type="button" onclick="saveSettings(\'merchant\')" class="btn-sm cyan mt-2">Save</button></div></div>'}}
+function saveSettings(type){var data={};try{if(type==='general'){data={platformName:$('set-platform').value,adminEmail:$('set-admin-email').value,commissionRate:parseInt($('set-commission').value)||10,returnCost:parseInt($('set-return-cost').value)||0,currency:$('set-currency').value}}else if(type==='shipping'){data={deliveryFee:parseInt($('set-delivery-fee').value)||5000,maxRadius:parseInt($('set-radius').value)||30,autoAssign:$('set-auto-assign').value==='yes'}}else{data={autoApprove:$('set-auto-approve').value==='yes',merchantCommission:parseInt($('set-merchant-comm').value)||10,minOrderAmount:parseInt($('set-min-order').value)||1000}}db.collection('settings').doc(type).set({...data,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).then(function(){showT('Settings saved!');logAudit('settings_updated','setting',type,type+' settings','Updated '+type+' settings')}).catch(function(e){showT(e.message,'error')})}catch(e){showT(e.message,'error')}}
 
 /* ===== NOTIFICATIONS ===== */
 var lastOrderCount=0,notifs=[],unreadNotifs=0;
@@ -1378,40 +1772,15 @@ document.addEventListener('click',function(e){
     var ag=$('eo-agent').value;if(ag){var agObj=allUsers.find(function(u){return u.id===ag});up.processedBy=ag;up.processedByName=agObj?agObj.name:''}else{up.processedBy=firebase.firestore.FieldValue.delete();up.processedByName=firebase.firestore.FieldValue.delete()}
     var rd=$('eo-rider').value;if(rd){var rdObj=allUsers.find(function(u){return u.id===rd});up.riderId=rd;up.riderName=rdObj?rdObj.name:''}else{up.riderId=firebase.firestore.FieldValue.delete();up.riderName=firebase.firestore.FieldValue.delete()}
 
-    // --- AUTOMATIC STOCK DEDUCTION LOGIC ---
-    if (o.itemName && o.status !== up.status) {
-        try {
-            var snap = await db.collection('products').where('name', '==', o.itemName).limit(1).get();
-            if (!snap.empty) {
-                var prodDoc = snap.docs[0];
-                var prodUpdate = {};
-                var qty = o.qty || 1;
-
-                if ((up.status === 'out_for_delivery' || up.status === 'delivered') && o.stockDeducted !== true) {
-                    prodUpdate.stock = firebase.firestore.FieldValue.increment(-qty);
-                    up.stockDeducted = true;
-                }
-                if (up.status === 'delivered') {
-                    prodUpdate.delivered = firebase.firestore.FieldValue.increment(qty);
-                }
-                if ((up.status === 'returned' || up.status === 'cancelled') && o.stockDeducted === true) {
-                    prodUpdate.stock = firebase.firestore.FieldValue.increment(qty);
-                    up.stockDeducted = false;
-                }
-                if (Object.keys(prodUpdate).length > 0) {
-                    await prodDoc.ref.update(prodUpdate);
-                }
-            }
-        } catch(e) { console.error("Admin stock adjust error:", e); }
-    }
-
+    // Stock deduction is handled automatically by the Shipping Portal to prevent double counting.
+    // Admin edits only update order details and status.
     db.collection('orders').doc(oid).update(up).then(function(){showT('Order updated!');closeModal()}).catch(function(er){showT(er.message,'error')})
 });return}
     btn=e.target.closest('[data-assign-order]');
     if(btn){var oid=btn.getAttribute('data-assign-order'),agents=allUsers.filter(function(u){return u.role==='call_center'&&u.active});if(!agents.length){showT('No active agents available','error');return}$('modal-container').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Assign Agent</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="assign-form" class="space-y-4"><div><label class="form-label">Select Agent</label><select id="as-agent" class="input-dark" required>'+agents.map(function(a){return'<option value="'+a.id+'" class="bg-slate-900">'+a.name+' ('+a.email+')</option>'}).join('')+'</select></div><button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Assign</button></form></div></div>';document.getElementById('assign-form').addEventListener('submit',function(ev){ev.preventDefault();var ag=$('as-agent').value,agObj=allUsers.find(function(u){return u.id===ag});db.collection('orders').doc(oid).update({processedBy:ag,processedByName:agObj?agObj.name:''}).then(function(){showT('Agent assigned!');logAudit('order_assigned','order',oid,'#'+oid.slice(-6).toUpperCase(),'Assigned to agent '+(agObj?agObj.name:''))}).catch(function(er){showT(er.message,'error')})});return}
     btn=e.target.closest('[data-print-order]');
     if(btn){printOrder(btn.getAttribute('data-print-order'));return}
-        btn=e.target.closest('[data-approve-refund]');
+            btn=e.target.closest('[data-approve-refund]');
     if(btn){
         var refId=btn.getAttribute('data-approve-refund');
         db.collection('refunds').doc(refId).get().then(function(doc){
@@ -1421,14 +1790,26 @@ document.addEventListener('click',function(e){
             db.collection('refunds').doc(refId).update({status:'approved', processedAt: firebase.firestore.FieldValue.serverTimestamp()});
             // 2. Update Original Order to Cancelled
             if(refData.orderId){
+                var orderToCancel = allOrders.find(o => o.id === refData.orderId);
                 db.collection('orders').doc(refData.orderId).update({
                     status:'cancelled', 
                     refundStatus:'approved',
                     timeline: firebase.firestore.FieldValue.arrayUnion({status:'cancelled', at:new Date().toISOString(), by:window.currentUser.name, note:'Refund approved by Admin'})
                 });
-            }
-            showT('Refund approved & Order Cancelled!');
-            logAudit('order_updated','refund',refId,'Refund','Approved refund');
+                
+                // 3. RESTORE STOCK to merchant since item is going back
+                if(orderToCancel && orderToCancel.itemName && orderToCancel.merchantId && orderToCancel.qty){
+                    db.collection('products').where('name','==',orderToCancel.itemName).where('merchantId','==',orderToCancel.merchantId).limit(1).get().then(function(snap){
+                        if(!snap.empty){
+                            snap.docs[0].ref.update({
+                                stock: firebase.firestore.FieldValue.increment(orderToCancel.qty),
+                                returnedStock: firebase.firestore.FieldValue.increment(orderToCancel.qty)
+                            });
+                        }
+                    });
+                }
+            }showT('Refund approved! Order cancelled & stock restored.');
+            logAudit('order_updated','refund',refId,'Refund','Approved refund and restored stock');
         }).catch(function(e){showT(e.message,'error')});
         return;
     }
@@ -1438,6 +1819,8 @@ document.addEventListener('click',function(e){
     if(btn){db.collection('refunds').doc(btn.getAttribute('data-process-refund')).update({status:'processed',processedAt:firebase.firestore.FieldValue.serverTimestamp()}).then(function(){showT('Refund marked as processed!');logAudit('order_updated','refund',btn.getAttribute('data-process-refund'),'Refund','Marked as processed')}).catch(function(e){showT(e.message,'error')});return}
     btn=e.target.closest('[data-delete-expense]');
     if(btn){if(confirm('Delete this expense?')){db.collection('expenses').doc(btn.getAttribute('data-delete-expense')).delete().then(function(){showT('Expense deleted!')}).catch(function(e){showT(e.message,'error')})}return}
+    btn=e.target.closest('[data-delete-announcement]');
+    if(btn){db.collection('announcements').doc(btn.getAttribute('data-delete-announcement')).delete().then(function(){showT('Announcement deleted!')}).catch(function(e){showT(e.message,'error')});return}
        btn=e.target.closest('[data-rider-assign-quick]');
     btn=e.target.closest('[data-rider-assign-quick]');
     if(btn){var rid=btn.getAttribute('data-rider-assign-quick');var rdObj=allUsers.find(function(u){return u.id===rid});var unassigned=allOrders.filter(function(o){return o.status==='confirmed'&&!o.riderId});if(!unassigned.length){showT('No unassigned confirmed orders','error');return}var next=unassigned[0];db.collection('orders').doc(next.id).update({riderId:rid,riderName:rdObj?rdObj.name:''}).then(function(){showT('Order #'+next.id.slice(-6).toUpperCase()+' assigned to '+(rdObj?rdObj.name:''));logAudit('order_assigned','order',next.id,'#'+next.id.slice(-6).toUpperCase(),'Quick assign → '+(rdObj?rdObj.name:''))}).catch(function(e){showT(e.message,'error')});return}
