@@ -181,10 +181,11 @@
                     </div>
                     
                     <!-- REVENUE BREAKDOWN -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-green-400 uppercase" data-i18n="gross_rev">Gross Revenue</span><span class="iconify text-green-400" data-icon="mdi:cash-multiple"></span></div><div id="st-gross-rev" class="text-xl font-bold text-white">TZS 0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-orange-400 uppercase">COGS (Supplier)</span><span class="iconify text-orange-400" data-icon="mdi:factory"></span></div><div id="st-cogs" class="text-xl font-bold text-orange-400">-TZS 0</div></div>
                         <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-red-400 uppercase" data-i18n="commission">Commission (10%)</span><span class="iconify text-red-400" data-icon="mdi:percent"></span></div><div id="st-commission" class="text-xl font-bold text-red-400">-TZS 0</div></div>
-                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-cyan-400 uppercase" data-i18n="net_earn">Net Earnings</span><span class="iconify text-cyan-400" data-icon="mdi:wallet"></span></div><div id="st-net-rev" class="text-xl font-bold text-cyan-400">TZS 0</div></div>
+                        <div class="stat-card"><div class="flex items-center justify-between mb-2"><span class="text-[10px] font-bold text-cyan-400 uppercase" data-i18n="net_earn">True Net Profit</span><span class="iconify text-cyan-400" data-icon="mdi:wallet"></span></div><div id="st-net-rev" class="text-xl font-bold text-cyan-400">TZS 0</div></div>
                     </div>
                     <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-4 mb-6">
                         <div class="flex flex-col md:flex-row gap-3">
@@ -258,6 +259,11 @@
                         <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
                             <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><span class="iconify text-cyan-400" data-icon="mdi:trophy-award"></span> Top Selling Products</h3>
                             <div id="top-products-list" class="space-y-3"><p class="text-slate-500 text-center py-8">No sales data yet.</p></div>
+                            
+                            <div class="border-t border-white/[0.08] mt-6 pt-6">
+                                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2"><span class="iconify text-red-400" data-icon="mdi:alert-circle-outline"></span> Return Reasons</h3>
+                                <div id="return-reasons-list" class="space-y-3"><p class="text-slate-500 text-center py-8">No returns yet. 🎉</p></div>
+                            </div>
                         </div>
                     </div>
 </div>
@@ -353,8 +359,9 @@
                         <form id="product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="text-xs font-semibold text-slate-400 uppercase">Name *</label><input type="text" id="prod-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
                             <div><label class="text-xs font-semibold text-slate-400 uppercase">Category</label><input type="text" id="prod-cat" list="cat-datalist" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="Electronics"><datalist id="cat-datalist"></datalist></div>
-                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Price (TZS) *</label><input type="number" id="prod-price" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
-                            <div><label class="text-xs font-semibold text-slate-400 uppercase">SKU</label><input type="text" id="prod-sku" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="WE-001"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Selling Price (TZS) *</label><input type="number" id="prod-price" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Supplier Cost (TZS)</label><input type="number" id="prod-cost" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="What YOU pay to buy it"></div>
+                            <div class="md:col-span-2"><label class="text-xs font-semibold text-slate-400 uppercase">SKU</label><input type="text" id="prod-sku" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="WE-001"></div>
                             <div><label class="text-xs font-semibold text-slate-400 uppercase">Initial Stock *</label><input type="number" id="prod-stock" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
                             <div><label class="text-xs font-semibold text-slate-400 uppercase">Min Stock</label><input type="number" id="prod-min" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="5"></div>
                             <div class="md:col-span-2">
@@ -1034,7 +1041,7 @@ let currentPage = 1, pageSize = 15;
         function removeZone(i){localZones.splice(i,1);renderZones();renderZoneDatalist();db.collection('users').doc(uid()).update({deliveryZones:localZones}).catch(function(e){showT(e.message,"error")})}
         function loadData() {
             db.collection('products').where('merchantId', '==', uid()).onSnapshot(snap => { myProducts = snap.docs.map(d => ({id: d.id, ...d.data()})); updateDashboard(); populateDropdowns(); renderProducts(); renderInventory(); renderNotifications(); renderCatalog(); });
-            db.collection('orders').where('merchantId', '==', uid()).orderBy('createdAt', 'desc').onSnapshot(snap => { myOrders = snap.docs.map(d => ({id: d.id, ...d.data()})); if(myOrders.length>lastOrderCount&&lastOrderCount>0){showOrderToast(myOrders.length-lastOrderCount)} lastOrderCount=myOrders.length; filteredOrders = [...myOrders]; updateDashboard(); renderReviewList(); renderOrdersTable(); renderNotifications(); renderSettlements(); renderTopProducts(); });
+            db.collection('orders').where('merchantId', '==', uid()).orderBy('createdAt', 'desc').onSnapshot(snap => { myOrders = snap.docs.map(d => ({id: d.id, ...d.data()})); if(myOrders.length>lastOrderCount&&lastOrderCount>0){showOrderToast(myOrders.length-lastOrderCount)} lastOrderCount=myOrders.length; filteredOrders = [...myOrders]; updateDashboard(); renderReviewList(); renderOrdersTable(); renderNotifications(); renderSettlements(); renderTopProducts(); renderReturnReasons(); renderInventory(); });
             
             // Safe listener for Refunds
             db.collection('refunds').where('merchantId', '==', uid()).onSnapshot(snap => { 
@@ -1100,9 +1107,18 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             document.getElementById('stat-sales-month').textContent = `TZS ${Number(monthOrders.reduce((s,o) => s + (o.totalAmount||0), 0)).toLocaleString()}`;
             var dpDelivered=dp.filter(function(o){return o.status==='delivered'});
             var grossRev=dpDelivered.reduce(function(s,o){return s+(o.totalAmount||0)},0);
+            
+            // Calculate COGS (Cost of Goods Sold)
+            var cogs=dpDelivered.reduce(function(s,o){
+                var p=myProducts.find(function(x){return x.id===o.productId});
+                var cost=p?(p.costPrice||0):0;
+                return s+(cost*(o.qty||1));
+            },0);
+            
             var commRev=Math.round(grossRev*0.1);
-            var netRev=grossRev-commRev;
+            var netRev=grossRev-cogs-commRev; // True Net Profit
             document.getElementById('st-gross-rev').textContent='TZS '+grossRev.toLocaleString();
+            document.getElementById('st-cogs').textContent='-TZS '+cogs.toLocaleString();
             document.getElementById('st-commission').textContent='-TZS '+commRev.toLocaleString();
             document.getElementById('st-net-rev').textContent='TZS '+netRev.toLocaleString();
             const alertCount = myProducts.filter(p => p.minStock && p.stock <= p.minStock).length + myProducts.filter(p => p.stock === 0).length + myOrders.filter(o => o.status === 'pending').length;
@@ -1118,6 +1134,36 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             myProducts.filter(p => p.minStock && p.stock <= p.minStock && p.stock > 0).forEach(p => { html += `<div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-yellow-400" data-icon="mdi:alert"></span><div><div class="font-bold text-yellow-400 text-sm">LOW STOCK: ${p.name}</div><div class="text-xs text-slate-400">Only ${p.stock} left</div></div></div>`; });
             myOrders.filter(o => o.status === 'pending').forEach(o => { html += `<div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-blue-400" data-icon="mdi:cart-plus"></span><div><div class="font-bold text-blue-400 text-sm">NEW ORDER: #${o.id.slice(-6).toUpperCase()}</div></div></div>`; });
             c.innerHTML = html || '<p class="text-slate-500 text-center py-12">All caught up!</p>';
+        }
+
+        function renderReturnReasons() {
+            const c = document.getElementById('return-reasons-list');
+            if(!c) return;
+            const returned = myOrders.filter(o => o.status === 'returned');
+            if(!returned.length) {
+                c.innerHTML = '<p class="text-slate-500 text-center py-8">No returns yet. 🎉</p>';
+                return;
+            }
+            let reasons = {};
+            returned.forEach(o => {
+                let r = o.returnReason || 'Unspecified';
+                reasons[r] = (reasons[r] || 0) + 1;
+            });
+            let sorted = Object.entries(reasons).sort((a,b) => b[1] - a[1]);
+            const maxCount = sorted[0][1];
+            c.innerHTML = sorted.map(r => {
+                let percent = (r[1] / maxCount) * 100;
+                let color = r[0] === 'Unspecified' ? 'bg-slate-500' : 'bg-red-500';
+                return `<div class="mb-3">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm text-white capitalize">${r[0].replace(/_/g, ' ')}</span>
+                        <span class="text-xs text-red-400 font-bold">${r[1]}x</span>
+                    </div>
+                    <div class="w-full bg-white/[0.05] rounded-full h-2 overflow-hidden">
+                        <div class="${color} h-full rounded-full" style="width: ${percent}%"></div>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         function renderTopProducts() {
@@ -1476,6 +1522,20 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                 
                 var remColor = remaining <= 0 ? 'text-red-400' : (p.minStock && remaining <= p.minStock ? 'text-yellow-400' : 'text-green-400');
                 
+                // SMART RESTOCK PREDICTOR
+                var stockBadge = '';
+                if(remaining > 0) {
+                    var soldLast7Days = myOrders.filter(function(o) {
+                        return o.productId === p.id && o.status === 'delivered' && o.createdAt && o.createdAt.toDate() > (Date.now() - 7*24*60*60*1000);
+                    }).reduce(function(s, o) { return s + (Number(o.qty) || 1); }, 0);
+                    var dailyAvg = soldLast7Days / 7;
+                    if(dailyAvg > 0) {
+                        var daysLeft = Math.floor(remaining / dailyAvg);
+                        if(daysLeft <= 3) stockBadge = '<div class="text-[10px] text-red-400 font-bold mt-1 animate-pulse">⚠️ Out in ' + daysLeft + 'd</div>';
+                        else if(daysLeft <= 7) stockBadge = '<div class="text-[10px] text-yellow-400 font-bold mt-1">Low: ~' + daysLeft + 'd left</div>';
+                    }
+                }
+                
                 return '<tr class="hover:bg-white/[0.02]">' +
                     '<td class="px-4 py-3"><div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">' + 
                         (p.image ? '<img src="'+p.image+'" class="w-full h-full object-cover">' : '<span class="iconify text-slate-600" data-icon="mdi:package-variant"></span>') + 
@@ -1487,7 +1547,7 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                     '<td class="px-4 py-3 text-sm text-right font-semibold text-orange-400">' + reserved.toLocaleString() + '</td>' +
                     '<td class="px-4 py-3 text-sm text-right font-semibold text-blue-400">' + delivered.toLocaleString() + '</td>' +
                     '<td class="px-4 py-3 text-sm text-right font-semibold text-pink-400">' + returned.toLocaleString() + '</td>' +
-                    '<td class="px-4 py-3 text-sm text-right font-bold ' + remColor + '">' + remaining.toLocaleString() + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-right font-bold ' + remColor + '">' + remaining.toLocaleString() + stockBadge + '</td>' +
                     '<td class="px-4 py-3 text-xs text-slate-300"><input type="text" value="'+(p.location||'A1')+'" onchange="updateLocation(\''+p.id+'\',this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-xs text-white w-20 focus:outline-none"></td>' +
                 '</tr>';
             }).join('');
@@ -1575,6 +1635,7 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                     sku: document.getElementById('prod-sku').value, 
                     stock: parseInt(document.getElementById('prod-stock').value), 
                     minStock: parseInt(document.getElementById('prod-min').value) || 0, 
+                    costPrice: parseInt(document.getElementById('prod-cost').value) || 0, // Saves Supplier Cost
                     description: document.getElementById('prod-desc').value, 
                     image: imageData, 
                     variants: variants, // Save the variants array
