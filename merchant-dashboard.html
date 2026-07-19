@@ -368,8 +368,48 @@
 
                 <!-- INVENTORY -->
                 <div id="panel-inventory" class="tab-panel hidden">
+                    <h2 class="text-xl font-bold text-white mb-6">Warehouse & Stock</h2>
+                    
+                    <!-- Summary Stats -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="stat-card border-cyan-500/20">
+                            <div class="text-[10px] font-bold text-cyan-400 uppercase mb-1">Total Stock</div>
+                            <div id="wh-stat-stock" class="text-2xl font-bold text-white">0</div>
+                        </div>
+                        <div class="stat-card border-blue-500/20">
+                            <div class="text-[10px] font-bold text-blue-400 uppercase mb-1">Total Delivered</div>
+                            <div id="wh-stat-delivered" class="text-2xl font-bold text-white">0</div>
+                        </div>
+                        <div class="stat-card border-pink-500/20">
+                            <div class="text-[10px] font-bold text-pink-400 uppercase mb-1">Total Returned</div>
+                            <div id="wh-stat-returned" class="text-2xl font-bold text-white">0</div>
+                        </div>
+                        <div class="stat-card border-green-500/20">
+                            <div class="text-[10px] font-bold text-green-400 uppercase mb-1">Remaining Stock</div>
+                            <div id="wh-stat-remaining" class="text-2xl font-bold text-white">0</div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-2 bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-lg font-bold text-white mb-4">Stock Levels</h3><div id="stock-table-list" class="space-y-3"></div></div>
+                        <div class="lg:col-span-2 bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
+                            <table class="w-full text-sm text-left min-w-[1000px]">
+                                  <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]">
+                                    <tr>
+                                        <th class="px-4 py-3">Image</th>
+                                        <th class="px-4 py-3">Product Name</th>
+                                        <th class="px-4 py-3">SKU</th>
+                                        <th class="px-4 py-3">Merchant</th>
+                                        <th class="px-4 py-3 text-right">Stock</th>
+                                        <th class="px-4 py-3 text-right">Reserved</th>
+                                        <th class="px-4 py-3 text-right">Delivery</th>
+                                        <th class="px-4 py-3 text-right">Return</th>
+                                        <th class="px-4 py-3 text-right">Remain Stock</th>
+                                        <th class="px-4 py-3">Location</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="warehouse-table" class="divide-y divide-white/[0.05]"></tbody>
+                            </table>
+                        </div>
                         <div class="space-y-6">
                             <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
                                 <h4 class="font-bold text-white mb-4">Stock Adjustment</h4>
@@ -1306,14 +1346,76 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
      function renderCatalog(){var tb=document.getElementById('catalog-table-body'),empty=document.getElementById('catalog-empty'),table=tb?tb.closest('table'):null;var s=(document.getElementById('catalog-search')||{}).value||'';s=s.toLowerCase();var list=myProducts.filter(function(p){if(!s)return true;return(p.name||'').toLowerCase().indexOf(s)!==-1||(p.sku||'').toLowerCase().indexOf(s)!==-1||(p.category||'').toLowerCase().indexOf(s)!==-1});if(!list.length){if(table)table.classList.add('hidden');empty.classList.remove('hidden');return}if(table)table.classList.remove('hidden');empty.classList.add('hidden');tb.innerHTML=list.map(function(p){var barcodeVal=p.sku||'NO-SKU';var bid='bc-'+p.id.replace(/\//g,'_');return'<tr class="hover:bg-white/[0.02]"><td class="px-4 py-3"><div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">'+(p.image?'<img src="'+p.image+'" class="w-full h-full object-cover">':'<span class="iconify text-slate-600" data-icon="mdi:image-off-outline"></span>')+'</div></td><td class="px-4 py-3 font-semibold text-white">'+p.name+'</td><td class="px-4 py-3 text-slate-400 text-xs">'+(p.category||'—')+'</td><td class="px-4 py-3 text-right font-bold text-cyan-400">TZS '+Number(p.price).toLocaleString()+'</td><td class="px-4 py-3 font-mono text-xs text-slate-300">'+(p.sku||'—')+'</td><td class="px-4 py-3 text-right font-bold '+(p.stock<=0?'text-red-400':p.minStock&&p.stock<=p.minStock?'text-yellow-400':'text-green-400')+'">'+p.stock+'</td><td class="px-4 py-3 text-right text-slate-400">'+(p.minStock||0)+'</td><td class="px-4 py-3 text-xs text-slate-500 max-w-[200px] truncate">'+(p.description||'—')+'</td><td class="px-4 py-3 text-center"><svg id="'+bid+'" class="inline-block"></svg></td></tr>'}).join('');setTimeout(function(){list.forEach(function(p){var bid='bc-'+p.id.replace(/\//g,'_');var el=document.getElementById(bid);if(el&&typeof JsBarcode!=='undefined'){try{JsBarcode(el,p.sku||'NO-SKU',{format:'CODE128',width:1.2,height:30,displayValue:true,fontSize:9,margin:2,lineColor:'#e2e8f0',background:'transparent',font:'Plus Jakarta Sans'})}catch(e){}}})},100)}
 
         function renderInventory() {
-            const c = document.getElementById('stock-table-list');
-            if(!myProducts.length) { c.innerHTML='<p class="text-slate-500 text-center py-8">No products.</p>'; return; }
-            c.innerHTML = myProducts.map(p=>`<div class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl gap-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">${p.image ? `<img src="${p.image}" class="w-full h-full object-cover">` : '<span class="iconify text-slate-600" data-icon="mdi:box"></span>'}</div><div><div class="text-sm font-semibold">${p.name}</div><div class="text-[10px] text-slate-500">Min: ${p.minStock||0}</div></div></div><button onclick="quickReorder('${p.id}',${Math.max(p.minStock?p.minStock*2:20,10)})" class="reorder-btn" title="Quick reorder"><span class="iconify text-xs" data-icon="mdi:lightning-bolt"></span> +${Math.max(p.minStock?p.minStock*2:20,10)}</button><div class="text-right"><div class="font-bold ${p.stock<=0?'text-red-400':p.minStock&&p.stock<=p.minStock?'text-yellow-400':'text-cyan-400'}">${p.stock}</div><div class="text-[10px] text-slate-500 uppercase">Current</div></div></div>`).join('');
-            const h = document.getElementById('stock-history-list'); let logs = [];
+            const tb = document.getElementById('warehouse-table');
+            if(!tb) return;
+            
+            var totalStock=0, totalReserved=0, totalDelivered=0, totalReturned=0, totalRemaining=0;
+            
+            if(!myProducts.length){
+                tb.innerHTML='<tr><td colspan="10" class="text-center text-slate-500 py-8">No products in warehouse.</td></tr>';
+                document.getElementById('wh-stat-stock').textContent = '0';
+                document.getElementById('wh-stat-delivered').textContent = '0';
+                document.getElementById('wh-stat-returned').textContent = '0';
+                document.getElementById('wh-stat-remaining').textContent = '0';
+                const h = document.getElementById('stock-history-list'); 
+                if(h) h.innerHTML = '<p class="text-slate-500">No history yet.</p>';
+                return;
+            }
+            
+            tb.innerHTML = myProducts.map(function(p){
+                var stock = Number(p.stock || 0);               
+                var delivered = Number(p.delivered || 0);         
+                var returned = Number(p.returnedStock || 0);      
+                
+                // Calculate Reserved dynamically from ACTIVE orders
+                var reserved = myOrders.filter(function(o) {
+                    return o.status === 'out_for_delivery' && o.productId === p.id;
+                }).reduce(function(sum, o) {
+                    return sum + (Number(o.qty) || 1);
+                }, 0);
+                
+                // The correct math: Remain = Stock - Delivery + Return
+                var remaining = stock - delivered + returned;
+                if(remaining < 0) remaining = 0; // Prevent negative numbers
+                
+                totalStock += stock;
+                totalReserved += reserved;
+                totalDelivered += delivered;
+                totalReturned += returned;
+                totalRemaining += remaining;
+                
+                var remColor = remaining <= 0 ? 'text-red-400' : (p.minStock && remaining <= p.minStock ? 'text-yellow-400' : 'text-green-400');
+                
+                return '<tr class="hover:bg-white/[0.02]">' +
+                    '<td class="px-4 py-3"><div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">' + 
+                        (p.image ? '<img src="'+p.image+'" class="w-full h-full object-cover">' : '<span class="iconify text-slate-600" data-icon="mdi:package-variant"></span>') + 
+                    '</div></td>' +
+                    '<td class="px-4 py-3 text-sm text-white font-medium">' + (p.name || '—') + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-400 font-mono">' + (p.sku || '—') + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-cyan-300 font-medium">' + (window.currentUser.shopName || '—') + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-right font-bold text-white">' + stock.toLocaleString() + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-right font-semibold text-orange-400">' + reserved.toLocaleString() + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-right font-semibold text-blue-400">' + delivered.toLocaleString() + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-right font-semibold text-pink-400">' + returned.toLocaleString() + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-right font-bold ' + remColor + '">' + remaining.toLocaleString() + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-300"><input type="text" value="'+(p.location||'A1')+'" onchange="updateLocation(\''+p.id+'\',this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-xs text-white w-20 focus:outline-none"></td>' +
+                '</tr>';
+            }).join('');
+            
+            document.getElementById('wh-stat-stock').textContent = totalStock.toLocaleString();
+            document.getElementById('wh-stat-delivered').textContent = totalDelivered.toLocaleString();
+            document.getElementById('wh-stat-returned').textContent = totalReturned.toLocaleString();
+            document.getElementById('wh-stat-remaining').textContent = totalRemaining.toLocaleString();
+
+            // Render History
+            const h = document.getElementById('stock-history-list'); 
+            let logs = [];
             myProducts.forEach(p => { if(p.stockLog) p.stockLog.forEach(l => logs.push({...l, productName: p.name})); });
             logs.sort((a,b) => (b.at?.seconds||0) - (a.at?.seconds||0));
             h.innerHTML = logs.length ? logs.slice(0,20).map(l=>`<div class="flex justify-between items-center p-2 bg-black/20 rounded"><div><span class="font-semibold text-white">${l.productName}</span><span class="ml-2 ${l.type==='in'?'text-green-400':'text-red-400'} uppercase font-bold">(${l.type})</span></div><div class="text-right"><div class="text-slate-300">${l.qty} pcs</div></div></div>`).join('') : '<p class="text-slate-500">No history yet.</p>';
-        } // FORM SUBMISSIONS
+        }
+
+        async function updateLocation(pid,loc){try{await db.collection('products').doc(pid).update({location:loc});showT("Location updated!");}catch(e){showT(e.message,"error");}} // FORM SUBMISSIONS
                 document.getElementById('bundle-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const p1Id = document.getElementById('bundle-p1').value;
