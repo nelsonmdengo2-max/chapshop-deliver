@@ -1386,16 +1386,25 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
         }
                 function populateDropdowns() {
             const s1 = document.getElementById('order-product'); 
-            s1.innerHTML = '<option value="">Select...</option>' + myProducts.map(p=>`<option value="${p.id}" data-price="${p.price}">${p.name} (${p.sku||'No SKU'}) - Stock: ${p.stock}</option>`).join('');
+            if(s1) {
+                s1.innerHTML = '<option value="">Select...</option>' + myProducts.map(p=>`<option value="${p.id}" data-price="${p.price}">${p.name} (${p.sku||'No SKU'}) - Stock: ${p.stock}</option>`).join('');
+                s1.onchange = function() {
+                    var selected = s1.options[s1.selectedIndex];
+                    var price = selected.getAttribute('data-price') || 0;
+                    document.getElementById('order-price').value = price;
+                    calcMerchantTotal();
+                };
+            }
             
-            s1.onchange = function() {
-                var selected = s1.options[s1.selectedIndex];
-                var price = selected.getAttribute('data-price') || 0;
-                document.getElementById('order-price').value = price;
-                calcMerchantTotal();
-            };
+            const s2 = document.getElementById('adj-product'); 
+            if(s2) s2.innerHTML = '<option value="">Select...</option>' + myProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
             
-            const s2 = document.getElementById('adj-product'); s2.innerHTML = '<option value="">Select...</option>' + myProducts.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+            // FIX: Populate Bundle Dropdowns
+            const bp1 = document.getElementById('bundle-p1');
+            const bp2 = document.getElementById('bundle-p2');
+            var bundleOpts = '<option value="">Select Product...</option>' + myProducts.filter(p => !p.isBundle).map(p=>`<option value="${p.id}">${p.name} (${p.sku||'No SKU'}) - Stock: ${p.stock}</option>`).join('');
+            if(bp1) bp1.innerHTML = bundleOpts;
+            if(bp2) bp2.innerHTML = bundleOpts;
         }
 
         function calcMerchantTotal() {
