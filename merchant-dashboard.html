@@ -312,8 +312,8 @@
                         </div>
                     </div>
                                         <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
-                        <table class="w-full text-sm text-left min-w-[900px]">
-                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">City</th><th class="px-4 py-3">Product/SKU</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Agent</th><th class="px-4 py-3">Rider</th><th class="px-4 py-3">Date</th><th class="px-4 py-3">Actions</th></tr></thead>
+                        <table class="w-full text-sm text-left min-w-[1100px]">
+                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">City</th><th class="px-4 py-3">Product/SKU</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Agent / Call Info</th><th class="px-4 py-3">CC Notes</th><th class="px-4 py-3">Rider</th><th class="px-4 py-3">Date</th><th class="px-4 py-3">Actions</th></tr></thead>
                             <tbody id="orders-table-body" class="divide-y divide-white/[0.05]"></tbody>
                         </table>
                     </div>
@@ -1228,11 +1228,11 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
         function exportCSV(){if(!filteredOrders.length)return showT("No data","error");var csv='ID,Customer Name,Customer Phone,City,Address,SKU,Product,Qty,Unit Price,Amount,Currency,Status,Agent Name,Rider Name,Merchant,Placed At,Accepted At,Confirmed At,Out for Delivery At,Delivered At\n';filteredOrders.forEach(function(o){csv+=['#'+o.id.slice(-6).toUpperCase(),'"'+(o.customerName||'').replace(/"/g,'""')+'"','"'+(o.customerPhone||'')+'"','"'+(o.customerCity||'')+'"','"'+(o.customerAddress||'').replace(/"/g,'""')+'"',o.productSku||'','"'+(o.itemName||'').replace(/"/g,'""')+'"',o.qty||1,o.productPrice||0,o.totalAmount||0,o.currency||'TZS',o.status||'','"'+(o.processedByName||'')+'"','"'+(o.riderName||'')+'"','"'+(o.merchantName||'')+'"',o.createdAt?fmtDate(o.createdAt):'',o.acceptedAt?fmtDate(o.acceptedAt):'',o.confirmedAt?fmtDate(o.confirmedAt):'',o.outForDeliveryAt?fmtDate(o.outForDeliveryAt):'',o.deliveredAt?fmtDate(o.deliveredAt):''].join(',')+'\n'});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='chapshop_orders_'+new Date().toISOString().slice(0,10)+'.csv';a.click();showT("CSV exported with full details!")}
 
         function fmtDur(s){ if(!s||s<=0) return '0s'; if(s<60) return Math.round(s)+'s'; var m=Math.floor(s/60),sec=Math.round(s%60); return m+'m '+sec+'s'; }
-        function renderOrdersTable() {
+                   function renderOrdersTable() {
             const tb = document.getElementById('orders-table-body');
             if(!filteredOrders.length) { 
-                tb.innerHTML='<tr><td colspan="10" class="text-center text-slate-500 py-8">No orders found.</td></tr>'; 
-                updatePaginationUI(0);
+                tb.innerHTML='<tr><td colspan="11" class="text-center text-slate-500 py-8">No orders found.</td></tr>'; 
+                updatePaginationUI(0, 0, 0);
                 return; 
             }
 
@@ -1244,27 +1244,29 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             const end = start + pageSize;
             const paginatedItems = filteredOrders.slice(start, end);
 
-                        tb.innerHTML = paginatedItems.map(o=>{
-                var showBtns=['pending','accepted','confirmed','out_for_delivery'].indexOf(o.status)!==-1;
-                return '<tr class="hover:bg-white/[0.02]">'+
-                    '<td class="px-4 py-3 font-mono text-cyan-400 text-xs">#'+o.id.slice(-6).toUpperCase()+'</td>'+
-                    '<td class="px-4 py-3 text-sm">'+o.customerName+'</td>'+
-                    '<td class="px-4 py-3 text-xs text-slate-400">'+(o.customerCity||'N/A')+'</td>'+
-                    '<td class="px-4 py-3 text-xs text-slate-300">'+o.itemName+' <span class="text-slate-500">('+(o.productSku||'')+')</span></td>'+
-                    '<td class="px-4 py-3 text-sm font-semibold">TZS '+Number(o.totalAmount).toLocaleString()+'</td>'+
-                    '<td class="px-4 py-3">'+getStatusBadge(o.status)+'</td>'+
-                    '<td class="px-4 py-3 text-xs text-orange-400">'+(o.processedByName||'—')+(o.callAttempts?'<div class="text-slate-500 mt-1 flex items-center gap-1"><span class="iconify" data-icon="mdi:phone"></span> '+o.callAttempts+' calls</div>':'')+(o.callDuration?'<div class="text-slate-500 flex items-center gap-1"><span class="iconify" data-icon="mdi:timer-outline"></span> '+fmtDur(o.callDuration)+'</div>':'')+(o.callRecordingUrl?'<div class="mt-1"><audio controls style="height: 30px; width: 180px;" src="'+o.callRecordingUrl+'"></audio></div>':'')+'</td>'+
-                    '<td class="px-4 py-3 text-xs text-violet-400">'+(o.riderName||'—')+'</td>'+
-                    '<td class="px-4 py-3 text-xs text-slate-500">'+formatDate(o.createdAt)+'</td>'+
-                    '<td class="px-4 py-3"><div class="flex gap-1">'+
-                        '<button onclick="viewOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400" title="View"><span class="iconify text-sm" data-icon="mdi:eye"></span></button>'+
-                        '<button onclick="printOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400" title="Print Invoice"><span class="iconify text-sm" data-icon="mdi:printer"></span></button>'+
-                        '<button onclick="editMerchantOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-yellow-400" title="Edit"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button>'+
-                        '<button onclick="archiveMerchantOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-indigo-400" title="Archive"><span class="iconify text-sm" data-icon="mdi:archive-arrow-down-outline"></span></button>'+
-                        '<button onclick="deleteMerchantOrder(\''+o.id+'\')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Delete"><span class="iconify text-sm" data-icon="mdi:delete"></span></button>'+
-                        (showBtns?'<button onclick="requestCancel(\''+o.id+'\')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Request Cancel"><span class="iconify text-sm" data-icon="mdi:close-circle"></span></button>':'')+
+            tb.innerHTML = paginatedItems.map(o => {
+                var showBtns = ['pending', 'accepted', 'confirmed', 'out_for_delivery'].indexOf(o.status) !== -1;
+                return '<tr class="hover:bg-white/[0.02]">' +
+                    '<td class="px-4 py-3 font-mono text-cyan-400 text-xs">#' + o.id.slice(-6).toUpperCase() + '</td>' +
+                    '<td class="px-4 py-3 text-sm">' + (o.customerName || '') + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-400">' + (o.customerCity || 'N/A') + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-300">' + (o.itemName || '') + ' <span class="text-slate-500">(' + (o.productSku || '') + ')</span></td>' +
+                    '<td class="px-4 py-3 text-sm font-semibold">TZS ' + Number(o.totalAmount || 0).toLocaleString() + '</td>' +
+                    '<td class="px-4 py-3">' + getStatusBadge(o.status) + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-orange-400 whitespace-nowrap">' + (o.processedByName || '—') + (o.callAttempts ? '<div class="text-slate-500 mt-1 flex items-center gap-1"><span class="iconify" data-icon="mdi:phone"></span> ' + o.callAttempts + ' calls</div>' : '') + (o.callDuration ? '<div class="text-slate-500 flex items-center gap-1"><span class="iconify" data-icon="mdi:timer-outline"></span> ' + fmtDur(o.callDuration) + '</div>' : '') + (o.callRecordingUrl ? '<div class="mt-1"><audio controls style="height: 30px; width: 180px;" src="' + o.callRecordingUrl + '"></audio></div>' : '') + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-300 italic max-w-[200px] truncate" title="' + (o.callNotes || '') + '">' + (o.callNotes || '—') + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-violet-400 whitespace-nowrap">' + (o.riderName || '—') + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">' + formatDate(o.createdAt) + '</td>' +
+                    '<td class="px-4 py-3"><div class="flex gap-1">' +
+                        '<button onclick="viewOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400" title="View"><span class="iconify text-sm" data-icon="mdi:eye"></span></button>' +
+                        '<button onclick="printOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400" title="Print Invoice"><span class="iconify text-sm" data-icon="mdi:printer"></span></button>' +
+                        '<button onclick="editMerchantOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-yellow-400" title="Edit"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button>' +
+                        '<button onclick="archiveMerchantOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-indigo-400" title="Archive"><span class="iconify text-sm" data-icon="mdi:archive-arrow-down-outline"></span></button>' +
+                        '<button onclick="deleteMerchantOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Delete"><span class="iconify text-sm" data-icon="mdi:delete"></span></button>' +
+                        (showBtns ? '<button onclick="requestCancel(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Request Cancel"><span class="iconify text-sm" data-icon="mdi:close-circle"></span></button>' : '') +
                     '</div></td></tr>';
             }).join('');
+            
             updatePaginationUI(filteredOrders.length, start, end);
         }
 
