@@ -1383,7 +1383,7 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             var qty = parseInt(document.getElementById('emo-qty').value) || 0;
             var price = parseInt(document.getElementById('emo-price').value) || 0;
             document.getElementById('emo-total').value = (qty * price);
-        }
+        } 
                 function populateDropdowns() {
             const s1 = document.getElementById('order-product'); 
             if(s1) {
@@ -1521,9 +1521,9 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                     return sum + (Number(o.qty) || 1);
                 }, 0);
                 
-                // The correct math: Remain = Stock - Delivery + Return
-                var remaining = stock - delivered + returned;
-                if(remaining < 0) remaining = 0; // Prevent negative numbers
+                          // The correct math: Remain = Stock - Delivery - Reservation + Return
+            var remaining = stock - delivered - reserved + returned;
+            if(remaining < 0) remaining = 0; // Prevent negative numbers
                 
                 totalStock += stock;
                 totalReserved += reserved;
