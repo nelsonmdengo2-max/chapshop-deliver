@@ -437,11 +437,14 @@
             var list = [];
 
             if(currentWsTab === 'new') {
-                // PRIORITY 1: Always look for NEW orders first
+                // PRIORITY 1: Always look for NEW orders assigned to me
                 list = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
                 
-                // PRIORITY 2: If NO new orders, pull 'no_answer' and DUE 'callback_requested'
-                if(!list.length) {
+                // PRIORITY 2: If I have no new orders, check if there are ANY unassigned 'pending' orders in the system.
+                var unassignedPendingExists = allOrders.some(function(o) { return o.status === 'pending' && !o.ccAssignedTo; });
+
+                // PRIORITY 3: ONLY if I have no new orders AND there are NO unassigned pending orders in the whole system, pull 'no_answer' and DUE 'callback_requested'
+                if(!list.length && !unassignedPendingExists) {
                     var now = new Date();
                     list = allOrders.filter(function(o) { 
                         var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
@@ -452,7 +455,6 @@
                         // STRICT DATE RULE: Only show scheduled callbacks if today is the scheduled day (or past it)
                         if(o.status === 'callback_requested' && o.scheduledDate) {
                             var schedDate = o.scheduledDate.toDate();
-                            // Set both dates to midnight to compare just the DAYS
                             var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                             var schedMid = new Date(schedDate.getFullYear(), schedDate.getMonth(), schedDate.getDate());
                             if(schedMid <= todayMid) return true;
@@ -465,7 +467,7 @@
 
                 if(!list.length) { 
                     c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>';
-                    claimNextOrder(); 
+                    if(!unassignedPendingExists) claimNextOrder(); 
                     return; 
                 }
             } else if(currentWsTab === 'retry') {
