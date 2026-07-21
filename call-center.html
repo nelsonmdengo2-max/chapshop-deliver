@@ -1094,8 +1094,8 @@
             isClaiming = true;
             
             try {
-                // Look for 'pending' orders
-                const q = await db.collection('orders').where('status', '==', 'pending').limit(15).get();
+                // Look for 'pending' OR 'accepted' orders that haven't been assigned to an agent yet
+                const q = await db.collection('orders').where('status', 'in', ['pending', 'accepted']).limit(15).get();
                 let claimed = false;
                 
                 // Sort manually in JavaScript
@@ -1115,7 +1115,7 @@
                             // Use a Firestore Transaction to safely claim the order
                             await db.runTransaction(async (transaction) => {
                                 const orderDoc = await transaction.get(doc.ref);
-                                if (!orderDoc.exists || orderDoc.data().ccAssignedTo || orderDoc.data().status !== 'pending') {
+                                if (!orderDoc.exists || orderDoc.data().ccAssignedTo || (orderDoc.data().status !== 'pending' && orderDoc.data().status !== 'accepted')) {
                                     return; // Someone else took it, skip
                                 }
                                 transaction.update(doc.ref, { 
