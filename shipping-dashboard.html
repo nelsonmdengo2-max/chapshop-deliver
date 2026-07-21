@@ -147,10 +147,26 @@
                 </div>
 
                 <!-- ORDERS -->
-                <div id="panel-orders" class="tab-panel hidden">
-                    <div class="mb-6 relative max-w-md">
-                        <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
-                        <input type="text" id="order-search" oninput="renderOrders()" placeholder="Search by ID, Phone, or Name..." class="w-full bg-white/[0.02] border border-white/[0.08] rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50">
+                               <div id="panel-orders" class="tab-panel hidden">
+                    <div class="mb-6 flex flex-col md:flex-row gap-4">
+                        <div class="relative flex-1 max-w-md">
+                            <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
+                            <input type="text" id="order-search" oninput="renderOrders()" placeholder="Search by ID, Phone, or Name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50">
+                        </div>
+                        <select id="ship-city-filter" onchange="renderOrders()" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 min-w-[150px]">
+                            <option value="">All Cities</option>
+                            <option value="Dar es Salaam">Dar es Salaam</option>
+                            <option value="Arusha">Arusha</option>
+                            <option value="Mbeya">Mbeya</option>
+                            <option value="Mwanza">Mwanza</option>
+                            <option value="Morogoro">Morogoro</option>
+                            <option value="Tanga">Tanga</option>
+                            <option value="Dodoma">Dodoma</option>
+                            <option value="Zanzibar">Zanzibar</option>
+                            <option value="Mtwara">Mtwara</option>
+                            <option value="Kigoma">Kigoma</option>
+                        </select>
+                        <input type="date" id="ship-date-filter" onchange="renderOrders()" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50">
                     </div>
                     <div class="mb-6 bg-white/[0.02] border border-white/[0.08] rounded-xl p-1.5 flex gap-1 flex-wrap w-fit">
                         <div onclick="switchSub('orders', 'pending')" class="sub-tab active" id="orders-tab-pending">Pending Orders</div>
@@ -394,7 +410,25 @@
         if(s==='shipped')list=allOrders.filter(function(o){return o.status==='out_for_delivery';});
         if(s==='delivered')list=allOrders.filter(function(o){return o.status==='delivered';});
         if(s==='returned')list=allOrders.filter(function(o){return o.status==='returned';});
-        if(search){list=list.filter(function(o){return o.id.toLowerCase().includes(search)||(o.customerPhone&&o.customerPhone.includes(search))||(o.customerName&&o.customerName.toLowerCase().includes(search));});}
+                   if(search){list=list.filter(function(o){return o.id.toLowerCase().includes(search)||(o.customerPhone&&o.customerPhone.includes(search))||(o.customerName&&o.customerName.toLowerCase().includes(search));});}
+            
+            // City Filter Logic
+            var cityFilter = document.getElementById('ship-city-filter') ? document.getElementById('ship-city-filter').value : '';
+            if(cityFilter) {
+                list = list.filter(function(o){ return (o.customerCity||'').toLowerCase() === cityFilter.toLowerCase(); });
+            }
+            
+            // Date Filter Logic
+            var dateFilter = document.getElementById('ship-date-filter') ? document.getElementById('ship-date-filter').value : '';
+            if(dateFilter) {
+                list = list.filter(function(o){ 
+                    if(!o.createdAt) return false;
+                    try {
+                        var orderDate = o.createdAt.toDate().toISOString().split('T')[0];
+                        return orderDate === dateFilter;
+                    } catch(e) { return false; }
+                });
+            }
         if(!list.length){c.innerHTML='<p class="text-slate-500 text-center py-12">No orders here.</p>';return;}
         
         if(s==='pending'||s==='packing'){
