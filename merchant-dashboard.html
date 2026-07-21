@@ -1203,10 +1203,10 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             }).join('');
         }
 
-        function renderReviewList() {
+                function renderReviewList() {
             const c = document.getElementById('review-list'); const pending = myOrders.filter(o => o.status === 'pending');
-            if (!pending.length) { c.innerHTML = '<p class="text-slate-500 text-center py-8">No orders need reviewing.</p>'; return; }
-            c.innerHTML = pending.map(o => `<div class="bg-white/[0.02] border border-yellow-500/20 rounded-xl p-4 flex flex-col md:flex-row justify-between gap-4"><div><div class="flex items-center gap-2 mb-1"><span class="font-mono text-cyan-400 font-bold text-sm">#${o.id.slice(-6).toUpperCase()}</span>${getStatusBadge(o.status)}</div><div class="text-sm text-slate-400">${o.customerName} • ${o.customerCity||'N/A'}</div><div class="text-xs text-slate-500">${o.itemName} x${o.qty} - TZS ${Number(o.totalAmount).toLocaleString()}</div></div><div class="flex gap-2"><button onclick="acceptOrder('${o.id}')" class="px-4 py-2 bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 rounded-lg text-xs font-bold hover:bg-cyan-500/30">Accept</button><button onclick="rejectOrder('${o.id}', '${o.productId}', ${o.qty})" class="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg text-xs font-bold hover:bg-red-500/30">Reject</button></div></div>`).join('');
+            if (!pending.length) { c.innerHTML = '<p class="text-slate-500 text-center py-8">No orders waiting for call center.</p>'; return; }
+            c.innerHTML = pending.map(o => `<div class="bg-white/[0.02] border border-yellow-500/20 rounded-xl p-4 flex flex-col md:flex-row justify-between gap-4"><div><div class="flex items-center gap-2 mb-1"><span class="font-mono text-cyan-400 font-bold text-sm">#${o.id.slice(-6).toUpperCase()}</span>${getStatusBadge(o.status)}</div><div class="text-sm text-slate-400">${o.customerName} • ${o.customerCity||'N/A'}</div><div class="text-xs text-slate-500">${o.itemName} x${o.qty} - TZS ${Number(o.totalAmount).toLocaleString()}</div></div><div class="flex items-center gap-2"><span class="text-xs text-yellow-400 font-bold flex items-center gap-1.5"><span class="iconify" data-icon="mdi:headset"></span> Waiting for Call Center</span></div></div>`).join('');
         }
 
         async function acceptOrder(id) { try { await db.collection('orders').doc(id).update({ status: 'accepted' }); showT("Accepted!"); } catch(e) { showT(e.message, "error"); } }
