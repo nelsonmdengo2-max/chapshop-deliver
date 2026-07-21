@@ -1474,10 +1474,16 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                     category: document.getElementById('ep-cat').value.trim(),
                     price: parseInt(document.getElementById('ep-price').value) || 0,
                     sku: document.getElementById('ep-sku').value.trim(),
-                    stock: parseInt(document.getElementById('ep-stock').value) || 0,
                     minStock: parseInt(document.getElementById('ep-min').value) || 0,
                     description: document.getElementById('ep-desc').value.trim()
                 };
+                
+                // ONLY update stock if they actually typed a number greater than 0
+                // This prevents them from accidentally erasing the stock to 0!
+                var stockVal = parseInt(document.getElementById('ep-stock').value);
+                if(!isNaN(stockVal) && stockVal >= 0) {
+                    updateData.stock = stockVal;
+                }
 
                 db.collection('products').doc(id).update(updateData).then(function(){
                     showT("Product updated successfully!");
