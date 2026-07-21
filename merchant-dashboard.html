@@ -2066,6 +2066,35 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
 
         function requestCancel(id){if(!confirm('Request cancellation for this order?'))return;db.collection('orders').doc(id).update({status:'cancel_requested'}).then(function(){showT('Cancellation requested — admin will review');renderOrdersTable()}).catch(function(e){showT(e.message,'error')})}
 
+        // DISCOUNT FUNCTION FOR MERCHANTS
+        function applyMerchantDiscount(orderId) {
+            var o = myOrders.find(function(x){ return x.id === orderId; });
+            if(!o) return;
+            
+            if(['delivered', 'cancelled', 'returned'].includes(o.status)) {
+                return showT("Cannot apply discount to a closed order.", "error");
+            }
+            
+            var discountStr = prompt("APPLY DISCOUNT\nCurrent Total: TZS " + Number(o.totalAmount).toLocaleString() + "\n\nEnter discount amount in TZS (e.g. 5000):");
+            if(discountStr === null) return; // Merchant clicked cancel
+            
+            var discount = parseInt(discountStr);
+            if(isNaN(discount) || discount <= 0) return showT("Invalid discount amount", "error");
+            
+            var newTotal = o.totalAmount - discount;
+            if(newTotal <= 0) return showT("Discount cannot be greater than the total amount", "error");
+            
+            if(confirm("Apply TZS " + discount.toLocaleString() + " discount?\nNew Total: TZS " + newTotal.toLocaleString())) {
+                db.collection('orders').doc(orderId).update({
+                    totalAmount: newTotal,
+                    discountApplied: discount,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(function(){
+                    showT("Discount applied successfully!");
+                }).catch(function(e){ showT(e.message, "error"); });
+            }
+        }
+
         function renderRefunds() {
             const tbody = document.getElementById('refunds-table-body');
             if(!tbody) return;
