@@ -64,7 +64,7 @@
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Password</label><input type="password" name="password" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="••••••••"></div>
                 <button type="submit" class="w-full bg-cyan-500 text-white font-semibold py-3 rounded-xl hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20">Sign In</button>
             </form>
-            <div class="text-center mt-6"><a href="index.html" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors">← Back to Website</a></div>
+            <div class="text-center mt-6"><a href="https://chapshopdelivery.live" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors">← Back to Website</a></div>
         </div>
     </div>
 
@@ -93,7 +93,7 @@
             </nav>
             <div class="p-4 border-t border-white/[0.08] space-y-1 flex-shrink-0">
                 <button onclick="switchTab('profile')" class="sidebar-link w-full text-left" id="nav-profile"><span class="iconify text-lg" data-icon="mdi:account-cog-outline"></span> Settings</button>
-                <button onclick="handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</button>
+                <a href="https://chapshopdelivery.live" onclick="handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</a>
             </div>
         </aside>
 
@@ -392,16 +392,16 @@
             var start = getDateFilter(dashFilter);
             var my = allOrders.filter(function(o) { return o.processedBy === myId() && (!start || (o.updatedAt && o.updatedAt.toDate() >= start)); });
             document.getElementById('d-new').textContent = allOrders.filter(function(o) { return o.status === 'accepted'; }).length;
-            document.getElementById('d-confirmed').textContent = my.filter(function(o) { return o.status === 'confirmed'; }).length;
-            document.getElementById('d-cancelled').textContent = my.filter(function(o) { return o.status === 'cancelled'; }).length;
-            document.getElementById('d-noreply').textContent = my.filter(function(o) { return o.status === 'no_answer'; }).length;
-            document.getElementById('d-scheduled').textContent = my.filter(function(o) { return o.status === 'callback_requested'; }).length;
-            document.getElementById('d-outregion').textContent = my.filter(function(o) { return o.status === 'out_of_region'; }).length;
-            document.getElementById('d-wrong').textContent = my.filter(function(o) { return o.status === 'wrong_number'; }).length;
+            document.getElementById('d-confirmed').textContent = my.filter(function(o) { return o.callOutcome === 'confirmed'; }).length;
+            document.getElementById('d-cancelled').textContent = my.filter(function(o) { return o.callOutcome === 'cancelled'; }).length;
+            document.getElementById('d-noreply').textContent = my.filter(function(o) { return o.callOutcome === 'no_answer'; }).length;
+            document.getElementById('d-scheduled').textContent = my.filter(function(o) { return o.callOutcome === 'callback_requested'; }).length;
+            document.getElementById('d-outregion').textContent = my.filter(function(o) { return o.callOutcome === 'out_of_region'; }).length;
+            document.getElementById('d-wrong').textContent = my.filter(function(o) { return o.callOutcome === 'wrong_number'; }).length;
             document.getElementById('d-delivered').textContent = my.filter(function(o) { return o.status === 'delivered'; }).length;
             document.getElementById('d-returned').textContent = my.filter(function(o) { return o.status === 'returned'; }).length;
             var todayStart = new Date(); todayStart.setHours(0,0,0,0);
-            var todayConfirmed = allOrders.filter(function(o) { return o.processedBy === myId() && o.status === 'confirmed' && o.updatedAt && o.updatedAt.toDate() >= todayStart; }).length;
+            var todayConfirmed = allOrders.filter(function(o) { return o.processedBy === myId() && o.callOutcome === 'confirmed' && o.updatedAt && o.updatedAt.toDate() >= todayStart; }).length;
             document.getElementById('target-text').textContent = todayConfirmed + '/' + DAILY_TARGET;
             document.getElementById('target-bar').style.width = Math.min(100, (todayConfirmed/DAILY_TARGET)*100) + '%';
             
@@ -436,21 +436,15 @@
             var search = (document.getElementById('ws-search').value || '').toLowerCase();
             var list = [];
 
-                       if(currentWsTab === 'new') {
-                // PRIORITY 1: Look for orders already assigned to me and accepted
+            if(currentWsTab === 'new') {
+                // PRIORITY 1: Always look for NEW orders assigned to me
                 list = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
                 
-                // STRICT RULE: Only show ONE order at a time. Sort by oldest assigned first.
-                if(list.length > 0) {
-                    list.sort(function(a, b) { return (a.ccAssignedAt?.seconds || 0) - (b.ccAssignedAt?.seconds || 0); });
-                    list = [list[0]]; // Force array to only contain 1 order
-                }
-
-                // PRIORITY 2: If I have NO active orders, check if there are ANY unassigned 'pending' orders in the system.
+                // PRIORITY 2: If I have no new orders, check if there are ANY unassigned 'pending' orders in the system.
                 var unassignedPendingExists = allOrders.some(function(o) { return o.status === 'pending' && !o.ccAssignedTo; });
 
-                // PRIORITY 3: ONLY if I have no active orders AND there are NO unassigned pending orders, pull 'no_answer' and DUE 'callback_requested'
-                if(list.length === 0 && !unassignedPendingExists) {
+                // PRIORITY 3: ONLY if I have no new orders AND there are NO unassigned pending orders in the whole system, pull 'no_answer' and DUE 'callback_requested'
+                if(!list.length && !unassignedPendingExists) {
                     var now = new Date();
                     list = allOrders.filter(function(o) { 
                         var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
@@ -458,6 +452,7 @@
                         
                         if(o.status === 'no_answer') return true;
                         
+                        // STRICT DATE RULE: Only show scheduled callbacks if today is the scheduled day (or past it)
                         if(o.status === 'callback_requested' && o.scheduledDate) {
                             var schedDate = o.scheduledDate.toDate();
                             var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -470,15 +465,9 @@
                     }).slice(0, 1); // Just get the oldest one to work on
                 }
 
-                // PRIORITY 4: If I have no active order, but there ARE new pending orders in the system, claim one!
-                if(list.length === 0 && unassignedPendingExists) {
-                    c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">Claiming the next new order...</p></div>';
-                    claimNextOrder(); 
-                    return; 
-                }
-
-                if(list.length === 0) { 
+                if(!list.length) { 
                     c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>';
+                    if(!unassignedPendingExists) claimNextOrder(); 
                     return; 
                 }
             } else if(currentWsTab === 'retry') {
