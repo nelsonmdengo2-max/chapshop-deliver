@@ -203,7 +203,7 @@
                     <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
-                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Product</th><th class="p-4">SKU</th><th class="p-4">Warehouse</th><th class="p-4 text-right">Available</th><th class="p-4 text-right">Delivered</th><th class="p-4 text-right">Reorder Lvl</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Action</th></tr></thead>
+                                <thead class="bg-white/[0.02]"><tr class="text-left text-slate-500 uppercase text-xs"><th class="p-4">Product</th><th class="p-4">SKU</th><th class="p-4">Warehouse</th><th class="p-4 text-right">Original Stock</th><th class="p-4 text-right">Reserved</th><th class="p-4 text-right">Delivered</th><th class="p-4 text-right">Returned</th><th class="p-4 text-right">Remain Stock</th><th class="p-4 text-center">Status</th><th class="p-4 text-center">Action</th></tr></thead>
                                 <tbody id="cs-tbody" class="divide-y divide-white/[0.05]"></tbody>
                             </table>
                         </div>
@@ -863,16 +863,27 @@
             return;
         }
 
-        tbody.innerHTML = filtered.map(p => {
+                tb.innerHTML = filtered.map(p => {
+            var stock = Number(p.stock || 0);
+            var delivered = Number(p.delivered || 0);
+            var returned = Number(p.returnedStock || 0);
+            var reserved = Number(p.reserved || 0);
+            
+            // Calculate true remaining stock on the shelf
+            var remaining = stock - delivered - reserved + returned;
+            if(remaining < 0) remaining = 0; // Prevent negative numbers
+            
             return '<tr class="hover:bg-white/[0.02] transition-colors">' +
                 '<td class="p-4 text-white font-medium">' + (p.name || 'N/A') + '</td>' +
                 '<td class="p-4 text-slate-400 font-mono text-xs">' + (p.sku || '—') + '</td>' +
                 '<td class="p-4 text-slate-400">' + (p.warehouse || 'Main') + '</td>' +
-                '<td class="p-4 text-right font-bold text-white">' + (p.stock || 0) + '</td>' +
-                '<td class="p-4 text-right text-cyan-400">' + (p.delivered || 0) + '</td>' +
-                '<td class="p-4 text-right text-slate-500">' + (p.minStock || 0) + '</td>' +
+                '<td class="p-4 text-right font-bold text-white">' + stock + '</td>' +
+                '<td class="p-4 text-right font-semibold text-orange-400">' + reserved + '</td>' +
+                '<td class="p-4 text-right font-semibold text-blue-400">' + delivered + '</td>' +
+                '<td class="p-4 text-right font-semibold text-pink-400">' + returned + '</td>' +
+                '<td class="p-4 text-right font-bold text-green-400">' + remaining + '</td>' +
                 '<td class="p-4 text-center">' + getStockStatus(p) + '</td>' +
-                             '<td class="p-4 text-center"><div class="flex items-center justify-center gap-3"><button onclick="adjustStock(\'' + p.id + '\', \'' + (p.name || '').replace(/'/g, "\\'") + '\')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Adjust</button><button onclick="deleteStockProduct(\'' + p.id + '\', \'' + (p.name || '').replace(/'/g, "\\'") + '\')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></div></td>' +
+                '<td class="p-4 text-center"><div class="flex items-center justify-center gap-3"><button onclick="adjustStock(\'' + p.id + '\', \'' + (p.name || '').replace(/'/g, "\\'") + '\')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Adjust</button><button onclick="deleteStockProduct(\'' + p.id + '\', \'' + (p.name || '').replace(/'/g, "\\'") + '\')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></div></td>' +
             '</tr>';
         }).join('');
     }
@@ -1381,7 +1392,7 @@
         showT('Notifications cleared');
     }
 
-    async function deleteStockProduct(productId, productName) {         if(!confirm('Are you sure you want to permanently DELETE "' + productName + '" from the inventory? This cannot be undone.')) return;         try {             await db.collection('products').doc(productId).delete();             showT('Product deleted successfully!');         } catch(e) {             showT('Error deleting product: ' + e.message, 'error');         }     }      async function deleteStockProduct(productId, productName) {         if(!confirm('Are you sure you want to permanently DELETE "' + productName + '" from the inventory? This cannot be undone.')) return;         try {             await db.collection('products').doc(productId).delete();             showT('Product deleted successfully!');         } catch(e) {             showT('Error deleting product: ' + e.message, 'error');         }     }      async function deleteStockProduct(productId, productName) {         if(!confirm('Are you sure you want to permanently DELETE "' + productName + '" from the inventory? This cannot be undone.')) return;         try {             await db.collection('products').doc(productId).delete();             showT('Product deleted successfully!');         } catch(e) {             showT('Error deleting product: ' + e.message, 'error');         }     }      async function deleteStockProduct(productId, productName) {         if(!confirm('Are you sure you want to permanently DELETE "' + productName + '" from the inventory? This cannot be undone.')) return;         try {             await db.collection('products').doc(productId).delete();             showT('Product deleted successfully!');         } catch(e) {             showT('Error deleting product: ' + e.message, 'error');         }     }      async function deleteStockProduct(productId, productName) {         if(!confirm('Are you sure you want to permanently DELETE "' + productName + '" from the inventory? This cannot be undone.')) return;         try {             await db.collection('products').doc(productId).delete();             showT('Product deleted successfully!');         } catch(e) {             showT('Error deleting product: ' + e.message, 'error');         }     }      async function adjustStock(productId, productName) {
+    async function adjustStock(productId, productName) {
         const action = prompt('Adjust stock for '+productName+'.\nType "+5" to add 5, or "-3" to remove 3:');
         if(!action) return;
         const match = action.trim().match(/^([+-]?\d+)$/);
