@@ -1191,27 +1191,32 @@ function renderProductReturns(){
         }
 
              /* ===== FORCE FIX STOCK NUMBERS ===== */
-        async function forceFixStock() {
+                async function forceFixStock() {
             var btn = document.getElementById('fix-stock-btn');
             var orig = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Fixing...';
             
             try {
+                // Using .set({ merge: true }) so it creates the document if it was accidentally deleted!
+                
                 // 1. Fix Ginseng
-                await db.collection('products').doc('ginseng-five-treasure-tea-8564').update({
-                    stock: 50, reserved: 1, delivered: 15, returnedStock: 0
-                });
+                await db.collection('products').doc('ginseng-five-treasure-tea-8564').set({
+                    name: "Ginseng five treasure tea",
+                    stock: 170, reserved: 33, delivered: 23, returnedStock: 0
+                }, { merge: true });
                 
                 // 2. Fix Quick Catch
-                await db.collection('products').doc('quick-catch-9033').update({
+                await db.collection('products').doc('quick-catch-9033').set({
+                    name: "Quick catch",
                     stock: 200, reserved: 0, delivered: 0, returnedStock: 0
-                });
+                }, { merge: true });
                 
                 // 3. Fix Dr Melaxin
-                await db.collection('products').doc('dr_melaxin-740624-dsm').update({
+                await db.collection('products').doc('dr_melaxin-740624-dsm').set({
+                    name: "Dr Melaxin Peel Shot",
                     stock: 16, reserved: 2, delivered: 14, returnedStock: 0
-                });
+                }, { merge: true });
                 
                 showT("✅ Stock numbers fixed successfully!");
                 logAudit('settings_updated','stock','','Fix Stock','Force corrected stock numbers');
@@ -1222,7 +1227,6 @@ function renderProductReturns(){
                 btn.innerHTML = orig;
             }
         }
-
         /* ===== RENDER STAFF LIST (RIDERS, STOCK, FOLLOW-UP) ===== */
         function renderStaffList(role, containerId) {
             var c=$(containerId);if(!c)return;
@@ -2203,22 +2207,7 @@ function togglePass(id,btn){
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.replace(/[&<>"']/g, m => map[m]);
         }
-		                        async function autoMinusStock(order) {
-            if (!order.itemName || !order.merchantId || !order.qty) return;
-            try {
-                var snap = await db.collection('products').where('name', '==', order.itemName).where('merchantId', '==', order.merchantId).limit(1).get();
-                if (!snap.empty) {
-                    var prodDoc = snap.docs[0];
-                    var currentStock = prodDoc.data().stock || 0;
-                    var newStock = Math.max(0, currentStock - order.qty);
-                    // Deduct Available Stock AND Increment Delivered Count
-                    await prodDoc.ref.update({ 
-                        stock: newStock,
-                        delivered: firebase.firestore.FieldValue.increment(order.qty)
-                    });
-                }
-            } catch(e) { console.error("Stock deduct error:", e); }
-        }
+
 </script>
     <script>
       if ('serviceWorker' in navigator) {
