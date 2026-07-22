@@ -872,7 +872,7 @@
                 '<td class="p-4 text-right text-cyan-400">' + (p.delivered || 0) + '</td>' +
                 '<td class="p-4 text-right text-slate-500">' + (p.minStock || 0) + '</td>' +
                 '<td class="p-4 text-center">' + getStockStatus(p) + '</td>' +
-                '<td class="p-4 text-center"><button onclick="adjustStock(\'' + p.id + '\', \'' + (p.name || '').replace(/'/g, "\\'") + '\')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Adjust</button></td>' +
+                             '<td class="p-4 text-center"><div class="flex items-center justify-center gap-3"><button onclick="adjustStock(\'' + p.id + '\', \'' + (p.name || '').replace(/'/g, "\\'") + '\')" class="text-cyan-400 hover:text-cyan-300 text-xs font-bold hover:underline">Adjust</button><button onclick="deleteStockProduct(\'' + p.id + '\', \'' + (p.name || '').replace(/'/g, "\\'") + '\')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></div></td>' +
             '</tr>';
         }).join('');
     }
