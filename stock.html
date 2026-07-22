@@ -643,7 +643,7 @@
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('app-screen').classList.add('hidden');
         }
-    });
+    });ƒ
 
     function loadData() {
         db.collection('products').onSnapshot(snap => {
@@ -871,13 +871,7 @@
             var stock = Number(p.stock || 0);
             var delivered = Number(p.delivered || 0);
             var returned = Number(p.returnedStock || 0);
-            
-            // Calculate Reserved dynamically from ACTIVE orders (Out for Delivery)
-            var reserved = allOrders.filter(function(o) {
-                return o.status === 'out_for_delivery' && o.productId === p.id;
-            }).reduce(function(sum, o) {
-                return sum + (Number(o.qty) || 1);
-            }, 0);
+            var reserved = Number(p.reserved || 0);
             
             // Calculate true remaining stock on the shelf
             var remaining = stock - delivered - reserved + returned;
