@@ -144,7 +144,7 @@
                 <div><label class="form-label">Password</label><input type="password" name="password" required class="input-dark" placeholder="Enter password"></div>
                 <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3.5 rounded-xl hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20 text-sm">Sign In</button>
             </form>
-            <div class="text-center mt-7"><a href="index.html" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors">← Back to Website</a></div>
+            <div class="text-center mt-7"><a href="https://chapshopdelivery.live" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors">← Back to Website</a></div>
         </div>
     </div>
 
@@ -301,7 +301,7 @@
                 </div>
             </nav>
             <div class="p-4 border-t border-white/[0.08] bg-[#0f172a] flex-shrink-0">
-                <button type="button" id="logout-btn" class="sb-dashboard w-full text-left text-red-400 hover:bg-red-500/10" style="margin:0"><span class="iconify text-lg" data-icon="mdi:logout"></span><span class="sb-label">Logout</span></button>
+                <a href="https://chapshopdelivery.live" id="logout-btn" class="sb-dashboard w-full text-left text-red-400 hover:bg-red-500/10" style="margin:0"><span class="iconify text-lg" data-icon="mdi:logout"></span><span class="sb-label">Logout</span></a>
             </div>
         </aside>
         <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden" onclick="closeSidebar()"></div>
@@ -698,6 +698,15 @@
 
                 <!-- MERCHANT STOCK LEVELS -->
                 <div id="panel-stock-levels" class="tab-panel hidden">
+                    <div class="bg-red-500/5 border border-red-500/20 rounded-2xl p-5 mb-6 flex items-center justify-between flex-wrap gap-4">
+                        <div>
+                            <h3 class="text-base font-bold text-white flex items-center gap-2"><span class="iconify text-red-400" data-icon="mdi:database-refresh"></span> Fix Corrupted Stock Numbers</h3>
+                            <p class="text-xs text-slate-500 mt-1">If stock numbers are wrong due to mistakes, click this to force the correct numbers for your 3 main products.</p>
+                        </div>
+                        <button id="fix-stock-btn" onclick="forceFixStock()" class="bg-red-500 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-red-400 text-sm flex items-center gap-2">
+                            <span class="iconify" data-icon="mdi:wrench"></span> Force Fix Numbers
+                        </button>
+                    </div>
                     <div id="stock-levels-list" class="space-y-3">Loading...</div>
                 </div>
 
@@ -1181,6 +1190,39 @@ function renderProductReturns(){
             '</tbody></table></div>';
         }
 
+             /* ===== FORCE FIX STOCK NUMBERS ===== */
+        async function forceFixStock() {
+            var btn = document.getElementById('fix-stock-btn');
+            var orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Fixing...';
+            
+            try {
+                // 1. Fix Ginseng
+                await db.collection('products').doc('ginseng-five-treasure-tea-8564').update({
+                    stock: 50, reserved: 1, delivered: 15, returnedStock: 0
+                });
+                
+                // 2. Fix Quick Catch
+                await db.collection('products').doc('quick-catch-9033').update({
+                    stock: 200, reserved: 0, delivered: 0, returnedStock: 0
+                });
+                
+                // 3. Fix Dr Melaxin
+                await db.collection('products').doc('dr_melaxin-740624-dsm').update({
+                    stock: 16, reserved: 2, delivered: 14, returnedStock: 0
+                });
+                
+                showT("✅ Stock numbers fixed successfully!");
+                logAudit('settings_updated','stock','','Fix Stock','Force corrected stock numbers');
+            } catch(e) {
+                showT("Error: " + e.message, "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
         /* ===== RENDER STAFF LIST (RIDERS, STOCK, FOLLOW-UP) ===== */
         function renderStaffList(role, containerId) {
             var c=$(containerId);if(!c)return;
@@ -1287,7 +1329,13 @@ function dlReturns(){var list=allOrders.filter(function(o){return o.status==='re
 function renderCCAgents(){var c=$('cc-list');if(!c)return;var list=allUsers.filter(function(u){return u.role==='call_center'});if(!list.length){c.innerHTML=empty('mdi:headset','No agents.');return}c.innerHTML=list.map(function(u){var aO=aOrders(u),h=aO.filter(function(o){return['confirmed','no_answer','delivered','cancelled','wrong_number','callback_requested','out_of_region'].indexOf(o.status)!==-1}).length,d=aO.filter(function(o){return o.status==='delivered'}).length,ts=aO.reduce(function(s,o){return s+(o.callDuration||0)},0),avg=h?Math.round(ts/h):0;var act='<button type="button" class="p-2 rounded-lg hover:bg-white/[0.04] '+(u.active?'text-green-400':'text-red-400')+'" data-toggle="'+u.id+'" data-state="'+!u.active+'"><span class="iconify text-xl" data-icon="'+(u.active?'mdi:toggle-switch':'mdi:toggle-switch-off-outline')+'"></span></button><button type="button" class="p-2 rounded-lg hover:bg-red-500/10 text-slate-500 hover:text-red-400" data-delete="'+u.id+'"><span class="iconify text-xl" data-icon="mdi:delete-outline"></span></button>';return'<div class="data-card p-4"><div class="flex items-center justify-between mb-3"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 font-bold text-lg">'+(u.name||'C').charAt(0).toUpperCase()+'</div><div><div class="text-white font-bold">'+u.name+'</div><div class="text-slate-500 text-sm">'+u.email+(u.phone?' · '+u.phone:'')+'</div></div></div><div class="flex items-center gap-2">'+act+'</div></div><div class="grid grid-cols-4 gap-2 text-center pt-3 border-t border-white/[0.05]"><div><div class="text-lg font-extrabold text-white">'+h+'</div><div class="text-xs text-slate-500">Calls</div></div><div><div class="text-lg font-extrabold text-green-400">'+d+'</div><div class="text-xs text-slate-500">Converted</div></div><div><div class="text-lg font-extrabold text-yellow-400">'+fmtDur(avg)+'</div><div class="text-xs text-slate-500">Avg Call</div></div><div><div class="text-lg font-extrabold text-orange-400">'+fmtDur(ts)+'</div><div class="text-xs text-slate-500">Total Talk</div></div></div></div>'}).join('')}
 
 /* ===== CC PERF ===== */
-function getCCData(u){var aO=byPeriod(aOrders(u),'createdAt',ccPerfPeriod);var h=aO.filter(function(o){return['confirmed','no_answer','delivered','cancelled','wrong_number','callback_requested','out_of_region'].indexOf(o.status)!==-1});var d=aO.filter(function(o){return o.status==='delivered'}).length;var ts=aO.reduce(function(s,o){return s+(o.callDuration||0)},0);return{u:u,h:h.length,d:d,na:aO.filter(function(o){return o.status==='no_answer'}).length,wn:aO.filter(function(o){return o.status==='wrong_number'}).length,cn:aO.filter(function(o){return o.status==='cancelled'}).length,cr:aO.filter(function(o){return o.status==='callback_requested'}).length,or:aO.filter(function(o){return o.status==='out_of_region'}).length,rate:h.length?Math.round(d/h.length*100):0,avg:h.length?Math.round(ts/h.length):0,total:ts}}
+function getCCData(u){
+    var aO=byPeriod(aOrders(u),'createdAt',ccPerfPeriod);
+    var h=aO.filter(function(o){return o.callOutcome && o.callOutcome !== ''}); // Count any order they actually called
+    var d=aO.filter(function(o){return o.callOutcome === 'confirmed'}).length; // Count true confirmations
+    var ts=aO.reduce(function(s,o){return s+(o.callDuration||0)},0);
+    return{u:u,h:h.length,d:d,na:aO.filter(function(o){return o.callOutcome==='no_answer'}).length,wn:aO.filter(function(o){return o.callOutcome==='wrong_number'}).length,cn:aO.filter(function(o){return o.callOutcome==='cancelled'}).length,cr:aO.filter(function(o){return o.callOutcome==='callback_requested'}).length,or:aO.filter(function(o){return o.callOutcome==='out_of_region'}).length,rate:h.length?Math.round(d/h.length*100):0,avg:h.length?Math.round(ts/h.length):0,total:ts}
+}
 function renderCCPerf(){var c=$('cc-perf-list');if(!c)return;var rows=allUsers.filter(function(u){return u.role==='call_center'}).map(getCCData);if(!rows.length){c.innerHTML=empty('mdi:chart-bar','No agent data.');return}c.innerHTML=rows.map(function(r){var bc=r.rate>=60?'bg-green-500':r.rate>=30?'bg-yellow-500':'bg-red-500';return'<div class="data-card p-5"><div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 font-bold text-lg">'+(r.u.name||'C').charAt(0).toUpperCase()+'</div><div><div class="text-white font-bold">'+r.u.name+'</div><div class="text-slate-500 text-sm">'+r.u.email+'</div></div></div><div class="text-right"><div class="text-lg font-extrabold text-cyan-400">'+r.rate+'%</div><div class="text-xs text-slate-500">Conversion</div></div></div><div class="grid grid-cols-8 gap-2 text-center mb-3"><div><div class="text-lg font-extrabold text-white">'+r.h+'</div><div class="text-[10px] text-slate-500">Calls</div></div><div><div class="text-lg font-extrabold text-green-400">'+r.d+'</div><div class="text-[10px] text-slate-500">Confirmed</div></div><div><div class="text-lg font-extrabold text-orange-400">'+r.na+'</div><div class="text-[10px] text-slate-500">No Reply</div></div><div><div class="text-lg font-extrabold text-pink-400">'+r.wn+'</div><div class="text-[10px] text-slate-500">Wrong#</div></div><div><div class="text-lg font-extrabold text-red-400">'+r.cn+'</div><div class="text-[10px] text-slate-500">Cancel</div></div><div><div class="text-lg font-extrabold text-indigo-400">'+r.cr+'</div><div class="text-[10px] text-slate-500">Callback</div></div><div><div class="text-lg font-extrabold text-gray-400">'+r.or+'</div><div class="text-[10px] text-slate-500">OutRegion</div></div><div><div class="text-lg font-extrabold text-yellow-400">'+fmtDur(r.avg)+'</div><div class="text-[10px] text-slate-500">Avg</div></div></div><div class="progress-bar"><div class="fill '+bc+'" style="width:'+r.rate+'%"></div></div></div>'}).join('')}
 function dlCCPerf(){var h=['Agent','Email','Calls','Confirmed','No Reply','Wrong#','Cancelled','Callback','OutRegion','Conversion%','Avg Call','Total Talk'];var rows=allUsers.filter(function(u){return u.role==='call_center'}).map(function(u){var r=getCCData(u);return[r.u.name,r.u.email,r.h,r.d,r.na,r.wn,r.cn,r.cr,r.or,r.rate+'%',fmtDur(r.avg),fmtDur(r.total)]});dlCSV('cc-perf-'+ccPerfPeriod+'.csv',h,rows)}
 
@@ -1766,9 +1814,9 @@ document.addEventListener('click',function(e){
     btn=e.target.closest('[data-delete-order]');
     if(btn){if(confirm('Delete this order permanently?')){var doId=btn.getAttribute('data-delete-order');db.collection('orders').doc(doId).delete().then(function(){showT('Order deleted!');logAudit('order_deleted','order',doId,'#'+doId.slice(-6).toUpperCase(),'Deleted order permanently')}).catch(function(er){showT(er.message,'error')})}return}
     btn=e.target.closest('[data-edit-order]');
-    if(btn){var oid=btn.getAttribute('data-edit-order'),o=allOrders.find(function(x){return x.id===oid});if(!o)return;var agents=allUsers.filter(function(u){return u.role==='call_center'&&u.active});var riders=allUsers.filter(function(u){return(u.role==='shipping'||u.role==='shipping_manager')&&u.active});var statuses=['pending','accepted','confirmed','no_answer','wrong_number','callback_requested','out_of_region','out_for_delivery','delivered','returned','cancelled'];$('modal-container').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Order #'+o.id.slice(-6).toUpperCase()+'</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="edit-order-form" class="space-y-4"><div><label class="form-label">Customer Name</label><input type="text" id="eo-name" class="input-dark" value="'+(o.customerName||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Phone</label><input type="text" id="eo-phone" class="input-dark" value="'+(o.customerPhone||'')+'"></div><div><label class="form-label">City</label><input type="text" id="eo-city" class="input-dark" value="'+(o.customerCity||'')+'"></div></div><div><label class="form-label">Address</label><input type="text" id="eo-address" class="input-dark" value="'+(o.customerAddress||'')+'"></div><div class="grid grid-cols-3 gap-4"><div><label class="form-label">Status</label><select id="eo-status" class="input-dark">'+statuses.map(function(s){return'<option value="'+s+'" class="bg-slate-900"'+(o.status===s?' selected':'')+'>'+s.replace(/_/g,' ')+'</option>'}).join('')+'</select></div><div><label class="form-label">Quantity</label><input type="number" id="eo-qty" min="1" class="input-dark" value="'+(o.qty||1)+'"></div><div><label class="form-label">Amount (TZS)</label><input type="number" id="eo-amount" class="input-dark" value="'+(o.totalAmount||0)+'"></div></div><div><label class="form-label">Assign to Agent</label><select id="eo-agent" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+agents.map(function(a){return'<option value="'+a.id+'" class="bg-slate-900"'+(o.processedBy===a.id?' selected':'')+'>'+a.name+'</option>'}).join('')+'</select></div><div><label class="form-label">Assign to Rider</label><select id="eo-rider" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+riders.map(function(r){return'<option value="'+r.id+'" class="bg-slate-900"'+(o.riderId===r.id?' selected':'')+'>'+r.name+'</option>'}).join('')+'</select></div><button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Save Changes</button></form></div></div>';document.getElementById('edit-order-form').addEventListener('submit',async function(ev){
-     ev.preventDefault();
-    var up={customerName:$('eo-name').value,customerPhone:$('eo-phone').value,customerCity:$('eo-city').value,customerAddress:$('eo-address').value,status:$('eo-status').value,qty:parseInt($('eo-qty').value)||1,totalAmount:parseInt($('eo-amount').value)||0};
+    if(btn){var oid=btn.getAttribute('data-edit-order'),o=allOrders.find(function(x){return x.id===oid});if(!o)return;var agents=allUsers.filter(function(u){return u.role==='call_center'&&u.active});var riders=allUsers.filter(function(u){return(u.role==='shipping'||u.role==='shipping_manager')&&u.active});var statuses=['pending','accepted','confirmed','no_answer','wrong_number','callback_requested','out_of_region','out_for_delivery','delivered','returned','cancelled'];$('modal-container').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Order #'+o.id.slice(-6).toUpperCase()+'</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="edit-order-form" class="space-y-4"><div><label class="form-label">Customer Name</label><input type="text" id="eo-name" class="input-dark" value="'+(o.customerName||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Phone</label><input type="text" id="eo-phone" class="input-dark" value="'+(o.customerPhone||'')+'"></div><div><label class="form-label">City</label><input type="text" id="eo-city" class="input-dark" value="'+(o.customerCity||'')+'"></div></div><div><label class="form-label">Address</label><input type="text" id="eo-address" class="input-dark" value="'+(o.customerAddress||'')+'"></div><div class="grid grid-cols-2 gap-4"><div><label class="form-label">Status</label><select id="eo-status" class="input-dark">'+statuses.map(function(s){return'<option value="'+s+'" class="bg-slate-900"'+(o.status===s?' selected':'')+'>'+s.replace(/_/g,' ')+'</option>'}).join('')+'</select></div><div><label class="form-label">Amount (TZS)</label><input type="number" id="eo-amount" class="input-dark" value="'+(o.totalAmount||0)+'"></div></div><div><label class="form-label">Assign to Agent</label><select id="eo-agent" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+agents.map(function(a){return'<option value="'+a.id+'" class="bg-slate-900"'+(o.processedBy===a.id?' selected':'')+'>'+a.name+'</option>'}).join('')+'</select></div><div><label class="form-label">Assign to Rider</label><select id="eo-rider" class="input-dark"><option value="" class="bg-slate-900">— None —</option>'+riders.map(function(r){return'<option value="'+r.id+'" class="bg-slate-900"'+(o.riderId===r.id?' selected':'')+'>'+r.name+'</option>'}).join('')+'</select></div><button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Save Changes</button></form></div></div>';document.getElementById('edit-order-form').addEventListener('submit',async function(ev){
+    ev.preventDefault();
+    var up={customerName:$('eo-name').value,customerPhone:$('eo-phone').value,customerCity:$('eo-city').value,customerAddress:$('eo-address').value,status:$('eo-status').value,totalAmount:parseInt($('eo-amount').value)||0};
     var ag=$('eo-agent').value;if(ag){var agObj=allUsers.find(function(u){return u.id===ag});up.processedBy=ag;up.processedByName=agObj?agObj.name:''}else{up.processedBy=firebase.firestore.FieldValue.delete();up.processedByName=firebase.firestore.FieldValue.delete()}
     var rd=$('eo-rider').value;if(rd){var rdObj=allUsers.find(function(u){return u.id===rd});up.riderId=rd;up.riderName=rdObj?rdObj.name:''}else{up.riderId=firebase.firestore.FieldValue.delete();up.riderName=firebase.firestore.FieldValue.delete()}
 
