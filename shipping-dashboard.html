@@ -456,9 +456,36 @@
                 }
             }else{ordersHtml=list.map(function(o){return generateCard(o);}).join('');}
             c.innerHTML=bulkBar+'<button onclick="autoDispatch()" class="mb-4 w-full bg-violet-500/20 text-violet-400 border border-violet-500/30 font-bold py-3 rounded-xl hover:bg-violet-500/30 transition-colors flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:rocket-launch"></span> Auto-Dispatch Next Order</button>'+ordersHtml;
-          }else if(s==='shipped'){
+                 }else if(s==='shipped'){
             c.innerHTML=list.map(function(o){
-                return'<div class="bg-white/[0.02] border border-violet-500/20 rounded-xl p-4 flex flex-col lg:flex-row gap-4 items-start"><div class="flex gap-3 items-start flex-1 min-w-0">'+(o.productImage?'<img src="'+o.productImage+'" onclick="viewImg(\''+o.productImage+'\')" class="w-10 h-10 rounded-lg bg-slate-800 object-cover flex-shrink-0 cursor-pointer">':'<div class="w-10 h-10 rounded-lg bg-slate-800 flex-shrink-0 flex items-center justify-center"><span class="iconify text-lg text-slate-600" data-icon="mdi:package-variant"></span></div>')+'<div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1 flex-wrap"><span class="font-mono text-cyan-400 font-bold text-xs">#'+o.id.slice(-6).toUpperCase()+'</span>'+getStatusBadge(o.status)+'<span class="text-white text-sm font-semibold truncate">'+escHtml(o.itemName)+' x'+o.qty+'</span><span class="ml-auto text-white font-bold text-sm">TZS '+Number(o.totalAmount).toLocaleString()+'</span></div><div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mt-1"><span class="text-cyan-300 font-medium">🏪 '+escHtml(o.merchantName)+'</span><span><span class="text-slate-400">👤</span> '+escHtml(o.customerName)+' • '+escHtml(o.customerPhone)+'</span><span class="text-slate-400">📍 '+escHtml(o.customerCity)+', '+escHtml(o.customerAddress)+'</span><span class="text-orange-400 font-medium">🎧 '+(escHtml(o.processedByName)||'N/A')+'</span><span class="text-violet-300 font-medium">🛵 '+(escHtml(o.riderName)||'Unassigned')+'</span></div></div></div><div class="flex flex-wrap gap-2 w-full lg:w-auto"><button type="button" onclick="notifyCustomerWhatsApp(\''+o.id+'\')" class="bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-3 py-2 rounded-lg hover:bg-green-500/30 text-xs cursor-pointer flex items-center gap-1"><span class="iconify" data-icon="mdi:whatsapp"></span> Notify</button><button type="button" onclick="updateStatus(\''+o.id+'\',\'delivered\')" class="flex-1 bg-green-500/20 text-green-400 border border-green-500/30 font-bold py-2 rounded-lg hover:bg-green-500/30 text-xs cursor-pointer">Delivered</button><button type="button" onclick="updateStatus(\''+o.id+'\',\'returned\')" class="flex-1 bg-pink-500/20 text-pink-400 border border-pink-500/30 font-bold py-2 rounded-lg hover:bg-pink-500/30 text-xs cursor-pointer">Returned</button><button type="button" onclick="printInvoice(\''+o.id+'\')" class="bg-white/[0.05] text-slate-300 border border-white/[0.1] font-bold px-3 py-2 rounded-lg hover:bg-white/[0.1] text-xs cursor-pointer">Invoice</button></div></div>';
+                var imgHtml = o.productImage ? '<img src="'+o.productImage+'" onclick="viewImg(\''+o.productImage+'\')" class="w-10 h-10 rounded-lg bg-slate-800 object-cover flex-shrink-0 cursor-pointer">' : '<div class="w-10 h-10 rounded-lg bg-slate-800 flex-shrink-0 flex items-center justify-center"><span class="iconify text-lg text-slate-600" data-icon="mdi:package-variant"></span></div>';
+                
+                return '<div class="bg-white/[0.02] border border-violet-500/20 rounded-xl p-4 flex flex-col lg:flex-row gap-4 items-start">' +
+                    '<div class="flex gap-3 items-start flex-1 min-w-0">' +
+                        imgHtml +
+                        '<div class="flex-1 min-w-0">' +
+                            '<div class="flex items-center gap-2 mb-1 flex-wrap">' +
+                                '<span class="font-mono text-cyan-400 font-bold text-xs">#'+o.id.slice(-6).toUpperCase()+'</span>' +
+                                getStatusBadge(o.status) +
+                                '<span class="text-white text-sm font-semibold truncate">'+escHtml(o.itemName)+' x'+o.qty+'</span>' +
+                                '<span class="ml-auto text-white font-bold text-sm">TZS '+Number(o.totalAmount).toLocaleString()+'</span>' +
+                            '</div>' +
+                            '<div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mt-1">' +
+                                '<span class="text-cyan-300 font-medium">🏪 '+escHtml(o.merchantName)+'</span>' +
+                                '<span><span class="text-slate-400">👤</span> '+escHtml(o.customerName)+' • '+escHtml(o.customerPhone)+'</span>' +
+                                '<span class="text-slate-400">📍 '+escHtml(o.customerCity)+', '+escHtml(o.customerAddress)+'</span>' +
+                                '<span class="text-orange-400 font-medium">🎧 '+(escHtml(o.processedByName)||'N/A')+'</span>' +
+                                '<span class="text-violet-300 font-medium">🛵 '+(escHtml(o.riderName)||'Unassigned')+'</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="flex flex-wrap gap-2 w-full lg:w-auto">' +
+                        '<button type="button" onclick="notifyCustomerWhatsApp(\''+o.id+'\')" class="bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-3 py-2 rounded-lg hover:bg-green-500/30 text-xs cursor-pointer flex items-center gap-1"><span class="iconify" data-icon="mdi:whatsapp"></span> Notify</button>' +
+                        '<button type="button" onclick="updateStatus(\''+o.id+'\',\'delivered\')" class="flex-1 bg-green-500/20 text-green-400 border border-green-500/30 font-bold py-2 rounded-lg hover:bg-green-500/30 text-xs cursor-pointer">Delivered</button>' +
+                        '<button type="button" onclick="updateStatus(\''+o.id+'\',\'returned\')" class="flex-1 bg-pink-500/20 text-pink-400 border border-pink-500/30 font-bold py-2 rounded-lg hover:bg-pink-500/30 text-xs cursor-pointer">Returned</button>' +
+                        '<button type="button" onclick="printInvoice(\''+o.id+'\')" class="bg-white/[0.05] text-slate-300 border border-white/[0.1] font-bold px-3 py-2 rounded-lg hover:bg-white/[0.1] text-xs cursor-pointer">Invoice</button>' +
+                    '</div>' +
+                '</div>';
             }).join('');
         }
         }else{
