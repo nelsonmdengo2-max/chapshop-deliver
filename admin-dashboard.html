@@ -268,8 +268,9 @@
                         <button type="button" data-tab="reports" data-panel="reports" data-report="shipping" data-title="Shipping Reports" class="sb-child">Shipping Reports</button>
                         <button type="button" data-tab="reports" data-panel="reports" data-report="callcenter" data-title="Call Center Reports" class="sb-child">Call Center Reports</button>
                         <button type="button" data-tab="reports" data-panel="reports" data-report="revenue" data-title="Revenue Reports" class="sb-child">Revenue Reports</button>
-                        <button type="button" data-tab="revenue-expenses" data-panel="revenue-expenses" data-title="Revenue vs Expenses" class="sb-child">Revenue vs Expenses</button>
-                        <button type="button" data-tab="product-returns" data-panel="product-returns" data-title="Product Return Rate" class="sb-child">Product Return Rate</button>
+                <button type="button" data-tab="revenue-expenses" data-panel="revenue-expenses" data-title="Revenue vs Expenses" class="sb-child">Revenue vs Expenses</button>
+                <button type="button" data-tab="daily-expenses" data-panel="daily-expenses" data-title="Daily Expenses & Salaries" class="sb-child">Daily Expenses & Salaries</button>
+                <button type="button" data-tab="product-returns" data-panel="product-returns" data-title="Product Return Rate" class="sb-child">Product Return Rate</button>
                     </div>
 
                 <div class="sb-section">
@@ -696,17 +697,32 @@
                     <div id="all-riders-list" class="space-y-3">Loading...</div>
                 </div>
 
-                <!-- MERCHANT STOCK LEVELS -->
+                                <!-- MERCHANT STOCK LEVELS -->
                 <div id="panel-stock-levels" class="tab-panel hidden">
-                    <div class="bg-red-500/5 border border-red-500/20 rounded-2xl p-5 mb-6 flex items-center justify-between flex-wrap gap-4">
-                        <div>
-                            <h3 class="text-base font-bold text-white flex items-center gap-2"><span class="iconify text-red-400" data-icon="mdi:database-refresh"></span> Fix Corrupted Stock Numbers</h3>
-                            <p class="text-xs text-slate-500 mt-1">If stock numbers are wrong due to mistakes, click this to force the correct numbers for your 3 main products.</p>
+                    <!-- TOP ACTION BAR -->
+                    <div class="flex flex-col md:flex-row gap-3 mb-6 items-start md:items-center justify-between">
+                        <div class="flex gap-2 flex-wrap">
+                            <button type="button" onclick="openAddProductAdmin()" class="bg-cyan-500 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/20 text-sm flex items-center gap-2 whitespace-nowrap"><span class="iconify text-lg" data-icon="mdi:plus-circle"></span> Add New Product</button>
+                            <button type="button" onclick="openBulkAdjust()" class="bg-white/[0.05] border border-white/[0.1] text-slate-300 font-bold py-2.5 px-4 rounded-xl hover:bg-white/[0.1] text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:scale-balance"></span> Bulk Adjust</button>
+                            <button type="button" onclick="cleanupAdminStock()" class="bg-amber-500/10 text-amber-400 border border-amber-500/30 font-bold py-2.5 px-4 rounded-xl hover:bg-amber-500/20 text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:database-refresh"></span> Fix Corrupted</button>
+                            <button type="button" onclick="dlStockCSV()" class="bg-green-500/10 text-green-400 border border-green-500/30 font-bold py-2.5 px-4 rounded-xl hover:bg-green-500/20 text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:download"></span> CSV</button>
                         </div>
-                        <button id="fix-stock-btn" onclick="forceFixStock()" class="bg-red-500 text-white font-bold px-5 py-2.5 rounded-xl hover:bg-red-400 text-sm flex items-center gap-2">
-                            <span class="iconify" data-icon="mdi:wrench"></span> Force Fix Numbers
-                        </button>
+                        <div class="flex gap-3 items-center flex-wrap">
+                            <div class="relative max-w-xs w-full"><span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="admin-stock-search" oninput="renderStockLevels()" placeholder="Search product, SKU, merchant..." class="input-dark pl-11" style="font-size:13px;padding:8px 14px 8px 40px"></div>
+                            <select id="admin-stock-merchant-filter" onchange="renderStockLevels()" class="input-dark" style="width:auto;max-width:180px;font-size:13px;padding:8px 12px"><option value="">All Merchants</option></select>
+                        </div>
                     </div>
+
+                    <!-- SUMMARY STATS -->
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+                        <div class="stat-card"><div class="text-xs font-bold text-slate-500 uppercase mb-1">Total Products</div><div id="asl-total-prods" class="text-2xl font-extrabold text-white">0</div></div>
+                        <div class="stat-card"><div class="text-xs font-bold text-slate-500 uppercase mb-1">Total Original Stock</div><div id="asl-total-stock" class="text-2xl font-extrabold text-white">0</div></div>
+                        <div class="stat-card"><div class="text-xs font-bold text-blue-400/70 uppercase mb-1">Total Delivered</div><div id="asl-total-del" class="text-2xl font-extrabold text-blue-400">0</div></div>
+                        <div class="stat-card"><div class="text-xs font-bold text-red-400/70 uppercase mb-1">Out of Stock</div><div id="asl-out-stock" class="text-2xl font-extrabold text-red-400">0</div></div>
+                        <div class="stat-card"><div class="text-xs font-bold text-green-400/70 uppercase mb-1">Available on Shelf</div><div id="asl-total-remain" class="text-2xl font-extrabold text-green-400">0</div></div>
+                    </div>
+
+                    <!-- PRODUCTS TABLE -->
                     <div id="stock-levels-list" class="space-y-3">Loading...</div>
                 </div>
 
@@ -827,6 +843,62 @@
                         <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
                             <h3 class="text-base font-bold text-white mb-4">Active Announcements</h3>
                             <div id="ann-list" class="space-y-3">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                                <!-- DAILY EXPENSES & SALARIES -->
+                <div id="panel-daily-expenses" class="tab-panel hidden">
+                    <h2 class="text-lg font-bold text-white mb-6">Daily Expenses & Salaries</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Form -->
+                        <div class="lg:col-span-1 bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 h-fit">
+                            <h3 class="text-base font-bold text-white mb-4">Add Record</h3>
+                            <form id="daily-exp-form" class="space-y-4">
+                                <div>
+                                    <label class="form-label">Category *</label>
+                                    <select id="dex-cat" required class="input-dark">
+                                        <option value="Salary">Salary</option>
+                                        <option value="Fuel">Fuel</option>
+                                        <option value="Rent">Rent</option>
+                                        <option value="Marketing">Marketing / Ads</option>
+                                        <option value="Maintenance">Maintenance</option>
+                                        <option value="Daily Operations">Daily Operations</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Amount (TZS) *</label>
+                                    <input type="number" id="dex-amount" required min="1" class="input-dark" placeholder="e.g. 50000">
+                                </div>
+                                <div>
+                                    <label class="form-label">Description / Payee</label>
+                                    <input type="text" id="dex-desc" class="input-dark" placeholder="e.g. Rider fuel, Juma salary">
+                                </div>
+                                <div>
+                                    <label class="form-label">Date</label>
+                                    <input type="date" id="dex-date" class="input-dark">
+                                </div>
+                                <button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400">Save Record</button>
+                            </form>
+                        </div>
+                        <!-- List -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-base font-bold text-white">Recent Records</h3>
+                                    <div class="text-right">
+                                        <div class="text-xs text-slate-500 uppercase">Total This Month</div>
+                                        <div id="dex-total" class="text-xl font-extrabold text-red-400">TZS 0</div>
+                                    </div>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="dtable">
+                                        <thead><tr><th>Date</th><th>Category</th><th>Description</th><th class="text-right">Amount</th><th class="text-center">Action</th></tr></thead>
+                                        <tbody id="dex-tbody" class="divide-y divide-white/[0.05]"></tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1094,7 +1166,22 @@ function prevAdminOrdersPage() { adminOrdersPage--; renderAdminOrders(); }
 
 /* ===== FIRESTORE ===== */
 var allSettings={};
-function startListeners(){db.collection('users').onSnapshot(function(s){allUsers=snapDocs(s);renderAllU()});db.collection('orders').orderBy('createdAt','desc').onSnapshot(function(s){allOrders=snapDocs(s);renderAllO()});db.collection('products').onSnapshot(function(s){allProducts=snapDocs(s);renderStockLevels()});db.collection('settings').onSnapshot(function(s){allSettings={};s.docs.forEach(function(d){allSettings[d.id]=d.data()});renderFinance();renderSettings()});db.collection('announcements').orderBy('createdAt','desc').onSnapshot(function(s){allAnnouncements=snapDocs(s);renderAnnouncements()});lastOrderCount=allOrders.length;renderAdminChats()}
+var dailyExpenses = [];
+function startListeners(){
+    db.collection('users').onSnapshot(function(s){allUsers=snapDocs(s);renderAllU()});
+    db.collection('orders').orderBy('createdAt','desc').onSnapshot(function(s){allOrders=snapDocs(s);renderAllO()});
+    db.collection('products').onSnapshot(function(s){allProducts=snapDocs(s);renderStockLevels()});
+    db.collection('settings').onSnapshot(function(s){allSettings={};s.docs.forEach(function(d){allSettings[d.id]=d.data()});renderFinance();renderSettings()});
+    db.collection('announcements').orderBy('createdAt','desc').onSnapshot(function(s){allAnnouncements=snapDocs(s);renderAnnouncements()});
+    
+    // NEW: Listen for Daily Expenses
+    db.collection('expenses').orderBy('date','desc').onSnapshot(function(s){
+        dailyExpenses = snapDocs(s);
+        renderDailyExpenses();
+    });
+    
+    lastOrderCount=allOrders.length;renderAdminChats();
+}
 function snapDocs(s){return s.docs.map(function(d){return{id:d.id,...d.data()}})}
 function renderAllU(){renderMerchants();renderMerchantPerf();renderCCAgents();renderCCPerf();renderShipMon();renderReturns();renderCustomers();renderUsers();renderRoles();renderPermissions();renderStaffList('rider','all-riders-list');renderStaffList('stock','all-stock-list');renderStaffList('follow_up','all-followup-list');renderFUPerf();renderFUAudio();updateDash()}
 
@@ -1171,11 +1258,24 @@ function renderProductReturns(){
             if(!allProducts.length){c.innerHTML=empty('mdi:warehouse','No products found in the system.');return}
             
             c.innerHTML='<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto"><table class="dtable min-w-[900px]"><thead><tr><th>Merchant</th><th>Product</th><th>SKU</th><th class="text-right">Original Stock</th><th class="text-right">Delivered</th><th class="text-right">Returned</th><th class="text-right">Remaining</th></tr></thead><tbody>'+
-            allProducts.map(function(p){
+                       allProducts.map(function(p){
                 var stock=Number(p.stock||0);
-                var delivered=Number(p.delivered||0);
-                var returned=Number(p.returnedStock||0);
-                var remain=stock-delivered+returned;
+                
+                // DYNAMIC MATH: Calculate from actual orders so it never lies
+                var delivered = allOrders.filter(function(o) {
+                    return o.status === 'delivered' && (o.productId === p.id || (p.sku && o.productSku === p.sku));
+                }).reduce(function(sum, o) { return sum + (Number(o.qty) || 1); }, 0);
+                
+                var reserved = allOrders.filter(function(o) {
+                    return o.status === 'out_for_delivery' && (o.productId === p.id || (p.sku && o.productSku === p.sku));
+                }).reduce(function(sum, o) { return sum + (Number(o.qty) || 1); }, 0);
+                
+                var returned = allOrders.filter(function(o) {
+                    return o.status === 'returned' && (o.productId === p.id || (p.sku && o.productSku === p.sku));
+                }).reduce(function(sum, o) { return sum + (Number(o.qty) || 1); }, 0);
+
+                var remain = stock - delivered - reserved + returned;
+                if(remain < 0) remain = 0;
                 var remColor=remain<=0?'text-red-400':(p.minStock&&remain<=p.minStock?'text-yellow-400':'text-green-400');
                 return '<tr>'+
                     '<td class="text-cyan-300 font-medium">'+(p.merchantName||'—')+'</td>'+
@@ -2208,7 +2308,72 @@ function togglePass(id,btn){
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.replace(/[&<>"']/g, m => map[m]);
         }
+        /* ===== DAILY EXPENSES LOGIC ===== */
+        function renderDailyExpenses() {
+            var tb = document.getElementById('dex-tbody');
+            if(!tb) return;
+            
+            var now = new Date();
+            var monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            var total = 0;
+            
+            if(!dailyExpenses.length) {
+                tb.innerHTML = '<tr><td colspan="5" class="text-center text-slate-500 py-8">No records yet.</td></tr>';
+            } else {
+                tb.innerHTML = dailyExpenses.map(function(e) {
+                    var d = e.date ? e.date.toDate() : (e.createdAt ? e.createdAt.toDate() : new Date());
+                    if(d >= monthStart) total += e.amount || 0;
+                    
+                    return '<tr>' +
+                        '<td class="p-4 text-xs text-slate-400 whitespace-nowrap">' + d.toLocaleDateString() + '</td>' +
+                        '<td class="p-4 text-white font-medium">' + (e.category||'N/A') + '</td>' +
+                        '<td class="p-4 text-slate-300 text-xs">' + (e.description||'—') + '</td>' +
+                        '<td class="p-4 text-right font-bold text-red-400">-' + fmtM(e.amount) + '</td>' +
+                        '<td class="p-4 text-center"><button onclick="deleteDailyExpense(\''+e.id+'\')" class="text-red-400 hover:text-red-300 text-xs font-bold hover:underline">Delete</button></td>' +
+                    '</tr>';
+                }).join('');
+            }
+            document.getElementById('dex-total').textContent = fmtM(total);
+        }
 
+        document.getElementById('daily-exp-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var btn = this.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerText = 'Saving...';
+            
+            var dateVal = document.getElementById('dex-date').value;
+            var ts = dateVal ? firebase.firestore.Timestamp.fromDate(new Date(dateVal + 'T12:00:00')) : firebase.firestore.FieldValue.serverTimestamp();
+            
+            try {
+                await db.collection('expenses').add({
+                    category: document.getElementById('dex-cat').value,
+                    amount: parseInt(document.getElementById('dex-amount').value) || 0,
+                    description: document.getElementById('dex-desc').value,
+                    date: ts,
+                    addedBy: window.currentUser.name
+                });
+                showT('Expense recorded!');
+                this.reset();
+                document.getElementById('dex-date').valueAsDate = new Date(); // Set back to today
+            } catch(err) {
+                showT(err.message, 'error');
+            }
+            btn.disabled = false; btn.innerText = 'Save Record';
+        });
+
+        async function deleteDailyExpense(id) {
+            if(!confirm('Delete this expense record?')) return;
+            try {
+                await db.collection('expenses').doc(id).delete();
+                showT('Record deleted!');
+            } catch(e) { showT(e.message, 'error'); }
+        }
+
+        // Set default date to today on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            var dexDate = document.getElementById('dex-date');
+            if(dexDate) dexDate.valueAsDate = new Date();
+        });
 </script>
     <script>
       if ('serviceWorker' in navigator) {
