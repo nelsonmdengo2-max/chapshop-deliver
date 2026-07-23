@@ -767,7 +767,101 @@
 
     function renderNotifications(){var c=document.getElementById('notif-list');if(!c)return;var h='';var ac=0;var ps=allOrders.filter(function(o){return o.status==='confirmed';}).length;if(ps>0){h+='<div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-blue-400" data-icon="mdi:package-variant-closed"></span><div><div class="font-bold text-blue-400 text-sm">'+ps+' Orders Awaiting Shipment</div></div></div>';ac+=ps;}var ls=allProducts.filter(function(p){return p.minStock&&p.stock<=p.minStock;});ls.forEach(function(p){h+='<div class="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-yellow-400" data-icon="mdi:alert"></span><div><div class="font-bold text-yellow-400 text-sm">LOW: '+escHtml(p.name)+'</div><div class="text-xs text-slate-400">Only '+(p.stock||0)+' left</div></div></div>';ac++;});var rr=allOrders.filter(function(o){return o.status==='returned';}).slice(0,3);rr.forEach(function(o){h+='<div class="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center gap-3"><span class="iconify text-2xl text-red-400" data-icon="mdi:keyboard-return"></span><div><div class="font-bold text-red-400 text-sm">RETURNED: #'+o.id.slice(-6).toUpperCase()+'</div></div></div>';ac++;});c.innerHTML=h||'<p class="text-slate-500 text-center py-12">All clear!</p>';var b=document.getElementById('ship-notif-badge');if(b){if(ac>0){b.classList.remove('hidden');b.textContent=ac;}else{b.classList.add('hidden');}}}
 
-    function printLabel(orderId){var o=allOrders.find(function(x){return x.id===orderId;});if(!o)return;var pw=window.open('','_blank');var h='<html><head><title>Label</title><script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script><style>body{font-family:Arial;margin:0;padding:20px;color:#000;background:#fff}.lc{width:400px;margin:0 auto;border:2px solid #000;padding:20px;border-radius:8px}.logo{text-align:center;font-size:24px;font-weight:900;margin-bottom:10px;border-bottom:2px solid #000;padding-bottom:10px}.r{display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px}.r span:first-child{font-weight:bold;color:#555}.s{border-bottom:1px dashed #ccc;padding-bottom:10px;margin-bottom:10px}.bc{text-align:center;margin-top:15px}.ft{text-align:center;margin-top:15px;font-size:10px;color:#999;border-top:1px dashed #ccc;padding-top:10px}@media print{body{padding:0}.lc{border:1px solid #000}}</style></head><body><div class="lc"><div class="logo">CHAPSHOP DELIVERY</div><div class="s"><div class="r"><span>Order ID:</span><span style="font-family:monospace;font-weight:bold">#'+o.id.slice(-6).toUpperCase()+'</span></div><div class="r"><span>Merchant:</span><span>'+escHtml(o.merchantName)+'</span></div></div><div class="s"><div class="r"><span>Customer:</span><span>'+escHtml(o.customerName)+'</span></div><div class="r"><span>Phone:</span><span>'+escHtml(o.customerPhone)+'</span></div><div class="r"><span>Address:</span><span style="text-align:right;width:60%">'+escHtml(o.customerAddress)+', '+escHtml(o.customerCity)+'</span></div></div><div class="s"><div class="r"><span>Product:</span><span>'+escHtml(o.itemName)+' (x'+o.qty+')</span></div><div class="r"><span>Amount:</span><span style="font-weight:bold">TZS '+Number(o.totalAmount).toLocaleString()+'</span></div></div>'+(o.callNotes?'<div style="background:#fff3cd;border:1px solid #ffeeba;padding:8px;border-radius:4px;font-size:12px;margin-bottom:15px;color:#856404"><strong>Note:</strong> '+escHtml(o.callNotes)+'</div>':'')+'<div class="bc"><svg id="barcode"></svg></div><div class="ft">Attach to package</div></div><script>JsBarcode("#barcode","'+o.id.slice(-6).toUpperCase()+'",{format:"CODE128",displayValue:true,fontSize:16,margin:10});setTimeout(function(){window.print()},500);<\/script></body></html>';pw.document.write(h);pw.document.close();}
+    function printLabel(orderId){
+        var o = allOrders.find(function(x){ return x.id === orderId; });
+        if(!o) return;
+        
+        var shortId = o.id.slice(-6).toUpperCase();
+        var pw = window.open('', '_blank');
+        
+        var html = '<html><head><title>Shipping Label - ' + shortId + '</title>';
+        html += '<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script>';
+        html += '<style>';
+        html += '@media print { body { margin: 0; } }';
+        html += 'body { font-family: "Plus Jakarta Sans", Arial, sans-serif; color: #111; background: #e2e8f0; padding: 20px; }';
+        html += '.label-container { width: 400px; margin: 0 auto; background: #fff; border: 1px solid #cbd5e1; padding: 20px; box-sizing: border-box; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }';
+        html += '.header { text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 15px; margin-bottom: 15px; }';
+        html += '.header h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; }';
+        html += '.header p { margin: 4px 0 0; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; }';
+        html += '.addresses { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 15px; }';
+        html += '.address-box { flex: 1; }';
+        html += '.address-box h3 { margin: 0 0 6px; font-size: 11px; background: #0f172a; color: #fff; padding: 4px 8px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }';
+        html += '.address-box p { margin: 2px 0; font-size: 13px; font-weight: 600; line-height: 1.4; color: #334155; }';
+        html += '.info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }';
+        html += '.info-table td { border: 1px solid #e2e8f0; padding: 8px; font-size: 12px; font-weight: 600; color: #334155; vertical-align: top; }';
+        html += '.info-table td.label { background: #f8fafc; font-weight: 800; text-transform: uppercase; font-size: 10px; color: #64748b; width: 25%; }';
+        html += '.agent-section { border: 1px dashed #94a3b8; padding: 10px; margin-bottom: 15px; border-radius: 6px; }';
+        html += '.agent-section div { font-size: 12px; margin-bottom: 4px; color: #334155; }';
+        html += '.agent-section strong { color: #0f172a; }';
+        html += '.barcode-container { text-align: center; margin-top: 15px; padding-top: 15px; border-top: 2px solid #0f172a; }';
+        html += '.actions { text-align: center; margin-top: 25px; }';
+        html += '.btn { padding: 10px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 14px; margin: 0 5px; }';
+        html += '.btn-print { background: #06b6d4; color: #fff; }';
+        html += '.btn-close { background: #e2e8f0; color: #334155; }';
+        html += '</style></head><body>';
+        
+        html += '<div class="actions">';
+        html += '<button class="btn btn-print" onclick="window.print()">🖨️ Print Label</button>';
+        html += '<button class="btn btn-close" onclick="window.close()">✕ Close</button>';
+        html += '</div>';
+        
+        html += '<div class="label-container">';
+        
+        // Header
+        html += '<div class="header">';
+        html += '<h1>ChapShop Delivery</h1>';
+        html += '<p>Official Shipping Label</p>';
+        html += '</div>';
+        
+        // Addresses
+        html += '<div class="addresses">';
+        // Shipped From
+        html += '<div class="address-box">';
+        html += '<h3>Shipped From</h3>';
+        html += '<p>' + escHtml(o.merchantName || 'ChapShop Merchant') + '</p>';
+        html += '<p>ChapShop Warehouse</p>';
+        html += '<p>Dar es Salaam, TZ</p>';
+        html += '</div>';
+        // Ship To
+        html += '<div class="address-box">';
+        html += '<h3>Ship To</h3>';
+        html += '<p>' + escHtml(o.customerName || 'N/A') + '</p>';
+        html += '<p>' + escHtml(o.customerPhone || 'N/A') + '</p>';
+        html += '<p>' + escHtml(o.customerAddress || '') + ', ' + escHtml(o.customerCity || '') + '</p>';
+        html += '</div>';
+        html += '</div>';
+        
+        // Info Table
+        html += '<table class="info-table">';
+        html += '<tr><td class="label">Order No</td><td>#' + shortId + '</td><td class="label">Date</td><td>' + formatDate(o.createdAt) + '</td></tr>';
+        html += '<tr><td class="label">Payment</td><td>COD (Cash on Delivery)</td><td class="label">Qty</td><td>' + (o.qty || 1) + '</td></tr>';
+        html += '<tr><td class="label">Product</td><td colspan="3">' + escHtml(o.itemName || 'N/A') + '</td></tr>';
+        html += '<tr><td class="label">Total Amount</td><td colspan="3" style="font-size: 14px; color: #06b6d4;">TZS ' + Number(o.totalAmount || 0).toLocaleString() + '</td></tr>';
+        html += '</table>';
+        
+        // Agent & Comments
+        html += '<div class="agent-section">';
+        html += '<div><strong>Call Center Agent:</strong> ' + escHtml(o.processedByName || 'Unassigned') + '</div>';
+        html += '<div><strong>Comments / Notes:</strong> ' + escHtml(o.callNotes || 'None') + '</div>';
+        html += '</div>';
+        
+        // Barcode
+        html += '<div class="barcode-container">';
+        html += '<svg id="barcode"></svg>';
+        html += '</div>';
+        
+        html += '</div>'; // end label-container
+        
+        // Script for barcode
+        html += '<script>';
+        html += 'JsBarcode("#barcode", "' + shortId + '", { format: "CODE128", displayValue: true, fontSize: 16, margin: 0, height: 50, width: 2 });';
+        html += '<\/script>';
+        
+        html += '</body></html>';
+        
+        pw.document.write(html);
+        pw.document.close();
+    }
 
     var shipChart=null,statusChart=null;
     function renderCharts(){if(typeof Chart==='undefined'||!allOrders)return;var days=[],dayData=[],now=new Date(),dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];for(var i=6;i>=0;i--){var d=new Date(now);d.setDate(now.getDate()-i);d.setHours(0,0,0,0);days.push(dn[d.getDay()]);var nd=new Date(d);nd.setDate(d.getDate()+1);var cnt=allOrders.filter(function(o){return o.createdAt&&o.createdAt.toDate()>=d&&o.createdAt.toDate()<nd;}).length;dayData.push(cnt);}if(shipChart)shipChart.destroy();shipChart=new Chart(document.getElementById('shipments-chart'),{type:'line',data:{labels:days,datasets:[{label:'Orders',data:dayData,borderColor:'#06b6d4',backgroundColor:'rgba(6,182,212,0.2)',fill:true,tension:0.4,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{color:'#475569',precision:0},grid:{color:'rgba(255,255,255,0.05)'}},x:{ticks:{color:'#475569'},grid:{display:false}}}}});var st={'delivered':0,'out_for_delivery':0,'confirmed':0,'accepted':0,'returned':0,'cancelled':0};allOrders.forEach(function(o){if(st[o.status]!==undefined)st[o.status]++;});var sd=[st['delivered'],st['out_for_delivery'],st['confirmed']+st['accepted'],st['returned'],st['cancelled']];if(statusChart)statusChart.destroy();statusChart=new Chart(document.getElementById('status-chart'),{type:'doughnut',data:{labels:['Delivered','In Transit','Pending','Returned','Cancelled'],datasets:[{data:sd,backgroundColor:['#10b981','#8b5cf6','#f59e0b','#ec4899','#ef4444'],borderColor:'#0f172a',borderWidth:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:12},padding:15}}}}});}
