@@ -440,11 +440,11 @@
                 // PRIORITY 1: Always look for NEW orders assigned to me
                 list = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
                 
-                // PRIORITY 2: If I have no new orders, check if there are ANY unassigned 'pending' orders in the system.
-                var unassignedPendingExists = allOrders.some(function(o) { return o.status === 'pending' && !o.ccAssignedTo; });
+                 // PRIORITY 2: If I have NO active orders, check if there are ANY 'pending' orders in the system.
+                var pendingExists = allOrders.some(function(o) { return o.status === 'pending'; });
 
-                // PRIORITY 3: ONLY if I have no new orders AND there are NO unassigned pending orders in the whole system, pull 'no_answer' and DUE 'callback_requested'
-                if(!list.length && !unassignedPendingExists) {
+                // PRIORITY 3: ONLY if I have no active orders AND there are NO pending orders, pull 'no_answer' and DUE 'callback_requested'
+                if(list.length === 0 && !pendingExists) {
                     var now = new Date();
                     list = allOrders.filter(function(o) { 
                         var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
