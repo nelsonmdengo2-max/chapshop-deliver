@@ -590,66 +590,44 @@
         if(confirm('Assign #'+order.id.slice(-6).toUpperCase()+' to '+riderObj.name+'? (Active: '+minCount+')')){await updateStatus(order.id,'out_for_delivery',riderObj.name,0,riderObj.id);}
     }
 
-       async function updateStatus(orderId, newStatus, riderName, deliveryFee, riderId) {
+           async function updateStatus(orderId, newStatus, riderName, deliveryFee, riderId) {
         try {
             var order = allOrders.find(function(o) { return o.id === orderId; });
             if(!order) return showT("Order not found", "error");
             
-            // Prevent duplicate increments if button is clicked twice
+            // Prevent duplicate clicks
             if(order.status === newStatus) return;
 
-            // ✅ ADD CONFIRMATION POPUP FOR DELIVERY STATUS
+            // Confirmation popup for delivery/returned
             if(newStatus === 'delivered' || newStatus === 'returned') {
                 var confirmMsg = newStatus === 'delivered' ? 
                     "Are you sure you want to mark this order as DELIVERED? Make sure you have the cash in hand." : 
                     "Are you sure you want to mark this order as RETURNED?";
-                if(!confirm(confirmMsg)) return; // Stops if they click "Cancel"
+                if(!confirm(confirmMsg)) return;
             }
 
-            // Define productId and qty at the TOP so they aren't undefined
-            var productId = order.productId;
-            var qty = Number(order.qty) || 1;
-            
             var tl = {status: newStatus, by: window.currentUser.name, at: new Date()};
-            var ud = {status: newStatus, shippedBy: myId(), shippedByName: window.currentUser.name, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), timeline: firebase.firestore.FieldValue.arrayUnion(tl)};
+            var ud = {
+                status: newStatus, 
+                shippedBy: myId(), 
+                shippedByName: window.currentUser.name, 
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(), 
+                timeline: firebase.firestore.FieldValue.arrayUnion(tl)
+            };
             
             if(newStatus === 'out_for_delivery') { 
                 ud.shippedAt = firebase.firestore.FieldValue.serverTimestamp(); 
                 if(riderName) ud.riderName = riderName;
                 if(riderId) ud.riderId = riderId;
                 if(deliveryFee && deliveryFee > 0) ud.deliveryFee = deliveryFee;
-                
-                if(productId) {
-                    await db.collection('products').doc(productId).update({
-                        reserved: firebase.firestore.FieldValue.increment(qty)
-                    });
-                }
+                // ✅ REMOVED: No product reserved increment — calculated dynamically now
             }
 
+            // ✅ REMOVED: All product field increments (delivered, reserved, returnedStock)
+            // These are now calculated dynamically from orders in both dashboards
             await db.collection('orders').doc(orderId).update(ud);
-
-            if(productId) {
-                if(newStatus === 'delivered') {
-                    await db.collection('products').doc(productId).update({
-                        // STOP decrementing 'stock'. 'stock' must remain the Total Original Stock.
-                        reserved: firebase.firestore.FieldValue.increment(-qty),   
-                        delivered: firebase.firestore.FieldValue.increment(qty)
-                    });
-                    showT('Delivered!');
-                }
-                else if(newStatus === 'returned') {
-                    await db.collection('products').doc(productId).update({
-                        reserved: firebase.firestore.FieldValue.increment(-qty),   
-                        returnedStock: firebase.firestore.FieldValue.increment(qty)
-                    });
-                    showT('Returned! Item back on shelf.');
-                }
-                else {
-                    showT('Updated to ' + newStatus.replace(/_/g, ' '));
-                }
-            } else {
-                showT('Updated to ' + newStatus.replace(/_/g, ' '));
-            }
+            showT('Updated to ' + newStatus.replace(/_/g, ' '));
+            
         } catch(err) {
             showT(err.message, "error");
         }
@@ -721,8 +699,7 @@
 
     function bulkAssign(){var rid=document.getElementById('bulk-rider-select').value;if(!rid)return showT("Select rider","error");var ch=document.querySelectorAll('.bulk-check:checked');if(!ch.length)return showT("Select orders","error");var ro=allRiders.find(function(r){return r.id===rid;});var n=0;ch.forEach(function(cb){updateStatus(cb.value,'out_for_delivery',ro.name,0,ro.id);n++;});ch.forEach(function(cb){cb.checked=false;});document.getElementById('bulk-rider-select').value='';showT(n+' assigned to '+ro.name+'!');}
     function printManifest(){var rid=document.getElementById('bulk-rider-select').value;if(!rid)return showT("Select rider","error");var ro=allRiders.find(function(r){return r.id===rid;});var ro2=allOrders.filter(function(o){return o.riderId===rid&&o.status==='out_for_delivery';});if(!ro2.length)return showT("No active deliveries","error");var pw=window.open('','_blank');var h='<html><head><title>Manifest</title><style>body{font-family:Arial;padding:20px;color:#111}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#f3f4f6}</style></head><body><h1 style="text-align:center">Delivery Manifest</h1><p><strong>Rider:</strong> '+escHtml(ro.name)+' | <strong>Date:</strong> '+new Date().toLocaleDateString()+'</p><table><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Address</th><th>Amount</th></tr></thead><tbody>';var t=0;ro2.forEach(function(o,i){h+='<tr><td>'+(i+1)+'</td><td>'+escHtml(o.customerName)+'</td><td>'+escHtml(o.customerPhone)+'</td><td>'+escHtml(o.customerAddress)+', '+escHtml(o.customerCity)+'</td><td>TZS '+Number(o.totalAmount).toLocaleString()+'</td></tr>';t+=o.totalAmount;});h+='</tbody></table><p style="text-align:right;font-size:18px;font-weight:bold;margin-top:20px">Total: TZS '+t.toLocaleString()+'</p></body></html>';pw.document.write(h);pw.document.close();pw.print();}
-
-            function renderWarehouse(){
+    function renderWarehouse(){
         var tb=document.getElementById('warehouse-table');
         if(!tb)return;
         
@@ -734,16 +711,20 @@
         }
         
         tb.innerHTML=allProducts.map(function(p){
-            var stock = Number(p.stock || 0);               
-            var delivered = Number(p.delivered || 0);         
-            var returned = Number(p.returnedStock || 0);      
+            var stock = Number(p.stock || 0); // Original total, never changes automatically
             
-            // Calculate Reserved dynamically from ACTIVE orders so it never gets corrupted
+            // DYNAMIC MATH: Calculate from actual orders so it NEVER lies
             var reserved = allOrders.filter(function(o) {
-                return o.status === 'out_for_delivery' && o.productId === p.id;
-            }).reduce(function(sum, o) {
-                return sum + (Number(o.qty) || 1);
-            }, 0);
+                return o.status === 'out_for_delivery' && (o.productId === p.id || (p.sku && o.productSku === p.sku));
+            }).reduce(function(sum, o) { return sum + (Number(o.qty) || 1); }, 0);
+            
+            var delivered = allOrders.filter(function(o) {
+                return o.status === 'delivered' && (o.productId === p.id || (p.sku && o.productSku === p.sku));
+            }).reduce(function(sum, o) { return sum + (Number(o.qty) || 1); }, 0);
+            
+            var returned = allOrders.filter(function(o) {
+                return o.status === 'returned' && (o.productId === p.id || (p.sku && o.productSku === p.sku));
+            }).reduce(function(sum, o) { return sum + (Number(o.qty) || 1); }, 0);
             
             // The correct math: Remain = Stock - Delivery - Reservation + Return
             var remaining = stock - delivered - reserved + returned;
@@ -761,18 +742,19 @@
                 '<td class="px-4 py-3"><div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">' + 
                     (p.image ? '<img src="'+p.image+'" class="w-full h-full object-cover">' : '<span class="iconify text-slate-600" data-icon="mdi:package-variant"></span>') + 
                 '</div></td>' +
-                '<td class="px-4 py-3 text-sm text-white font-medium">' + escHtml(p.name) + '</td>' +
-                '<td class="px-4 py-3 text-xs text-slate-400 font-mono">' + (escHtml(p.sku)||'—') + '</td>' +
-                '<td class="px-4 py-3 text-xs text-cyan-300 font-medium">' + (escHtml(p.merchantName)||'—') + '</td>' +
+                '<td class="px-4 py-3 text-sm text-white font-medium">' + (p.name || '—') + '</td>' +
+                '<td class="px-4 py-3 text-xs text-slate-400 font-mono">' + (p.sku || '—') + '</td>' +
+                '<td class="px-4 py-3 text-xs text-cyan-300 font-medium">' + (p.merchantName || '—') + '</td>' +
                 '<td class="px-4 py-3 text-sm text-right font-bold text-white">' + stock.toLocaleString() + '</td>' +
                 '<td class="px-4 py-3 text-sm text-right font-semibold text-orange-400">' + reserved.toLocaleString() + '</td>' +
                 '<td class="px-4 py-3 text-sm text-right font-semibold text-blue-400">' + delivered.toLocaleString() + '</td>' +
                 '<td class="px-4 py-3 text-sm text-right font-semibold text-pink-400">' + returned.toLocaleString() + '</td>' +
                 '<td class="px-4 py-3 text-sm text-right font-bold ' + remColor + '">' + remaining.toLocaleString() + '</td>' +
-                '<td class="px-4 py-3 text-xs text-slate-300"><input type="text" value="'+escHtml(p.location||'A1')+'" onchange="updateLocation(\''+p.id+'\',this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-xs text-white w-20 focus:outline-none"></td>' +
+                '<td class="px-4 py-3 text-xs text-slate-300"><input type="text" value="'+(p.location||'A1')+'" onchange="updateLocation(\''+p.id+'\',this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-xs text-white w-20 focus:outline-none"></td>' +
             '</tr>';
         }).join('');
         
+        // Update the summary cards at the top of the Warehouse page
         document.getElementById('wh-stat-stock').textContent = totalStock.toLocaleString();
         document.getElementById('wh-stat-delivered').textContent = totalDelivered.toLocaleString();
         document.getElementById('wh-stat-returned').textContent = totalReturned.toLocaleString();
