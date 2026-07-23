@@ -183,6 +183,21 @@
                             <button type="button" onclick="document.getElementById('add-product-form').classList.toggle('hidden')" class="bg-cyan-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-cyan-400 transition-colors text-sm flex items-center gap-2 whitespace-nowrap"><span class="iconify" data-icon="mdi:plus"></span> Add Product</button>
                         </div>
                     </div>
+                    <!-- NEW: CREATE PRODUCT FORM -->
+                    <div class="bg-cyan-500/5 border border-cyan-500/20 rounded-2xl p-6 mb-6">
+                        <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2"><span class="iconify text-cyan-400 text-xl" data-icon="mdi:package-variant-closed-plus"></span> Create New Product</h3>
+                        <form id="stock-create-product-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Merchant *</label><select id="sp-merchant" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></select></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Product Name *</label><input type="text" id="sp-name" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">SKU</label><input type="text" id="sp-sku" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="e.g. GIN-001"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Warehouse</label><input type="text" id="sp-warehouse" value="Main Warehouse" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Original Stock Qty *</label><input type="number" id="sp-stock" required min="0" value="100" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Selling Price (TZS)</label><input type="number" id="sp-price" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="0"></div>
+                            <div class="md:col-span-2"><label class="text-xs font-semibold text-slate-400 uppercase">Product Image</label><input type="file" id="sp-img" accept="image/*" class="w-full mt-1 text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-cyan-500/20 file:text-cyan-400 hover:file:bg-cyan-500/30 cursor-pointer"></div>
+                            <div class="md:col-span-2 flex justify-end"><button type="submit" class="bg-cyan-500 text-white font-bold px-6 py-2.5 rounded-xl hover:bg-cyan-400 text-sm">Save Product</button></div>
+                        </form>
+                    </div>
+
                     <div id="add-product-form" class="hidden bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 mb-6">
                         <h3 class="text-base font-bold text-white mb-4">Register New Product</h3>
                         <form onsubmit="handleAddProduct(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -643,16 +658,20 @@
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('app-screen').classList.add('hidden');
         }
-    });ƒ
+    });
 
     function loadData() {
         db.collection('products').onSnapshot(snap => {
             allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            renderKPIs(); renderCharts(); renderDashboardTable(); renderCurrentStock(); renderLowStock(); renderDamagedExpired(); populateProductSelects();
+            renderKPIs(); renderCharts(); renderDashboardTable(); renderCurrentStock(); renderLowStock(); renderDamagedExpired(); populateProductSelects(); populateMerchantSelect();
         });
         db.collection('orders').onSnapshot(snap => {
             allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
             renderCurrentStock(); renderDashboardTable(); renderKPIs();
+        });
+        db.collection('users').where('role', '==', 'merchant').onSnapshot(snap => {
+            allMerchants = snap.docs.map(d => ({id: d.id, ...d.data()}));
+            populateMerchantSelect();
         });
         db.collection('users').where('role', '==', 'merchant').onSnapshot(snap => {
             allMerchants = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -846,7 +865,7 @@
     }
 
     // ===== CURRENT STOCK (was missing!) =====
-    function renderCurrentStock() {
+        function renderCurrentStock() {
         const tbody = document.getElementById('cs-tbody');
         if (!tbody) return;
 
@@ -863,15 +882,18 @@
         }
 
         if (!filtered.length) {
-            tbody.innerHTML = '<tr><td colspan="8" class="p-10 text-center text-slate-500 text-sm">No products found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" class="p-10 text-center text-slate-500 text-sm">No products found.</td></tr>';
             return;
         }
 
-                tb.innerHTML = filtered.map(p => {
-            var stock = Number(p.stock || 0);
-            var delivered = Number(p.delivered || 0);
-            var returned = Number(p.returnedStock || 0);
-            var reserved = Number(p.reserved || 0);
+        tbody.innerHTML = filtered.map(p => {
+            var stock = Number(p.stock || 0); // Original total, never changes automatically
+            
+            // Get live stats from the orders collection so it NEVER lies
+            var liveStats = getLiveProductStats(p.id, p.sku);
+            var delivered = liveStats.delivered;
+            var reserved = liveStats.reserved;
+            var returned = liveStats.returned;
             
             // Calculate true remaining stock on the shelf
             var remaining = stock - delivered - reserved + returned;
@@ -1394,6 +1416,97 @@
         const badge = document.getElementById('notif-count-badge');
         if(badge) badge.classList.add('hidden');
         showT('Notifications cleared');
+    }
+
+    function populateMerchantSelect() {
+        var sel = document.getElementById('sp-merchant');
+        if(!sel) return;
+        sel.innerHTML = '<option value="">Select Merchant</option>' + allMerchants.map(function(m){ return '<option value="'+m.id+'">'+(m.shopName||m.name)+'</option>'; }).join('');
+    }
+
+    // Image Compressor for Stock Dashboard
+    function compressImageStock(file, maxW = 800, quality = 0.5) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > maxW) { h *= maxW / w; w = maxW; } }
+                    else { if (h > maxW) { w *= maxW / h; h = maxW; } }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.onerror = reject;
+                img.src = e.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    document.getElementById('stock-create-product-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var btn = this.querySelector('button[type="submit"]'); var orig = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = 'Saving...';
+
+        var mid = document.getElementById('sp-merchant').value;
+        var mObj = allMerchants.find(function(u){ return u.id === mid; });
+        if(!mid) { showT('Please select a merchant', 'error'); btn.disabled=false; btn.innerHTML=orig; return; }
+
+        var imageData = '';
+        var fileInput = document.getElementById('sp-img');
+        try {
+            if (fileInput.files[0]) { 
+                imageData = await compressImageStock(fileInput.files[0]); 
+            }
+
+            var data = {
+                merchantId: mid,
+                merchantName: mObj ? (mObj.shopName || mObj.name) : '',
+                name: document.getElementById('sp-name').value.trim(),
+                sku: document.getElementById('sp-sku').value.trim(),
+                warehouse: document.getElementById('sp-warehouse').value.trim() || 'Main',
+                stock: parseInt(document.getElementById('sp-stock').value) || 0, 
+                price: parseInt(document.getElementById('sp-price').value) || 0,
+                image: imageData,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            await db.collection('products').add(data);
+            showT('Product created successfully!');
+            this.reset();
+            document.getElementById('sp-stock').value = 100;
+        } catch(err) { 
+            showT(err.message, 'error'); 
+        }
+        btn.disabled = false; btn.innerHTML = orig;
+    });
+
+    // BULLETPROOF DYNAMIC MATH
+    function getLiveProductStats(productId, sku) {
+        var stats = { delivered: 0, reserved: 0, returned: 0 };
+        allOrders.forEach(function(o) {
+            // Match by productId OR sku
+            if((productId && o.productId === productId) || (sku && o.productSku === sku)) {
+                if(o.status === 'delivered') stats.delivered += (Number(o.qty) || 1);
+                if(o.status === 'out_for_delivery') stats.reserved += (Number(o.qty) || 1);
+                if(o.status === 'returned') stats.returned += (Number(o.qty) || 1);
+            }
+        });
+        return stats;
+    }
+
+    async function deleteStockProduct(productId, productName) {
+        if(!confirm('Are you sure you want to permanently DELETE "' + productName + '" from the inventory? This cannot be undone.')) return;
+        try {
+            await db.collection('products').doc(productId).delete();
+            showT('Product deleted successfully!');
+        } catch(e) {
+            showT('Error deleting product: ' + e.message, 'error');
+        }
     }
 
     async function adjustStock(productId, productName) {
