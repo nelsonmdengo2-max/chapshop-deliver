@@ -1182,6 +1182,7 @@ function renderProductReturns(){
                     '<td class="text-white font-medium">'+(p.name||'—')+'</td>'+
                     '<td class="text-slate-500 text-xs font-mono">'+(p.sku||'—')+'</td>'+
                     '<td class="text-right font-bold text-white">'+stock.toLocaleString()+'</td>'+
+                    '<td class="text-right font-semibold text-orange-400">'+reserved.toLocaleString()+'</td>'+
                     '<td class="text-right font-semibold text-blue-400">'+delivered.toLocaleString()+'</td>'+
                     '<td class="text-right font-semibold text-pink-400">'+returned.toLocaleString()+'</td>'+
                     '<td class="text-right font-bold '+remColor+'">'+remain.toLocaleString()+'</td>'+
