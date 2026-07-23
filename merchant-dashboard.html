@@ -87,7 +87,7 @@
             </form>
             <div class="text-center mt-6">
                 <button type="button" onclick="handleForgotPassword()" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors block mb-3">Forgot Password?</button>
-                <a href="index.html" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors">← Back to Website</a>
+                <a href="https://chapshopdelivery.live" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors">← Back to Website</a>
             </div>
         </div>
     </div>
@@ -145,7 +145,7 @@
             
             <!-- 3. STICKY LOGOUT BUTTON -->
             <div class="p-4 border-t border-white/[0.08] bg-[#0f172a] flex-shrink-0">
-                <button onclick="handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> <span data-i18n="logout">Logout</span></button>
+                <a href="https://chapshopdelivery.live" onclick="handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> <span data-i18n="logout">Logout</span></a>
             </div>
         </aside>
 
@@ -1092,10 +1092,32 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             document.getElementById('stat-wrong').textContent = myOrders.filter(o => o.status === 'wrong_number').length;
             document.getElementById('stat-outregion').textContent = myOrders.filter(o => o.status === 'out_of_region').length;
 
-            var totalStock = myProducts.reduce((s,p) => s + (p.stock||0), 0);
-            var lowStockCount = myProducts.filter(p => p.minStock && p.stock > 0 && p.stock <= p.minStock).length;
-            var outStockCount = myProducts.filter(p => p.stock === 0).length;
-            document.getElementById('stat-stock').textContent = totalStock;
+                        // ✅ FIX: Calculate AVAILABLE stock dynamically (what's actually on the shelf)
+            var totalAvailableStock = 0;
+            var lowStockCount = 0;
+            var outStockCount = 0;
+            
+            myProducts.forEach(function(p) {
+                var stock = Number(p.stock || 0);
+                var delivered = myOrders.filter(function(o){
+                    return o.status === 'delivered' && o.productId === p.id;
+                }).reduce(function(sum, o){ return sum + (Number(o.qty) || 1); }, 0);
+                var reserved = myOrders.filter(function(o){
+                    return o.status === 'out_for_delivery' && o.productId === p.id;
+                }).reduce(function(sum, o){ return sum + (Number(o.qty) || 1); }, 0);
+                var returned = myOrders.filter(function(o){
+                    return o.status === 'returned' && o.productId === p.id;
+                }).reduce(function(sum, o){ return sum + (Number(o.qty) || 1); }, 0);
+                
+                var remaining = stock - delivered - reserved + returned;
+                if(remaining < 0) remaining = 0;
+                
+                totalAvailableStock += remaining;
+                if(p.minStock && remaining > 0 && remaining <= p.minStock) lowStockCount++;
+                if(remaining <= 0) outStockCount++;
+            });
+            
+            document.getElementById('stat-stock').textContent = totalAvailableStock;
             document.getElementById('stat-low-stock').textContent = lowStockCount;
             document.getElementById('stat-out-stock').textContent = outStockCount;
             document.getElementById('card-low-stock').classList.toggle('stock-critical', lowStockCount > 0);
@@ -1260,7 +1282,7 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                     '<td class="px-4 py-3"><div class="flex gap-1">' +
                         '<button onclick="viewOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400" title="View"><span class="iconify text-sm" data-icon="mdi:eye"></span></button>' +
                         '<button onclick="printOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-cyan-400" title="Print Invoice"><span class="iconify text-sm" data-icon="mdi:printer"></span></button>' +
-                        '<button onclick="editMerchantOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-yellow-400" title="Edit"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button>' +
+                        (['pending', 'accepted'].includes(o.status) ? '<button onclick="editMerchantOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-yellow-400" title="Edit Order"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button>' : '<span class="p-1.5 text-slate-700 cursor-not-allowed" title="Cannot edit processed orders"><span class="iconify text-sm" data-icon="mdi:pencil-off"></span></span>') +
                         '<button onclick="archiveMerchantOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-white/[0.05] text-slate-400 hover:text-indigo-400" title="Archive"><span class="iconify text-sm" data-icon="mdi:archive-arrow-down-outline"></span></button>' +
                         '<button onclick="deleteMerchantOrder(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Delete"><span class="iconify text-sm" data-icon="mdi:delete"></span></button>' +
                         (showBtns ? '<button onclick="requestCancel(\'' + o.id + '\')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20" title="Request Cancel"><span class="iconify text-sm" data-icon="mdi:close-circle"></span></button>' : '') +
@@ -1478,11 +1500,18 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                     description: document.getElementById('ep-desc').value.trim()
                 };
                 
-                // ONLY update stock if they actually typed a number greater than 0
-                // This prevents them from accidentally erasing the stock to 0!
+                // ✅ FIX: Only update stock if value is POSITIVE and DIFFERENT from current
+                // This prevents accidental reset to 0 when editing other fields
                 var stockVal = parseInt(document.getElementById('ep-stock').value);
-                if(!isNaN(stockVal) && stockVal >= 0) {
+                var currentStock = p.stock || 0;
+                if(!isNaN(stockVal) && stockVal > 0 && stockVal !== currentStock) {
                     updateData.stock = stockVal;
+                    updateData.stockLog = firebase.firestore.FieldValue.arrayUnion({
+                        type: stockVal > currentStock ? 'in' : 'out',
+                        qty: Math.abs(stockVal - currentStock),
+                        note: 'Stock updated via Edit Product',
+                        at: new Date()
+                    });
                 }
 
                 db.collection('products').doc(id).update(updateData).then(function(){
@@ -1516,20 +1545,27 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
             }
             
             tb.innerHTML = myProducts.map(function(p){
-                var stock = Number(p.stock || 0);               
-                var delivered = Number(p.delivered || 0);         
-                var returned = Number(p.returnedStock || 0);      
+                // ✅ FIX: stock is the MASTER number (manually set, never auto-decremented)
+                var stock = Number(p.stock || 0);
                 
-                // Calculate Reserved dynamically from ACTIVE orders
-                var reserved = myOrders.filter(function(o) {
-                    return o.status === 'out_for_delivery' && o.productId === p.id;
-                }).reduce(function(sum, o) {
-                    return sum + (Number(o.qty) || 1);
-                }, 0);
+                // ✅ FIX: Calculate ALL metrics dynamically from orders (NOT from Firestore fields)
+                var productId = p.id;
                 
-                          // The correct math: Remain = Stock - Delivery - Reservation + Return
-            var remaining = stock - delivered - reserved + returned;
-            if(remaining < 0) remaining = 0; // Prevent negative numbers
+                               var delivered = myOrders.filter(function(o){
+                    return o.status === 'delivered' && (o.productId === productId || (p.sku && o.productSku === p.sku));
+                }).reduce(function(sum, o){ return sum + (Number(o.qty) || 1); }, 0);
+                
+                var reserved = myOrders.filter(function(o){
+                    return o.status === 'out_for_delivery' && (o.productId === productId || (p.sku && o.productSku === p.sku));
+                }).reduce(function(sum, o){ return sum + (Number(o.qty) || 1); }, 0);
+                
+                var returned = myOrders.filter(function(o){
+                    return o.status === 'returned' && (o.productId === productId || (p.sku && o.productSku === p.sku));
+                }).reduce(function(sum, o){ return sum + (Number(o.qty) || 1); }, 0);
+                
+                // ✅ CORRECT FORMULA: On Shelf = Original - Gone Forever - In Transit + Came Back
+                var remaining = stock - delivered - reserved + returned;
+                if(remaining < 0) remaining = 0;
                 
                 totalStock += stock;
                 totalReserved += reserved;
