@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChapShop Platform Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script>
+        var fc={apiKey:"AIzaSyBjyRehaNQqt5ogt5U3tiw8NYr4TyuX2iI",authDomain:"chapshop-delivery-88fe1.firebaseapp.com",projectId:"chapshop-delivery-88fe1",storageBucket:"chapshop-delivery-88fe1.firebasestorage.app",messagingSenderId:"540757404981",appId:"1:540757404981:web:f5ae5d041dd260304eb07c"};
+        firebase.initializeApp(fc);
+        var auth = firebase.auth();
+        var db = firebase.firestore();
+    </script>
+    <style>body{font-family:'Plus Jakarta Sans',sans-serif;}</style>
+</head>
+<body class="bg-[#020617] text-white min-h-screen flex flex-col items-center justify-center p-6">
+    
+    <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-cyan-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20">
+            <span class="iconify text-white text-3xl" data-icon="mdi:truck-fast"></span>
+        </div>
+        <h1 class="text-2xl font-extrabold tracking-tight">ChapShop Delivery</h1>
+        <p class="text-slate-400 text-sm mt-1">Platform Login</p>
+    </div>
+
+    <div class="w-full max-w-md bg-white/[0.02] border border-white/[0.08] rounded-2xl p-8 space-y-5">
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="text-xs text-slate-400 mb-1.5 block font-medium uppercase">Email</label>
+                <input type="email" id="email" required class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="you@chapshop.com">
+            </div>
+            <div>
+                <label class="text-xs text-slate-400 mb-1.5 block font-medium uppercase">Password</label>
+                <input type="password" id="password" required class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50" placeholder="••••••••">
+            </div>
+            <button type="submit" id="loginBtn" class="w-full bg-cyan-500 text-white font-bold py-3.5 rounded-xl hover:bg-cyan-400 transition-colors flex items-center justify-center gap-2">
+                <span class="iconify" data-icon="mdi:login"></span>
+                Sign In
+            </button>
+            <div id="errorMsg" class="hidden text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 rounded-lg py-2 px-3"></div>
+        </form>
+    </div>
+
+    <div class="mt-8 text-center">
+        <a href="https://chapshopdelivery.live" class="text-sm text-slate-500 hover:text-cyan-400 transition-colors">← Back to Website</a>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var btn = document.getElementById('loginBtn');
+            var btnText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Signing in...';
+            document.getElementById('errorMsg').classList.add('hidden');
+
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch(err) {
+                document.getElementById('errorMsg').textContent = err.message;
+                document.getElementById('errorMsg').classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = btnText;
+            }
+        });
+
+        // THE SMART ROUTER: Automatically sends users to their correct dashboard
+        auth.onAuthStateChanged(async function(user) {
+            if (user) {
+                try {
+                    var doc = await db.collection('users').doc(user.uid).get();
+                    if (doc.exists) {
+                        var data = doc.data();
+                        
+                        // Check if account is active
+                        if (data.active === false) {
+                            document.getElementById('errorMsg').textContent = 'Your account has been disabled. Contact support.';
+                            document.getElementById('errorMsg').classList.remove('hidden');
+                            auth.signOut();
+                            return;
+                        }
+
+                        // Route based on role
+                        if (data.role === 'merchant') {
+                            if (data.approved === false) {
+                                document.getElementById('errorMsg').textContent = 'Your account is pending admin approval.';
+                                document.getElementById('errorMsg').classList.remove('hidden');
+                                auth.signOut();
+                            } else {
+                                window.location.href = 'merchant-dashboard.html';
+                            }
+                        } 
+                        else if (data.role === 'admin' || data.role === 'finance') {
+                            window.location.href = 'admin-dashboard.html';
+                        } 
+                        else if (data.role === 'shipping' || data.role === 'rider') {
+                            window.location.href = 'shipping-dashboard.html';
+                        } 
+                        else if (data.role === 'call_center') {
+                            window.location.href = 'call-center.html';
+                        } 
+                        else if (data.role === 'follow_up') {
+                            window.location.href = 'follow-up.html';
+                        } 
+                        else if (data.role === 'stock') {
+                            window.location.href = 'stock.html';
+                        } 
+                        else {
+                            // Fallback if role is unknown
+                            window.location.href = 'merchant-dashboard.html';
+                        }
+                    } else {
+                        document.getElementById('errorMsg').textContent = 'User profile not found in database.';
+                        document.getElementById('errorMsg').classList.remove('hidden');
+                        auth.signOut();
+                    }
+                } catch(e) {
+                    console.error("Error fetching user data:", e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
