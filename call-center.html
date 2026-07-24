@@ -354,10 +354,21 @@
                 allMerchants = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
             });
 
-                        db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
+                db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
                 allOrders = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
                 allOrders.forEach(function(o) { if(o.status === 'accepted' && !knownOrderIds.has(o.id)) playDing(); });
                 knownOrderIds = new Set(allOrders.map(function(o) { return o.id; }));
+                
+                // BACKGROUND AUTO-CLAIM: If I have no active orders, and there are pending orders, claim one!
+                var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
+                var pendingExists = allOrders.some(function(o) { return o.status === 'pending'; });
+                
+                if(myActive.length === 0 && pendingExists) {
+                    claimNextOrder(); 
+                }
+
+                updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance(); renderMyCalls();
+            });
                 
                 // BACKGROUND AUTO-CLAIM: If I have no active orders, and there are pending orders, claim one instantly!
                 var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
