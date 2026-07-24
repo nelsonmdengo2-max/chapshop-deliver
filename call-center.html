@@ -1128,58 +1128,36 @@
             showT("Shift report downloaded!");
         }
 
-                async function claimNextOrder() {
+                        async function claimNextOrder() {
             if (isClaiming) return;
             isClaiming = true;
             
             try {
-                // Look for 'pending' OR 'accepted' orders that haven't been assigned to an agent yet
-                const q = await db.collection('orders').where('status', 'in', ['pending', 'accepted']).limit(15).get();
-                let claimed = false;
+                // Look for up to 20 pending orders
+                const q = await db.collection('orders').where('status', '==', 'pending').limit(20).get();
+                if (q.empty) return; // No pending orders, stop here
                 
-                // Sort manually in JavaScript
+                // Sort manually in JavaScript to find the oldest one
                 const docs = q.docs.sort(function(a, b) {
                     const aT = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
                     const bT = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
                     return aT - bT;
                 });
                 
-                // Loop through them to find one that isn't assigned to anyone yet
-                for (let i = 0; i < docs.length; i++) {
-                    const doc = docs[i];
-                    const orderData = doc.data();
-                    
-                    if (!orderData.ccAssignedTo) {
-                        try {
-                            // Use a Firestore Transaction to safely claim the order
-                            await db.runTransaction(async (transaction) => {
-                                const orderDoc = await transaction.get(doc.ref);
-                                if (!orderDoc.exists || orderDoc.data().ccAssignedTo || (orderDoc.data().status !== 'pending' && orderDoc.data().status !== 'accepted')) {
-                                    return; // Someone else took it, skip
-                                }
-                                transaction.update(doc.ref, { 
-                                    ccAssignedTo: myId(), 
-                                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(), // Fixed timestamp
-                                    status: 'accepted' // Change status to accepted so it leaves the merchant pool
-                                });
-                            });
-                            
-                            showT("New order assigned to you!", "success");
-                            claimed = true;
-                            break; // Stop looking, we got one!
-                        } catch (e) {
-                            // Log the error so we can see if Firebase is blocking it
-                            console.error("Claim transaction failed: ", e);
-                        }
-                    }
-                }
+                // Try to claim the oldest one directly (simpler and more reliable than a transaction)
+                const doc = docs[0]; 
+                await db.collection('orders').doc(doc.id).update({
+                    ccAssignedTo: myId(), 
+                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'accepted'
+                });
                 
-                if (!claimed) {
-                    // If we checked 15 orders and they were all taken, try again in 3 seconds
-                    setTimeout(function() { isClaiming = false; claimNextOrder(); }, 3000);
-                }
+                showT("New order assigned to you!", "success");
+                
             } catch (err) {
-                console.error("Error querying for next order: ", err);
+                // If it fails (maybe another agent took it), show a tiny error so we know
+                console.error("Error claiming order: ", err);
+                showT("Could not claim order: " + err.message, "error");
             } finally {
                 isClaiming = false;
             }
