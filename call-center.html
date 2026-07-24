@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Call Center — ChapShop Delivery</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#020617">
+    <meta name="theme-color" fcontent="#020617">
     <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEhaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1120,14 +1120,13 @@
             var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'shift_report_' + new Date().toISOString().slice(0,10) + '.csv'; a.click();
             showT("Shift report downloaded!");
         }
-
-                        async function claimNextOrder() {
+        async function claimNextOrder() {
             if (isClaiming) return;
             isClaiming = true;
             
             try {
-                // Look for up to 20 pending orders
-                const q = await db.collection('orders').where('status', '==', 'pending').limit(20).get();
+                // Look for the oldest 'pending' order
+                const q = await db.collection('orders').where('status', '==', 'pending').limit(15).get();
                 if (q.empty) return; // No pending orders, stop here
                 
                 // Sort manually in JavaScript to find the oldest one
@@ -1137,20 +1136,29 @@
                     return aT - bT;
                 });
                 
-                // Try to claim the oldest one directly (simpler and more reliable than a transaction)
-                const doc = docs[0]; 
-                await db.collection('orders').doc(doc.id).update({
-                    ccAssignedTo: myId(), 
-                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'accepted'
-                });
+                const doc = docs[0]; // Grab the very first (oldest) pending order
                 
-                showT("New order assigned to you!", "success");
-                
+                try {
+                    // Use a Firestore Transaction to safely claim the order
+                    await db.runTransaction(async (transaction) => {
+                        const orderDoc = await transaction.get(doc.ref);
+                        // If it's no longer pending, someone else got it or status changed
+                        if (!orderDoc.exists || orderDoc.data().status !== 'pending') {
+                            return; 
+                        }
+                        transaction.update(doc.ref, { 
+                            ccAssignedTo: myId(), 
+                            ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            status: 'accepted' // Change status to accepted so it leaves the merchant pool
+                        });
+                    });
+                    
+                    showT("New order assigned to you!", "success");
+                } catch (e) {
+                    console.error("Claim transaction failed: ", e);
+                }
             } catch (err) {
-                // If it fails (maybe another agent took it), show a tiny error so we know
-                console.error("Error claiming order: ", err);
-                showT("Could not claim order: " + err.message, "error");
+                console.error("Error querying for next order: ", err);
             } finally {
                 isClaiming = false;
             }
