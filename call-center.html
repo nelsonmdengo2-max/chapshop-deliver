@@ -354,10 +354,25 @@
                 allMerchants = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
             });
 
-                db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
+                         db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
                 allOrders = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
                 allOrders.forEach(function(o) { if(o.status === 'accepted' && !knownOrderIds.has(o.id)) playDing(); });
                 knownOrderIds = new Set(allOrders.map(function(o) { return o.id; }));
+                
+                // BACKGROUND AUTO-CLAIM with Timestamp Cooldown
+                var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
+                var unassignedExists = allOrders.some(function(o) { 
+                    return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo); 
+                });
+                var now = Date.now();
+                
+                if(currentWsTab === 'new' && myActive.length === 0 && unassignedExists && (now - lastClaimAttempt > 5000)) {
+                    lastClaimAttempt = now;
+                    claimNextOrder(); 
+                }
+
+                updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance(); renderMyCalls();
+            });
                 
                 // BACKGROUND AUTO-CLAIM with Timestamp Cooldown
                 var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
