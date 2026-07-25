@@ -201,141 +201,8 @@
                             <tbody id="mycalls-table" class="divide-y divide-white/[0.05]"></tbody>
                         </table>
                     </div>
-                    <div class="flex flex-col md:flex-row gap-3 mt-4 items-center justify-between text-xs text-slate-400">
-                        <div class="flex items-center gap-2">
-                            <span>Rows per page:</span>
-                            <select id="mycalls-page-size" onchange="changeMyCallsPageSize(this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-white focus:outline-none">
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                            </select>
-                        </div>
-                        <div id="mycalls-pagination-info" class="text-slate-500">Showing 0 to 0 of 0</div>
-                        <div class="flex gap-2">
-                            <button id="mycalls-prev-btn" onclick="prevMyCallsPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed">Previous</button>
-                            <button id="mycalls-next-btn" onclick="nextMyCallsPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed">Next</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SHIPPING TRACKING -->
-                <div id="panel-shipping" class="tab-panel hidden">
-                    <div class="mb-4 relative max-w-sm">
-                        <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
-                        <input type="text" id="ship-search" oninput="renderShipping()" placeholder="Search by Order ID, Phone, or Name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50">
-                    </div>
-                    <div class="flex gap-2 mb-4 flex-wrap">
-                        <button onclick="filterShipping('all')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">All</button>
-                        <button onclick="filterShipping('confirmed')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Received</button>
-                        <button onclick="filterShipping('preparing')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Preparing</button>
-                        <button onclick="filterShipping('out_for_delivery')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">In Transit</button>
-                        <button onclick="filterShipping('delivered')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Delivered</button>
-                        <button onclick="filterShipping('returned')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Returned</button>
-                        <button onclick="filterShipping('cancelled')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Cancelled</button>
-                    </div>
-                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
-                        <table class="w-full text-sm text-left min-w-[1100px]">
-                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">Merchant</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Item</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3">Call Agent</th><th class="px-4 py-3">Rider</th><th class="px-4 py-3">Shipping Status</th><th class="px-4 py-3">Updated</th></tr></thead>
-                            <tbody id="shipping-table" class="divide-y divide-white/[0.05]"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- PERFORMANCE -->
-                <div id="panel-performance" class="tab-panel hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                        <div class="stat-card text-center"><div class="text-slate-400 text-xs font-bold uppercase mb-2">Total Calls Handled</div><div id="p-total" class="text-4xl font-bold text-white">0</div></div>
-                        <div class="stat-card text-center border-cyan-500/20"><div class="text-cyan-400 text-xs font-bold uppercase mb-2">Confirmation Rate</div><div id="p-rate" class="text-4xl font-bold text-cyan-400">0%</div></div>
-                        <div class="stat-card text-center border-green-500/20"><div class="text-green-400 text-xs font-bold uppercase mb-2">Avg Call Time</div><div id="p-time" class="text-4xl font-bold text-green-400">0s</div></div>
-                    </div>
-                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-white">Recent Call History</h3>
-                            <button onclick="downloadShiftReport()" class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-cyan-500/30 flex items-center gap-2">
-                                <span class="iconify" data-icon="mdi:download"></span> Download Shift Report
-                            </button>
-                        </div>
-                        <div id="p-history" class="space-y-2 max-h-[500px] overflow-y-auto"></div>
-                    </div>
-                </div>
-
-                <!-- SETTINGS -->
-                <div id="panel-profile" class="tab-panel hidden">
-                    <div class="max-w-lg space-y-6">
-                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
-                            <h3 class="text-lg font-bold text-white mb-6">Profile Settings</h3>
-                            <div class="space-y-4">
-                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Agent Name</label><input type="text" id="set-name" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
-                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Email (Locked)</label><input type="email" id="set-email" disabled class="w-full mt-1 bg-white/[0.02] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-slate-500 cursor-not-allowed"></div>
-                                <button onclick="saveProfile()" class="bg-cyan-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-cyan-400">Save Profile</button>
-                            </div>
-                        </div>
-                        <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
-                            <h3 class="text-lg font-bold text-white mb-6">Change Password</h3>
-                            <form id="pw-form" class="space-y-4">
-                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Current Password</label><input type="password" id="pw-current" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
-                                <div><label class="text-xs font-semibold text-slate-400 uppercase">New Password</label><input type="password" id="pw-new" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
-                                <div><label class="text-xs font-semibold text-slate-400 uppercase">Confirm New Password</label><input type="password" id="pw-confirm" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
-                                <button type="submit" class="bg-red-500/20 text-red-400 border border-red-500/30 font-semibold px-6 py-3 rounded-xl hover:bg-red-500/30">Update Password</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </main>
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
-    </div>
-
-    <script>
-        var allOrders = [], allAgents = [], allMerchants = [], dashFilter = 'all', currentWsTab = 'new';
-        var myCallsPage = 1, myCallsPageSize = 20;
-        var COMMISSION_PER_CONFIRMATION = 500;
-        var timerInterval = null, timerSeconds = 0, activeTimerId = null;
-        var mediaRecorder = null, audioChunks = [];
-        var knownOrderIds = new Set(), audioCtx, isOnBreak = false;
-        var lastClaimAttempt = 0; // Timestamp of the last claim attempt    
-        var shipFilter = 'all';
-        const myId = function() { return window.currentUser.uid; };
-        const DAILY_TARGET = 20;
-
-        function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        function playDing() {
-            if(!audioCtx) return;
-            var o = audioCtx.createOscillator(); var g = audioCtx.createGain();
-            o.connect(g); g.connect(audioCtx.destination);
-            o.type = 'sine'; o.frequency.setValueAtTime(880, audioCtx.currentTime); o.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.1);
-            g.gain.setValueAtTime(0.3, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-            o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.4);
-        }
-
-        function toggleBreak() {
-            isOnBreak = !isOnBreak;
-            var btn = document.getElementById('break-btn'), dot = document.getElementById('break-dot'), txt = document.getElementById('break-text');
-            if(isOnBreak) {
-                btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-xs font-bold text-yellow-400 transition-all';
-                dot.className = 'w-2 h-2 rounded-full bg-yellow-400'; txt.textContent = 'On Break';
-            } else {
-                btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/30 text-xs font-bold text-green-400 transition-all';
-                dot.className = 'w-2 h-2 rounded-full bg-green-400'; txt.textContent = 'Online';
-            }
-            db.collection('users').doc(myId()).update({ agentStatus: isOnBreak ? 'break' : 'online' }).catch(function(){});
-        }
-
-        function showAuthLoader(text) {
-            var loader = document.getElementById('auth-loader');
-            if(!loader) return;
-            document.getElementById('auth-loader-text').innerText = text;
-            loader.classList.remove('hidden');
-            loader.classList.add('flex');
-        }
-
-        function hideAuthLoader() {
-            var loader = document.getElementById('auth-loader');
-            if(loader) { loader.classList.add('hidden'); loader.classList.remove('flex'); }
-        }
-
-        function onAppLoaded() {
+                     
+            function onAppLoaded() {
             hideAuthLoader();
             if (window.currentUser.role !== 'call_center') { showT("Access Denied.", "error"); auth.signOut(); return; }
             document.getElementById('header-name').textContent = window.currentUser.name || 'Agent';
@@ -354,39 +221,10 @@
                 allMerchants = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
             });
 
-                         db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
+            db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
                 allOrders = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
                 allOrders.forEach(function(o) { if(o.status === 'accepted' && !knownOrderIds.has(o.id)) playDing(); });
                 knownOrderIds = new Set(allOrders.map(function(o) { return o.id; }));
-                
-                // BACKGROUND AUTO-CLAIM with Timestamp Cooldown
-                var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
-                var unassignedExists = allOrders.some(function(o) { 
-                    return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo); 
-                });
-                var now = Date.now();
-                
-                if(currentWsTab === 'new' && myActive.length === 0 && unassignedExists && (now - lastClaimAttempt > 5000)) {
-                    lastClaimAttempt = now;
-                    claimNextOrder(); 
-                }
-
-                updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance(); renderMyCalls();
-            });
-                
-                // BACKGROUND AUTO-CLAIM with Timestamp Cooldown
-                var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
-                // Look for 'pending' OR 'accepted' orders that haven't been assigned to an agent yet
-                var unassignedExists = allOrders.some(function(o) { 
-                    return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo); 
-                });
-                var now = Date.now();
-                
-                if(currentWsTab === 'new' && myActive.length === 0 && unassignedExists && (now - lastClaimAttempt > 5000)) {
-                    lastClaimAttempt = now;
-                    claimNextOrder(); 
-                }
-
                 updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance(); renderMyCalls();
             });
         }
@@ -442,8 +280,7 @@
             renderAgentOfMonth();
         }
 
-                var wsPage = 1, wsPageSize = 10;
-        var claimRetryCount = 0, MAX_CLAIM_RETRIES = 10;
+        var wsPage = 1, wsPageSize = 10;
         
         function switchWs(tab) {
             currentWsTab = tab;
@@ -470,12 +307,11 @@
                 // PRIORITY 1: Always look for NEW orders assigned to me
                 list = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
                 
-                                // PRIORITY 2: Check for unassigned pending/accepted orders in the system.
+                 // PRIORITY 2: If I have NO active orders, check if there are ANY 'pending' orders in the system.
                 var pendingExists = allOrders.some(function(o) { return o.status === 'pending'; });
-                var unassignedPendingExists = allOrders.some(function(o) { return (o.status === 'pending' || o.status === 'accepted') && !o.ccAssignedTo; });
 
-                              // PRIORITY 3: ONLY if I have no active orders AND there are NO unassigned pending orders, pull 'no_answer' and DUE 'callback_requested'
-                if(list.length === 0 && !unassignedPendingExists) {
+                // PRIORITY 3: ONLY if I have no active orders AND there are NO pending orders, pull 'no_answer' and DUE 'callback_requested'
+                if(list.length === 0 && !pendingExists) {
                     var now = new Date();
                     list = allOrders.filter(function(o) { 
                         var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
@@ -495,9 +331,10 @@
                         return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0); // Oldest first
                     }).slice(0, 1); // Just get the oldest one to work on
                 }
+
                 if(!list.length) { 
                     c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>';
-                    if(unassignedPendingExists) claimNextOrder(); 
+                    if(!unassignedPendingExists) claimNextOrder(); 
                     return; 
                 }
             } else if(currentWsTab === 'retry') {
@@ -1151,69 +988,61 @@
             showT("Shift report downloaded!");
         }
 
-                       async function claimNextOrder() {
-            if (isClaiming || claimRetryCount >= MAX_CLAIM_RETRIES) return;
+                async function claimNextOrder() {
+            if (isClaiming) return;
             isClaiming = true;
             
             try {
                 // Look for 'pending' OR 'accepted' orders that haven't been assigned to an agent yet
-                // FIXED: orderBy at Firestore level + increased limit to avoid missing pending orders
-                const q = await db.collection('orders')
-                    .where('status', 'in', ['pending', 'accepted'])
-                    .orderBy('createdAt', 'asc')
-                    .limit(50)
-                    .get();
-                
+                const q = await db.collection('orders').where('status', 'in', ['pending', 'accepted']).limit(15).get();
                 let claimed = false;
                 
+                // Sort manually in JavaScript
+                const docs = q.docs.sort(function(a, b) {
+                    const aT = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
+                    const bT = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
+                    return aT - bT;
+                });
+                
                 // Loop through them to find one that isn't assigned to anyone yet
-                for (let i = 0; i < q.docs.length; i++) {
-                    const doc = q.docs[i];
+                for (let i = 0; i < docs.length; i++) {
+                    const doc = docs[i];
                     const orderData = doc.data();
                     
                     if (!orderData.ccAssignedTo) {
-                        let actuallyClaimed = false;
-                        
                         try {
+                            // Use a Firestore Transaction to safely claim the order
                             await db.runTransaction(async (transaction) => {
                                 const orderDoc = await transaction.get(doc.ref);
                                 if (!orderDoc.exists || orderDoc.data().ccAssignedTo || (orderDoc.data().status !== 'pending' && orderDoc.data().status !== 'accepted')) {
-                                    return;
+                                    return; // Someone else took it, skip
                                 }
                                 transaction.update(doc.ref, { 
                                     ccAssignedTo: myId(), 
-                                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                    status: 'accepted'
+                                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(), // Fixed timestamp
+                                    status: 'accepted' // Change status to accepted so it leaves the merchant pool
                                 });
-                                actuallyClaimed = true;
                             });
                             
-                            if (actuallyClaimed) {
-                                showT("New order assigned to you!", "success");
-                                claimed = true;
-                                claimRetryCount = 0;
-                                break;
-                            }
+                            showT("New order assigned to you!", "success");
+                            claimed = true;
+                            break; // Stop looking, we got one!
                         } catch (e) {
+                            // Log the error so we can see if Firebase is blocking it
                             console.error("Claim transaction failed: ", e);
                         }
                     }
                 }
                 
                 if (!claimed) {
-                    claimRetryCount++;
-                    var delay = Math.min(3000 * Math.pow(1.5, claimRetryCount), 30000);
-                    setTimeout(function() { isClaiming = false; claimNextOrder(); }, delay);
-                    return;
+                    // If we checked 15 orders and they were all taken, try again in 3 seconds
+                    setTimeout(function() { isClaiming = false; claimNextOrder(); }, 3000);
                 }
             } catch (err) {
                 console.error("Error querying for next order: ", err);
-                claimRetryCount++;
-                setTimeout(function() { isClaiming = false; claimNextOrder(); }, 5000);
-                return;
+            } finally {
+                isClaiming = false;
             }
-            
-            isClaiming = false;
         }
         function renderLeaderboard() {
             var c = document.getElementById('leaderboard-list');
