@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Call Center — ChapShop Delivery</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" fcontent="#020617">
+    <meta name="theme-color" content="#020617">
     <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEhaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,12 +168,11 @@
                             <input type="text" id="ws-search" oninput="renderWorkspace()" placeholder="Search by Order ID, Phone, or Name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50">
                         </div>
                         <button onclick="openCcCreateOrder()" class="bg-cyan-500 text-white font-semibold py-2.5 px-5 rounded-lg text-sm flex items-center gap-2 whitespace-nowrap w-full sm:w-auto justify-center"><span class="iconify" data-icon="mdi:plus-circle"></span> New Phone Order</button>
-                                            <div class="flex gap-2 bg-black/20 p-1.5 rounded-lg w-full sm:w-fit justify-center">
-                        <button onclick="switchWs('new')" class="ws-tab active" id="ws-tab-new">New</button>
-                        <button onclick="switchWs('retry')" class="ws-tab" id="ws-tab-retry">Retry</button>
-                        <button onclick="switchWs('scheduled')" class="ws-tab" id="ws-tab-scheduled">Scheduled</button>
-                    </div>
-                    <button onclick="forceClaim()" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold px-4 py-2 rounded-lg text-xs hover:bg-yellow-500/30 whitespace-nowrap">⚡ Force Claim Next</button>
+                        <div class="flex gap-2 bg-black/20 p-1.5 rounded-lg w-full sm:w-fit justify-center">
+                            <button onclick="switchWs('new')" class="ws-tab active" id="ws-tab-new">New</button>
+                            <button onclick="switchWs('retry')" class="ws-tab" id="ws-tab-retry">Retry</button>
+                            <button onclick="switchWs('scheduled')" class="ws-tab" id="ws-tab-scheduled">Scheduled</button>
+                        </div>
                     </div>
                     <div id="ws-content" class="space-y-4"></div>
                 </div>
@@ -295,7 +294,7 @@
         var timerInterval = null, timerSeconds = 0, activeTimerId = null;
         var mediaRecorder = null, audioChunks = [];
         var knownOrderIds = new Set(), audioCtx, isOnBreak = false;
-               var lastClaimAttempt = 0; // Timestamp of the last claim attempt
+        var isClaiming = false;
         var shipFilter = 'all';
         const myId = function() { return window.currentUser.uid; };
         const DAILY_TARGET = 20;
@@ -355,21 +354,10 @@
                 allMerchants = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
             });
 
-                       db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
+            db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
                 allOrders = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
                 allOrders.forEach(function(o) { if(o.status === 'accepted' && !knownOrderIds.has(o.id)) playDing(); });
                 knownOrderIds = new Set(allOrders.map(function(o) { return o.id; }));
-                
-                 // BACKGROUND AUTO-CLAIM with Timestamp Cooldown: Immune to browser sleeping!
-                var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
-                var pendingExists = allOrders.some(function(o) { return o.status === 'pending'; });
-                var now = Date.now();
-                
-                if(currentWsTab === 'new' && myActive.length === 0 && pendingExists && (now - lastClaimAttempt > 5000)) {
-                    lastClaimAttempt = now;
-                    claimNextOrder(); 
-                }
-
                 updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance(); renderMyCalls();
             });
         }
@@ -1132,41 +1120,57 @@
             var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'shift_report_' + new Date().toISOString().slice(0,10) + '.csv'; a.click();
             showT("Shift report downloaded!");
         }
-            
-        function forceClaim() {
-            lastClaimAttempt = 0; // Reset the timer
-            claimNextOrder(true); // Force it to ignore active orders
-        }
 
-                async function claimNextOrder(force) {
-            // We no longer need isClaiming, the timestamp handles the cooldown
+                async function claimNextOrder() {
+            if (isClaiming) return;
+            isClaiming = true;
+            
             try {
-                // Look for up to 20 pending orders
-                const q = await db.collection('orders').where('status', '==', 'pending').limit(20).get();
-                if (q.empty) return; // No pending orders, stop here
+                // Look for 'pending' OR 'accepted' orders that haven't been assigned to an agent yet
+                const q = await db.collection('orders').where('status', 'in', ['pending', 'accepted']).limit(15).get();
+                let claimed = false;
                 
-                // Sort manually in JavaScript to find the oldest one
+                // Sort manually in JavaScript
                 const docs = q.docs.sort(function(a, b) {
                     const aT = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
                     const bT = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
                     return aT - bT;
                 });
                 
-                // Try to claim the oldest one directly (simpler and more reliable than a transaction)
-                const doc = docs[0]; 
-                await db.collection('orders').doc(doc.id).update({
-                    ccAssignedTo: myId(), 
-                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'accepted'
-                });
+                // Loop through them to find one that isn't assigned to anyone yet
+                for (let i = 0; i < docs.length; i++) {
+                    const doc = docs[i];
+                    const orderData = doc.data();
+                    
+                    if (!orderData.ccAssignedTo) {
+                        try {
+                            // Use a Firestore Transaction to safely claim the order
+                            await db.runTransaction(async (transaction) => {
+                                const orderDoc = await transaction.get(doc.ref);
+                                if (!orderDoc.exists || orderDoc.data().ccAssignedTo || (orderDoc.data().status !== 'pending' && orderDoc.data().status !== 'accepted')) {
+                                    return; // Someone else took it, skip
+                                }
+                                transaction.update(doc.ref, { 
+                                    ccAssignedTo: myId(), 
+                                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(), // Fixed timestamp
+                                    status: 'accepted' // Change status to accepted so it leaves the merchant pool
+                                });
+                            });
+                            
+                            showT("New order assigned to you!", "success");
+                            claimed = true;
+                            break; // Stop looking, we got one!
+                        } catch (e) {
+                            // Log the error so we can see if Firebase is blocking it
+                            console.error("Claim transaction failed: ", e);
+                        }
+                    }
+                }
                 
-                showT("New order assigned to you!", "success");
-                
-            } catch (err) {
-                // If it fails (maybe another agent took it), show a tiny error so we know
-                console.error("Error claiming order: ", err);
-            }
-        }
+                if (!claimed) {
+                    // If we checked 15 orders and they were all taken, try again in 3 seconds
+                    setTimeout(function() { isClaiming = false; claimNextOrder(); }, 3000);
+                }
             } catch (err) {
                 console.error("Error querying for next order: ", err);
             } finally {
