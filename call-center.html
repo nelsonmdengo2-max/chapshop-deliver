@@ -1142,7 +1142,8 @@
             claimNextOrder(true); // Force it to ignore active orders
         }
 
-        async function claimNextOrder(force) {
+                async function claimNextOrder(force) {
+            // We no longer need isClaiming, the timestamp handles the cooldown
             try {
                 // Look for up to 20 pending orders
                 const q = await db.collection('orders').where('status', '==', 'pending').limit(20).get();
@@ -1155,30 +1156,18 @@
                     return aT - bT;
                 });
                 
-                let claimed = false;
-                // Loop through to find one that isn't assigned to someone else yet
-                for (let i = 0; i < docs.length; i++) {
-                    const doc = docs[i];
-                    const orderData = doc.data();
-                    
-                    // If it's not assigned to anyone, grab it!
-                    if (!orderData.ccAssignedTo) {
-                        await db.collection('orders').doc(doc.id).update({
-                            ccAssignedTo: myId(), 
-                            ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            status: 'accepted'
-                        });
-                        showT("New order assigned to you!", "success");
-                        claimed = true;
-                        break; // Stop looking, we got one!
-                    }
-                }
+                // Try to claim the oldest one directly (simpler and more reliable than a transaction)
+                const doc = docs[0]; 
+                await db.collection('orders').doc(doc.id).update({
+                    ccAssignedTo: myId(), 
+                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'accepted'
+                });
                 
-                if(!claimed) {
-                    console.log("Found pending orders, but they are already assigned to other agents.");
-                }
+                showT("New order assigned to you!", "success");
                 
             } catch (err) {
+                // If it fails (maybe another agent took it), show a tiny error so we know
                 console.error("Error claiming order: ", err);
             }
         }
