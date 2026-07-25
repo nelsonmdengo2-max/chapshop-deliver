@@ -6,7 +6,7 @@
     <title>Call Center — ChapShop Delivery</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#020617">
-    <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEhaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
+    <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEwaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -38,6 +38,7 @@
 </head>
 <body class="bg-[#020617] text-white min-h-screen">
 
+    <!-- AUTH LOADER -->
     <div id="auth-loader" class="fixed inset-0 z-[9999] bg-[#020617] hidden flex flex-col items-center justify-center">
         <div class="relative w-16 h-16">
             <div class="absolute inset-0 border-4 border-cyan-500/20 rounded-full"></div>
@@ -46,12 +47,13 @@
         <p id="auth-loader-text" class="mt-5 text-slate-400 text-sm font-semibold tracking-wide pulse-text">Loading...</p>
     </div>
 
+    <!-- TOAST -->
     <div id="toast" class="toast bg-[#0f172a] border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
         <span id="toast-icon" class="iconify text-cyan-400 text-xl" data-icon="mdi:check-circle"></span>
         <span id="toast-msg" class="text-sm font-medium">Success</span>
     </div>
 
-    <!-- LOGIN -->
+    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="min-h-screen flex items-center justify-center">
         <div class="w-full max-w-md px-6">
             <div class="text-center mb-8">
@@ -68,9 +70,12 @@
         </div>
     </div>
 
-    <!-- APP -->
+    <!-- APP SCREEN -->
     <div id="app-screen" class="hidden min-h-screen lg:h-screen flex flex-col lg:flex-row lg:overflow-hidden">
-        
+
+        <!-- SIDEBAR OVERLAY (mobile) -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
         <!-- SIDEBAR -->
         <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
             <div class="p-6 border-b border-white/[0.08] flex-shrink-0">
@@ -83,7 +88,7 @@
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2">Main</div>
                 <button onclick="switchTab('dashboard')" class="sidebar-link active w-full text-left" id="nav-dashboard"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</button>
                 <button onclick="switchTab('workspace')" class="sidebar-link w-full text-left" id="nav-workspace"><span class="iconify text-lg" data-icon="mdi:phone-message-outline"></span> Workspace</button>
-                
+
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Tracking</div>
                 <button onclick="switchTab('mycalls')" class="sidebar-link w-full text-left" id="nav-mycalls"><span class="iconify text-lg" data-icon="mdi:phone-log"></span> My Handled Calls</button>
                 <button onclick="switchTab('shipping')" class="sidebar-link w-full text-left" id="nav-shipping"><span class="iconify text-lg" data-icon="mdi:truck-fast-outline"></span> Shipping Tracking</button>
@@ -115,11 +120,11 @@
                     <div class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs" id="header-avatar">A</div>
                     <span id="header-name" class="text-sm font-semibold text-white hidden sm:block">Agent</span>
                 </div>
-            </header> 
-            
+            </header>
+
             <div class="p-6 md:p-8 flex-1 overflow-y-auto min-h-0">
 
-                <!-- DASHBOARD -->
+                <!-- DASHBOARD PANEL -->
                 <div id="panel-dashboard" class="tab-panel">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <h2 class="text-xl font-bold text-white">Agent Dashboard</h2>
@@ -160,7 +165,7 @@
                     </div>
                 </div>
 
-                <!-- WORKSPACE -->
+                <!-- WORKSPACE PANEL -->
                 <div id="panel-workspace" class="tab-panel hidden">
                     <div class="mb-6 bg-white/[0.02] border border-white/[0.08] rounded-xl p-3 flex flex-col sm:flex-row gap-3 items-center">
                         <div class="relative flex-1 w-full">
@@ -177,8 +182,12 @@
                     <div id="ws-content" class="space-y-4"></div>
                 </div>
 
-                <!-- MY HANDLED CALLS -->
+                <!-- MY HANDLED CALLS PANEL -->
                 <div id="panel-mycalls" class="tab-panel hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                        <h2 class="text-xl font-bold text-white">My Handled Calls</h2>
+                        <button onclick="downloadShiftReport()" class="bg-cyan-500 text-white font-semibold py-2 px-4 rounded-lg text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:download"></span> Export CSV</button>
+                    </div>
                     <div class="mb-4 relative max-w-sm">
                         <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
                         <input type="text" id="mycalls-search" oninput="renderMyCalls()" placeholder="Search ID, phone, or name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50">
@@ -201,16 +210,227 @@
                             <tbody id="mycalls-table" class="divide-y divide-white/[0.05]"></tbody>
                         </table>
                     </div>
-                     
-            function onAppLoaded() {
+                    <div class="flex flex-col md:flex-row gap-3 mt-4 items-center justify-between text-xs text-slate-400">
+                        <div class="flex items-center gap-2">
+                            <span>Rows per page:</span>
+                            <select id="mycalls-page-size" onchange="changeMyCallsPageSize(this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-white focus:outline-none">
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div id="mycalls-pagination-info" class="text-slate-500">Showing 0 to 0 of 0</div>
+                        <div class="flex gap-2">
+                            <button id="mycalls-prev-btn" onclick="prevMyCallsPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed" disabled>Previous</button>
+                            <button id="mycalls-next-btn" onclick="nextMyCallsPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed" disabled>Next</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SHIPPING PANEL -->
+                <div id="panel-shipping" class="tab-panel hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                        <h2 class="text-xl font-bold text-white">Shipping Tracking</h2>
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="filterShipping('all')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">All</button>
+                            <button onclick="filterShipping('confirmed')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Confirmed</button>
+                            <button onclick="filterShipping('preparing')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Preparing</button>
+                            <button onclick="filterShipping('out_for_delivery')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Out for Delivery</button>
+                            <button onclick="filterShipping('delivered')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Delivered</button>
+                            <button onclick="filterShipping('returned')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Returned</button>
+                        </div>
+                    </div>
+                    <div class="mb-4 relative max-w-sm">
+                        <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
+                        <input type="text" id="ship-search" oninput="renderShipping()" placeholder="Search ID, phone, or name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50">
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
+                        <table class="w-full text-sm text-left min-w-[900px]">
+                            <thead class="text-xs text-slate-400 uppercase bg-white/[0.02]">
+                                <tr>
+                                    <th class="px-4 py-3">Order ID</th>
+                                    <th class="px-4 py-3">Merchant</th>
+                                    <th class="px-4 py-3">Customer</th>
+                                    <th class="px-4 py-3">Item</th>
+                                    <th class="px-4 py-3">Amount</th>
+                                    <th class="px-4 py-3">Agent</th>
+                                    <th class="px-4 py-3">Rider</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3">Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shipping-table" class="divide-y divide-white/[0.05]"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PERFORMANCE PANEL -->
+                <div id="panel-performance" class="tab-panel hidden">
+                    <h2 class="text-xl font-bold text-white mb-6">My Performance</h2>
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="stat-card"><div class="text-[10px] font-bold text-slate-500 uppercase mb-1">Total Calls</div><div id="p-total" class="text-2xl font-bold text-white">0</div></div>
+                        <div class="stat-card"><div class="text-[10px] font-bold text-cyan-400 uppercase mb-1">Confirm Rate</div><div id="p-rate" class="text-2xl font-bold text-white">0%</div></div>
+                        <div class="stat-card"><div class="text-[10px] font-bold text-green-400 uppercase mb-1">Avg Call Time</div><div id="p-time" class="text-2xl font-bold text-white">0s</div></div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6">
+                        <h3 class="font-bold text-white mb-4">Recent Call History</h3>
+                        <div id="p-history" class="space-y-2"></div>
+                    </div>
+                    <button onclick="downloadShiftReport()" class="mt-6 bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-cyan-400 flex items-center gap-2 text-sm"><span class="iconify" data-icon="mdi:download"></span> Download Shift Report</button>
+                </div>
+
+                <!-- PROFILE / SETTINGS PANEL -->
+                <div id="panel-profile" class="tab-panel hidden">
+                    <h2 class="text-xl font-bold text-white mb-6">Settings</h2>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 max-w-lg mb-6">
+                        <h3 class="font-bold text-white mb-4">Profile</h3>
+                        <form onsubmit="event.preventDefault(); saveProfile();" class="space-y-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Name</label><input type="text" id="set-name" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Email</label><input type="email" id="set-email" readonly class="w-full mt-1 bg-white/[0.03] border border-white/[0.05] rounded-xl px-4 py-3 text-sm text-slate-500 cursor-not-allowed"></div>
+                            <button type="submit" class="bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-cyan-400 text-sm">Save Profile</button>
+                        </form>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6 max-w-lg">
+                        <h3 class="font-bold text-white mb-4">Change Password</h3>
+                        <form id="pw-form" class="space-y-4">
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Current Password</label><input type="password" id="pw-current" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">New Password</label><input type="password" id="pw-new" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Confirm New Password</label><input type="password" id="pw-confirm" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50"></div>
+                            <button type="submit" class="bg-cyan-500 text-white font-semibold py-3 px-6 rounded-xl hover:bg-cyan-400 text-sm">Update Password</button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ===== GLOBAL VARIABLES =====
+        var allOrders = [], allMerchants = [], allAgents = [];
+        var knownOrderIds = new Set();
+        var isClaiming = false;
+        var activeTimerId = null, timerSeconds = 0, timerInterval = null;
+        var mediaRecorder = null, audioChunks = [];
+        var dashFilter = 'all';
+        var currentWsTab = 'new';
+        var shipFilter = 'all';
+        var myCallsPage = 1, myCallsPageSize = 20;
+        var wsPage = 1, wsPageSize = 10;
+        var claimRetryCount = 0, MAX_CLAIM_RETRIES = 10;
+        var COMMISSION_PER_CONFIRMATION = 500;
+        var DAILY_TARGET = 20;
+        var isOnBreak = false;
+        var audioCtx = null;
+
+        // ===== AUTH LOADER =====
+        function showAuthLoader(text) {
+            var el = document.getElementById('auth-loader');
+            if(el) el.classList.remove('hidden');
+            var txt = document.getElementById('auth-loader-text');
+            if(txt) txt.textContent = text || 'Loading...';
+        }
+        function hideAuthLoader() {
+            var el = document.getElementById('auth-loader');
+            if(el) el.classList.add('hidden');
+        }
+
+        // ===== AUDIO / DING =====
+        function initAudio() {
+            try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+        }
+        function playDing() {
+            if(!audioCtx) return;
+            try {
+                var osc = audioCtx.createOscillator();
+                var gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = 880;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 0.5);
+            } catch(e) {}
+        }
+
+        // ===== VIEW IMAGE =====
+        function viewImg(url) {
+            var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:600px"><img src="'+url+'" class="w-full rounded-xl"><button onclick="this.closest(\'.modal-overlay\').remove()" class="mt-4 w-full bg-white/[0.05] border border-white/[0.1] py-2 rounded-xl text-sm text-slate-400 hover:text-white">Close</button></div></div>';
+            document.body.insertAdjacentHTML('beforeend', h);
+        }
+
+        // ===== BREAK TOGGLE =====
+        function toggleBreak() {
+            isOnBreak = !isOnBreak;
+            var btn = document.getElementById('break-btn');
+            var dot = document.getElementById('break-dot');
+            var text = document.getElementById('break-text');
+            if(isOnBreak) {
+                btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-xs font-bold text-yellow-400 transition-all';
+                dot.className = 'w-2 h-2 rounded-full bg-yellow-400';
+                text.textContent = 'On Break';
+            } else {
+                btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/30 text-xs font-bold text-green-400 transition-all';
+                dot.className = 'w-2 h-2 rounded-full bg-green-400';
+                text.textContent = 'Online';
+            }
+        }
+
+        // ===== FORMAT DATE =====
+        function formatDate(ts) {
+            if(!ts) return '—';
+            var d = ts.toDate ? ts.toDate() : new Date(ts);
+            return d.toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) + ' ' + d.toLocaleTimeString('en-GB', {hour:'2-digit',minute:'2-digit'});
+        }
+
+        // ===== STATUS BADGE =====
+        function getStatusBadge(s) {
+            var map = {
+                'pending': '<span class="text-xs font-bold px-2 py-1 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">Pending</span>',
+                'accepted': '<span class="text-xs font-bold px-2 py-1 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">Accepted</span>',
+                'confirmed': '<span class="text-xs font-bold px-2 py-1 rounded bg-green-500/20 text-green-400 border border-green-500/30">Confirmed</span>',
+                'preparing': '<span class="text-xs font-bold px-2 py-1 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">Preparing</span>',
+                'out_for_delivery': '<span class="text-xs font-bold px-2 py-1 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">Out for Delivery</span>',
+                'delivered': '<span class="text-xs font-bold px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Delivered</span>',
+                'cancelled': '<span class="text-xs font-bold px-2 py-1 rounded bg-red-500/20 text-red-400 border border-red-500/30">Cancelled</span>',
+                'no_answer': '<span class="text-xs font-bold px-2 py-1 rounded bg-gray-500/20 text-gray-400 border border-gray-500/30">No Reply</span>',
+                'busy': '<span class="text-xs font-bold px-2 py-1 rounded bg-gray-500/20 text-gray-400 border border-gray-500/30">Busy</span>',
+                'wrong_number': '<span class="text-xs font-bold px-2 py-1 rounded bg-pink-500/20 text-pink-400 border border-pink-500/30">Wrong Number</span>',
+                'out_of_region': '<span class="text-xs font-bold px-2 py-1 rounded bg-slate-500/20 text-slate-400 border border-slate-500/30">Out of Region</span>',
+                'callback_requested': '<span class="text-xs font-bold px-2 py-1 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">Callback</span>',
+                'returned': '<span class="text-xs font-bold px-2 py-1 rounded bg-violet-500/20 text-violet-400 border border-violet-500/30">Returned</span>'
+            };
+            return map[s] || '<span class="text-xs font-bold px-2 py-1 rounded bg-white/[0.05] text-slate-400 border border-white/[0.1]">' + (s||'Unknown') + '</span>';
+        }
+
+        // ===== MY ID =====
+        function myId() { return window.currentUser ? window.currentUser.uid : ''; }
+
+        // ===== TOAST =====
+        function showT(msg, type) {
+            var t = document.getElementById('toast');
+            var icon = document.getElementById('toast-icon');
+            var m = document.getElementById('toast-msg');
+            m.textContent = msg;
+            if(type === 'error') { icon.setAttribute('data-icon', 'mdi:alert-circle'); icon.className = 'iconify text-red-400 text-xl'; t.className = t.className.replace('border-cyan-500/30', 'border-red-500/30'); }
+            else { icon.setAttribute('data-icon', 'mdi:check-circle'); icon.className = 'iconify text-cyan-400 text-xl'; t.className = t.className.replace('border-red-500/30', 'border-cyan-500/30'); }
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(function() { t.classList.remove('show'); }, 3000);
+        }
+
+        // ===== APP LOADED =====
+        function onAppLoaded() {
             hideAuthLoader();
-            if (window.currentUser.role !== 'call_center') { showT("Access Denied.", "error"); auth.signOut(); return; }
+            if (!window.currentUser || window.currentUser.role !== 'call_center') { showT("Access Denied.", "error"); if(window.auth) auth.signOut(); return; }
             document.getElementById('header-name').textContent = window.currentUser.name || 'Agent';
             document.getElementById('header-avatar').textContent = (window.currentUser.name || 'A').charAt(0).toUpperCase();
             document.getElementById('set-name').value = window.currentUser.name || '';
             document.getElementById('set-email').value = window.currentUser.email || '';
             initAudio();
-            
+
             db.collection('users').where('role', '==', 'call_center').onSnapshot(function(snap) {
                 allAgents = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
                 renderLeaderboard();
@@ -223,22 +443,35 @@
 
             db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
                 allOrders = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
+
+                // Reset retry counter when new unassigned orders appear
+                var hasNewUnassigned = allOrders.some(function(o) {
+                    return (o.status === 'pending' || o.status === 'accepted') && !o.ccAssignedTo;
+                });
+                if(hasNewUnassigned) claimRetryCount = 0;
+
                 allOrders.forEach(function(o) { if(o.status === 'accepted' && !knownOrderIds.has(o.id)) playDing(); });
                 knownOrderIds = new Set(allOrders.map(function(o) { return o.id; }));
                 updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance(); renderMyCalls();
             });
         }
 
-        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
-        function switchTab(t) { 
-            document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.add('hidden'); }); 
-            document.querySelectorAll('.sidebar-link').forEach(function(l) { l.classList.remove('active'); }); 
-            document.getElementById('panel-' + t).classList.remove('hidden'); 
-            document.getElementById('nav-' + t).classList.add('active'); 
-            if(window.innerWidth < 1024) toggleSidebar(); 
-            if(t === 'mycalls') renderMyCalls(); 
+        // ===== SIDEBAR / TABS =====
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-overlay').classList.toggle('hidden');
         }
 
+        function switchTab(t) {
+            document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.add('hidden'); });
+            document.querySelectorAll('.sidebar-link').forEach(function(l) { l.classList.remove('active'); });
+            document.getElementById('panel-' + t).classList.remove('hidden');
+            document.getElementById('nav-' + t).classList.add('active');
+            if(window.innerWidth < 1024) toggleSidebar();
+            if(t === 'mycalls') renderMyCalls();
+        }
+
+        // ===== DATE FILTER =====
         function getDateFilter(filter) {
             var now = new Date(); var s = null;
             if(filter === 'today') s = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -255,6 +488,7 @@
             updateDashboard();
         }
 
+        // ===== DASHBOARD =====
         function updateDashboard() {
             var start = getDateFilter(dashFilter);
             var my = allOrders.filter(function(o) { return o.processedBy === myId() && (!start || (o.updatedAt && o.updatedAt.toDate() >= start)); });
@@ -271,25 +505,24 @@
             var todayConfirmed = allOrders.filter(function(o) { return o.processedBy === myId() && o.callOutcome === 'confirmed' && o.updatedAt && o.updatedAt.toDate() >= todayStart; }).length;
             document.getElementById('target-text').textContent = todayConfirmed + '/' + DAILY_TARGET;
             document.getElementById('target-bar').style.width = Math.min(100, (todayConfirmed/DAILY_TARGET)*100) + '%';
-            
+
             var totalConfirmed = allOrders.filter(function(o) { return o.processedBy === myId() && o.status === 'confirmed'; }).length;
             var commission = totalConfirmed * COMMISSION_PER_CONFIRMATION;
             document.getElementById('cc-commission-text').textContent = 'TZS ' + commission.toLocaleString();
-            
-            renderLeaderboard(); 
+
+            renderLeaderboard();
             renderAgentOfMonth();
         }
 
-        var wsPage = 1, wsPageSize = 10;
-        
+        // ===== WORKSPACE =====
         function switchWs(tab) {
             currentWsTab = tab;
-            wsPage = 1; // Reset to page 1 when switching tabs
+            wsPage = 1;
             document.querySelectorAll('.ws-tab').forEach(function(t) { t.classList.remove('active'); });
             document.getElementById('ws-tab-' + tab).classList.add('active');
             renderWorkspace();
         }
-        
+
         function changeWsPageSize(size) { wsPageSize = parseInt(size); wsPage = 1; renderWorkspace(); }
         function nextWsPage() { wsPage++; renderWorkspace(); }
         function prevWsPage() { wsPage--; renderWorkspace(); }
@@ -304,22 +537,19 @@
             var list = [];
 
             if(currentWsTab === 'new') {
-                // PRIORITY 1: Always look for NEW orders assigned to me
+                // PRIORITY 1: Orders already assigned to me
                 list = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
-                
-                 // PRIORITY 2: If I have NO active orders, check if there are ANY 'pending' orders in the system.
-                var pendingExists = allOrders.some(function(o) { return o.status === 'pending'; });
 
-                // PRIORITY 3: ONLY if I have no active orders AND there are NO pending orders, pull 'no_answer' and DUE 'callback_requested'
-                if(list.length === 0 && !pendingExists) {
-                    var now = new Date();
-                    list = allOrders.filter(function(o) { 
+                // PRIORITY 2: Check for unassigned pending/accepted orders
+                var pendingExists = allOrders.some(function(o) { return o.status === 'pending'; });
+                var unassignedPendingExists = allOrders.some(function(o) { return (o.status === 'pending' || o.status === 'accepted') && !o.ccAssignedTo; });
+
+                // PRIORITY 3: If no assigned orders AND no unassigned pending orders, fall back to retry/callback
+                if(list.length === 0 && !unassignedPendingExists) {
+                    list = allOrders.filter(function(o) {
                         var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
                         if(!isMine) return false;
-                        
                         if(o.status === 'no_answer') return true;
-                        
-                        // STRICT DATE RULE: Only show scheduled callbacks if today is the scheduled day (or past it)
                         if(o.status === 'callback_requested' && o.scheduledDate) {
                             var schedDate = o.scheduledDate.toDate();
                             var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -327,16 +557,17 @@
                             if(schedMid <= todayMid) return true;
                         }
                         return false;
-                    }).sort(function(a, b) { 
-                        return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0); // Oldest first
-                    }).slice(0, 1); // Just get the oldest one to work on
+                    }).sort(function(a, b) {
+                        return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0);
+                    }).slice(0, 1);
                 }
 
-                if(!list.length) { 
+                if(!list.length) {
                     c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>';
-                    if(!unassignedPendingExists) claimNextOrder(); 
-                    return; 
+                    if(unassignedPendingExists) claimNextOrder();
+                    return;
                 }
+
             } else if(currentWsTab === 'retry') {
                 list = allOrders.filter(function(o) { return (o.processedBy === myId() || o.ccAssignedTo === myId()) && ((o.status === 'no_answer' || o.status === 'busy') || (o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() <= now)); });
                 if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No retry orders right now.</p>'; return; }
@@ -345,14 +576,13 @@
                 if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No scheduled callbacks.</p>'; return; }
             }
 
-                     if(search) {
+            if(search) {
                 list = list.filter(function(o) { return o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)); });
             }
 
             var totalWsOrders = list.length;
             if(totalWsOrders === 0) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No orders match your search.</p>'; return; }
 
-            // PAGINATION LOGIC
             var wsTotalPages = Math.ceil(totalWsOrders / wsPageSize);
             if(wsPage > wsTotalPages) wsPage = 1;
             if(wsPage < 1) wsPage = 1;
@@ -363,24 +593,22 @@
             c.innerHTML = paginatedWsList.map(function(o) {
                 var history = getCustomerHistory(o.customerPhone);
                 var histText = history.length > 1 ? '<div class="mt-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-300"><span class="iconify inline-block mr-1" data-icon="mdi:history"></span>Customer ordered ' + history.length + ' times.</div>' : '';
-                
+
                 var activeOrdersToday = allOrders.filter(function(x) { return x.customerPhone === o.customerPhone && ['accepted', 'confirmed'].includes(x.status) && x.createdAt && x.createdAt.toDate().toDateString() === new Date().toDateString(); }).length;
                 var dupAlert = activeOrdersToday > 1 ? '<div class="mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded-lg text-xs text-red-400 flex items-center gap-2"><span class="iconify" data-icon="mdi:alert-circle"></span> Warning: Customer has ' + activeOrdersToday + ' active orders today!</div>' : '';
-                
-                // FEATURE 1: CUSTOMER RISK PROFILE
-                var history = getCustomerHistory(o.customerPhone);
+
                 var badHistoryCount = history.filter(function(x) { return ['returned', 'no_answer', 'cancelled', 'wrong_number'].includes(x.status); }).length;
                 var riskAlert = '';
                 if(badHistoryCount >= 2) {
                     riskAlert = '<div class="mb-3 p-2 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-400 font-bold flex items-center gap-2"><span class="iconify text-lg" data-icon="mdi:alert-octagon"></span> ⚠️ HIGH RISK CUSTOMER: Has ' + badHistoryCount + ' past failed/cancelled orders. Confirm carefully!</div>';
                 }
-                
+
                 var waMsg = encodeURIComponent('Habari! Ninakupigia simu kutoka ChapShop Delivery kuhusu agizo lako la ' + (o.itemName || 'bidhaa yako') + '. Tafadhali niambie wakati upatikanapo.');
                 var cleanPhone = (o.customerPhone || '').replace(/[^0-9]/g, '');
-                
+
                 var html = '<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-5 hover:border-cyan-500/30 transition-colors">';
-                
-                              // FEATURE 4: CALL SCRIPT PROMPT (ONLY ON NEW TAB)
+
+                // Call Script (only on new tab)
                 if(currentWsTab === 'new') {
                     var benefit = o.productDesc ? o.productDesc : 'kutatua hitaji lako';
                     html += '<div class="bg-cyan-500/5 border border-cyan-500/10 rounded-xl p-3 mb-4 text-xs text-cyan-200/80 italic break-words whitespace-normal">';
@@ -388,24 +616,28 @@
                     html += '"Habari, jina langu ni ' + (window.currentUser.name || 'Agent') + ' napiga simu kutoka ChapShop Delivery. Je, ninaongea na ' + (o.customerName || '') + '? Umeagiza ' + (o.itemName || 'bidhaa') + ' ambayo itakusaidia ' + benefit + '. Kiasi cha kulipia ni TZS ' + Number(o.totalAmount || 0).toLocaleString() + '. Je, uko tayari kuipokea na kulipa pesa taslimu leo?"';
                     html += '</div>';
                 }
+
                 html += '<div class="flex flex-col md:flex-row justify-between gap-4 mb-4">';
                 html += '<div><div class="flex items-center gap-3 mb-1"><span class="font-mono text-cyan-400 font-bold">#' + o.id.slice(-6).toUpperCase() + '</span>' + getStatusBadge(o.status) + (o.scheduledDate ? '<span class="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">📅 ' + o.scheduledDate.toDate().toLocaleDateString() + '</span>' : '') + '<button onclick="openCcEditOrder(\'' + o.id + '\')" class="ml-auto text-xs text-yellow-400 hover:underline">Edit Details</button></div>';
                 html += '<div class="flex flex-wrap items-center gap-2 mb-2"><span class="text-xs font-bold text-cyan-300 bg-cyan-500/10 px-2 py-1 rounded">🏪 ' + (o.merchantName || 'Unknown') + '</span><span class="text-slate-500 text-xs">• ' + formatDate(o.createdAt) + '</span>';
-                // FEATURE 3: WhatsApp COD Verification Button
                 html += '<button type="button" onclick="sendWhatsAppVerification(\'' + o.id + '\')" class="ml-auto text-xs font-bold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded hover:bg-green-500/20">Send WA Verify</button>';
                 html += '</div></div>';
                 html += '<div class="text-right"><div class="text-lg font-bold text-white">TZS ' + Number(o.totalAmount).toLocaleString() + '</div><div class="text-xs text-slate-500">' + o.itemName + ' x' + o.qty + '</div></div>';
                 html += '</div>';
+
                 html += dupAlert + riskAlert;
+
                 html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-3 bg-black/20 rounded-xl"><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Customer</div><div class="text-white text-sm font-medium">' + o.customerName + '</div></div><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Phone</div><div class="flex items-center gap-2"><a href="tel:' + o.customerPhone + '" class="text-cyan-400 text-sm font-medium hover:underline">' + o.customerPhone + '</a><a href="https://wa.me/' + cleanPhone + '?text=' + waMsg + '" target="_blank" class="text-green-400 hover:text-green-300"><span class="iconify text-base" data-icon="mdi:whatsapp"></span></a></div></div><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Address</div><div class="text-slate-300 text-sm">' + (o.customerCity || 'N/A') + ', ' + (o.customerAddress || 'N/A') + '</div></div></div>';
-                               // RESTORED: PRODUCT IMAGE & DESCRIPTION BOX
+
+                // Product Image & Description
                 html += '<div class="flex gap-4 mb-4 p-3 bg-cyan-500/5 border border-cyan-500/10 rounded-xl items-start">';
                 html += (o.productImage ? '<div onclick="viewImg(\'' + o.productImage + '\')" class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 overflow-hidden border border-white/10 cursor-pointer hover:border-cyan-500/50 transition-all"><img src="' + o.productImage + '" class="w-full h-full object-cover"></div>' : '<div class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 flex items-center justify-center border border-white/10"><span class="iconify text-4xl text-slate-600" data-icon="mdi:package-variant"></span></div>');
                 html += '<div class="flex-1"><div class="text-[10px] text-cyan-400 uppercase font-bold mb-1">Product Ordered</div><div class="text-white text-sm font-bold">' + (o.itemName || o.productName || 'Unknown') + '</div><div class="text-xs text-slate-400 mt-1 line-clamp-2">' + (o.productDesc || 'No description provided.') + '</div></div>';
                 html += '</div>';
-                
+
                 html += histText;
-                                // Check if this order is the one currently being timed
+
+                // Timer button
                 var timerHtml = '';
                 if (o.id === activeTimerId) {
                     var m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
@@ -416,15 +648,19 @@
                 }
 
                 html += '<form class="space-y-3 pt-4 border-t border-white/[0.05]"><div class="flex flex-col sm:flex-row gap-3">'+timerHtml+'<select id="outcome-' + o.id + '" onchange="toggleSchedule(this.value, \'' + o.id + '\')" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white"><option value="" disabled selected>-- Select Outcome --</option><option value="confirmed">✅ Confirmed</option><option value="no_answer">📞 No Reply</option><option value="wrong_number">❌ Wrong Number</option><option value="out_of_region">🗺️ Out of Region</option><option value="cancelled">❌ Cancelled</option><option value="callback_requested">📅 Schedule Callback</option></select></div>';
+
                 html += '<div id="schedule-box-' + o.id + '" class="hidden bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl"><label class="text-xs font-bold text-indigo-400 uppercase">Callback Date & Time</label><input type="datetime-local" id="date-' + o.id + '" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white"></div>';
-                              // Quick Notes Buttons
+
+                // Quick Notes
                 html += '<div class="flex flex-wrap gap-2 mb-2">';
                 html += '<button type="button" onclick="addQuickNote(\''+o.id+'\', \'Order by mistake\')" class="quick-tag">Order by mistake</button>';
                 html += '<button type="button" onclick="addQuickNote(\''+o.id+'\', \'No need again\')" class="quick-tag">No need again</button>';
                 html += '<button type="button" onclick="addQuickNote(\''+o.id+'\', \'Customer will call back\')" class="quick-tag">Customer will call back</button>';
                 html += '<button type="button" onclick="addQuickNote(\''+o.id+'\', \'Wrong number\')" class="quick-tag">Wrong number</button>';
                 html += '</div>';
+
                 html += '<textarea id="notes-' + o.id + '" rows="2" placeholder="Add call notes here..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white resize-none">' + (o.callNotes || '') + '</textarea>';
+
                 html += '<div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:ml-auto">';
                 html += '<button type="button" onclick="handleDownsell(\'' + o.id + '\')" class="w-full sm:w-auto bg-purple-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-purple-400 flex items-center justify-center gap-2 text-sm cursor-pointer"><span class="iconify" data-icon="mdi:arrow-down-bold-circle-outline"></span> Downsell</button>';
                 html += '<button type="button" onclick="handleFormSubmit(\'' + o.id + '\', this)" class="w-full sm:w-auto bg-cyan-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-cyan-400 flex items-center justify-center gap-2 text-sm cursor-pointer"><span class="iconify" data-icon="mdi:check"></span> Update Order</button>';
@@ -432,240 +668,183 @@
                 html += '</form></div>';
                 return html;
             }).join('');
-            
-            // Add Pagination Footer if more than 1 page or if it's retry/scheduled tab
+
+            // Pagination footer
             if(currentWsTab !== 'new' || totalWsOrders > wsPageSize) {
-                c.innerHTML += `
-                <div class="flex flex-col md:flex-row gap-3 mt-6 items-center justify-between text-xs text-slate-400">
-                    <div class="flex items-center gap-2">
-                        <span>Rows per page:</span>
-                        <select id="ws-page-size" onchange="changeWsPageSize(this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-white focus:outline-none">
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                        </select>
-                    </div>
-                    <div class="text-slate-500">Showing ${wsStartIdx + 1} to ${Math.min(wsEndIdx, totalWsOrders)} of ${totalWsOrders}</div>
-                    <div class="flex gap-2">
-                        <button id="ws-prev-btn" onclick="prevWsPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed">Previous</button>
-                        <button id="ws-next-btn" onclick="nextWsPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed">Next</button>
-                    </div>
-                </div>`;
-                
+                c.innerHTML += '<div class="flex flex-col md:flex-row gap-3 mt-6 items-center justify-between text-xs text-slate-400"><div class="flex items-center gap-2"><span>Rows per page:</span><select id="ws-page-size" onchange="changeWsPageSize(this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-white focus:outline-none"><option value="10">10</option><option value="20">20</option><option value="50">50</option></select></div><div class="text-slate-500">Showing ' + (wsStartIdx + 1) + ' to ' + Math.min(wsEndIdx, totalWsOrders) + ' of ' + totalWsOrders + '</div><div class="flex gap-2"><button id="ws-prev-btn" onclick="prevWsPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed">Previous</button><button id="ws-next-btn" onclick="nextWsPage()" class="px-3 py-1 bg-white/[0.05] border border-white/[0.1] rounded-lg hover:bg-white/[0.1] disabled:opacity-30 disabled:cursor-not-allowed">Next</button></div></div>';
+
                 var wsPrevBtn = document.getElementById('ws-prev-btn');
                 var wsNextBtn = document.getElementById('ws-next-btn');
                 var wsSizeSelect = document.getElementById('ws-page-size');
-                
                 if(wsSizeSelect) wsSizeSelect.value = wsPageSize;
                 if(wsPrevBtn) wsPrevBtn.disabled = (wsPage === 1);
                 if(wsNextBtn) wsNextBtn.disabled = (wsPage >= wsTotalPages);
             }
         }
 
-               function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
-        
-        // DOWNSELL FUNCTION FOR CALL CENTER
+        function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
+
+        // ===== DOWNSELL =====
         function handleDownsell(orderId) {
             var o = allOrders.find(function(x){ return x.id === orderId; });
             if(!o) return;
-            
             var newPriceStr = prompt("DOWNSELL OFFER\nCustomer Current Total: TZS " + Number(o.totalAmount).toLocaleString() + "\n\nEnter NEW total amount to offer the customer:");
-            if(newPriceStr === null) return; // Agent clicked cancel
-            
+            if(newPriceStr === null) return;
             var newPrice = parseInt(newPriceStr);
             if(isNaN(newPrice) || newPrice <= 0) return showT("Invalid amount entered", "error");
-            
             if(confirm("Confirm downsell order to TZS " + newPrice.toLocaleString() + " and mark as CONFIRMED?")) {
                 db.collection('orders').doc(orderId).update({
                     totalAmount: newPrice,
-                    status: 'confirmed', 
+                    status: 'confirmed',
                     callOutcome: 'confirmed',
                     callNotes: 'Downsell accepted at TZS ' + newPrice,
                     processedBy: myId(),
                     processedByName: window.currentUser.name,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     timeline: firebase.firestore.FieldValue.arrayUnion({status: 'confirmed', at: new Date().toISOString(), by: window.currentUser.name, note: 'Downsell accepted at TZS ' + newPrice})
-                }).then(function(){
-                    showT("Downsell confirmed successfully!");
-                }).catch(function(e){ showT(e.message, "error"); });
+                }).then(function(){ showT("Downsell confirmed successfully!"); }).catch(function(e){ showT(e.message, "error"); });
             }
         }
 
         function addQuickNote(id, text) {
             var ta = document.getElementById('notes-'+id);
-            if(ta.value.trim() !== '') {
-                ta.value += ', ' + text; // Append if there is already text
-            } else {
-                ta.value = text; // Set text if empty
-            }
+            if(ta.value.trim() !== '') { ta.value += ', ' + text; } else { ta.value = text; }
         }
-        function addTag(el, text) { var ta = el.closest('form').querySelector('textarea'); if(ta.value.includes(text)) { ta.value = ta.value.replace(text+', ', ''); el.style.borderColor=''; el.style.color=''; } else { ta.value += text + ', '; el.style.borderColor='#06b6d4'; el.style.color='#22d3ee'; } }
 
-                async function startTimer(id) {
+        // ===== TIMER =====
+        async function startTimer(id) {
             if(timerInterval) { showT("Finish current call first", "error"); return; }
             activeTimerId = id; timerSeconds = 0;
-            
-            db.collection('orders').doc(id).update({ callAttempts: firebase.firestore.FieldValue.increment(1) }).catch(function(){});
-            
-            // INSTANTLY update local array so the 5-call rule works without waiting for sync
-            var localIdx = allOrders.findIndex(function(o) { return o.id === id; });
-            if(localIdx !== -1) {
-                allOrders[localIdx].callAttempts = (allOrders[localIdx].callAttempts || 0) + 1;
-            }
 
-            // 1. Request Microphone Access & Start Audio Recording
+            db.collection('orders').doc(id).update({ callAttempts: firebase.firestore.FieldValue.increment(1) }).catch(function(){});
+
+            var localIdx = allOrders.findIndex(function(o) { return o.id === id; });
+            if(localIdx !== -1) { allOrders[localIdx].callAttempts = (allOrders[localIdx].callAttempts || 0) + 1; }
+
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
                 audioChunks = [];
-                
-                mediaRecorder.ondataavailable = event => {
-                    if (event.data.size > 0) audioChunks.push(event.data);
-                };
-                
-                mediaRecorder.start(); // Start recording audio
+                mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
+                mediaRecorder.start();
             } catch(err) {
-                showT("Microphone access denied. Cannot record audio.", "error");
+                showT("Microphone access denied. Call timer started without recording.", "error");
                 console.error("Mic error:", err);
             }
 
-            // 2. Start the timer
-            timerInterval = setInterval(() => { 
-                timerSeconds++; 
-                const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0'); 
-                const s = (timerSeconds % 60).toString().padStart(2, '0'); 
+            timerInterval = setInterval(() => {
+                timerSeconds++;
+                const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+                const s = (timerSeconds % 60).toString().padStart(2, '0');
                 const disp = document.getElementById('timer-display-'+id);
-                if(disp) disp.textContent = `${m}:${s}`; 
+                if(disp) disp.textContent = m + ':' + s;
             }, 1000);
         }
-                     async function stopTimer() {
-            clearInterval(timerInterval); timerInterval = null; 
-            var duration = timerSeconds; 
-            timerSeconds = 0; 
-            var currentOrderId = activeTimerId; // Save ID before clearing
-            
-            // Stop recording and upload audio
+
+        async function stopTimer() {
+            clearInterval(timerInterval); timerInterval = null;
+            var duration = timerSeconds;
+            timerSeconds = 0;
+            var currentOrderId = activeTimerId;
+
             if (mediaRecorder && mediaRecorder.state !== 'inactive') {
                 mediaRecorder.stop();
                 mediaRecorder.stream.getTracks().forEach(track => track.stop());
-                
+
                 mediaRecorder.onstop = async () => {
                     if (currentOrderId && audioChunks.length > 0) {
                         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                         const storageRef = firebase.storage().ref('call_recordings/' + currentOrderId + '_' + Date.now() + '.webm');
-                        
                         try {
-                            showT("Uploading call recording...", "success");
+                            showT("Uploading call recording...");
                             const snapshot = await storageRef.put(audioBlob);
                             const downloadURL = await snapshot.ref.getDownloadURL();
-                            
-                            // Save BOTH Duration and Audio URL to Firestore
                             await db.collection('orders').doc(currentOrderId).update({
                                 callDuration: firebase.firestore.FieldValue.increment(duration),
                                 callRecordingUrl: downloadURL
                             });
-                            showT("Call time and audio saved!", "success");
+                            showT("Call time and audio saved!");
                         } catch(e) {
                             console.error("Upload error:", e);
                             showT("Failed to upload audio, but time was saved.", "error");
-                            // Still save duration if upload fails
-                            await db.collection('orders').doc(currentOrderId).update({
-                                callDuration: firebase.firestore.FieldValue.increment(duration)
-                            });
+                            await db.collection('orders').doc(currentOrderId).update({ callDuration: firebase.firestore.FieldValue.increment(duration) });
                         }
                     } else {
-                        // Fallback if no audio was recorded
-                        await db.collection('orders').doc(currentOrderId).update({
-                            callDuration: firebase.firestore.FieldValue.increment(duration)
-                        });
+                        if(currentOrderId) await db.collection('orders').doc(currentOrderId).update({ callDuration: firebase.firestore.FieldValue.increment(duration) });
                     }
                 };
             } else {
-                // Fallback if mic wasn't used
                 if(currentOrderId) {
-                    db.collection('orders').doc(currentOrderId).update({
-                        callDuration: firebase.firestore.FieldValue.increment(duration)
-                    }).catch(function(e){ console.error("Error saving duration:", e); });
+                    db.collection('orders').doc(currentOrderId).update({ callDuration: firebase.firestore.FieldValue.increment(duration) }).catch(function(e){ console.error("Error saving duration:", e); });
                 }
             }
-            
-            // Reset UI
+
             if(currentOrderId) {
                 var btn = document.getElementById('timer-btn-'+currentOrderId), label = document.getElementById('timer-label-'+currentOrderId), display = document.getElementById('timer-display-'+currentOrderId);
                 if(btn) { btn.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/30'); btn.classList.remove('bg-red-500/20', 'text-red-400', 'border-red-500/30'); label.textContent = 'Start Call'; }
                 if(display) { display.classList.add('hidden'); display.classList.remove('sm:flex'); }
             }
-            activeTimerId = null; 
+            activeTimerId = null;
             return duration;
         }
 
-        // FEATURE 3: WhatsApp COD Verification Link
+        // ===== WHATSAPP VERIFY =====
         function sendWhatsAppVerification(orderId) {
-            const o = allOrders.find(x => x.id === orderId);
+            var o = allOrders.find(function(x) { return x.id === orderId; });
             if(!o) return;
-            
-            const cleanPhone = (o.customerPhone || '').replace(/[^0-9]/g, '');
-            const waPhone = cleanPhone.startsWith('0') ? '255' + cleanPhone.substring(1) : cleanPhone;
-            
-            const msg = encodeURIComponent(`Hello ${o.customerName},\nPlease reply 'YES' to confirm your ChapShop order for ${o.itemName} (TZS ${o.totalAmount}).\nCash on Delivery.\nThank you!`);
-            
-            window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+            var cleanPhone = (o.customerPhone || '').replace(/[^0-9]/g, '');
+            var waPhone = cleanPhone.startsWith('0') ? '255' + cleanPhone.substring(1) : cleanPhone;
+            var msg = encodeURIComponent('Hello ' + (o.customerName || '') + ',\nPlease reply YES to confirm your ChapShop order for ' + (o.itemName || '') + ' (TZS ' + (o.totalAmount || 0) + ').\nCash on Delivery.\nThank you!');
+            window.open('https://wa.me/' + waPhone + '?text=' + msg, '_blank');
             showT("WhatsApp verification opened!");
         }
 
+        // ===== FORM SUBMIT =====
         function handleFormSubmit(id, btn) {
             try {
                 var outcome = document.getElementById('outcome-'+id).value;
                 var notes = document.getElementById('notes-'+id).value;
                 var dateVal = document.getElementById('date-'+id) ? document.getElementById('date-'+id).value : null;
-                
-                             if(!outcome) { showT("Select outcome", "error"); return; }
+
+                if(!outcome) { showT("Select outcome", "error"); return; }
                 if(outcome === 'callback_requested' && !dateVal) { showT("Pick a date", "error"); return; }
-                
-                // Stop timer if it's running (it will save the duration to DB automatically)
-                if(activeTimerId === id) {
-                    stopTimer();
-                }
-                
-                btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Updating...'; 
-                btn.disabled = true; 
-                
-                var updateData = { 
-                    status: outcome, 
-                    callOutcome: outcome, 
-                    callNotes: notes, 
-                    processedBy: myId(), 
-                    processedByName: window.currentUser.name, 
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
+
+                if(activeTimerId === id) { stopTimer(); }
+
+                btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Updating...';
+                btn.disabled = true;
+
+                var updateData = {
+                    status: outcome,
+                    callOutcome: outcome,
+                    callNotes: notes,
+                    processedBy: myId(),
+                    processedByName: window.currentUser.name,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    timeline: firebase.firestore.FieldValue.arrayUnion({ status: outcome, at: new Date().toISOString(), by: window.currentUser.name, note: notes })
                 };
 
-                updateData.timeline = firebase.firestore.FieldValue.arrayUnion({
-                    status: outcome,
-                    at: new Date().toISOString(),
-                    by: window.currentUser.name,
-                    note: notes
-                });
-
-                if(outcome === 'callback_requested' && dateVal) { 
-                    updateData.scheduledDate = firebase.firestore.Timestamp.fromDate(new Date(dateVal)); 
+                if(outcome === 'callback_requested' && dateVal) {
+                    updateData.scheduledDate = firebase.firestore.Timestamp.fromDate(new Date(dateVal));
                 }
-                
-                db.collection('orders').doc(id).update(updateData).then(function() { 
-                    showT("Order updated!"); 
-                    btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order'; 
-                    btn.disabled = false; 
-                }).catch(function(err) { 
-                    showT("Error: " + err.message, "error"); 
-                    btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order'; 
-                    btn.disabled = false; 
+
+                db.collection('orders').doc(id).update(updateData).then(function() {
+                    showT("Order updated!");
+                    btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order';
+                    btn.disabled = false;
+                }).catch(function(err) {
+                    showT("Error: " + err.message, "error");
+                    btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order';
+                    btn.disabled = false;
                 });
-            } catch(e) { 
-                showT("Error: " + e.message, "error"); 
-                btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order'; 
-                btn.disabled = false; 
+            } catch(e) {
+                showT("Error: " + e.message, "error");
+                btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order';
+                btn.disabled = false;
             }
         }
 
+        // ===== SHIPPING =====
         function filterShipping(f) {
             shipFilter = f;
             document.querySelectorAll('.ship-btn').forEach(function(b) { b.className = 'ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'; });
@@ -680,7 +859,7 @@
             if(shipFilter !== 'all') { shipped = shipped.filter(function(o) { return o.status === shipFilter; }); }
             if(search) { shipped = shipped.filter(function(o) { return o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)); }); }
             if(!shipped.length) { tb.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-8">No orders in this category.</td></tr>'; return; }
-            
+
             tb.innerHTML = shipped.map(function(o) {
                 return '<tr class="hover:bg-white/[0.02]">' +
                     '<td class="px-4 py-3 font-mono text-cyan-400 text-xs cursor-pointer hover:underline" onclick="viewShippingHistory(\'' + o.id + '\')">#' + o.id.slice(-6).toUpperCase() + '</td>' +
@@ -699,7 +878,6 @@
         function viewShippingHistory(id) {
             var o = allOrders.find(function(x) { return x.id === id; });
             if(!o) return;
-            
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
             h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Order History</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
             h += '<div class="space-y-4">';
@@ -709,18 +887,19 @@
             h += '<div class="flex justify-between"><span class="text-slate-400 text-sm">Item</span><span class="text-white text-sm font-medium">' + (o.itemName||'') + ' x' + (o.qty||1) + '</span></div>';
             h += '</div>';
             h += '<div class="text-xs font-bold text-slate-500 uppercase mb-3">Tracking Timeline</div>';
-            h += '<div class="space-y-0">'; 
+            h += '<div class="space-y-0">';
             if (o.timeline && o.timeline.length > 0) {
                 o.timeline.slice().reverse().forEach(function(t) {
                     h += '<div class="flex gap-4"><div class="flex flex-col items-center"><div class="w-3 h-3 rounded-full bg-cyan-400 mt-1.5 flex-shrink-0"></div><div class="w-px h-full bg-white/[0.05] mt-1"></div></div><div class="pb-5"><div class="text-slate-400 text-xs">' + formatDate(t.at) + '</div><div class="text-white font-semibold text-sm mt-0.5">' + (t.status || 'updated').replace(/_/g,' ').toUpperCase() + '</div>' + (t.by ? '<div class="text-orange-400 text-xs mt-0.5">By: ' + t.by + '</div>' : '') + (t.note ? '<div class="text-slate-500 italic text-xs mt-1">"' + t.note + '"</div>' : '') + '</div></div>';
                 });
             } else {
-                h += '<p class="text-slate-500 text-sm text-center py-4">No history recorded yet for this order.</p>';
+                h += '<p class="text-slate-500 text-sm text-center py-4">No history recorded yet.</p>';
             }
             h += '</div></div></div></div>';
             document.body.insertAdjacentHTML('beforeend', h);
         }
 
+        // ===== PERFORMANCE =====
         function renderPerformance() {
             var my = allOrders.filter(function(o) { return o.processedBy === myId(); });
             var confirmed = my.filter(function(o) { return o.status === 'confirmed'; }).length;
@@ -737,6 +916,7 @@
             c.innerHTML = recent.map(function(o) { return '<div class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl"><div class="flex items-center gap-3"><span class="font-mono text-cyan-400 text-xs">#' + o.id.slice(-6).toUpperCase() + '</span><span class="text-sm text-slate-300">' + o.customerName + '</span></div><div class="flex items-center gap-3"><span class="text-xs text-slate-500">' + (o.callDuration || 0) + 's</span>' + getStatusBadge(o.status) + '</div></div>'; }).join('');
         }
 
+        // ===== PROFILE =====
         async function saveProfile() { try { await db.collection('users').doc(myId()).update({ name: document.getElementById('set-name').value }); document.getElementById('header-name').textContent = document.getElementById('set-name').value; showT("Profile Saved!"); } catch(e) { showT(e.message, "error"); } }
 
         document.getElementById('pw-form').addEventListener('submit', async function(e) {
@@ -747,6 +927,7 @@
             try { await user.reauthenticateWithCredential(cred); await user.updatePassword(newPw); showT("Password updated!"); this.reset(); } catch(err) { showT("Current password is incorrect.", "error"); }
         });
 
+        // ===== CREATE ORDER =====
         function openCcCreateOrder() {
             var mOpts = allMerchants.length ? allMerchants.map(function(m){return '<option value="'+m.id+'" class="bg-slate-900">'+(m.shopName||m.name)+'</option>'}).join('') : '<option value="">No merchants found</option>';
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:600px">';
@@ -765,15 +946,15 @@
                 e.preventDefault();
                 var mid = document.getElementById('cc-merchant').value;
                 if(!mid) { showT("Please select a merchant", "error"); return; }
-                
+
                 db.collection('users').doc(mid).get().then(function(doc) {
                     var mObj = doc.exists ? doc.data() : {};
                     var qty = parseInt(document.getElementById('cc-qty').value)||1;
                     var price = parseInt(document.getElementById('cc-price').value)||0;
                     var total = parseInt(document.getElementById('cc-total').value)||0;
-                    
+
                     return db.collection('orders').add({
-                        merchantId: mid, 
+                        merchantId: mid,
                         merchantName: mObj.shopName || mObj.name || '',
                         customerName: document.getElementById('cc-cname').value,
                         customerPhone: document.getElementById('cc-cphone').value,
@@ -781,7 +962,7 @@
                         customerAddress: document.getElementById('cc-caddress').value,
                         itemName: document.getElementById('cc-item').value,
                         qty: qty, productPrice: price, totalAmount: total,
-                        status: 'accepted', 
+                        status: 'accepted',
                         ccAssignedTo: myId(),
                         processedBy: myId(), processedByName: window.currentUser.name,
                         createdAt: new Date(), updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -793,6 +974,7 @@
             });
         }
 
+        // ===== EDIT ORDER =====
         function openCcEditOrder(id) {
             var o = allOrders.find(function(x) { return x.id === id; });
             if(!o) return;
@@ -829,33 +1011,28 @@
             });
         }
 
+        // ===== MY CALLS =====
         function renderMyCalls() {
             var tb = document.getElementById('mycalls-table');
             var search = (document.getElementById('mycalls-search').value || '').toLowerCase();
-            
             var myHandled = allOrders.filter(function(o) { return o.processedBy === myId(); });
-            
-            if(search) {
-                myHandled = myHandled.filter(function(o) { return o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)); });
-            }
-            
+            if(search) { myHandled = myHandled.filter(function(o) { return o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)); }); }
             myHandled.sort(function(a,b) { return (b.updatedAt && b.updatedAt.seconds || 0) - (a.updatedAt && a.updatedAt.seconds || 0); });
-            
+
             var total = myHandled.length;
             var totalPages = Math.ceil(total / myCallsPageSize);
             if (myCallsPage > totalPages && totalPages > 0) myCallsPage = totalPages;
             if (myCallsPage < 1) myCallsPage = 1;
-
             var start = (myCallsPage - 1) * myCallsPageSize;
             var end = start + myCallsPageSize;
             var paginatedItems = myHandled.slice(start, end);
-            
-            if(!total) { 
-                tb.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-8">You have not handled any calls yet.</td></tr>'; 
+
+            if(!total) {
+                tb.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-8">You have not handled any calls yet.</td></tr>';
                 updateMyCallsPagination(0, 0, 0);
-                return; 
+                return;
             }
-            
+
             tb.innerHTML = paginatedItems.map(function(o) {
                 return '<tr class="hover:bg-white/[0.02]">' +
                     '<td class="px-4 py-3 font-mono text-cyan-400 text-xs">#' + o.id.slice(-6).toUpperCase() + '</td>' +
@@ -869,7 +1046,7 @@
                     '<td class="px-4 py-3 text-center"><div class="flex gap-1 justify-center"><button onclick="openCcEditOrder(\'' + o.id + '\')" class="bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-blue-500/30 cursor-pointer">Edit</button><button onclick="openEditCallStatus(\'' + o.id + '\')" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-yellow-500/30 cursor-pointer">Status</button></div></td>' +
                 '</tr>';
             }).join('');
-            
+
             var actualEnd = Math.min(end, total);
             updateMyCallsPagination(total, start + 1, actualEnd);
         }
@@ -896,6 +1073,7 @@
         function nextMyCallsPage() { myCallsPage++; renderMyCalls(); }
         function prevMyCallsPage() { myCallsPage--; renderMyCalls(); }
 
+        // ===== EDIT CALL STATUS =====
         function openEditCallStatus(id) {
             var o = allOrders.find(function(x) { return x.id === id; });
             if(!o) return;
@@ -930,9 +1108,7 @@
                 var status = document.getElementById('ecs-status').value;
                 var notes = document.getElementById('ecs-notes').value;
                 var dateVal = document.getElementById('ecs-date') ? document.getElementById('ecs-date').value : null;
-
                 if(status === 'callback_requested' && !dateVal) { showT("Please pick a date for the callback", "error"); return; }
-
                 var updateData = {
                     status: status,
                     callOutcome: status,
@@ -942,9 +1118,7 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     timeline: firebase.firestore.FieldValue.arrayUnion({ status: status, at: new Date().toISOString(), by: window.currentUser.name, note: notes })
                 };
-
                 if(status === 'callback_requested' && dateVal) { updateData.scheduledDate = firebase.firestore.Timestamp.fromDate(new Date(dateVal)); }
-
                 db.collection('orders').doc(id).update(updateData).then(function(){
                     showT("Order status updated!");
                     document.querySelector('.modal-overlay').remove();
@@ -957,25 +1131,7 @@
             if(box) { if(val === 'callback_requested') { box.classList.remove('hidden'); } else { box.classList.add('hidden'); } }
         }
 
-        // ===== BULLETPROOF AUTH LOADER LOGIC =====
-        document.addEventListener('DOMContentLoaded', function() {
-            var loginForm = document.querySelector('#login-screen form');
-            if(loginForm) { loginForm.addEventListener('submit', function(e) { showAuthLoader('Signing in...'); }); }
-        });
-
-        document.addEventListener('click', function(e) {
-            var btn = e.target.closest('[onclick*="handleLogout"]');
-            if(btn) { showAuthLoader('Logging out...'); }
-        });
-
-        firebase.auth().onAuthStateChanged(function(user) { hideAuthLoader(); });
-
-        var toastEl = document.getElementById('toast');
-        if(toastEl) {
-            var observer = new MutationObserver(function() { if (toastEl.classList.contains('show')) { hideAuthLoader(); } });
-            observer.observe(toastEl, { attributes: true });
-        }
-
+        // ===== SHIFT REPORT =====
         function downloadShiftReport() {
             var myHandled = allOrders.filter(function(o) { return o.processedBy === myId(); });
             if(!myHandled.length) return showT("No calls to export", "error");
@@ -988,62 +1144,70 @@
             showT("Shift report downloaded!");
         }
 
-                async function claimNextOrder() {
-            if (isClaiming) return;
+        // ===== CLAIM NEXT ORDER (FIXED) =====
+        async function claimNextOrder() {
+            if (isClaiming || claimRetryCount >= MAX_CLAIM_RETRIES) return;
             isClaiming = true;
-            
+
             try {
-                // Look for 'pending' OR 'accepted' orders that haven't been assigned to an agent yet
-                const q = await db.collection('orders').where('status', 'in', ['pending', 'accepted']).limit(15).get();
+                const q = await db.collection('orders')
+                    .where('status', 'in', ['pending', 'accepted'])
+                    .orderBy('createdAt', 'asc')
+                    .limit(50)
+                    .get();
+
                 let claimed = false;
-                
-                // Sort manually in JavaScript
-                const docs = q.docs.sort(function(a, b) {
-                    const aT = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
-                    const bT = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
-                    return aT - bT;
-                });
-                
-                // Loop through them to find one that isn't assigned to anyone yet
-                for (let i = 0; i < docs.length; i++) {
-                    const doc = docs[i];
+
+                for (let i = 0; i < q.docs.length; i++) {
+                    const doc = q.docs[i];
                     const orderData = doc.data();
-                    
+
                     if (!orderData.ccAssignedTo) {
+                        let actuallyClaimed = false;
+
                         try {
-                            // Use a Firestore Transaction to safely claim the order
                             await db.runTransaction(async (transaction) => {
                                 const orderDoc = await transaction.get(doc.ref);
                                 if (!orderDoc.exists || orderDoc.data().ccAssignedTo || (orderDoc.data().status !== 'pending' && orderDoc.data().status !== 'accepted')) {
-                                    return; // Someone else took it, skip
+                                    return;
                                 }
-                                transaction.update(doc.ref, { 
-                                    ccAssignedTo: myId(), 
-                                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(), // Fixed timestamp
-                                    status: 'accepted' // Change status to accepted so it leaves the merchant pool
+                                transaction.update(doc.ref, {
+                                    ccAssignedTo: myId(),
+                                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                    status: 'accepted'
                                 });
+                                actuallyClaimed = true;
                             });
-                            
-                            showT("New order assigned to you!", "success");
-                            claimed = true;
-                            break; // Stop looking, we got one!
+
+                            if (actuallyClaimed) {
+                                showT("New order assigned to you!", "success");
+                                claimed = true;
+                                claimRetryCount = 0;
+                                break;
+                            }
                         } catch (e) {
-                            // Log the error so we can see if Firebase is blocking it
                             console.error("Claim transaction failed: ", e);
                         }
                     }
                 }
-                
+
                 if (!claimed) {
-                    // If we checked 15 orders and they were all taken, try again in 3 seconds
-                    setTimeout(function() { isClaiming = false; claimNextOrder(); }, 3000);
+                    claimRetryCount++;
+                    var delay = Math.min(3000 * Math.pow(1.5, claimRetryCount), 30000);
+                    setTimeout(function() { isClaiming = false; claimNextOrder(); }, delay);
+                    return;
                 }
             } catch (err) {
                 console.error("Error querying for next order: ", err);
-            } finally {
-                isClaiming = false;
+                claimRetryCount++;
+                setTimeout(function() { isClaiming = false; claimNextOrder(); }, 5000);
+                return;
             }
+
+            isClaiming = false;
         }
+
+        // ===== LEADERBOARD =====
         function renderLeaderboard() {
             var c = document.getElementById('leaderboard-list');
             if(!c) return;
@@ -1061,11 +1225,12 @@
             });
             if(currentAgentRank > 5) {
                 var myData = sorted.find(function(a) { return a.id === myId(); });
-                html += '<div class="flex items-center justify-between p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 mt-2 border-dashed"><div class="flex items-center gap-3"><span class="text-lg font-bold w-6 text-center text-slate-500">' + currentAgentRank + '</span><span class="text-sm font-medium text-cyan-400">' + myData.name + ' (You)</span></div><span class="text-sm font-bold text-cyan-400">' + myData.count + ' Confirmed</span></div>';
+                if(myData) html += '<div class="flex items-center justify-between p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 mt-2 border-dashed"><div class="flex items-center gap-3"><span class="text-lg font-bold w-6 text-center text-slate-500">' + currentAgentRank + '</span><span class="text-sm font-medium text-cyan-400">' + myData.name + ' (You)</span></div><span class="text-sm font-bold text-cyan-400">' + myData.count + ' Confirmed</span></div>';
             }
             c.innerHTML = html || '<p class="text-slate-500 text-sm">No data yet.</p>';
         }
 
+        // ===== AGENT OF MONTH =====
         function renderAgentOfMonth() {
             var c = document.getElementById('aom-card');
             if(!c) return;
@@ -1084,10 +1249,10 @@
             var ranked = Object.values(stats).map(function(s) {
                 var confRate = s.processed > 0 ? Math.round((s.confirmed / s.processed) * 100) : 0;
                 var delRate = s.confirmed > 0 ? Math.round((s.delivered / s.confirmed) * 100) : 0;
-                var score = (s.delivered * 1000) + (delRate * 10) + confRate; 
+                var score = (s.delivered * 1000) + (delRate * 10) + confRate;
                 return Object.assign(s, { confRate: confRate, delRate: delRate, score: score });
             }).sort(function(a, b) { return b.score - a.score; });
-            
+
             var winner = ranked[0];
             var isMe = winner && winner.id === myId();
             if (!winner || winner.processed === 0) {
@@ -1095,6 +1260,25 @@
                 return;
             }
             c.innerHTML = '<div class="flex flex-col md:flex-row items-center justify-between gap-4"><div class="flex items-center gap-4"><span class="text-4xl">👑</span><div><div class="text-[10px] text-yellow-400 uppercase font-bold tracking-wider">Top Call Center Agent - ' + now.toLocaleString('default', { month: 'long' }) + '</div><div class="text-xl font-extrabold text-yellow-400">' + winner.name + ' ' + (isMe ? '(You!) 🎉' : '') + '</div></div></div><div class="grid grid-cols-3 gap-6 text-center w-full md:w-auto"><div><div class="text-lg font-extrabold text-green-400">' + winner.delivered + '</div><div class="text-[10px] text-slate-500 uppercase">Delivered</div></div><div><div class="text-lg font-extrabold text-cyan-400">' + winner.confRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Confirm Rate</div></div><div><div class="text-lg font-extrabold text-violet-400">' + winner.delRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Delivery Rate</div></div></div></div>';
+        }
+
+        // ===== AUTH EVENTS =====
+        document.addEventListener('DOMContentLoaded', function() {
+            var loginForm = document.querySelector('#login-screen form');
+            if(loginForm) { loginForm.addEventListener('submit', function(e) { showAuthLoader('Signing in...'); }); }
+        });
+
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('[onclick*="handleLogout"]');
+            if(btn) { showAuthLoader('Logging out...'); }
+        });
+
+        firebase.auth().onAuthStateChanged(function(user) { hideAuthLoader(); });
+
+        var toastEl = document.getElementById('toast');
+        if(toastEl) {
+            var observer = new MutationObserver(function() { if (toastEl.classList.contains('show')) { hideAuthLoader(); } });
+            observer.observe(toastEl, { attributes: true });
         }
     </script>
     <script>
