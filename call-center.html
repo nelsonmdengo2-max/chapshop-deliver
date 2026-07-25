@@ -168,11 +168,12 @@
                             <input type="text" id="ws-search" oninput="renderWorkspace()" placeholder="Search by Order ID, Phone, or Name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50">
                         </div>
                         <button onclick="openCcCreateOrder()" class="bg-cyan-500 text-white font-semibold py-2.5 px-5 rounded-lg text-sm flex items-center gap-2 whitespace-nowrap w-full sm:w-auto justify-center"><span class="iconify" data-icon="mdi:plus-circle"></span> New Phone Order</button>
-                        <div class="flex gap-2 bg-black/20 p-1.5 rounded-lg w-full sm:w-fit justify-center">
-                            <button onclick="switchWs('new')" class="ws-tab active" id="ws-tab-new">New</button>
-                            <button onclick="switchWs('retry')" class="ws-tab" id="ws-tab-retry">Retry</button>
-                            <button onclick="switchWs('scheduled')" class="ws-tab" id="ws-tab-scheduled">Scheduled</button>
-                        </div>
+                                            <div class="flex gap-2 bg-black/20 p-1.5 rounded-lg w-full sm:w-fit justify-center">
+                        <button onclick="switchWs('new')" class="ws-tab active" id="ws-tab-new">New</button>
+                        <button onclick="switchWs('retry')" class="ws-tab" id="ws-tab-retry">Retry</button>
+                        <button onclick="switchWs('scheduled')" class="ws-tab" id="ws-tab-scheduled">Scheduled</button>
+                    </div>
+                    <button onclick="forceClaim()" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold px-4 py-2 rounded-lg text-xs hover:bg-yellow-500/30 whitespace-nowrap">⚡ Force Claim Next</button>
                     </div>
                     <div id="ws-content" class="space-y-4"></div>
                 </div>
@@ -1131,13 +1132,20 @@
             var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'shift_report_' + new Date().toISOString().slice(0,10) + '.csv'; a.click();
             showT("Shift report downloaded!");
         }
-        async function claimNextOrder() {
-            if (isClaiming) return;
-            isClaiming = true;
-            
+            function forceClaim() {
+            lastClaimAttempt = 0; // Reset the timer
+            claimNextOrder(true); // Force it to ignore active orders
+        }
+
+        function forceClaim() {
+            lastClaimAttempt = 0; // Reset the timer
+            claimNextOrder(true); // Force it to ignore active orders
+        }
+
+        async function claimNextOrder(force) {
             try {
-                // Look for the oldest 'pending' order
-                const q = await db.collection('orders').where('status', '==', 'pending').limit(15).get();
+                // Look for up to 20 pending orders
+                const q = await db.collection('orders').where('status', '==', 'pending').limit(20).get();
                 if (q.empty) return; // No pending orders, stop here
                 
                 // Sort manually in JavaScript to find the oldest one
@@ -1147,27 +1155,33 @@
                     return aT - bT;
                 });
                 
-                const doc = docs[0]; // Grab the very first (oldest) pending order
-                
-                try {
-                    // Use a Firestore Transaction to safely claim the order
-                    await db.runTransaction(async (transaction) => {
-                        const orderDoc = await transaction.get(doc.ref);
-                        // If it's no longer pending, someone else got it or status changed
-                        if (!orderDoc.exists || orderDoc.data().status !== 'pending') {
-                            return; 
-                        }
-                        transaction.update(doc.ref, { 
+                let claimed = false;
+                // Loop through to find one that isn't assigned to someone else yet
+                for (let i = 0; i < docs.length; i++) {
+                    const doc = docs[i];
+                    const orderData = doc.data();
+                    
+                    // If it's not assigned to anyone, grab it!
+                    if (!orderData.ccAssignedTo) {
+                        await db.collection('orders').doc(doc.id).update({
                             ccAssignedTo: myId(), 
                             ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            status: 'accepted' // Change status to accepted so it leaves the merchant pool
+                            status: 'accepted'
                         });
-                    });
-                    
-                    showT("New order assigned to you!", "success");
-                } catch (e) {
-                    console.error("Claim transaction failed: ", e);
+                        showT("New order assigned to you!", "success");
+                        claimed = true;
+                        break; // Stop looking, we got one!
+                    }
                 }
+                
+                if(!claimed) {
+                    console.log("Found pending orders, but they are already assigned to other agents.");
+                }
+                
+            } catch (err) {
+                console.error("Error claiming order: ", err);
+            }
+        }
             } catch (err) {
                 console.error("Error querying for next order: ", err);
             } finally {
