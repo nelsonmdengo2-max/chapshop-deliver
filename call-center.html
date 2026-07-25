@@ -442,7 +442,8 @@
             renderAgentOfMonth();
         }
 
-        var wsPage = 1, wsPageSize = 10;
+                var wsPage = 1, wsPageSize = 10;
+        var claimRetryCount = 0, MAX_CLAIM_RETRIES = 10;
         
         function switchWs(tab) {
             currentWsTab = tab;
@@ -469,11 +470,12 @@
                 // PRIORITY 1: Always look for NEW orders assigned to me
                 list = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
                 
-                 // PRIORITY 2: If I have NO active orders, check if there are ANY 'pending' orders in the system.
+                                // PRIORITY 2: Check for unassigned pending/accepted orders in the system.
                 var pendingExists = allOrders.some(function(o) { return o.status === 'pending'; });
+                var unassignedPendingExists = allOrders.some(function(o) { return (o.status === 'pending' || o.status === 'accepted') && !o.ccAssignedTo; });
 
-                // PRIORITY 3: ONLY if I have no active orders AND there are NO pending orders, pull 'no_answer' and DUE 'callback_requested'
-                if(list.length === 0 && !pendingExists) {
+                              // PRIORITY 3: ONLY if I have no active orders AND there are NO unassigned pending orders, pull 'no_answer' and DUE 'callback_requested'
+                if(list.length === 0 && !unassignedPendingExists) {
                     var now = new Date();
                     list = allOrders.filter(function(o) { 
                         var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
@@ -495,7 +497,7 @@
                 }
                 if(!list.length) { 
                     c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>';
-                    if(!unassignedPendingExists) claimNextOrder(); 
+                    if(unassignedPendingExists) claimNextOrder(); 
                     return; 
                 }
             } else if(currentWsTab === 'retry') {
@@ -1149,61 +1151,69 @@
             showT("Shift report downloaded!");
         }
 
-                async function claimNextOrder() {
-            if (isClaiming) return;
+                       async function claimNextOrder() {
+            if (isClaiming || claimRetryCount >= MAX_CLAIM_RETRIES) return;
             isClaiming = true;
             
             try {
                 // Look for 'pending' OR 'accepted' orders that haven't been assigned to an agent yet
-                const q = await db.collection('orders').where('status', 'in', ['pending', 'accepted']).limit(15).get();
+                // FIXED: orderBy at Firestore level + increased limit to avoid missing pending orders
+                const q = await db.collection('orders')
+                    .where('status', 'in', ['pending', 'accepted'])
+                    .orderBy('createdAt', 'asc')
+                    .limit(50)
+                    .get();
+                
                 let claimed = false;
                 
-                // Sort manually in JavaScript
-                const docs = q.docs.sort(function(a, b) {
-                    const aT = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
-                    const bT = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
-                    return aT - bT;
-                });
-                
                 // Loop through them to find one that isn't assigned to anyone yet
-                for (let i = 0; i < docs.length; i++) {
-                    const doc = docs[i];
+                for (let i = 0; i < q.docs.length; i++) {
+                    const doc = q.docs[i];
                     const orderData = doc.data();
                     
                     if (!orderData.ccAssignedTo) {
+                        let actuallyClaimed = false;
+                        
                         try {
-                            // Use a Firestore Transaction to safely claim the order
                             await db.runTransaction(async (transaction) => {
                                 const orderDoc = await transaction.get(doc.ref);
                                 if (!orderDoc.exists || orderDoc.data().ccAssignedTo || (orderDoc.data().status !== 'pending' && orderDoc.data().status !== 'accepted')) {
-                                    return; // Someone else took it, skip
+                                    return;
                                 }
                                 transaction.update(doc.ref, { 
                                     ccAssignedTo: myId(), 
-                                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(), // Fixed timestamp
-                                    status: 'accepted' // Change status to accepted so it leaves the merchant pool
+                                    ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                    status: 'accepted'
                                 });
+                                actuallyClaimed = true;
                             });
                             
-                            showT("New order assigned to you!", "success");
-                            claimed = true;
-                            break; // Stop looking, we got one!
+                            if (actuallyClaimed) {
+                                showT("New order assigned to you!", "success");
+                                claimed = true;
+                                claimRetryCount = 0;
+                                break;
+                            }
                         } catch (e) {
-                            // Log the error so we can see if Firebase is blocking it
                             console.error("Claim transaction failed: ", e);
                         }
                     }
                 }
                 
                 if (!claimed) {
-                    // If we checked 15 orders and they were all taken, try again in 3 seconds
-                    setTimeout(function() { isClaiming = false; claimNextOrder(); }, 3000);
+                    claimRetryCount++;
+                    var delay = Math.min(3000 * Math.pow(1.5, claimRetryCount), 30000);
+                    setTimeout(function() { isClaiming = false; claimNextOrder(); }, delay);
+                    return;
                 }
             } catch (err) {
                 console.error("Error querying for next order: ", err);
-            } finally {
-                isClaiming = false;
+                claimRetryCount++;
+                setTimeout(function() { isClaiming = false; claimNextOrder(); }, 5000);
+                return;
             }
+            
+            isClaiming = false;
         }
         function renderLeaderboard() {
             var c = document.getElementById('leaderboard-list');
