@@ -168,11 +168,12 @@
                             <input type="text" id="ws-search" oninput="renderWorkspace()" placeholder="Search by Order ID, Phone, or Name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50">
                         </div>
                         <button onclick="openCcCreateOrder()" class="bg-cyan-500 text-white font-semibold py-2.5 px-5 rounded-lg text-sm flex items-center gap-2 whitespace-nowrap w-full sm:w-auto justify-center"><span class="iconify" data-icon="mdi:plus-circle"></span> New Phone Order</button>
-                        <div class="flex gap-2 bg-black/20 p-1.5 rounded-lg w-full sm:w-fit justify-center">
-                            <button onclick="switchWs('new')" class="ws-tab active" id="ws-tab-new">New</button>
-                            <button onclick="switchWs('retry')" class="ws-tab" id="ws-tab-retry">Retry</button>
-                            <button onclick="switchWs('scheduled')" class="ws-tab" id="ws-tab-scheduled">Scheduled</button>
-                        </div>
+                                            <div class="flex gap-2 bg-black/20 p-1.5 rounded-lg w-full sm:w-fit justify-center">
+                        <button onclick="switchWs('new')" class="ws-tab active" id="ws-tab-new">New</button>
+                        <button onclick="switchWs('retry')" class="ws-tab" id="ws-tab-retry">Retry</button>
+                        <button onclick="switchWs('scheduled')" class="ws-tab" id="ws-tab-scheduled">Scheduled</button>
+                    </div>
+                    <button onclick="forceClaim()" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold px-4 py-2 rounded-lg text-xs hover:bg-yellow-500/30 whitespace-nowrap">⚡ Force Claim Next</button>
                     </div>
                     <div id="ws-content" class="space-y-4"></div>
                 </div>
