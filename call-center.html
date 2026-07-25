@@ -1132,11 +1132,7 @@
             var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'shift_report_' + new Date().toISOString().slice(0,10) + '.csv'; a.click();
             showT("Shift report downloaded!");
         }
-            function forceClaim() {
-            lastClaimAttempt = 0; // Reset the timer
-            claimNextOrder(true); // Force it to ignore active orders
-        }
-
+            
         function forceClaim() {
             lastClaimAttempt = 0; // Reset the timer
             claimNextOrder(true); // Force it to ignore active orders
