@@ -176,7 +176,6 @@
                     </div>
                     <div id="ws-content" class="space-y-4"></div>
                 </div>
-
                 <!-- MY HANDLED CALLS -->
                 <div id="panel-mycalls" class="tab-panel hidden">
                     <div class="mb-4 relative max-w-sm">
@@ -331,7 +330,6 @@
                         return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0); // Oldest first
                     }).slice(0, 1); // Just get the oldest one to work on
                 }
-
                 if(!list.length) { 
                     c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>';
                     if(!unassignedPendingExists) claimNextOrder(); 
@@ -490,8 +488,7 @@
                 }).catch(function(e){ showT(e.message, "error"); });
             }
         }
-
-        function addQuickNote(id, text) {
+function addQuickNote(id, text) {
             var ta = document.getElementById('notes-'+id);
             if(ta.value.trim() !== '') {
                 ta.value += ', ' + text; // Append if there is already text
@@ -611,9 +608,7 @@
             
             window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
             showT("WhatsApp verification opened!");
-        }
-
-        function handleFormSubmit(id, btn) {
+        } function handleFormSubmit(id, btn) {
             try {
                 var outcome = document.getElementById('outcome-'+id).value;
                 var notes = document.getElementById('notes-'+id).value;
@@ -791,9 +786,7 @@
                     document.querySelector('.modal-overlay').remove();
                 }).catch(function(err){ showT(err.message, "error"); });
             });
-        }
-
-        function openCcEditOrder(id) {
+        } function openCcEditOrder(id) {
             var o = allOrders.find(function(x) { return x.id === id; });
             if(!o) return;
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
@@ -933,8 +926,7 @@
 
                 if(status === 'callback_requested' && !dateVal) { showT("Please pick a date for the callback", "error"); return; }
 
-                var updateData = {
-                    status: status,
+                var updateData = { status: status,
                     callOutcome: status,
                     callNotes: notes,
                     processedBy: myId(),
