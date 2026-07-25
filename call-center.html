@@ -361,10 +361,13 @@
                 
                 // BACKGROUND AUTO-CLAIM with Timestamp Cooldown
                 var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
-                var pendingExists = allOrders.some(function(o) { return o.status === 'pending'; });
+                // Look for 'pending' OR 'accepted' orders that haven't been assigned to an agent yet
+                var unassignedExists = allOrders.some(function(o) { 
+                    return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo); 
+                });
                 var now = Date.now();
                 
-                if(currentWsTab === 'new' && myActive.length === 0 && pendingExists && (now - lastClaimAttempt > 5000)) {
+                if(currentWsTab === 'new' && myActive.length === 0 && unassignedExists && (now - lastClaimAttempt > 5000)) {
                     lastClaimAttempt = now;
                     claimNextOrder(); 
                 }
