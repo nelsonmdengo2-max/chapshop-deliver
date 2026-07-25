@@ -294,7 +294,7 @@
         var timerInterval = null, timerSeconds = 0, activeTimerId = null;
         var mediaRecorder = null, audioChunks = [];
         var knownOrderIds = new Set(), audioCtx, isOnBreak = false;
-        var isClaiming = false;
+               var lastClaimAttempt = 0; // Timestamp of the last claim attempt
         var shipFilter = 'all';
         const myId = function() { return window.currentUser.uid; };
         const DAILY_TARGET = 20;
@@ -359,11 +359,13 @@
                 allOrders.forEach(function(o) { if(o.status === 'accepted' && !knownOrderIds.has(o.id)) playDing(); });
                 knownOrderIds = new Set(allOrders.map(function(o) { return o.id; }));
                 
-                // BACKGROUND AUTO-CLAIM: If I have no active orders, and there are pending orders, claim one!
+                 // BACKGROUND AUTO-CLAIM with Timestamp Cooldown: Immune to browser sleeping!
                 var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
                 var pendingExists = allOrders.some(function(o) { return o.status === 'pending'; });
+                var now = Date.now();
                 
-                if(myActive.length === 0 && pendingExists) {
+                if(currentWsTab === 'new' && myActive.length === 0 && pendingExists && (now - lastClaimAttempt > 5000)) {
+                    lastClaimAttempt = now;
                     claimNextOrder(); 
                 }
 
