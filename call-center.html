@@ -293,8 +293,8 @@
         var COMMISSION_PER_CONFIRMATION = 500;
         var timerInterval = null, timerSeconds = 0, activeTimerId = null;
         var mediaRecorder = null, audioChunks = [];
-        var knownOrderIds = new Set(), audioCtx, isOnBreak = false;
-        var lastClaimAttempt = 0; // Timestamp of the last claim attempt       
+             var knownOrderIds = new Set(), audioCtx, isOnBreak = false;
+        var isClaiming = false;    
         var shipFilter = 'all';
         const myId = function() { return window.currentUser.uid; };
         const DAILY_TARGET = 20;
