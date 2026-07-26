@@ -519,6 +519,7 @@
         +'<div class="flex items-center gap-2 mb-1.5 flex-wrap">'
         +'<span class="font-mono text-cyan-400 font-bold text-sm">#'+o.id.slice(-6).toUpperCase()+'</span>'
         +getStatusBadge(o.status)
+        +(o.merchantPaid ? '<span class="badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">PAID</span>' : '')
         +'<span class="text-white font-semibold text-sm">'+escHtml(o.itemName)+' <span class="text-slate-500">×'+o.qty+'</span></span>'
         +'<span class="ml-auto text-white font-bold text-sm">TZS '+Number(o.totalAmount).toLocaleString()+'</span>'
         +'</div>'
