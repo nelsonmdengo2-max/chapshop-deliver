@@ -1274,7 +1274,7 @@ function lookupPhone(){var p=(document.getElementById('phone-lookup')||{}).value
                     '<td class="px-4 py-3 text-xs text-slate-400">' + (o.customerCity || 'N/A') + '</td>' +
                     '<td class="px-4 py-3 text-xs text-slate-300">' + (o.itemName || '') + ' <span class="text-slate-500">(' + (o.productSku || '') + ')</span></td>' +
                     '<td class="px-4 py-3 text-sm font-semibold">TZS ' + Number(o.totalAmount || 0).toLocaleString() + '</td>' +
-                    '<td class="px-4 py-3">' + getStatusBadge(o.status) + '</td>' +
+                    '<td class="px-4 py-3">' + getStatusBadge(o.status) + (o.merchantPaid ? ' <span class="badge bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">PAID</span>' : '') + '</td>' +
                     '<td class="px-4 py-3 text-xs text-orange-400 whitespace-nowrap">' + (o.processedByName || '—') + (o.callAttempts ? '<div class="text-slate-500 mt-1 flex items-center gap-1"><span class="iconify" data-icon="mdi:phone"></span> ' + o.callAttempts + ' calls</div>' : '') + (o.callDuration ? '<div class="text-slate-500 flex items-center gap-1"><span class="iconify" data-icon="mdi:timer-outline"></span> ' + fmtDur(o.callDuration) + '</div>' : '') + (o.callRecordingUrl ? '<div class="mt-1"><audio controls style="height: 30px; width: 180px;" src="' + o.callRecordingUrl + '"></audio></div>' : '') + '</td>' +
                     '<td class="px-4 py-3 text-xs text-slate-300 italic max-w-[200px] truncate" title="' + (o.callNotes || '') + '">' + (o.callNotes || '—') + '</td>' +
                     '<td class="px-4 py-3 text-xs text-violet-400 whitespace-nowrap">' + (o.riderName || '—') + '</td>' +
