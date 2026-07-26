@@ -888,51 +888,76 @@
     function prevPageOrders() { if(ordersCurrentPage > 1) { ordersCurrentPage--; renderOrders(); } }
 	
 	    // BATCH PRINT ALL PENDING LABELS
-    function batchPrintLabels(){
+        function batchPrintLabels(){
         var pending = allOrders.filter(function(o){return o.status==='confirmed';});
         if(!pending.length) return showT("No pending orders to print","error");
         
         var printWindow = window.open('','_blank');
-        var html = '<html><head><title>Batch Labels</title>';
+        var html = '<html><head><title>Batch Shipping Labels</title>';
         html += '<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script>';
         html += '<style>';
-        html += 'body{margin:0;padding:10px;font-family:Arial,sans-serif;color:#000;background:#fff}';
-        html += '.label{width:380px;border:2px solid #000;padding:15px;border-radius:8px;margin-bottom:15px;page-break-inside:avoid}';
-        html += '.logo{text-align:center;font-size:20px;font-weight:900;margin-bottom:8px;border-bottom:2px solid #000;padding-bottom:8px}';
-        html += '.row{display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px}';
-        html += '.row span:first-child{font-weight:bold;color:#555}';
-        html += '.sec{border-bottom:1px dashed #ccc;padding-bottom:8px;margin-bottom:8px}';
-        html += '.bc{text-align:center;margin-top:10px}';
-        html += '@media print{.label{border:1px solid #000;margin:0}}';
+        html += '@media print { body { margin: 0; } }';
+        html += 'body { font-family: "Plus Jakarta Sans", Arial, sans-serif; color: #111; background: #e2e8f0; padding: 20px; }';
+        html += '.label-container { width: 400px; margin: 0 auto 40px auto; background: #fff; border: 1px solid #cbd5e1; padding: 20px; box-sizing: border-box; box-shadow: 0 4px 6px rgba(0,0,0,0.1); page-break-inside: avoid; }';
+        html += '.header { text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 15px; margin-bottom: 15px; }';
+        html += '.header h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; }';
+        html += '.header p { margin: 4px 0 0; font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; }';
+        html += '.addresses { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 15px; }';
+        html += '.address-box { flex: 1; }';
+        html += '.address-box h3 { margin: 0 0 6px; font-size: 11px; background: #0f172a; color: #fff; padding: 4px 8px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }';
+        html += '.address-box p { margin: 2px 0; font-size: 13px; font-weight: 600; line-height: 1.4; color: #334155; }';
+        html += '.info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }';
+        html += '.info-table td { border: 1px solid #e2e8f0; padding: 8px; font-size: 12px; font-weight: 600; color: #334155; vertical-align: top; }';
+        html += '.info-table td.label { background: #f8fafc; font-weight: 800; text-transform: uppercase; font-size: 10px; color: #64748b; width: 25%; }';
+        html += '.agent-section { border: 1px dashed #94a3b8; padding: 10px; margin-bottom: 15px; border-radius: 6px; }';
+        html += '.agent-section div { font-size: 12px; margin-bottom: 4px; color: #334155; }';
+        html += '.agent-section strong { color: #0f172a; }';
+        html += '.barcode-container { text-align: center; margin-top: 15px; padding-top: 15px; border-top: 2px solid #0f172a; }';
+        html += '.actions { text-align: center; margin-top: 25px; margin-bottom: 50px; }';
+        html += '.btn { padding: 10px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 14px; margin: 0 5px; }';
+        html += '.btn-print { background: #06b6d4; color: #fff; }';
         html += '</style></head><body>';
         
+        html += '<div class="actions">';
+        html += '<button class="btn btn-print" onclick="window.print()">🖨️ Print All Labels</button>';
+        html += '</div>';
+        
         pending.forEach(function(o, idx){
-            var mapUrl = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent((o.customerAddress||'') + ', ' + (o.customerCity||''));
-            html += '<div class="label">';
-            html += '<div class="logo">CHAPSHOP DELIVERY</div>';
-            html += '<div class="sec">';
-            html += '<div class="row"><span>Order:</span><span style="font-family:monospace;font-weight:bold">#'+o.id.slice(-6).toUpperCase()+'</span></div>';
-            html += '<div class="row"><span>Merchant:</span><span>'+(escHtml(o.merchantName)||'N/A')+'</span></div>';
+            var shortId = o.id.slice(-6).toUpperCase();
+            
+            html += '<div class="label-container">';
+            // Header
+            html += '<div class="header"><h1>ChapShop Delivery</h1><p>Official Shipping Label</p></div>';
+            // Addresses
+            html += '<div class="addresses">';
+            html += '<div class="address-box"><h3>Shipped From</h3><p>' + escHtml(o.merchantName || 'ChapShop Merchant') + '</p><p>ChapShop Warehouse</p><p>Dar es Salaam, TZ</p></div>';
+            html += '<div class="address-box"><h3>Ship To</h3><p>' + escHtml(o.customerName || 'N/A') + '</p><p>' + escHtml(o.customerPhone || 'N/A') + '</p><p>' + escHtml(o.customerAddress || '') + ', ' + escHtml(o.customerCity || '') + '</p></div>';
             html += '</div>';
-            html += '<div class="sec">';
-            html += '<div class="row"><span>Customer:</span><span>'+escHtml(o.customerName)+'</span></div>';
-            html += '<div class="row"><span>Phone:</span><span>'+escHtml(o.customerPhone)+'</span></div>';
-            html += '<div class="row"><span>Address:</span><span style="text-align:right;width:65%">'+escHtml(o.customerAddress)+', '+escHtml(o.customerCity)+'</span></div>';
+            // Info Table
+            html += '<table class="info-table">';
+            html += '<tr><td class="label">Order No</td><td>#' + shortId + '</td><td class="label">Date</td><td>' + formatDate(o.createdAt) + '</td></tr>';
+            html += '<tr><td class="label">Payment</td><td>COD (Cash on Delivery)</td><td class="label">Qty</td><td>' + (o.qty || 1) + '</td></tr>';
+            html += '<tr><td class="label">Product</td><td colspan="3">' + escHtml(o.itemName || 'N/A') + '</td></tr>';
+            html += '<tr><td class="label">Total Amount</td><td colspan="3" style="font-size: 14px; color: #06b6d4;">TZS ' + Number(o.totalAmount || 0).toLocaleString() + '</td></tr>';
+            html += '</table>';
+            // Agent & Comments
+            html += '<div class="agent-section">';
+            html += '<div><strong>Call Center Agent:</strong> ' + escHtml(o.processedByName || 'Unassigned') + '</div>';
+            html += '<div><strong>Comments / Notes:</strong> ' + escHtml(o.callNotes || 'None') + '</div>';
             html += '</div>';
-            html += '<div class="sec">';
-            html += '<div class="row"><span>Item:</span><span>'+escHtml(o.itemName)+' (x'+o.qty+')</span></div>';
-            html += '<div class="row"><span>Amount:</span><span style="font-weight:bold">TZS '+Number(o.totalAmount).toLocaleString()+'</span></div>';
-            html += '</div>';
-            html += '<div class="bc"><svg id="bc'+idx+'"></svg></div>';
-            html += '</div>';
+            // Barcode
+            html += '<div class="barcode-container"><svg id="bc'+idx+'"></svg></div>';
+            html += '</div>'; // end label-container
         });
         
+        // Script for barcodes
         html += '<script>';
         pending.forEach(function(o, idx){
-            html += 'JsBarcode("#bc'+idx+'", "'+o.id.slice(-6).toUpperCase()+'", { format: "CODE128", displayValue: true, fontSize: 14, margin: 5, width: 1.5, height: 40 });';
+            var shortId = o.id.slice(-6).toUpperCase();
+            html += 'JsBarcode("#bc'+idx+'", "'+shortId+'", { format: "CODE128", displayValue: true, fontSize: 16, margin: 0, height: 50, width: 2 });';
         });
-        html += 'setTimeout(function(){window.print()},800);';
         html += '<\/script>';
+        
         html += '</body></html>';
         
         printWindow.document.write(html);
