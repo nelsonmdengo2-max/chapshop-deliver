@@ -1,0 +1,26 @@
+{
+  "name": "ChapShop Shipping Manager",
+  "short_name": "CS Shipping",
+  "description": "ChapShop Delivery Shipping & Fulfillment Dashboard",
+  "start_url": "shipping-dashboard.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#f97316",
+  "orientation": "any",
+  "categories": ["business"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iI2Y5NzMxNiIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEwaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==",
+      "sizes": "32x32",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
