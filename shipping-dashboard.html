@@ -340,7 +340,13 @@
 <script>
     function escHtml(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-    let allOrders=[],allRiders=[],allProducts=[],allMerchants=[],subStates={orders:'pending',shipments:'create',reports:'shipping'},groupByZone=false;
+       let allOrders=[], allProducts=[], allMerchants=[], subStates={orders:'pending',shipments:'create',reports:'shipping'}, groupByZone=false;
+    // We preload the 3 riders so they show up in the dropdowns instantly
+    let allRiders=[
+        { id: 'rider_sadick', name: 'Sadick' },
+        { id: 'rider_joseph', name: 'Joseph' },
+        { id: 'rider_kasiani', name: 'Kasiani' }
+    ];
     const myId=function(){return window.currentUser.uid;};
 
        var ridersInitialized = false; // Prevents infinite loop
@@ -372,8 +378,14 @@
         document.getElementById('set-name').value=window.currentUser.name||'';
         document.getElementById('set-email').value=window.currentUser.email||'';
         
-        db.collection('users').where('role','in',['shipping','shipping_manager']).where('active','==',true).onSnapshot(function(snap){
-            allRiders=snap.docs.map(function(d){return{id:d.id,...d.data()};});
+          db.collection('users').where('role','in',['shipping','shipping_manager']).where('active','==',true).onSnapshot(function(snap){
+            var dbRiders = snap.docs.map(function(d){return{id:d.id,...d.data()};});
+            // Merge DB riders with our default riders so they never disappear
+            dbRiders.forEach(function(r) {
+                if(!allRiders.some(function(d){ return d.id === r.id || d.name === r.name; })) {
+                    allRiders.push(r);
+                }
+            });
             ensureDefaultRiders(); 
             renderActivePanel(); // Only render what the user is looking at
         },function(err){console.error(err);});
