@@ -31,6 +31,8 @@
         .sidebar-scroll { -ms-overflow-style: none; scrollbar-width: none; }
         .modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;padding:1rem}
         .modal-box{background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:1rem;padding:1.5rem;width:100%;max-height:90vh;overflow-y:auto}
+        select option { background-color: #0f172a; color: #e2e8f0; }
+        input[type="date"], input[type="datetime-local"] { color-scheme: dark; }
     </style>
 </head>
 <body class="bg-[#020617] text-white min-h-screen">
@@ -341,6 +343,25 @@
     let allOrders=[],allRiders=[],allProducts=[],allMerchants=[],subStates={orders:'pending',shipments:'create',reports:'shipping'},groupByZone=false;
     const myId=function(){return window.currentUser.uid;};
 
+    async function ensureDefaultRiders() {
+        var defaultRiders = ['Sadick', 'Joseph', 'Kasiani'];
+        for (var i = 0; i < defaultRiders.length; i++) {
+            var name = defaultRiders[i];
+            var exists = allRiders.some(function(r) { return r.name && r.name.toLowerCase() === name.toLowerCase(); });
+            if (!exists) {
+                try {
+                    await db.collection('users').add({
+                        name: name,
+                        role: 'shipping',
+                        active: true,
+                        cashSettled: 0,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch(e) { console.error("Failed to create rider " + name, e); }
+            }
+        }
+    }
+
     function onAppLoaded(){
         if(window.currentUser.role!=='shipping'){showT("Access Denied.","error");auth.signOut();return;}
         document.getElementById('header-name').textContent=window.currentUser.name||'Shipping Dept';
@@ -348,7 +369,11 @@
         document.getElementById('set-name').value=window.currentUser.name||'';
         document.getElementById('set-email').value=window.currentUser.email||'';
         
-        db.collection('users').where('role','in',['shipping','shipping_manager']).where('active','==',true).onSnapshot(function(snap){allRiders=snap.docs.map(function(d){return{id:d.id,...d.data()};});renderAll();},function(err){console.error(err);});
+        db.collection('users').where('role','in',['shipping','shipping_manager']).where('active','==',true).onSnapshot(function(snap){
+            allRiders=snap.docs.map(function(d){return{id:d.id,...d.data()};});
+            ensureDefaultRiders(); // Creates Sadick, Joseph, Kasiani if missing
+            renderAll();
+        },function(err){console.error(err);});
         db.collection('users').where('role','==','merchant').where('active','==',true).onSnapshot(function(snap){allMerchants=snap.docs.map(function(d){return{id:d.id,...d.data()};});renderAll();},function(err){console.error(err);});
         db.collection('products').onSnapshot(function(snap){allProducts=snap.docs.map(function(d){return{id:d.id,...d.data()};});renderAll();},function(err){console.error(err);});
         db.collection('orders').orderBy('createdAt','desc').onSnapshot(function(snap){allOrders=snap.docs.map(function(d){return{id:d.id,...d.data()};});renderAll();},function(err){console.error(err);});
@@ -636,7 +661,7 @@
     function renderShipments(){
         var c=document.getElementById('shipments-content');if(!c)return;var s=subStates.shipments;
         if(s==='create'){var ac=allOrders.filter(function(o){return o.status==='out_for_delivery';}).length;var pc=allOrders.filter(function(o){return o.status==='confirmed';}).length;c.innerHTML='<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"><div class="stat-card border-cyan-500/20"><div class="text-xs text-cyan-400 font-bold uppercase mb-2">Pending Pickup</div><div class="text-3xl font-bold text-white">'+pc+'</div></div><div class="stat-card border-violet-500/20"><div class="text-xs text-violet-400 font-bold uppercase mb-2">In Transit</div><div class="text-3xl font-bold text-white">'+ac+'</div></div></div><div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-6"><h3 class="text-lg font-bold text-white mb-4">Create New Shipment</h3><p class="text-slate-400 text-sm mb-6">Manually create a shipping order.</p><button onclick="openShipCreateOrder()" class="bg-cyan-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-cyan-400 text-sm"><span class="iconify inline mr-1" data-icon="mdi:plus"></span> Create Order</button></div>';}
-        else if(s==='list'){var shipped=allOrders.filter(function(o){return['out_for_delivery','in_transit','arrived','preparing','printed'].indexOf(o.status)!==-1;});if(!shipped.length){c.innerHTML='<div class="text-center py-16"><p class="text-slate-500">No active shipments.</p></div>';return;}c.innerHTML='<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto"><table class="w-full text-sm text-left min-w-[900px]"><thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">Tracking #</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Phone</th><th class="px-4 py-3">Item</th><th class="px-4 py-3">Rider</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Date</th><th class="px-4 py-3 text-center">Action</th></tr></thead><tbody class="divide-y divide-white/[0.05]">'+shipped.map(function(o){return'<tr class="hover:bg-white/[0.02] text-xs"><td class="px-4 py-3 font-mono text-cyan-400 font-bold">#'+o.id.slice(-6).toUpperCase()+'</td><td class="px-4 py-3">'+escHtml(o.customerName)+'</td><td class="px-4 py-3 text-slate-400">'+escHtml(o.customerPhone)+'</td><td class="px-4 py-3">'+escHtml(o.itemName)+' x'+(o.qty||1)+'</td><td class="px-4 py-3 text-violet-400">'+(escHtml(o.riderName)||'—')+'</td><td class="px-4 py-3">'+getStatusBadge(o.status, o.merchantPaid)+'</td><td class="px-4 py-3 text-slate-500">'+formatDate(o.shippedAt||o.createdAt)+'</td><td class="px-4 py-3 text-center"><button onclick="printLabel(\''+o.id+'\')" class="text-cyan-400 hover:underline text-xs mr-2">Label</button><button onclick="printInvoice(\''+o.id+'\')" class="text-cyan-400 hover:underline text-xs">Invoice</button></td></tr>';}).join('')+'</tbody></table></div>';}
+        else if(s==='list'){var shipped=allOrders.filter(function(o){return['out_for_delivery','in_transit','arrived','preparing','printed'].indexOf(o.status)!==-1;});if(!shipped.length){c.innerHTML='<div class="text-center py-16"><p class="text-slate-500">No active shipments.</p></div>';return;}c.innerHTML='<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto"><table class="w-full text-sm text-left min-w-[1100px]"><thead class="text-xs text-slate-400 uppercase bg-white/[0.02]"><tr><th class="px-4 py-3">Tracking #</th><th class="px-4 py-3">Customer</th><th class="px-4 py-3">Phone</th><th class="px-4 py-3">Address</th><th class="px-4 py-3">Item</th><th class="px-4 py-3">Rider</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Date</th><th class="px-4 py-3 text-center">Action</th></tr></thead><tbody class="divide-y divide-white/[0.05]">'+shipped.map(function(o){return'<tr class="hover:bg-white/[0.02] text-xs"><td class="px-4 py-3 font-mono text-cyan-400 font-bold">#'+o.id.slice(-6).toUpperCase()+'</td><td class="px-4 py-3">'+escHtml(o.customerName)+'</td><td class="px-4 py-3 text-slate-400">'+escHtml(o.customerPhone)+'</td><td class="px-4 py-3 text-slate-300">'+escHtml(o.customerAddress)+', '+escHtml(o.customerCity)+'</td><td class="px-4 py-3">'+escHtml(o.itemName)+' x'+(o.qty||1)+'</td><td class="px-4 py-3 text-violet-400">'+(escHtml(o.riderName)||'—')+'</td><td class="px-4 py-3">'+getStatusBadge(o.status, o.merchantPaid)+'</td><td class="px-4 py-3 text-slate-500">'+formatDate(o.shippedAt||o.createdAt)+'</td><td class="px-4 py-3 text-center"><button onclick="printLabel(\''+o.id+'\')" class="text-cyan-400 hover:underline text-xs mr-2">Label</button><button onclick="printInvoice(\''+o.id+'\')" class="text-cyan-400 hover:underline text-xs">Invoice</button></td></tr>';}).join('')+'</tbody></table></div>';}
     }
 
        function renderReturns(){
