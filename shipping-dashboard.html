@@ -343,7 +343,10 @@
     let allOrders=[],allRiders=[],allProducts=[],allMerchants=[],subStates={orders:'pending',shipments:'create',reports:'shipping'},groupByZone=false;
     const myId=function(){return window.currentUser.uid;};
 
+       var ridersInitialized = false; // Prevents infinite loop
     async function ensureDefaultRiders() {
+        if(ridersInitialized) return;
+        ridersInitialized = true;
         var defaultRiders = ['Sadick', 'Joseph', 'Kasiani'];
         for (var i = 0; i < defaultRiders.length; i++) {
             var name = defaultRiders[i];
@@ -371,38 +374,45 @@
         
         db.collection('users').where('role','in',['shipping','shipping_manager']).where('active','==',true).onSnapshot(function(snap){
             allRiders=snap.docs.map(function(d){return{id:d.id,...d.data()};});
-            ensureDefaultRiders(); // Creates Sadick, Joseph, Kasiani if missing
-            renderAll();
+            ensureDefaultRiders(); 
+            renderActivePanel(); // Only render what the user is looking at
         },function(err){console.error(err);});
         db.collection('users').where('role','==','merchant').where('active','==',true).onSnapshot(function(snap){allMerchants=snap.docs.map(function(d){return{id:d.id,...d.data()};});renderAll();},function(err){console.error(err);});
         db.collection('products').onSnapshot(function(snap){allProducts=snap.docs.map(function(d){return{id:d.id,...d.data()};});renderAll();},function(err){console.error(err);});
         db.collection('orders').orderBy('createdAt','desc').onSnapshot(function(snap){allOrders=snap.docs.map(function(d){return{id:d.id,...d.data()};});renderAll();},function(err){console.error(err);});
     }
 
-    function renderAll(){
-        try{updateDashboard();}catch(e){}
-        try{renderOrders();}catch(e){}
-        try{renderShipments();}catch(e){}
-        try{renderReturns();}catch(e){}
-        try{renderReports();}catch(e){}
-        try{renderCash();}catch(e){}
-        try{renderWarehouse();}catch(e){}
-        try{renderInvoices();}catch(e){}
+       let currentTab = 'dashboard';
+    function renderActivePanel() {
+        // Update notifications badge always
         try{renderNotifications();}catch(e){}
-        try{renderCharts();}catch(e){}
+        
+        // Only render the panel the user is currently looking at (stops screen shaking)
+        if(currentTab === 'dashboard') { try{updateDashboard(); renderCharts();}catch(e){} }
+        else if(currentTab === 'orders') { try{renderOrders();}catch(e){} }
+        else if(currentTab === 'shipments') { try{renderShipments();}catch(e){} }
+        else if(currentTab === 'returns') { try{renderReturns();}catch(e){} }
+        else if(currentTab === 'reports') { try{renderReports();}catch(e){} }
+        else if(currentTab === 'cash') { try{renderCash();}catch(e){} }
+        else if(currentTab === 'products') { try{renderWarehouse();}catch(e){} }
+        else if(currentTab === 'invoices') { try{renderInvoices();}catch(e){} }
     }
+    
+    // Keep renderAll just in case, but we won't use it for snapshots anymore
+    function renderAll(){ renderActivePanel(); }
 
     function toggleSidebar(){document.getElementById('sidebar').classList.toggle('-translate-x-full');document.getElementById('sidebar-overlay').classList.toggle('hidden');}
     
-    function switchTab(t,sub){
+        function switchTab(t,sub){
+        currentTab = t; // Save the current tab
         document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.add('hidden');});
         document.querySelectorAll('.sidebar-link').forEach(function(l){l.classList.remove('active');});
         var panel=document.getElementById('panel-'+t);if(panel)panel.classList.remove('hidden');
         var navBtn=document.getElementById('nav-'+t);if(navBtn)navBtn.classList.add('active');
         if(sub){switchSub(t,sub);}
+        renderActivePanel(); // Render the newly opened tab immediately
         if(window.innerWidth<1024)toggleSidebar();
     }
-    
     function toggleAccordion(id){var el=document.getElementById(id);var icon=document.getElementById(id+'-icon');if(!el)return;el.classList.toggle('hidden');if(icon)icon.style.transform=el.classList.contains('hidden')?'rotate(0deg)':'rotate(180deg)';}
 
     function switchSub(panel,tab){
