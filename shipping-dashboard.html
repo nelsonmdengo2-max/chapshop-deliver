@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viefwport" content="width=device-width, initial-scale=1.0">
         <title>Shipping Department — ChapShop Delivery</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#020617">
@@ -352,6 +352,19 @@
 
 <script>
     function escHtml(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+    // Override the badge to show PAID for delivered orders IF merchantPaid is true
+    var _origGetStatusBadge = window.getStatusBadge;
+    window.getStatusBadge = function(status, paid) {
+        if(status === 'delivered' && paid) {
+            return '<span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">PAID</span>';
+        }
+        if(status === 'delivered' && !paid) {
+            return '<span class="text-xs font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded">DELIVERED</span>';
+        }
+        if(_origGetStatusBadge) return _origGetStatusBadge(status, paid);
+        return '';
+    };
 
     let allOrders=[], allProducts=[], allMerchants=[], subStates={orders:'pending',shipments:'create',reports:'shipping'}, groupByZone=false;
        
