@@ -340,13 +340,22 @@
 <script>
     function escHtml(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-       let allOrders=[], allProducts=[], allMerchants=[], subStates={orders:'pending',shipments:'create',reports:'shipping'}, groupByZone=false;
+    let allOrders=[], allProducts=[], allMerchants=[], subStates={orders:'pending',shipments:'create',reports:'shipping'}, groupByZone=false;
+       
+       // Debounce function to stop screen shaking
+       var renderTimer = null;
+       function safeRender() {
+           clearTimeout(renderTimer);
+           renderTimer = setTimeout(function() {
+               renderActivePanel();
+           }, 200); // Waits 200ms before rendering
+       }
     // We preload the 3 riders so they show up in the dropdowns instantly
-    let allRiders=[
+       let allRiders=[
         { id: 'rider_sadick', name: 'Sadick' },
         { id: 'rider_joseph', name: 'Joseph' },
         { id: 'rider_kasiani', name: 'Kasiani' },
-	    { id: 'rider_kasiani', name: 'Zuberi' }
+        { id: 'rider_zuberi', name: 'Zuberi' }
     ];
     const myId=function(){return window.currentUser.uid;};
 
@@ -354,7 +363,7 @@
     async function ensureDefaultRiders() {
         if(ridersInitialized) return;
         ridersInitialized = true;
-        var defaultRiders = ['Sadick', 'Joseph', 'Kasiani'];
+        var defaultRiders = ['Sadick', 'Joseph', 'Kasiani', 'Zuberi'];
         for (var i = 0; i < defaultRiders.length; i++) {
             var name = defaultRiders[i];
             var exists = allRiders.some(function(r) { return r.name && r.name.toLowerCase() === name.toLowerCase(); });
@@ -390,9 +399,20 @@
             ensureDefaultRiders(); 
             renderActivePanel(); // Only render what the user is looking at
         },function(err){console.error(err);});
-        db.collection('users').where('role','==','merchant').where('active','==',true).onSnapshot(function(snap){allMerchants=snap.docs.map(function(d){return{id:d.id,...d.data()};});renderAll();},function(err){console.error(err);});
-        db.collection('products').onSnapshot(function(snap){allProducts=snap.docs.map(function(d){return{id:d.id,...d.data()};});renderAll();},function(err){console.error(err);});
-        db.collection('orders').orderBy('createdAt','desc').onSnapshot(function(snap){allOrders=snap.docs.map(function(d){return{id:d.id,...d.data()};});renderAll();},function(err){console.error(err);});
+            db.collection('users').where('role','==','merchant').where('active','==',true).onSnapshot(function(snap){
+            allMerchants=snap.docs.map(function(d){return{id:d.id,...d.data()};});
+            if(['dashboard', 'orders', 'invoices'].includes(currentTab)) safeRender();
+        },function(err){console.error(err);});
+        
+        db.collection('products').onSnapshot(function(snap){
+            allProducts=snap.docs.map(function(d){return{id:d.id,...d.data()};});
+            if(currentTab === 'products') safeRender();
+        },function(err){console.error(err);});
+        
+        db.collection('orders').orderBy('createdAt','desc').onSnapshot(function(snap){
+            allOrders=snap.docs.map(function(d){return{id:d.id,...d.data()};});
+            safeRender();
+        },function(err){console.error(err);});
     }
 
        let currentTab = 'dashboard';
