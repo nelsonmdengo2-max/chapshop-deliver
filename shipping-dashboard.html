@@ -547,13 +547,13 @@
                         imgHtml +
                         '<div class="flex-1 min-w-0">' +
                             '<div class="flex items-center gap-2 mb-1 flex-wrap">' +
-'<span class="font-mono text-cyan-400 font-bold text-xs">#'+o.id.slice(-6).toUpperCase()+'</span>' +
-getStatusBadge(o.status, o.merchantPaid) +
+                                '<span class="font-mono text-cyan-400 font-bold text-xs">#'+o.id.slice(-6).toUpperCase()+'</span>' +
+                                getStatusBadge(o.status) +
                                 '<span class="text-white text-sm font-semibold truncate">'+escHtml(o.itemName)+' x'+o.qty+'</span>' +
                                 '<span class="ml-auto text-white font-bold text-sm">TZS '+Number(o.totalAmount).toLocaleString()+'</span>' +
                             '</div>' +
                             '<div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mt-1">' +
-                  f              '<span class="text-cyan-300 font-medium">🏪 '+escHtml(o.merchantName)+'</span>' +
+                                '<span class="text-cyan-300 font-medium">🏪 '+escHtml(o.merchantName)+'</span>' +
                                 '<span><span class="text-slate-400">👤</span> '+escHtml(o.customerName)+' • '+escHtml(o.customerPhone)+'</span>' +
                                 '<span class="text-slate-400">📍 '+escHtml(o.customerCity)+', '+escHtml(o.customerAddress)+'</span>' +
                                 '<span class="text-orange-400 font-medium">🎧 '+(escHtml(o.processedByName)||'N/A')+'</span>' +
