@@ -1082,7 +1082,7 @@
 
 </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+//cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <script src="core.js"></script>
     <style>
@@ -1453,7 +1453,7 @@
     }
 
     function onAppLoaded(){
-        if(window.currentUser.role!=='shipping' && window.currentUser.role!=='shipping_manager'){showT("Access Denied.","error");auth.signOut();return;}
+        if(window.currentUser.role!=='shipping'){showT("Access Denied.","error");auth.signOut();return;}
         document.getElementById('header-name').textContent=window.currentUser.name||'Shipping Dept';
         document.getElementById('header-avatar').textContent=(window.currentUser.name||'S').charAt(0).toUpperCase();
         document.getElementById('set-name').value=window.currentUser.name||'';
