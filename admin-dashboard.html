@@ -1358,8 +1358,22 @@ function getMPData(u){var mO=byPeriod(mOrders(u),'createdAt',perfPeriod);var d=m
 function renderMerchantPerf(){var c=$('merchant-perf-list');if(!c)return;var rows=allUsers.filter(function(u){return u.role==='merchant'}).map(getMPData);var sv=($('perf-sort')||{}).value||'revenue';rows.sort(function(a,b){return sv==='revenue'?b.rev-a.rev:b.t-a.t});if(!rows.length){c.innerHTML=empty('mdi:chart-bar','No data for this period.');return}c.innerHTML=rows.map(function(r){var bc=r.rate>=60?'bg-green-500':r.rate>=30?'bg-yellow-500':'bg-red-500';return'<div class="data-card p-5"><div class="flex items-center justify-between mb-4"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold text-lg">'+(r.u.name||'M').charAt(0).toUpperCase()+'</div><div><div class="text-white font-bold">'+(r.u.shopName||r.u.name)+'</div><div class="text-slate-500 text-sm">'+r.u.email+'</div></div></div><div class="text-right"><div class="text-lg font-extrabold text-cyan-400">'+fmtM(r.rev)+'</div><div class="text-xs text-slate-500">Revenue</div></div></div><div class="grid grid-cols-6 gap-3 text-center mb-3"><div><div class="text-xl font-extrabold text-white">'+r.t+'</div><div class="text-[10px] text-slate-500">Total</div></div><div><div class="text-xl font-extrabold text-green-400">'+r.d+'</div><div class="text-[10px] text-slate-500">Delivered</div></div><div><div class="text-xl font-extrabold text-yellow-400">'+r.p+'</div><div class="text-[10px] text-slate-500">Pending</div></div><div><div class="text-xl font-extrabold text-red-400">'+r.c+'</div><div class="text-[10px] text-slate-500">Cancelled</div></div><div><div class="text-xl font-extrabold text-slate-400">'+r.r+'</div><div class="text-[10px] text-slate-500">Returned</div></div><div><div class="text-xl font-extrabold text-cyan-400">'+r.rate+'%</div><div class="text-[10px] text-slate-500">Success</div></div></div><div class="progress-bar"><div class="fill '+bc+'" style="width:'+r.rate+'%"></div></div></div>'}).join('')}
 function dlMerchantPerf(){var h=['Merchant','Shop','Total','Delivered','Pending','Cancelled','Returned','Revenue','Success%'];var rows=allUsers.filter(function(u){return u.role==='merchant'}).map(function(u){var r=getMPData(u);return[r.u.name,r.u.shopName||'',r.t,r.d,r.p,r.c,r.r,r.rev,r.rate+'%']});dlCSV('merchant-perf-'+perfPeriod+'.csv',h,rows)}
 
-/* ===== ORDERS ===== */
-function renderAdminOrders(){
+/* ===== MARK SINGLE ORDER AS PAID ===== */
+async function markOrderPaid(oid) {
+    if(!confirm('Mark order #'+oid.slice(-6).toUpperCase()+' as PAID?')) return;
+    try {
+        await db.collection('orders').doc(oid).update({
+            merchantPaid: true,
+            paidAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showT('Order marked as PAID!');
+        logAudit('settlement','order',oid,'#'+oid.slice(-6).toUpperCase(),'Marked as paid manually');
+    } catch(e) {
+        showT(e.message, 'error');
+    }
+}
+
+/* ===== ORDERS ===== */ function renderAdminOrders(){
     var c=$('admin-orders-table');if(!c)return;
     var s=(($('admin-order-search')||{}).value||'').toLowerCase();
     var df=($('admin-order-filter')||{}).value||'';
@@ -1403,7 +1417,7 @@ function renderAdminOrders(){
             '<td class="text-yellow-400/80 text-sm">'+fmtDur(o.callDuration)+'</td>'+
             '<td>'+badge(o.status)+'</td>'+
             '<td class="text-slate-500 text-sm whitespace-nowrap">'+fmtDate(o.createdAt)+'</td>'+
-            '<td><div class="flex gap-1"><button type="button" class="btn-sm cyan" style="padding:4px 8px" data-edit-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button><button type="button" class="btn-sm red" style="padding:4px 8px" data-delete-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:delete"></span></button><button type="button" class="btn-sm green" style="padding:4px 8px" data-assign-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:account-arrow-right"></span></button><button type="button" class="btn-sm" style="padding:4px 8px;color:#94a3b8;border-color:rgba(148,163,184,0.25);background:rgba(148,163,184,0.06)" data-print-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:printer"></span></button></div></td>'+
+            '<td><div class="flex gap-1"><button type="button" class="btn-sm cyan" style="padding:4px 8px" data-edit-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:pencil"></span></button><button type="button" class="btn-sm red" style="padding:4px 8px" data-delete-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:delete"></span></button><button type="button" class="btn-sm green" style="padding:4px 8px" data-assign-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:account-arrow-right"></span></button><button type="button" class="btn-sm" style="padding:4px 8px;color:#94a3b8;border-color:rgba(148,163,184,0.25);background:rgba(148,163,184,0.06)" data-print-order="'+o.id+'"><span class="iconify text-sm" data-icon="mdi:printer"></span></button>'+(o.merchantPaid?'<button type="button" class="btn-sm" style="padding:4px 8px;color:#10b981;border-color:rgba(16,185,129,0.25);background:rgba(16,185,129,0.06);cursor:default" disabled title="Already Paid"><span class="iconify text-sm" data-icon="mdi:cash-check"></span></button>':'<button type="button" class="btn-sm" style="padding:4px 8px;color:#f59e0b;border-color:rgba(245,158,11,0.25);background:rgba(245,158,11,0.06)" data-pay-order="'+o.id+'" title="Mark as Paid"><span class="iconify text-sm" data-icon="mdi:cash"></span></button>')+'</div></td>'+
         '</tr>'
     }).join('')+'</tbody></table></div>';
     
@@ -1976,6 +1990,8 @@ document.addEventListener('click',function(e){
     if(btn){var oid=btn.getAttribute('data-assign-order'),agents=allUsers.filter(function(u){return u.role==='call_center'&&u.active});if(!agents.length){showT('No active agents available','error');return}$('modal-container').innerHTML='<div class="modal-overlay" onclick="if(event.target===this)closeModal()"><div class="modal-box"><div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Assign Agent</h3><button type="button" onclick="closeModal()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div><form id="assign-form" class="space-y-4"><div><label class="form-label">Select Agent</label><select id="as-agent" class="input-dark" required>'+agents.map(function(a){return'<option value="'+a.id+'" class="bg-slate-900">'+a.name+' ('+a.email+')</option>'}).join('')+'</select></div><button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 shadow-lg shadow-cyan-500/20 text-sm">Assign</button></form></div></div>';document.getElementById('assign-form').addEventListener('submit',function(ev){ev.preventDefault();var ag=$('as-agent').value,agObj=allUsers.find(function(u){return u.id===ag});db.collection('orders').doc(oid).update({processedBy:ag,processedByName:agObj?agObj.name:''}).then(function(){showT('Agent assigned!');logAudit('order_assigned','order',oid,'#'+oid.slice(-6).toUpperCase(),'Assigned to agent '+(agObj?agObj.name:''))}).catch(function(er){showT(er.message,'error')})});return}
     btn=e.target.closest('[data-print-order]');
     if(btn){printOrder(btn.getAttribute('data-print-order'));return}
+    btn=e.target.closest('[data-pay-order]');
+    if(btn){markOrderPaid(btn.getAttribute('data-pay-order'));return}
             btn=e.target.closest('[data-approve-refund]');
     if(btn){
         var refId=btn.getAttribute('data-approve-refund');
