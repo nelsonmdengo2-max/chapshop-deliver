@@ -381,8 +381,13 @@
         }
     }
 
-    function onAppLoaded(){
+       function onAppLoaded(){
         if(window.currentUser.role!=='shipping'){showT("Access Denied.","error");auth.signOut();return;}
+        
+        // ADD THESE TWO LINES TO HIDE LOGIN AND SHOW APP:
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.remove('hidden');
+
         document.getElementById('header-name').textContent=window.currentUser.name||'Shipping Dept';
         document.getElementById('header-avatar').textContent=(window.currentUser.name||'S').charAt(0).toUpperCase();
         document.getElementById('set-name').value=window.currentUser.name||'';
