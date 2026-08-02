@@ -510,9 +510,13 @@
     <div class="flex flex-col md:flex-row gap-3 mb-5">
         <div class="relative flex-1 max-w-sm"><span class="iconify absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span><input type="text" id="admin-order-search" oninput="adminOrdersPage=1;renderAdminOrders()" placeholder="Search ID, phone, name..." class="input-dark pl-11"></div>
         <select id="admin-order-filter" onchange="adminOrdersPage=1;renderAdminOrders()" class="input-dark" style="width:auto;max-width:200px"><option value="">All Statuses</option><option value="pending">Pending</option><option value="accepted">Accepted</option><option value="confirmed">Confirmed</option><option value="no_answer">No Answer</option><option value="cancelled">Cancelled</option><option value="out_for_delivery">Out for Delivery</option><option value="delivered">Delivered</option><option value="returned">Returned</option></select>
-        <button type="button" data-create-order class="bg-cyan-500 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/20 text-sm flex items-center gap-2 whitespace-nowrap">
+       <button type="button" data-create-order class="bg-cyan-500 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/20 text-sm flex items-center gap-2 whitespace-nowrap">
     <span class="iconify text-lg" data-icon="mdi:plus-circle"></span>
     Create Order
+</button>
+<button type="button" onclick="markAllDeliveredAsPaid()" class="bg-green-500 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-green-400 transition-all shadow-lg shadow-green-500/20 text-sm flex items-center gap-2 whitespace-nowrap">
+    <span class="iconify text-lg" data-icon="mdi:cash-check"></span>
+    Mark All Delivered as Paid
 </button>
     </div>
     <div id="bulk-bar" class="bulk-bar" style="display:none"><div class="bulk-check" onclick="toggleBulkAll()"><span class="iconify text-white text-sm" data-icon="mdi:check"></span></div><span class="bulk-count" id="bulk-count">0 selected</span><div class="flex gap-2 ml-auto flex-wrap"><button type="button" onclick="bulkAction('rider')" class="btn-sm cyan" style="font-size:11px;padding:5px 10px"><span class="iconify text-sm" data-icon="mdi:account-arrow-right"></span> Assign Rider</button><button type="button" onclick="bulkAction('status')" class="btn-sm green" style="font-size:11px;padding:5px 10px"><span class="iconify text-sm" data-icon="mdi:flag"></span> Change Status</button><button type="button" onclick="bulkAction('delete')" class="btn-sm red" style="font-size:11px;padding:5px 10px"><span class="iconify text-sm" data-icon="mdi:delete"></span> Delete</button><button type="button" onclick="clearBulk()" class="text-slate-500 hover:text-white text-xs font-semibold">✕ Clear</button></div></div>
