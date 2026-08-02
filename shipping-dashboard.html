@@ -1411,19 +1411,6 @@ getStatusBadge(o.status, o.merchantPaid) +
 <script>
     function escHtml(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-    // Override the badge to show PAID for delivered orders IF merchantPaid is true
-    var _origGetStatusBadge = window.getStatusBadge;
-    window.getStatusBadge = function(status, paid) {
-        if(status === 'delivered' && paid) {
-            return '<span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">PAID</span>';
-        }
-        if(status === 'delivered' && !paid) {
-            return '<span class="text-xs font-bold text-green-400 bg-green-500/10 px-2 py-0.5 rounded">DELIVERED</span>';
-        }
-        if(_origGetStatusBadge) return _origGetStatusBadge(status, paid);
-        return '';
-    };
-
     let allOrders=[], allProducts=[], allMerchants=[], subStates={orders:'pending',shipments:'create',reports:'shipping'}, groupByZone=false;
        
        // Debounce function to stop screen shaking
