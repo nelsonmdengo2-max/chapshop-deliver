@@ -997,7 +997,8 @@
                                     <input type="file" id="cd-image" accept="image/*" required class="input-dark" style="padding: 10px;" onchange="previewChapdropImage(this)">
                                     <img id="cd-image-preview" style="display:none; max-height: 150px; margin-top: 10px; border-radius: 12px;">
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="grid grid-cols-3 gap-4">
+                                    <div><label class="form-label">Quantity *</label><input type="number" id="cd-stock" required min="0" class="input-dark" placeholder="0"></div>
                                     <div><label class="form-label">Base Cost (TZS) *</label><input type="number" id="cd-cost" required min="0" class="input-dark" placeholder="0"></div>
                                     <div><label class="form-label">Suggested Price (TZS) *</label><input type="number" id="cd-price" required min="0" class="input-dark" placeholder="0"></div>
                                 </div>
@@ -1704,13 +1705,16 @@ function renderChapdrop(){var c=$('panel-chapdrop');if(!c)return;startChapdropLi
                 var storageRef = firebase.storage().ref('chapdrop_images/' + fileName);
                 var snapshot = await storageRef.put(file);
                 var imageUrl = await snapshot.ref.getDownloadURL();
-                
                 // 2. Save product data to Firestore with the image URL
                 var data = {
                     name: $('cd-name').value.trim(),
                     category: $('cd-category').value,
                     description: $('cd-desc').value.trim(),
                     image: imageUrl,
+                    stock: parseInt($('cd-stock').value) || 0, // Added Quantity
+                    reserved: 0, // Initialize reserved stock
+                    delivered: 0, // Initialize delivered stock
+                    returnedStock: 0, // Initialize returned stock
                     baseCost: parseInt($('cd-cost').value) || 0,
                     suggestedPrice: parseInt($('cd-price').value) || 0,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
