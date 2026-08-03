@@ -13,6 +13,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
     <style>
         *{font-family:'Plus Jakarta Sans',sans-serif;-webkit-font-smoothing:antialiased}
         body{background:#020617;font-size:15px}
@@ -991,7 +992,11 @@
                                     </select>
                                 </div>
                                 <div><label class="form-label">Description</label><textarea id="cd-desc" rows="2" class="input-dark" placeholder="Short marketing description..."></textarea></div>
-                                <div><label class="form-label">Image URL *</label><input type="text" id="cd-image" required class="input-dark" placeholder="https://..."></div>
+                                                              <div>
+                                    <label class="form-label">Product Image *</label>
+                                    <input type="file" id="cd-image" accept="image/*" required class="input-dark" style="padding: 10px;" onchange="previewChapdropImage(this)">
+                                    <img id="cd-image-preview" style="display:none; max-height: 150px; margin-top: 10px; border-radius: 12px;">
+                                </div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div><label class="form-label">Base Cost (TZS) *</label><input type="number" id="cd-cost" required min="0" class="input-dark" placeholder="0"></div>
                                     <div><label class="form-label">Suggested Price (TZS) *</label><input type="number" id="cd-price" required min="0" class="input-dark" placeholder="0"></div>
@@ -1674,7 +1679,55 @@ async function settleRider(rid,amt){if(amt<=0)return showT('Rider has no outstan
 var allChapdrop=[],chapdropListenerStarted=false;
 function startChapdropListener(){if(chapdropListenerStarted)return;chapdropListenerStarted=true;db.collection('chapdrop_products').onSnapshot(function(s){allChapdrop=snapDocs(s);renderChapdrop()})}
 function renderChapdrop(){var c=$('panel-chapdrop');if(!c)return;startChapdropListener();var tb=$('chapdrop-tbody');if(!tb)return;if(!allChapdrop.length){tb.innerHTML='<tr><td colspan="4" class="text-center text-slate-500 py-8">No winning products uploaded yet.</td></tr>';return}tb.innerHTML=allChapdrop.map(function(p){return '<tr><td class="text-white font-medium">'+p.name+'</td><td class="text-right text-red-400">'+fmtM(p.baseCost)+'</td><td class="text-right text-green-400">'+fmtM(p.suggestedPrice)+'</td><td class="text-center"><button onclick="deleteChapdrop(\''+p.id+'\')" class="btn-sm red" style="padding:4px 10px;font-size:11px">Delete</button></td></tr>'}).join('')}
- $('chapdrop-form').addEventListener('submit',function(e){e.preventDefault();var btn=e.target.querySelector('button[type="submit"]');var orig=btn.innerHTML;btn.innerHTML='<span class="iconify animate-spin" data-icon="mdi:loading"></span> Uploading...';btn.disabled=true;var data={name:$('cd-name').value.trim(),category:$('cd-category').value,description:$('cd-desc').value.trim(),image:$('cd-image').value.trim(),baseCost:parseInt($('cd-cost').value)||0,suggestedPrice:parseInt($('cd-price').value)||0,createdAt:firebase.firestore.FieldValue.serverTimestamp()};db.collection('chapdrop_products').add(data).then(function(){showT('Product added to marketplace!');e.target.reset();logAudit('settings_updated','chapdrop',data.name,'Added Chapdrop Product','Added '+data.name+' to marketplace')}).catch(function(err){showT(err.message,'error')}).finally(function(){btn.innerHTML=orig;btn.disabled=false})});
+        function previewChapdropImage(input) {
+            var preview = document.getElementById('cd-image-preview');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) { preview.src = e.target.result; preview.style.display = 'block'; }
+                reader.readAsDataURL(input.files[0]);
+            } else { preview.style.display = 'none'; }
+        }
+
+        $('chapdrop-form').addEventListener('submit', async function(e){
+            e.preventDefault();
+            var btn = e.target.querySelector('button[type="submit"]');
+            var orig = btn.innerHTML;
+            btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Uploading...';
+            btn.disabled = true;
+            
+            try {
+                var file = $('cd-image').files[0];
+                if (!file) { showT('Please select an image', 'error'); return; }
+                
+                // 1. Upload image to Firebase Storage
+                var fileName = 'chapdrop_' + Date.now() + '_' + file.name;
+                var storageRef = firebase.storage().ref('chapdrop_images/' + fileName);
+                var snapshot = await storageRef.put(file);
+                var imageUrl = await snapshot.ref.getDownloadURL();
+                
+                // 2. Save product data to Firestore with the image URL
+                var data = {
+                    name: $('cd-name').value.trim(),
+                    category: $('cd-category').value,
+                    description: $('cd-desc').value.trim(),
+                    image: imageUrl,
+                    baseCost: parseInt($('cd-cost').value) || 0,
+                    suggestedPrice: parseInt($('cd-price').value) || 0,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await db.collection('chapdrop_products').add(data);
+                showT('Product added to marketplace!');
+                logAudit('settings_updated','chapdrop',data.name,'Added Chapdrop Product','Added '+data.name+' to marketplace');
+                e.target.reset();
+                document.getElementById('cd-image-preview').style.display = 'none';
+            } catch(err) {
+                showT(err.message, 'error');
+            } finally {
+                btn.innerHTML = orig;
+                btn.disabled = false;
+            }
+        });
 function deleteChapdrop(id){if(!confirm('Delete this product from the marketplace?'))return;db.collection('chapdrop_products').doc(id).delete().then(function(){showT('Product deleted!')}).catch(function(err){showT(err.message,'error')})}
 
 /* ===== USERS ===== */
