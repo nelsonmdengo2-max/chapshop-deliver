@@ -427,8 +427,21 @@
             document.getElementById('target-text').textContent = todayConfirmed + '/' + DAILY_TARGET;
             document.getElementById('target-bar').style.width = Math.min(100, (todayConfirmed/DAILY_TARGET)*100) + '%';
             
-            var totalConfirmed = allOrders.filter(function(o) { return o.processedBy === myId() && o.status === 'confirmed'; }).length;
-            var commission = totalConfirmed * COMMISSION_PER_CONFIRMATION;
+                // Calculate commission based ONLY on orders confirmed this month
+            var now = new Date();
+            var monthlyConfirmed = allOrders.filter(function(o) { 
+                if(o.processedBy === myId() && o.callOutcome === 'confirmed') {
+                    if(o.updatedAt) {
+                        try {
+                            var d = o.updatedAt.toDate();
+                            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                        } catch(e) { return false; }
+                    }
+                }
+                return false;
+            }).length;
+            
+            var commission = monthlyConfirmed * COMMISSION_PER_CONFIRMATION;
             document.getElementById('cc-commission-text').textContent = 'TZS ' + commission.toLocaleString();
             
             renderLeaderboard(); 
