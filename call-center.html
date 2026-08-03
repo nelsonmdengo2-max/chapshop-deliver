@@ -316,9 +316,7 @@
         var mediaRecorder = null, audioChunks = [];
         var knownOrderIds = new Set(), audioCtx, isOnBreak = false;
         var shipFilter = 'all';
-        var lastClaimAttempt = 0;
-        var currentWorkOrderId = null;
-        var previousCurrentOrderStatus = null;
+        var lastClaimAttempt = 0; // Timestamp of the last claim attempt
         const myId = function() { return window.currentUser.uid; };
         const DAILY_TARGET = 20;
 
@@ -372,30 +370,17 @@
                 var unassignedExists = allOrders.some(function(o) { 
                     return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo); 
                 });
-                var now = Date.now();
-                
-                if(currentWsTab === 'new' && myActive.length === 0 && unassignedExists && (now - lastClaimAttempt > 5000)) {
+                var now = Date.now(); 
+                if(currentWsTab === 'new' && !isOnBreak && myActive.length === 0 && (now - lastClaimAttempt > 1500)) {
                     lastClaimAttempt = now;
-                    claimNextOrder(); 
-                }
-
-                 updateDashboard(); renderShipping(); renderPerformance(); renderMyCalls();
-
-                // SMART RENDERING — don't re-render workspace while agent is typing
-                var wsPanelVisible = !document.getElementById('panel-workspace').classList.contains('hidden');
-                var wsNeedsRender = true;
-
-                if(wsPanelVisible && currentWorkOrderId) {
-                    var currentOrder = allOrders.find(function(o) { return o.id === currentWorkOrderId; });
-                    if(currentOrder && currentOrder.status === previousCurrentOrderStatus) {
-                        wsNeedsRender = false; // Same status — DON'T re-render (prevents jumping)
+                    if(unassignedExists) {
+                        claimNextOrder(); 
+                    } else {
+                        autoClaimRetry(); // No new orders? Auto-claim a "No Reply" order!
                     }
                 }
-                if(!wsPanelVisible) wsNeedsRender = true; // Always render if tab is hidden
 
-                if(wsNeedsRender) {
-                    renderWorkspace();
-                }
+                updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance(); renderMyCalls();
             });
         }
 
@@ -478,7 +463,7 @@
                     return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo); 
                 });
 
-                if(list.length === 0 && !unassignedExists) {
+                if(list.length === 0) {
                     list = allOrders.filter(function(o) { 
                         var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
                         if(!isMine) return false;
@@ -589,9 +574,42 @@
             claimNextOrder(true); // Force it to ignore active orders
         }
 
-         async function claimNextOrder(force) {
+        async function autoClaimRetry() {
+            var now = new Date();
+            var retries = allOrders.filter(function(o) {
+                var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
+                if(!isMine) return false;
+                if(o.status === 'no_answer' || o.status === 'busy') return true;
+                if(o.status === 'callback_requested' && o.scheduledDate) {
+                    var schedDate = o.scheduledDate.toDate();
+                    var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    var schedMid = new Date(schedDate.getFullYear(), schedDate.getMonth(), schedDate.getDate());
+                    if(schedMid <= todayMid) return true;
+                }
+                return false;
+            }).sort(function(a, b) { return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0); });
+
+            if(retries.length > 0) {
+                var orderToRetry = retries[0];
+                try {
+                    await db.collection('orders').doc(orderToRetry.id).update({
+                        status: 'accepted',
+                        ccAssignedTo: myId(),
+                        ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        timeline: firebase.firestore.FieldValue.arrayUnion({ status: 'accepted', at: new Date().toISOString(), by: window.currentUser.name, note: 'Auto-claimed for retry' })
+                    });
+                    showT("Re-attempting No Reply order!", "success");
+                    playDing();
+                } catch (err) {
+                    console.error("Error auto-claiming retry: ", err);
+                }
+            }
+        }
+
+        async function claimNextOrder() {
             var now = Date.now();
-            if (!force && (now - lastClaimAttempt < 5000)) return; // 5s cooldown
+            if (now - lastClaimAttempt < 1500) return; // 1.5s cooldown to prevent spamming
             lastClaimAttempt = now;
 
             try {
