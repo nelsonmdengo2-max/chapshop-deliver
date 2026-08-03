@@ -568,25 +568,35 @@
             nextBtn.disabled = (wsPage >= totalPages);
         }
 
-        async function autoClaimRetry() {
-            var now = new Date();
-            var retries = allOrders.filter(function(o) {
-                var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
-                if(!isMine) return false;
-                if(o.status === 'no_answer' || o.status === 'busy') return true;
-                if(o.status === 'callback_requested' && o.scheduledDate) {
-                    var schedDate = o.scheduledDate.toDate();
-                    var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    var schedMid = new Date(schedDate.getFullYear(), schedDate.getMonth(), schedDate.getDate());
-                    if(schedMid <= todayMid) return true;
-                }
-                return false;
-            }).sort(function(a, b) { return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0); });
+                async function autoClaimRetry() {
+            try {
+                // 1. Look for unassigned 'no_answer' orders in the database
+                const q = await db.collection('orders').where('status', '==', 'no_answer').limit(20).get();
+                let docs = q.docs.filter(function(d) { return !d.data().ccAssignedTo; });
 
-            if(retries.length > 0) {
-                var orderToRetry = retries[0];
-                try {
-                    await db.collection('orders').doc(orderToRetry.id).update({
+                if (docs.length === 0) return; // No unassigned no_reply orders
+
+                // Sort to find the oldest one
+                docs = docs.sort(function(a, b) {
+                    const aT = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
+                    const bT = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
+                    return aT - bT;
+                });
+
+                for (let i = 0; i < docs.length; i++) {
+                    const doc = docs[i];
+                    const orderData = doc.data();
+
+                    // Skip if I was the last one to call it in the last 1 hour
+                    var lastAttempt = orderData.lastAttemptAt ? orderData.lastAttemptAt.toMillis() : 0;
+                    var oneHourAgo = Date.now() - (1 * 60 * 60 * 1000);
+                    
+                    if(orderData.lastAttemptBy === myId() && lastAttempt > oneHourAgo) {
+                        continue; // Skip so another agent gets it
+                    }
+
+                    // Assign it to me!
+                    await db.collection('orders').doc(doc.id).update({
                         status: 'accepted',
                         ccAssignedTo: myId(),
                         ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -595,9 +605,10 @@
                     });
                     showT("Re-attempting No Reply order!", "success");
                     playDing();
-                } catch (err) {
-                    console.error("Error auto-claiming retry: ", err);
+                    break; 
                 }
+            } catch (err) {
+                console.error("Error auto-claiming retry: ", err);
             }
         }
 
