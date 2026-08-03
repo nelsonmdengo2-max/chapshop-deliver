@@ -1008,7 +1008,7 @@
                             <h3 class="text-base font-bold text-white mb-4">Master Catalog</h3>
                             <div class="overflow-x-auto">
                                 <table class="dtable min-w-[600px]">
-                                    <thead><tr><th>Product</th><th class="text-right">Base Cost</th><th class="text-right">Sugg. Price</th><th class="text-center">Action</th></tr></thead>
+                                    <thead><tr><th>Image</th><th>Product</th><th class="text-right">Base Cost</th><th class="text-right">Sugg. Price</th><th class="text-center">Action</th></tr></thead>
                                     <tbody id="chapdrop-tbody" class="divide-y divide-white/[0.05]"></tbody>
                                 </table>
                             </div>
@@ -1678,7 +1678,7 @@ async function settleRider(rid,amt){if(amt<=0)return showT('Rider has no outstan
 /* ===== CHAPDROP CATALOG ===== */
 var allChapdrop=[],chapdropListenerStarted=false;
 function startChapdropListener(){if(chapdropListenerStarted)return;chapdropListenerStarted=true;db.collection('chapdrop_products').onSnapshot(function(s){allChapdrop=snapDocs(s);renderChapdrop()})}
-function renderChapdrop(){var c=$('panel-chapdrop');if(!c)return;startChapdropListener();var tb=$('chapdrop-tbody');if(!tb)return;if(!allChapdrop.length){tb.innerHTML='<tr><td colspan="4" class="text-center text-slate-500 py-8">No winning products uploaded yet.</td></tr>';return}tb.innerHTML=allChapdrop.map(function(p){return '<tr><td class="text-white font-medium">'+p.name+'</td><td class="text-right text-red-400">'+fmtM(p.baseCost)+'</td><td class="text-right text-green-400">'+fmtM(p.suggestedPrice)+'</td><td class="text-center"><button onclick="deleteChapdrop(\''+p.id+'\')" class="btn-sm red" style="padding:4px 10px;font-size:11px">Delete</button></td></tr>'}).join('')}
+function renderChapdrop(){var c=$('panel-chapdrop');if(!c)return;startChapdropListener();var tb=$('chapdrop-tbody');if(!tb)return;if(!allChapdrop.length){tb.innerHTML='<tr><td colspan="5" class="text-center text-slate-500 py-8">No winning products uploaded yet.</td></tr>';return}tb.innerHTML=allChapdrop.map(function(p){return '<tr><td><div class="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden flex-shrink-0">'+(p.image?'<img src="'+p.image+'" class="w-full h-full object-cover">':'<span class="iconify text-slate-600" data-icon="mdi:image-off"></span>')+'</div></td><td class="text-white font-medium">'+p.name+'</td><td class="text-right text-red-400">'+fmtM(p.baseCost)+'</td><td class="text-right text-green-400">'+fmtM(p.suggestedPrice)+'</td><td class="text-center"><button onclick="deleteChapdrop(\''+p.id+'\')" class="btn-sm red" style="padding:4px 10px;font-size:11px">Delete</button></td></tr>'}).join('')}
         function previewChapdropImage(input) {
             var preview = document.getElementById('cd-image-preview');
             if (input.files && input.files[0]) {
