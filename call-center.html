@@ -636,18 +636,27 @@
                 });
 
                 let claimed = false;
+                              // Assign the oldest order to this agent
                 for (let i = 0; i < docs.length; i++) {
                     const doc = docs[i];
                     const orderData = doc.data();
                     
                     if (!orderData.ccAssignedTo) {
+                        // Skip if I was the last one to call it in the last 1 hour (sends it to another agent)
+                        var lastAttempt = orderData.lastAttemptAt ? orderData.lastAttemptAt.toMillis() : 0;
+                        var oneHourAgo = Date.now() - (1 * 60 * 60 * 1000);
+                        
+                        if(orderData.lastAttemptBy === myId() && lastAttempt > oneHourAgo) {
+                            continue; // Skip this order so another agent gets it
+                        }
+
                         await db.collection('orders').doc(doc.id).update({
                             ccAssignedTo: myId(), 
                             ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
                             status: 'accepted'
                         });
                         showT("New order assigned to you!", "success");
-                        claimed = true;
+                        playDing(); // Play sound when new order pops up
                         break; 
                     }
                 }
@@ -723,14 +732,23 @@
                 btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Updating...'; 
                 btn.disabled = true; 
                 
-                var updateData = { 
-                    status: outcome, 
+                    var updateData = { 
                     callOutcome: outcome, 
                     callNotes: notes, 
                     processedBy: myId(), 
                     processedByName: window.currentUser.name, 
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
                 };
+
+                // If No Reply, unassign it so it goes to ANOTHER agent
+                if(outcome === 'no_answer') {
+                    updateData.status = 'accepted'; // Put back in general pool
+                    updateData.ccAssignedTo = firebase.firestore.FieldValue.delete(); // Unassign
+                    updateData.lastAttemptBy = myId(); // Tag that I attempted it
+                    updateData.lastAttemptAt = firebase.firestore.FieldValue.serverTimestamp();
+                } else {
+                    updateData.status = outcome;
+                }
                 updateData.timeline = firebase.firestore.FieldValue.arrayUnion({ status: outcome, at: new Date().toISOString(), by: window.currentUser.name, note: notes });
                 if(outcome === 'callback_requested' && dateVal) { updateData.scheduledDate = firebase.firestore.Timestamp.fromDate(new Date(dateVal)); }
                 
