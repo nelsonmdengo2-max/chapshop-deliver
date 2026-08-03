@@ -625,6 +625,12 @@
                     const q2 = await db.collection('orders').where('status', '==', 'accepted').limit(20).get();
                     docs = q2.docs.filter(function(d) { return !d.data().ccAssignedTo; });
                 }
+                
+                // If none, look for unassigned 'no_answer' orders (so another agent can retry)
+                if (docs.length === 0) {
+                    const q3 = await db.collection('orders').where('status', '==', 'no_answer').limit(20).get();
+                    docs = q3.docs.filter(function(d) { return !d.data().ccAssignedTo; });
+                }
 
                 if (docs.length === 0) return; // No orders to claim
 
@@ -641,10 +647,18 @@
                     const orderData = doc.data();
                     
                     if (!orderData.ccAssignedTo) {
+                        // Skip if I was the last one to call it in the last 1 hour (sends it to another agent)
+                        var lastAttempt = orderData.lastAttemptAt ? orderData.lastAttemptAt.toMillis() : 0;
+                        var oneHourAgo = Date.now() - (1 * 60 * 60 * 1000);
+                        
+                        if(orderData.lastAttemptBy === myId() && lastAttempt > oneHourAgo) {
+                            continue; // Skip this order so another agent gets it
+                        }
+
                         await db.collection('orders').doc(doc.id).update({
                             ccAssignedTo: myId(), 
                             ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            status: 'accepted'
+                            status: 'accepted' // Change to accepted so it pops up on the new agent's screen
                         });
                         showT("New order assigned to you!", "success");
                         claimed = true;
