@@ -359,27 +359,39 @@
             });
         }
 
-                  // Tanzania Regions and their major Cities/Districts
+                  // All 31 Tanzania Regions and their major Cities/Districts
         const tanzaniaLocations = {
+            "Arusha": ["Arusha MC", "Arusha DC", "Meru", "Karatu", "Monduli", "Ngorongoro", "Longido"],
             "Dar es Salaam": ["Ilala", "Kinondoni", "Temeke", "Ubungo", "Kigamboni", "Mbagala"],
-            "Arusha": ["Arusha MC", "Arusha DC", "Meru", "Karatu", "Monduli", "Ngorongoro"],
-            "Dodoma": ["Dodoma MC", "Dodoma DC", "Bahi", "Chamwino", "Kongwa", "Mpwapwa"],
-            "Mwanza": ["Nyamagana", "Ilemela", "Sengerema", "Magu", "Kwimba", "Misungwi"],
-            "Tanga": ["Tanga MC", "Tanga DC", "Korogwe", "Muheza", "Pangani", "Handeni"],
-            "Morogoro": ["Morogoro MC", "Morogoro DC", "Kilombero", "Kilosa", "Mvomero", "Ulanga"],
-            "Mbeya": ["Mbeya MC", "Mbeya DC", "Chunya", "Mbarali", "Rungwe", "Kyela"],
-            "Kilimanjaro": ["Moshi MC", "Moshi DC", "Hai", "Rombo", "Same", "Mwanga", "Siha"],
-            "Zanzibar": ["Mjini Magharibi", "Kaskazini A", "Kaskazini B", "Kusini", "Kati", "Unguja"],
-            "Pwani": ["Kibaha", "Bagamoyo", "Kisarawe", "Mkuranga", "Rufiji", "Chalinze"],
-            "Mara": ["Musoma MC", "Musoma DC", "Bunda", "Serengeti", "Tarime", "Rorya"],
-            "Kagera": ["Bukoba MC", "Bukoba DC", "Muleba", "Karagwe", "Kyerwa", "Ngara"],
-            "Tabora": ["Tabora MC", "Tabora DC", "Uyui", "Sikonge", "Kaliua", "Nzega"],
-            "Ruvuma": ["Songea MC", "Songea DC", "Mbinga", "Namtumbo", "Tunduru", "Madaba"],
-            "Shinyanga": ["Shinyanga MC", "Shinyanga DC", "Kahama", "Kishapu", "Bariadi", "Maswa"],
+            "Dodoma": ["Dodoma MC", "Dodoma DC", "Bahi", "Chamwino", "Kongwa", "Mpwapwa", "Kondoa", "Chemba"],
+            "Geita": ["Geita MC", "Geita DC", "Bukombe", "Chato", "Mbogwe", "Nyang'hwale"],
+            "Iringa": ["Iringa MC", "Iringa DC", "Kilolo", "Mafinga", "Mufindi"],
+            "Kagera": ["Bukoba MC", "Bukoba DC", "Muleba", "Karagwe", "Kyerwa", "Ngara", "Missenyi", "Biharamulo"],
+            "Katavi": ["Mpanda MC", "Mpanda DC", "Nsimbo", "Mlele", "Tanganyika"],
             "Kigoma": ["Kigoma MC", "Kigoma DC", "Kasulu", "Kibondo", "Kakonko", "Uvinza"],
+            "Kilimanjaro": ["Moshi MC", "Moshi DC", "Hai", "Rombo", "Same", "Mwanga", "Siha"],
             "Lindi": ["Lindi MC", "Lindi DC", "Ruangwa", "Nachingwea", "Liwale", "Kilwa"],
-            "Mtwara": ["Mtwara MC", "Mtwara DC", "Masasi", "Newala", "Tandahimba", "Nanyamba"],
-            "Pemba": ["Chake Chake", "Wete", "Micheweni", "Mkoani"]
+            "Manyara": ["Babati", "Hanang", "Kiteto", "Mbulu", "Simanjiro"],
+            "Mara": ["Musoma MC", "Musoma DC", "Bunda", "Serengeti", "Tarime", "Rorya", "Butiama"],
+            "Mbeya": ["Mbeya MC", "Mbeya DC", "Chunya", "Mbarali", "Rungwe", "Kyela", "Busokelo"],
+            "Morogoro": ["Morogoro MC", "Morogoro DC", "Kilombero", "Kilosa", "Mvomero", "Ulanga", "Malinyi", "Gairo"],
+            "Mtwara": ["Mtwara MC", "Mtwara DC", "Masasi", "Newala", "Tandahimba", "Nanyamba", "Nanyumbu"],
+            "Mwanza": ["Nyamagana", "Ilemela", "Sengerema", "Magu", "Kwimba", "Misungwi", "Buchosa"],
+            "Njombe": ["Njombe", "Makambako", "Wanging'ombe", "Ludewa", "Makete"],
+            "Pwani": ["Kibaha", "Bagamoyo", "Kisarawe", "Mkuranga", "Rufiji", "Chalinze", "Kibaha DC"],
+            "Rukwa": ["Sumbawanga MC", "Sumbawanga DC", "Nkasi", "Kalambo"],
+            "Ruvuma": ["Songea MC", "Songea DC", "Mbinga", "Namtumbo", "Tunduru", "Madaba"],
+            "Shinyanga": ["Shinyanga MC", "Shinyanga DC", "Kahama", "Kishapu"],
+            "Simiyu": ["Bariadi", "Busega", "Itilima", "Meatu"],
+            "Singida": ["Singida MC", "Singida DC", "Iramba", "Manyoni", "Mkalama", "Ikungi"],
+            "Songwe": ["Mbozi", "Ileje", "Momba", "Songwe"],
+            "Tabora": ["Tabora MC", "Tabora DC", "Uyui", "Sikonge", "Kaliua", "Nzega", "Ushetu"],
+            "Tanga": ["Tanga MC", "Tanga DC", "Korogwe", "Muheza", "Pangani", "Handeni", "Mkinga", "Kilindi"],
+            "Zanzibar (Mjini Magharibi)": ["Mjini", "Magharibi"],
+            "Zanzibar (Kaskazini)": ["Kaskazini A", "Kaskazini B"],
+            "Zanzibar (Kusini & Kati)": ["Kusini", "Kati"],
+            "Pemba (Kaskazini)": ["Wete", "Micheweni"],
+            "Pemba (Kusini)": ["Chake Chake", "Mkoani"]
         };
 
         function toggleSidebar() {
