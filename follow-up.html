@@ -359,7 +359,7 @@
             });
         }
 
-                // Tanzania Regions and their major Cities/Districts
+                  // Tanzania Regions and their major Cities/Districts
         const tanzaniaLocations = {
             "Dar es Salaam": ["Ilala", "Kinondoni", "Temeke", "Ubungo", "Kigamboni", "Mbagala"],
             "Arusha": ["Arusha MC", "Arusha DC", "Meru", "Karatu", "Monduli", "Ngorongoro"],
@@ -387,20 +387,17 @@
             document.getElementById('sidebar-overlay').classList.toggle('hidden');
         }
 
-        // Populate the Filter Dropdowns on page load
+        // Populate Region Dropdowns (Filter Bar & Modal)
         function populateRegionFilter() {
             const filterSelect = document.getElementById('filter-region');
             const modalSelect = document.getElementById('ord-region');
             
-            // Populate Filter
             if(filterSelect) {
                 filterSelect.innerHTML = '<option value="all" style="background-color: #0f172a;">All Regions</option>';
                 Object.keys(tanzaniaLocations).forEach(r => {
                     filterSelect.innerHTML += `<option value="${r}" style="background-color: #0f172a;">${r}</option>`;
                 });
             }
-
-            // Populate Modal
             if(modalSelect) {
                 modalSelect.innerHTML = '<option value="" style="background-color: #0f172a;">Select Region...</option>';
                 Object.keys(tanzaniaLocations).forEach(r => {
@@ -419,6 +416,22 @@
             citySelect.innerHTML = '<option value="all" style="background-color: #0f172a;">All Cities</option>';
 
             if(selectedRegion !== 'all' && tanzaniaLocations[selectedRegion]) {
+                tanzaniaLocations[selectedRegion].forEach(c => {
+                    citySelect.innerHTML += `<option value="${c}" style="background-color: #0f172a;">${c}</option>`;
+                });
+            }
+        }
+
+        // Update the Cities dropdown in the CREATE/EDIT ORDER MODAL
+        function populateModalCities() {
+            const regionSelect = document.getElementById('ord-region');
+            const citySelect = document.getElementById('ord-city');
+            if(!regionSelect || !citySelect) return;
+
+            const selectedRegion = regionSelect.value;
+            citySelect.innerHTML = '<option value="" style="background-color: #0f172a;">Select City...</option>';
+
+            if(selectedRegion && tanzaniaLocations[selectedRegion]) {
                 tanzaniaLocations[selectedRegion].forEach(c => {
                     citySelect.innerHTML += `<option value="${c}" style="background-color: #0f172a;">${c}</option>`;
                 });
@@ -548,9 +561,14 @@
             const cityFilter = document.getElementById('filter-city')?.value || 'all';
             let filtered = allOrders;
 
-            // Apply Region & City Filters
-            if(regionFilter !== 'all') filtered = filtered.filter(o => (o.region || '').toLowerCase() === regionFilter.toLowerCase());
-            if(cityFilter !== 'all') filtered = filtered.filter(o => (o.city || '').toLowerCase() === cityFilter.toLowerCase());
+            // Apply Region & City Filters (Matches Call Center's customerCity field)
+            if(regionFilter !== 'all') {
+                const citiesInRegion = tanzaniaLocations[regionFilter] || [];
+                filtered = filtered.filter(o => citiesInRegion.includes(o.customerCity));
+            }
+            if(cityFilter !== 'all') {
+                filtered = filtered.filter(o => (o.customerCity || '') === cityFilter);
+            }
 
             if(currentOrderFilter !== 'all') {
                 if(currentOrderFilter === 'pending') filtered = allOrders.filter(o => pendingStatuses.includes(o.status));
@@ -656,7 +674,7 @@
                 document.getElementById('ord-address').value = o.customerAddress || '';
                 document.getElementById('ord-region').value = o.region || '';
                 populateModalCities(); // Load the cities for that region
-                document.getElementById('ord-city').value = o.city || '';
+                document.getElementById('ord-city').value = o.customerCity || '';
                 document.getElementById('ord-image').value = o.itemImage || '';
                 document.getElementById('ord-item').value = o.itemName || '';
                 document.getElementById('ord-qty').value = o.qty || 1;
@@ -687,7 +705,7 @@
                 customerPhone: document.getElementById('ord-phone').value.trim(),
                 customerAddress: document.getElementById('ord-address').value.trim(),
                 region: document.getElementById('ord-region').value.trim(),
-                city: document.getElementById('ord-city').value.trim(),
+                customerCity: document.getElementById('ord-city').value.trim(),
                 itemImage: document.getElementById('ord-image').value.trim(),
                 itemName: document.getElementById('ord-item').value.trim(),
                 qty: parseInt(document.getElementById('ord-qty').value) || 1,
