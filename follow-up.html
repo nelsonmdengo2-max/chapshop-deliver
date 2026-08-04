@@ -618,8 +618,8 @@
                     <tr class="hover:bg-white/[0.02]">
                                                <td class="p-4">
                             <div class="flex items-center gap-3">
-                                ${o.itemImage ? 
-                                    `<img src="${o.itemImage}" alt="item" class="w-12 h-12 rounded-lg object-cover border border-white/10 flex-shrink-0 bg-white/[0.05]" onerror="this.outerHTML='<div class=\'w-12 h-12 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/10 flex-shrink-0\'><span class=\'iconify text-red-400 text-xl\' data-icon=\'mdi:image-broken-variant\'></span></div>'">` : 
+                                ${o.productImage ? 
+                                    `<img src="${o.productImage}" alt="item" class="w-12 h-12 rounded-lg object-cover border border-white/10 flex-shrink-0 bg-white/[0.05]" onerror="this.outerHTML='<div class=\'w-12 h-12 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/10 flex-shrink-0\'><span class=\'iconify text-red-400 text-xl\' data-icon=\'mdi:image-broken-variant\'></span></div>'">` : 
                                     `<div class="w-12 h-12 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/10 flex-shrink-0"><span class="iconify text-slate-500 text-xl" data-icon="mdi:image-off-outline"></span></div>`
                                 }
                                 <div>
@@ -675,7 +675,7 @@
                 document.getElementById('ord-region').value = o.region || '';
                 populateModalCities(); // Load the cities for that region
                 document.getElementById('ord-city').value = o.customerCity || '';
-                document.getElementById('ord-image').value = o.itemImage || '';
+                document.getElementById('ord-image').value = o.productImage || '';
                 document.getElementById('ord-item').value = o.itemName || '';
                 document.getElementById('ord-qty').value = o.qty || 1;
                 document.getElementById('ord-amount').value = o.totalAmount || 0;
@@ -706,7 +706,7 @@
                 customerAddress: document.getElementById('ord-address').value.trim(),
                 region: document.getElementById('ord-region').value.trim(),
                 customerCity: document.getElementById('ord-city').value.trim(),
-                itemImage: document.getElementById('ord-image').value.trim(),
+                productImage: document.getElementById('ord-image').value.trim(),
                 itemName: document.getElementById('ord-item').value.trim(),
                 qty: parseInt(document.getElementById('ord-qty').value) || 1,
                 totalAmount: parseInt(document.getElementById('ord-amount').value) || 0,
