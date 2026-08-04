@@ -41,8 +41,16 @@
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name *</label><input type="text" id="ord-cust" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Phone *</label><input type="text" id="ord-phone" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
                 <div class="md:col-span-2"><label class="text-xs font-semibold text-slate-400 uppercase">Delivery Address</label><input type="text" id="ord-address" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
-                <div><label class="text-xs font-semibold text-slate-400 uppercase">Region</label><input type="text" id="ord-region" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50" placeholder="e.g. Dar es Salaam"></div>
-                <div><label class="text-xs font-semibold text-slate-400 uppercase">City / District</label><input type="text" id="ord-city" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50" placeholder="e.g. Kinondoni"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Region</label>
+                    <select id="ord-region" onchange="populateModalCities()" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50">
+                        <option value="">Select Region...</option>
+                    </select>
+                </div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">City / District</label>
+                    <select id="ord-city" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50">
+                        <option value="">Select City...</option>
+                    </select>
+                </div>
                 <div class="md:col-span-2"><label class="text-xs font-semibold text-slate-400 uppercase">Item Image URL</label><input type="text" id="ord-image" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50" placeholder="https://example.com/image.jpg"></div>
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Item Name *</label><input type="text" id="ord-item" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Quantity</label><input type="number" id="ord-qty" value="1" min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
@@ -351,29 +359,57 @@
             });
         }
 
+                // Tanzania Regions and their major Cities/Districts
+        const tanzaniaLocations = {
+            "Dar es Salaam": ["Ilala", "Kinondoni", "Temeke", "Ubungo", "Kigamboni", "Mbagala"],
+            "Arusha": ["Arusha MC", "Arusha DC", "Meru", "Karatu", "Monduli", "Ngorongoro"],
+            "Dodoma": ["Dodoma MC", "Dodoma DC", "Bahi", "Chamwino", "Kongwa", "Mpwapwa"],
+            "Mwanza": ["Nyamagana", "Ilemela", "Sengerema", "Magu", "Kwimba", "Misungwi"],
+            "Tanga": ["Tanga MC", "Tanga DC", "Korogwe", "Muheza", "Pangani", "Handeni"],
+            "Morogoro": ["Morogoro MC", "Morogoro DC", "Kilombero", "Kilosa", "Mvomero", "Ulanga"],
+            "Mbeya": ["Mbeya MC", "Mbeya DC", "Chunya", "Mbarali", "Rungwe", "Kyela"],
+            "Kilimanjaro": ["Moshi MC", "Moshi DC", "Hai", "Rombo", "Same", "Mwanga", "Siha"],
+            "Zanzibar": ["Mjini Magharibi", "Kaskazini A", "Kaskazini B", "Kusini", "Kati", "Unguja"],
+            "Pwani": ["Kibaha", "Bagamoyo", "Kisarawe", "Mkuranga", "Rufiji", "Chalinze"],
+            "Mara": ["Musoma MC", "Musoma DC", "Bunda", "Serengeti", "Tarime", "Rorya"],
+            "Kagera": ["Bukoba MC", "Bukoba DC", "Muleba", "Karagwe", "Kyerwa", "Ngara"],
+            "Tabora": ["Tabora MC", "Tabora DC", "Uyui", "Sikonge", "Kaliua", "Nzega"],
+            "Ruvuma": ["Songea MC", "Songea DC", "Mbinga", "Namtumbo", "Tunduru", "Madaba"],
+            "Shinyanga": ["Shinyanga MC", "Shinyanga DC", "Kahama", "Kishapu", "Bariadi", "Maswa"],
+            "Kigoma": ["Kigoma MC", "Kigoma DC", "Kasulu", "Kibondo", "Kakonko", "Uvinza"],
+            "Lindi": ["Lindi MC", "Lindi DC", "Ruangwa", "Nachingwea", "Liwale", "Kilwa"],
+            "Mtwara": ["Mtwara MC", "Mtwara DC", "Masasi", "Newala", "Tandahimba", "Nanyamba"],
+            "Pemba": ["Chake Chake", "Wete", "Micheweni", "Mkoani"]
+        };
+
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
             document.getElementById('sidebar-overlay').classList.toggle('hidden');
         }
 
-        // Dynamically populate Region dropdown based on loaded orders
+        // Populate the Filter Dropdowns on page load
         function populateRegionFilter() {
-            const select = document.getElementById('filter-region');
-            if(!select) return;
-            const currentVal = select.value;
-            const regions = [...new Set(allOrders.map(o => o.region).filter(Boolean))].sort();
+            const filterSelect = document.getElementById('filter-region');
+            const modalSelect = document.getElementById('ord-region');
             
-            select.innerHTML = '<option value="all">All Regions</option>';
-            regions.forEach(r => {
-                const opt = document.createElement('option');
-                opt.value = r;
-                opt.textContent = r;
-                select.appendChild(opt);
-            });
-            select.value = currentVal;
+            // Populate Filter
+            if(filterSelect) {
+                filterSelect.innerHTML = '<option value="all">All Regions</option>';
+                Object.keys(tanzaniaLocations).forEach(r => {
+                    filterSelect.innerHTML += `<option value="${r}">${r}</option>`;
+                });
+            }
+
+            // Populate Modal
+            if(modalSelect) {
+                modalSelect.innerHTML = '<option value="">Select Region...</option>';
+                Object.keys(tanzaniaLocations).forEach(r => {
+                    modalSelect.innerHTML += `<option value="${r}">${r}</option>`;
+                });
+            }
         }
 
-        // Dynamically populate City dropdown based on selected Region
+        // Update the Cities dropdown in the FILTER BAR
         function populateCityFilter() {
             const regionSelect = document.getElementById('filter-region');
             const citySelect = document.getElementById('filter-city');
@@ -382,13 +418,25 @@
             const selectedRegion = regionSelect.value;
             citySelect.innerHTML = '<option value="all">All Cities</option>';
 
-            if(selectedRegion !== 'all') {
-                const cities = [...new Set(allOrders.filter(o => o.region === selectedRegion).map(o => o.city).filter(Boolean))].sort();
-                cities.forEach(c => {
-                    const opt = document.createElement('option');
-                    opt.value = c;
-                    opt.textContent = c;
-                    citySelect.appendChild(opt);
+            if(selectedRegion !== 'all' && tanzaniaLocations[selectedRegion]) {
+                tanzaniaLocations[selectedRegion].forEach(c => {
+                    citySelect.innerHTML += `<option value="${c}">${c}</option>`;
+                });
+            }
+        }
+
+        // Update the Cities dropdown in the CREATE/EDIT ORDER MODAL
+        function populateModalCities() {
+            const regionSelect = document.getElementById('ord-region');
+            const citySelect = document.getElementById('ord-city');
+            if(!regionSelect || !citySelect) return;
+
+            const selectedRegion = regionSelect.value;
+            citySelect.innerHTML = '<option value="">Select City...</option>';
+
+            if(selectedRegion && tanzaniaLocations[selectedRegion]) {
+                tanzaniaLocations[selectedRegion].forEach(c => {
+                    citySelect.innerHTML += `<option value="${c}">${c}</option>`;
                 });
             }
         }
@@ -607,6 +655,7 @@
                 document.getElementById('ord-phone').value = o.customerPhone || '';
                 document.getElementById('ord-address').value = o.customerAddress || '';
                 document.getElementById('ord-region').value = o.region || '';
+                populateModalCities(); // Load the cities for that region
                 document.getElementById('ord-city').value = o.city || '';
                 document.getElementById('ord-image').value = o.itemImage || '';
                 document.getElementById('ord-item').value = o.itemName || '';
