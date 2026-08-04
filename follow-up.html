@@ -41,6 +41,9 @@
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name *</label><input type="text" id="ord-cust" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Phone *</label><input type="text" id="ord-phone" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
                 <div class="md:col-span-2"><label class="text-xs font-semibold text-slate-400 uppercase">Delivery Address</label><input type="text" id="ord-address" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">Region</label><input type="text" id="ord-region" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50" placeholder="e.g. Dar es Salaam"></div>
+                <div><label class="text-xs font-semibold text-slate-400 uppercase">City / District</label><input type="text" id="ord-city" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50" placeholder="e.g. Kinondoni"></div>
+                <div class="md:col-span-2"><label class="text-xs font-semibold text-slate-400 uppercase">Item Image URL</label><input type="text" id="ord-image" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50" placeholder="https://example.com/image.jpg"></div>
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Item Name *</label><input type="text" id="ord-item" required class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Quantity</label><input type="number" id="ord-qty" value="1" min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Total Amount (TZS)</label><input type="number" id="ord-amount" value="0" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500/50"></div>
@@ -201,8 +204,14 @@
                 <div id="view-orders" class="hidden">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <h2 id="orders-title" class="text-lg font-bold text-white">All Orders</h2>
-                        <div class="flex gap-3 w-full md:w-auto">
-                            <input type="text" id="orders-search" oninput="renderOrders()" placeholder="Search..." class="flex-1 md:w-64 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50">
+                        <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+                            <input type="text" id="orders-search" oninput="renderOrders()" placeholder="Search name, phone, ID..." class="flex-1 md:w-48 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50">
+                            <select id="filter-region" onchange="populateCityFilter(); renderOrders()" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50">
+                                <option value="all">All Regions</option>
+                            </select>
+                            <select id="filter-city" onchange="renderOrders()" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50">
+                                <option value="all">All Cities</option>
+                            </select>
                             <button onclick="exportCSV()" class="bg-slate-700 text-white font-bold px-4 py-2 rounded-xl hover:bg-slate-600 transition-colors text-sm flex items-center gap-2"><span class="iconify" data-icon="mdi:file-export"></span> Export</button>
                             <button type="button" onclick="openOrderModal()" class="bg-emerald-500 text-white font-bold px-5 py-2 rounded-xl hover:bg-emerald-400 transition-colors text-sm flex items-center gap-2 whitespace-nowrap"><span class="iconify" data-icon="mdi:plus"></span> New Order</button>
                         </div>
@@ -330,6 +339,7 @@
             db.collection('orders').onSnapshot(snap => {
                 allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 renderKPIs(); renderCharts(); renderOrders(); renderReports();
+                populateRegionFilter();
             });
             db.collection('users').onSnapshot(snap => {
                 allUsers = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -344,6 +354,43 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
             document.getElementById('sidebar-overlay').classList.toggle('hidden');
+        }
+
+        // Dynamically populate Region dropdown based on loaded orders
+        function populateRegionFilter() {
+            const select = document.getElementById('filter-region');
+            if(!select) return;
+            const currentVal = select.value;
+            const regions = [...new Set(allOrders.map(o => o.region).filter(Boolean))].sort();
+            
+            select.innerHTML = '<option value="all">All Regions</option>';
+            regions.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r;
+                opt.textContent = r;
+                select.appendChild(opt);
+            });
+            select.value = currentVal;
+        }
+
+        // Dynamically populate City dropdown based on selected Region
+        function populateCityFilter() {
+            const regionSelect = document.getElementById('filter-region');
+            const citySelect = document.getElementById('filter-city');
+            if(!citySelect || !regionSelect) return;
+            
+            const selectedRegion = regionSelect.value;
+            citySelect.innerHTML = '<option value="all">All Cities</option>';
+
+            if(selectedRegion !== 'all') {
+                const cities = [...new Set(allOrders.filter(o => o.region === selectedRegion).map(o => o.city).filter(Boolean))].sort();
+                cities.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    citySelect.appendChild(opt);
+                });
+            }
         }
 
         function switchView(view, el, filter = null) {
@@ -449,7 +496,13 @@
         function renderOrders() {
             const tbody = document.getElementById('orders-tbody');
             const search = (document.getElementById('orders-search')?.value || '').toLowerCase();
+            const regionFilter = document.getElementById('filter-region')?.value || 'all';
+            const cityFilter = document.getElementById('filter-city')?.value || 'all';
             let filtered = allOrders;
+
+            // Apply Region & City Filters
+            if(regionFilter !== 'all') filtered = filtered.filter(o => (o.region || '').toLowerCase() === regionFilter.toLowerCase());
+            if(cityFilter !== 'all') filtered = filtered.filter(o => (o.city || '').toLowerCase() === cityFilter.toLowerCase());
 
             if(currentOrderFilter !== 'all') {
                 if(currentOrderFilter === 'pending') filtered = allOrders.filter(o => pendingStatuses.includes(o.status));
@@ -497,7 +550,19 @@
 
                 return `
                     <tr class="hover:bg-white/[0.02]">
-                        <td class="p-4"><div class="text-white font-medium flex items-center">${getSlaDot(o)} #${o.id.slice(-6).toUpperCase()}</div><div class="text-xs text-slate-500">${o.itemName || ''} x${o.qty||1}</div><div class="text-xs text-green-400 font-bold mt-1">TZS ${(o.totalAmount||0).toLocaleString()}</div></td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                ${o.itemImage ? 
+                                    `<img src="${o.itemImage}" alt="item" class="w-12 h-12 rounded-lg object-cover border border-white/10 flex-shrink-0">` : 
+                                    `<div class="w-12 h-12 rounded-lg bg-white/[0.05] flex items-center justify-center border border-white/10 flex-shrink-0"><span class="iconify text-slate-500 text-xl" data-icon="mdi:image-off-outline"></span></div>`
+                                }
+                                <div>
+                                    <div class="text-white font-medium flex items-center">${getSlaDot(o)} #${o.id.slice(-6).toUpperCase()}</div>
+                                    <div class="text-xs text-slate-500">${o.itemName || ''} x${o.qty||1}</div>
+                                    <div class="text-xs text-green-400 font-bold mt-1">TZS ${(o.totalAmount||0).toLocaleString()}</div>
+                                </div>
+                            </div>
+                        </td>
                         <td class="p-4"><div class="text-white font-medium cursor-pointer hover:text-emerald-400" onclick="viewCustomerHistory('${o.customerPhone || ''}')">${o.customerName || 'N/A'}</div><div class="text-xs text-slate-500">${o.customerPhone || 'N/A'}</div><div class="text-xs text-slate-500 mt-1">${o.customerAddress || ''}</div></td>
                         <td class="p-4 text-slate-400 text-xs">${merchant?.shopName || merchant?.name || 'N/A'}</td>
                         <td class="p-4 text-slate-400 text-xs">${rider?.name || 'Unassigned'}</td>
@@ -541,6 +606,9 @@
                 document.getElementById('ord-cust').value = o.customerName || '';
                 document.getElementById('ord-phone').value = o.customerPhone || '';
                 document.getElementById('ord-address').value = o.customerAddress || '';
+                document.getElementById('ord-region').value = o.region || '';
+                document.getElementById('ord-city').value = o.city || '';
+                document.getElementById('ord-image').value = o.itemImage || '';
                 document.getElementById('ord-item').value = o.itemName || '';
                 document.getElementById('ord-qty').value = o.qty || 1;
                 document.getElementById('ord-amount').value = o.totalAmount || 0;
@@ -549,7 +617,11 @@
                 title.innerText = 'Create New Order';
                 document.getElementById('ord-id').value = '';
                 document.getElementById('ord-cust').value = ''; document.getElementById('ord-phone').value = '';
-                document.getElementById('ord-address').value = ''; document.getElementById('ord-item').value = '';
+                document.getElementById('ord-address').value = ''; 
+                document.getElementById('ord-region').value = ''; 
+                document.getElementById('ord-city').value = ''; 
+                document.getElementById('ord-image').value = '';
+                document.getElementById('ord-item').value = '';
                 document.getElementById('ord-qty').value = 1; document.getElementById('ord-amount').value = 0;
                 document.getElementById('ord-status').value = 'pending';
             }
@@ -565,6 +637,9 @@
                 customerName: document.getElementById('ord-cust').value.trim(),
                 customerPhone: document.getElementById('ord-phone').value.trim(),
                 customerAddress: document.getElementById('ord-address').value.trim(),
+                region: document.getElementById('ord-region').value.trim(),
+                city: document.getElementById('ord-city').value.trim(),
+                itemImage: document.getElementById('ord-image').value.trim(),
                 itemName: document.getElementById('ord-item').value.trim(),
                 qty: parseInt(document.getElementById('ord-qty').value) || 1,
                 totalAmount: parseInt(document.getElementById('ord-amount').value) || 0,
