@@ -495,8 +495,12 @@
                     c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>';
                     return; 
                 }
-            } else if(currentWsTab === 'retry') {
-                list = allOrders.filter(function(o) { return (o.processedBy === myId() || o.ccAssignedTo === myId()) && ((o.status === 'no_answer' || o.status === 'busy') || (o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() <= now)); });
+           } else if(currentWsTab === 'retry') {
+    list = allOrders.filter(function(o) { 
+        // Remove the mine-only filter — show all agents' no-reply orders
+        return (o.status === 'no_answer' || o.status === 'busy') || 
+        (o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() <= now);
+    });
                 if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No retry orders right now.</p>'; return; }
             } else if(currentWsTab === 'scheduled') {
                 list = allOrders.filter(function(o) { return (o.processedBy === myId() || o.ccAssignedTo === myId()) && o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() > now; });
@@ -590,8 +594,36 @@
         async function autoClaimRetry() {
             var now = new Date();
             var retries = allOrders.filter(function(o) {
-                var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
-                if(!isMine) return false;
+            async function autoClaimRetry() {
+    var now = new Date();
+    var retries = allOrders.filter(function(o) {
+        if(o.status === 'no_answer' || o.status === 'busy') return true;
+        if(o.status === 'callback_requested' && o.scheduledDate) {
+            var schedDate = o.scheduledDate.toDate();
+            var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            var schedMid = new Date(schedDate.getFullYear(), schedDate.getMonth(), schedDate.getDate());
+            if(schedMid <= todayMid) return true;
+        }
+        return false;
+    }).sort(function(a, b) { return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0); });
+
+    if(retries.length > 0) {
+        var orderToRetry = retries[0];
+        try {
+            await db.collection('orders').doc(orderToRetry.id).update({
+                status: 'accepted',
+                ccAssignedTo: myId(),
+                ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                timeline: firebase.firestore.FieldValue.arrayUnion({ status: 'accepted', at: new Date().toISOString(), by: window.currentUser.name, note: 'Auto-claimed for retry' })
+            });
+            showT("Re-attempting No Reply order!", "success");
+            playDing();
+        } catch (err) {
+            console.error("Error auto-claiming retry: ", err);
+        }
+    }
+}
                 if(o.status === 'no_answer' || o.status === 'busy') return true;
                 if(o.status === 'callback_requested' && o.scheduledDate) {
                     var schedDate = o.scheduledDate.toDate();
