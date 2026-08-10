@@ -193,9 +193,7 @@
                             <button onclick="nextWsPage()" id="ws-next-btn" class="px-3 py-1.5 rounded-lg bg-white/[0.05] text-slate-400 text-xs hover:bg-white/[0.1] disabled:opacity-40 disabled:cursor-not-allowed">Next →</button>
                         </div>
                     </div>
-                </div>
-
-                <!-- MY HANDLED CALLS -->
+                </div><!-- MY HANDLED CALLS -->
                 <div id="panel-mycalls" class="tab-panel hidden">
                     <div class="mb-4 relative max-w-sm">
                         <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
@@ -327,9 +325,7 @@
             auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value).catch(err => {
                 showT(err.message, "error"); btn.innerHTML = 'Sign In'; btn.disabled = false;
             });
-        }
-
-        auth.onAuthStateChanged(async user => {
+        } auth.onAuthStateChanged(async user => {
             if (user) {
                 const doc = await db.collection('users').doc(user.uid).get();
                 if (doc.exists && doc.data().active) {
@@ -413,7 +409,7 @@
         function updateDashboard() {
             var start = getDateFilter(dashFilter);
             var my = allOrders.filter(function(o) { return o.processedBy === myId() && (!start || (o.updatedAt && o.updatedAt.toDate() >= start)); });
-            document.getElementById('d-new').textContent = allOrders.filter(function(o) { return o.status === 'accepted' && !o.ccAssignedTo; }).length;
+            document.getElementById('d-new').textContent = allOrders.filter(function(o) { return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo); }).length;
             document.getElementById('d-confirmed').textContent = my.filter(function(o) { return o.callOutcome === 'confirmed'; }).length;
             document.getElementById('d-cancelled').textContent = my.filter(function(o) { return o.callOutcome === 'cancelled'; }).length;
             document.getElementById('d-noreply').textContent = my.filter(function(o) { return o.callOutcome === 'no_answer'; }).length;
@@ -496,11 +492,11 @@
                     return; 
                 }
            } else if(currentWsTab === 'retry') {
-    list = allOrders.filter(function(o) { 
-        // Remove the mine-only filter — show all agents' no-reply orders
-        return (o.status === 'no_answer' || o.status === 'busy') || 
-        (o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() <= now);
-    });
+                list = allOrders.filter(function(o) { 
+                    // Remove the mine-only filter — show all agents' no-reply orders
+                    return (o.status === 'no_answer' || o.status === 'busy') || 
+                    (o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() <= now);
+                });
                 if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No retry orders right now.</p>'; return; }
             } else if(currentWsTab === 'scheduled') {
                 list = allOrders.filter(function(o) { return (o.processedBy === myId() || o.ccAssignedTo === myId()) && o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() > now; });
@@ -570,9 +566,7 @@
             }).join('');
             
             updateWsPagination(totalWsOrders, wsStartIdx, wsEndIdx);
-        }
-
-        function updateWsPagination(total, start, end) {
+        } function updateWsPagination(total, start, end) {
             var info = document.getElementById('ws-page-info');
             var prevBtn = document.getElementById('ws-prev-btn');
             var nextBtn = document.getElementById('ws-next-btn');
@@ -594,36 +588,6 @@
         async function autoClaimRetry() {
             var now = new Date();
             var retries = allOrders.filter(function(o) {
-            async function autoClaimRetry() {
-    var now = new Date();
-    var retries = allOrders.filter(function(o) {
-        if(o.status === 'no_answer' || o.status === 'busy') return true;
-        if(o.status === 'callback_requested' && o.scheduledDate) {
-            var schedDate = o.scheduledDate.toDate();
-            var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            var schedMid = new Date(schedDate.getFullYear(), schedDate.getMonth(), schedDate.getDate());
-            if(schedMid <= todayMid) return true;
-        }
-        return false;
-    }).sort(function(a, b) { return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0); });
-
-    if(retries.length > 0) {
-        var orderToRetry = retries[0];
-        try {
-            await db.collection('orders').doc(orderToRetry.id).update({
-                status: 'accepted',
-                ccAssignedTo: myId(),
-                ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                timeline: firebase.firestore.FieldValue.arrayUnion({ status: 'accepted', at: new Date().toISOString(), by: window.currentUser.name, note: 'Auto-claimed for retry' })
-            });
-            showT("Re-attempting No Reply order!", "success");
-            playDing();
-        } catch (err) {
-            console.error("Error auto-claiming retry: ", err);
-        }
-    }
-}
                 if(o.status === 'no_answer' || o.status === 'busy') return true;
                 if(o.status === 'callback_requested' && o.scheduledDate) {
                     var schedDate = o.scheduledDate.toDate();
@@ -652,13 +616,13 @@
             }
         }
 
-        async function claimNextOrder() {
+        async function claimNextOrder(isForced) {
             var now = Date.now();
-            if (now - lastClaimAttempt < 1500) return; // 1.5s cooldown to prevent spamming
+            if (!isForced && now - lastClaimAttempt < 1500) return; // 1.5s cooldown to prevent spamming
             lastClaimAttempt = now;
 
             try {
-                // Look for 'pending' orders
+                // Look for 'pending' orders first
                 const q = await db.collection('orders').where('status', '==', 'pending').limit(20).get();
                 let docs = q.docs;
 
@@ -696,9 +660,7 @@
             } catch (err) {
                 console.error("Error claiming order: ", err);
             }
-        }
-
-        function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
+        } function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
         function addQuickNote(id, text) { var ta = document.getElementById('notes-'+id); if(ta.value.trim() !== '') { ta.value += ', ' + text; } else { ta.value = text; } }
 
         async function startTimer(id) {
@@ -840,9 +802,7 @@
                     '<td class="px-4 py-3 text-xs text-slate-500">' + formatDate(o.updatedAt) + '</td>' +
                 '</tr>';
             }).join('');
-        } 
-
-        function viewShippingHistory(id) {
+        }  function viewShippingHistory(id) {
             var o = allOrders.find(function(x) { return x.id === id; });
             if(!o) return;
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
@@ -985,9 +945,7 @@
             }).join('');
             var actualEnd = Math.min(end, total);
             updateMyCallsPagination(total, start + 1, actualEnd);
-        }
-
-        function updateMyCallsPagination(totalCount, start, end) {
+        } function updateMyCallsPagination(totalCount, start, end) {
             var info = document.getElementById('mycalls-pagination-info');
             var prevBtn = document.getElementById('mycalls-prev-btn');
             var nextBtn = document.getElementById('mycalls-next-btn');
@@ -1130,8 +1088,7 @@
             }
             db.collection('users').doc(myId()).update({ agentStatus: isOnBreak ? 'break' : 'online' }).catch(function(){});
         }
-
-        function showAuthLoader(text) {
+function showAuthLoader(text) {
             var loader = document.getElementById('auth-loader');
             if(!loader) return;
             document.getElementById('auth-loader-text').innerText = text;
