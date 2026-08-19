@@ -156,19 +156,36 @@
                             <span class="iconify absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" data-icon="mdi:magnify"></span>
                             <input type="text" id="order-search" oninput="renderOrders()" placeholder="Search by ID, Phone, or Name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50">
                         </div>
-                        <select id="ship-city-filter" onchange="renderOrders()" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 min-w-[150px]">
-                            <option value="">All Cities</option>
-                            <option value="Dar es Salaam">Dar es Salaam</option>
-                            <option value="Arusha">Arusha</option>
-                            <option value="Mbeya">Mbeya</option>
-                            <option value="Mwanza">Mwanza</option>
-                            <option value="Morogoro">Morogoro</option>
-                            <option value="Tanga">Tanga</option>
-                            <option value="Dodoma">Dodoma</option>
-                            <option value="Zanzibar">Zanzibar</option>
-                            <option value="Mtwara">Mtwara</option>
-                            <option value="Kigoma">Kigoma</option>
-                        </select>
+    <select id="ship-city-filter" onchange="renderOrders()" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 min-w-[150px]">
+    <option value="">All Cities</option>
+    <option value="Dar es Salaam">Dar es Salaam</option>
+    <option value="Arusha">Arusha</option>
+    <option value="Dodoma">Dodoma</option>
+    <option value="Geita">Geita</option>
+    <option value="Iringa">Iringa</option>
+    <option value="Kagera">Kagera</option>
+    <option value="Katavi">Katavi</option>
+    <option value="Kigoma">Kigoma</option>
+    <option value="Kilimanjaro">Kilimanjaro</option>
+    <option value="Lindi">Lindi</option>
+    <option value="Manyara">Manyara</option>
+    <option value="Mara">Mara</option>
+    <option value="Mbeya">Mbeya</option>
+    <option value="Morogoro">Morogoro</option>
+    <option value="Mtwara">Mtwara</option>
+    <option value="Mwanza">Mwanza</option>
+    <option value="Njombe">Njombe</option>
+    <option value="Pwani">Pwani</option>
+    <option value="Rukwa">Rukwa</option>
+    <option value="Ruvuma">Ruvuma</option>
+    <option value="Shinyanga">Shinyanga</option>
+    <option value="Simiyu">Simiyu</option>
+    <option value="Singida">Singida</option>
+    <option value="Songwe">Songwe</option>
+    <option value="Tabora">Tabora</option>
+    <option value="Tanga">Tanga</option>
+    <option value="Zanzibar">Zanzibar</option>
+</select>
                         <input type="date" id="ship-date-filter" onchange="renderOrders()" class="bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50">
                     </div>
                     <div class="mb-6 bg-white/[0.02] border border-white/[0.08] rounded-xl p-1.5 flex gap-1 flex-wrap w-fit">
