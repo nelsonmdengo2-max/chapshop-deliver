@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFRiROUTE — QR Code Studio</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 40'%3E%3Cpath d='M2 2h12l12 18L14 38H2l12-18z' fill='%2312a150'/%3E%3Cpath d='M18 2h12l12 18L30 38H18l12-18z' fill='%231a6ee0'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>window.QRCode||document.write('<script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"><\/script>');</script>
+<style>
+.hidden{display:none!important} /* ← THE FIX — this line was missing */
+:root{--green:#12a150;--green-d:#0c7a3c;--blue:#1a6ee0;--red:#e5484d;--ink:#12253c;--muted:#5c6e83;--bg:#f2f5f9;--card:#fff;--line:#e3e9f1}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14.5px;line-height:1.5}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
+header{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+header svg{width:52px;height:45px}
+header b{font-size:22px;display:block;letter-spacing:.5px}
+header b .i{font-style:normal;color:var(--green)}
+header small{display:block;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:2px}
+.lib-warn{background:#fde8e8;border:1px solid #f6c9ca;color:#c62a2f;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:13.5px}
+.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 1px 2px rgba(16,35,58,.04)}
+.card h3{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:20px 0 10px}
+.card h3:first-child{margin-top:0}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.tchip{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);font-family:inherit;transition:.15s}
+.tchip:hover{border-color:var(--blue);color:var(--blue)}
+.tchip.active{background:linear-gradient(90deg,rgba(18,161,80,.12),rgba(26,110,224,.15));color:var(--ink);border-color:var(--green)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12.5px;font-weight:600;color:#33465c;margin-bottom:5px}
+.field input{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;background:#fbfcfe;color:var(--ink);transition:.15s}
+.field input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,110,224,.12)}
+.swatches{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.sw{width:38px;height:38px;border-radius:11px;border:2px solid var(--line);cursor:pointer;transition:.15s}
+.sw:hover{transform:scale(1.07)}
+.sw.active{border-color:var(--ink);box-shadow:0 0 0 3px rgba(18,161,80,.2)}
+.sw-custom{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);font-weight:600}
+.sw-custom input{width:38px;height:38px;border:2px dashed #b9c8da;border-radius:11px;background:none;cursor:pointer;padding:2px}
+select{padding:9px 12px;border:1px solid var(--line);border-radius:9px;font-family:inherit;font-size:13.5px;background:#fbfcfe;color:var(--ink)}
+select:focus{outline:none;border-color:var(--blue)}
+.preview-card{text-align:center}
+.qr-stage{background:#fff;border:1.5px dashed var(--line);border-radius:16px;padding:22px;margin-bottom:14px;min-height:290px;display:flex;align-items:center;justify-content:center}
+.qr-stage.has{border-style:solid;border-color:#bfe3cd}
+#qr-canvas{width:250px;height:250px;max-width:100%;cursor:pointer;border-radius:8px}
+.qr-empty{color:var(--muted);font-size:13.5px;text-align:center;padding:30px 10px}
+.qr-empty .em{font-size:40px;display:block;margin-bottom:10px}
+.data-str{font-family:monospace;font-size:12px;color:var(--blue);background:#eef4fc;border-radius:8px;padding:8px 12px;word-break:break-all;margin-bottom:14px;display:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid transparent;border-radius:11px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit;background:var(--blue);color:#fff;text-decoration:none}
+.btn:hover{filter:brightness(1.08)}
+.btn.green{background:var(--green)}
+.btn.ghost{background:#fff;border-color:var(--line);color:var(--ink)}
+.btn.ghost:hover{border-color:var(--blue);color:var(--blue);filter:none}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--muted);margin-top:12px}
+.tips{margin-top:18px}
+.tips ol{padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:#33465c;margin-top:10px}
+.tips .warn{background:#fff7e8;border:1px solid #f6dca8;color:#8a5b00;border-radius:11px;padding:12px 14px;font-size:13px;margin-bottom:12px}
+.tips code{background:#eef2f7;border-radius:6px;padding:2px 7px;font-size:12.5px;color:var(--blue)}
+.poster{position:fixed;inset:0;background:rgba(8,18,30,.65);z-index:150;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
+.poster-card{background:#fff;color:var(--ink);border-radius:18px;padding:46px 46px 38px;max-width:430px;width:100%;text-align:center;position:relative;box-shadow:0 30px 60px rgba(0,0,0,.35)}
+.poster-actions{position:absolute;top:12px;right:12px;display:flex;gap:7px}
+.poster-actions button{padding:7px 13px;border-radius:9px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit}
+.pa-print{background:var(--green);color:#fff}
+.pa-close{background:#e5eaf0;color:#333}
+.poster-card svg{width:84px;height:72px;margin-bottom:10px}
+.poster-card h1{font-size:27px;letter-spacing:.5px}
+.poster-card h1 .i{font-style:normal;color:var(--green)}
+.poster-card .tag{font-size:9.5px;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;margin:4px 0 24px}
+.poster-card img{width:240px;height:240px;max-width:100%;border:1px solid #eef1f5;border-radius:14px;padding:10px;margin-bottom:22px}
+.poster-card h2{font-size:17px;letter-spacing:.5px;margin-bottom:8px}
+.poster-card .purl{font-family:monospace;font-size:13px;color:var(--blue);word-break:break-all}
+.poster-bar{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--blue));margin-top:26px}
+@media print{body *{visibility:hidden}.poster,.poster *{visibility:visible}.poster{position:fixed;inset:0;background:#fff;padding:0;display:flex;align-items:center;justify-content:center}.poster-actions{display:none!important}.poster-card{box-shadow:none;border-radius:0;max-width:100%}}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+#toast{position:fixed;bottom:20px;right:20px;background:#0f2438;color:#fff;padding:12px 16px;border-radius:11px;font-size:13.5px;box-shadow:0 10px 30px rgba(8,18,30,.35);border-left:4px solid var(--green);opacity:0;transform:translateY(10px);transition:.3s;pointer-events:none;z-index:200}
+#toast.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg viewBox="0 0 46 40" aria-hidden="true"><path d="M2 2h12l12 18L14 38H2l12-18z" fill="#12a150"/><path d="M18 2h12l12 18L30 38H18l12-18z" fill="#1a6ee0" opacity=".92"/></svg>
+    <div><b>AFR<span class="i">i</span>ROUTE</b><small>QR Code Studio</small></div>
+  </header>
+
+  <div class="lib-warn hidden" id="lib-warn">⚠️ The QR library couldn't load from the internet. Please check your connection and refresh the page — the QR code needs this library to draw.</div>
+
+  <div class="grid">
+    <!-- SETTINGS -->
+    <div class="card">
+      <h3>1 · What should the QR open?</h3>
+      <div class="chips" id="type-chips"></div>
+      <div style="margin-top:14px">
+        <div class="field"><label id="main-label">Website URL</label><input id="qr-main" value="afriroute.live" placeholder="afriroute.live" oninput="render()"></div>
+        <div class="field hidden" id="extra-field"><label id="extra-label"></label><input id="qr-extra" oninput="render()"></div>
+      </div>
+
+      <h3>2 · Style</h3>
+      <div class="swatches" id="swatches">
+        <button class="sw active" style="background:#12a150" title="AFRiROUTE Green" onclick="setColor('#12a150',this)"></button>
+        <button class="sw" style="background:#1a6ee0" title="AFRiROUTE Blue" onclick="setColor('#1a6ee0',this)"></button>
+        <button class="sw" style="background:#12253c" title="Dark" onclick="setColor('#12253c',this)"></button>
+        <button class="sw" style="background:#0c1c2e" title="Navy" onclick="setColor('#0c1c2e',this)"></button>
+        <span class="sw-custom">Custom <input type="color" value="#12a150" onchange="setColor(this.value,null)"></span>
+      </div>
+      <div class="field" style="margin-top:14px"><label>Download size (pixels)</label>
+        <select id="size-select" onchange="exportSize=parseInt(this.value)">
+          <option value="512">512 × 512 — small (business cards)</option>
+          <option value="1024" selected>1024 × 1024 — medium (flyers)</option>
+          <option value="2048">2048 × 2048 — large (posters, banners)</option>
+        </select>
+      </div>
+
+      <h3>3 · Done!</h3>
+      <p class="hint" style="margin:0">The QR updates live on the right as you type. It <b>never expires</b> — as long as your link stays live, the QR keeps working forever.</p>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="card preview-card">
+      <h3 style="text-align:left">Live preview</h3>
+      <div class="qr-stage" id="qr-stage">
+        <div class="qr-empty" id="qr-empty"><span class="em">📱</span>Choose a type and type your link<br>to generate your QR code…</div>
+        <canvas id="qr-canvas" class="hidden" title="Click to open the link" onclick="testLink()"></canvas>
+      </div>
+      <div class="data-str" id="data-str"></div>
+      <div class="btn-row">
+        <button class="btn green" id="btn-download" onclick="downloadQR()" disabled>⬇ Download PNG</button>
+        <button class="btn" id="btn-poster" onclick="openPoster()" disabled>🖨 Print poster</button>
+        <button class="btn ghost" id="btn-test" onclick="testLink()" disabled>↗ Open link</button>
+      </div>
+      <p class="hint">💡 Tip: always keep the QR on a <b>white background</b> and don't print it too small — minimum 2×2 cm for reliable scanning.</p>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="card tips">
+    <h3>⚠️ Important — your link must be LIVE on the internet</h3>
+    <div class="warn">A QR code can only point to a <b>public web link</b> (like <code>https://afriroute.live</code>). A file sitting on your computer will <b>not</b> open on someone else's phone — you must put your website online first.</div>
+    <h3>🚀 How to put AFRiROUTE online for FREE (2 minutes)</h3>
+    <ol>
+      <li><b>Netlify Drop (easiest):</b> go to <code>app.netlify.com/drop</code> → drag your <code>afriroute-dashboard.html</code> file in → you instantly get a live link like <code>https://afriroute-demo.netlify.app</code>. Paste that link above and generate your QR.</li>
+      <li><b>GitHub Pages (permanent & free):</b> create a free account at github.com → new repository → upload your HTML file → Settings → Pages → turn it on.</li>
+      <li><b>Vercel:</b> vercel.com → import your file → free live link in seconds.</li>
+      <li><b>Custom domain (optional, later):</b> buy <code>afriroute.live</code> (~$10/year) and connect it — your QR stays the same as long as the domain doesn't change.</li>
+    </ol>
+    <h3>📍 Where to use your QR code</h3>
+    <ol>
+      <li>Posters &amp; flyers — "Scan to order a delivery"</li>
+      <li>Business cards — front side, big and bold</li>
+      <li>Stickers on delivery bikes, boxes &amp; packages</li>
+      <li>WhatsApp status / Instagram bio link</li>
+      <li>Shop counter — "Scan to track your order"</li>
+    </ol>
+  </div>
+</div>
+
+<div id="poster" class="poster hidden">
+  <div class="poster-card">
+    <div class="poster-actions">
+      <button class="pa-print" onclick="window.print()">🖨 Print</button>
+      <button class="pa-close" onclick="closePoster()">✕</button>
+    </div>
+    <svg viewBox="0 0 46 40" aria-hidden="true"><path d="M2 2h12l12 18L14 38H2l12-18z" fill="#12a150"/><path d="M18 2h12l12 18L30 38H18l12-18z" fill="#1a6ee0" opacity=".92"/></svg>
+    <h1>AFR<span class="i">i</span>ROUTE</h1>
+    <div class="tag">Delivery &amp; Transportation</div>
+    <img id="poster-qr" alt="QR code">
+    <h2 id="poster-cta">SCAN TO VISIT OUR WEBSITE</h2>
+    <div class="purl" id="poster-data"></div>
+    <div class="poster-bar"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+let type='web',qrColor='#12a150',exportSize=1024,lastData='';
+
+const TYPES={
+  web:  {label:'🌐 Website',   main:'Website URL',      ph:'afriroute.live or https://afriroute.live', extra:null, cta:'SCAN TO VISIT OUR WEBSITE', test:true},
+  wa:   {label:'💬 WhatsApp',  main:'WhatsApp number',  ph:'+255 754 000 111 or 0754...', extra:'Prefilled WhatsApp message (optional)', phx:'Hello AFRiROUTE! I want to order a delivery.', cta:'SCAN TO CHAT WITH US ON WHATSAPP', test:true},
+  tel:  {label:'📞 Phone call',main:'Phone number',     ph:'+255 754 000 111', extra:null, cta:'SCAN TO CALL US', test:false},
+  sms:  {label:'✉️ SMS',       main:'Phone number',     ph:'+255 754 000 111', extra:'Prefilled SMS message (optional)', phx:'Hello AFRiROUTE!', cta:'SCAN TO TEXT US', test:false},
+  mail: {label:'📧 Email',     main:'Email address',    ph:'hello@afriroute.live', extra:null, cta:'SCAN TO EMAIL US', test:true},
+  wifi: {label:'📶 WiFi',      main:'WiFi network name',ph:'AFRiROUTE Office', extra:'WiFi password (leave empty if open)', phx:'password123', cta:'SCAN TO JOIN OUR WIFI', test:false}
+};
+
+function toast(msg){
+  const t=$('#toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function setType(t){
+  type=t;
+  const c=TYPES[t];
+  $$('#type-chips .tchip').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+  $('#main-label').textContent=c.main;
+  const main=$('#qr-main');main.placeholder=c.ph;
+  if(c.extra){
+    $('#extra-field').classList.remove('hidden');
+    $('#extra-label').textContent=c.extra;
+    $('#qr-extra').placeholder=c.phx||'';
+  }else{
+    $('#extra-field').classList.add('hidden');
+  }
+  render();
+}
+
+function buildData(){
+  const v=$('#qr-main').value.trim();
+  if(!v)return'';
+  if(type==='web'){
+    let u=v;
+    if(!/^[a-z][a-z0-9+.-]*:\/\//i.test(u))u='https://'+u;
+    try{new URL(u)}catch(e){return''}
+    return u;
+  }
+  if(type==='wa'){
+    let n=v.replace(/\D/g,'');if(!n)return'';
+    if(n.startsWith('0'))n='255'+n.slice(1);
+    if(n.length===9&&!n.startsWith('255'))n='255'+n;
+    const msg=$('#qr-extra').value.trim();
+    return 'https://wa.me/'+n+(msg?'?text='+encodeURIComponent(msg):'');
+  }
+  if(type==='tel'){
+    const n=v.replace(/[^\d+]/g,'');return n?'tel:+'+n.replace(/^\+/,''):'';
+  }
+  if(type==='sms'){
+    const n=v.replace(/\D/g,'');if(!n)return'';
+    const msg=$('#qr-extra').value.trim();
+    return 'SMSTO:'+n+(msg?':'+msg:'');
+  }
+  if(type==='mail'){
+    return /^[\w.+-]+@[\w-]+\.[\w.-]+$/.test(v)?'mailto:'+v:'';
+  }
+  if(type==='wifi'){
+    const pass=$('#qr-extra').value.trim();
+    const escq=s=>s.replace(/([\\;,:"])/g,'\\$1');
+    return 'WIFI:T:WPA;S:'+escq(v)+';P:'+escq(pass)+';;';
+  }
+  return'';
+}
+
+function render(){
+  const data=buildData();
+  lastData=data;
+  const stage=$('#qr-stage'),cv=$('#qr-canvas'),empty=$('#qr-empty'),ds=$('#data-str');
+  const valid=!!data&&!!window.QRCode;
+  ['btn-download','btn-poster'].forEach(id=>$('#'+id).disabled=!valid);
+  $('#btn-test').disabled=!valid||!TYPES[type].test;
+  if(!data){stage.classList.remove('has');cv.classList.add('hidden');empty.classList.remove('hidden');ds.style.display='none';return;}
+  if(!window.QRCode){empty.classList.remove('hidden');empty.innerHTML='<span class="em">⚠️</span>QR library failed to load.<br>Check your internet connection and refresh.';return;}
+  QRCode.toCanvas(cv,data,{width:640,margin:2,errorCorrectionLevel:'H',color:{dark:qrColor,light:'#ffffff'}},err=>{
+    if(err){toast('Could not generate QR — link may be too long');return;}
+    stage.classList.add('has');cv.classList.remove('hidden');empty.classList.add('hidden');
+    ds.style.display='block';ds.textContent=data;
+  });
+}
+
+function setColor(c,btn){
+  qrColor=c;
+  $$('#swatches .sw').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  render();
+}
+
+function makeQR(data,size,cb){
+  const off=document.createElement('canvas');
+  QRCode.toCanvas(off,data,{width:size,margin:2,errorCorrectionLevel:'H',color:{dark:qrColor,light:'#ffffff'}},()=>cb(off.toDataURL('image/png')));
+}
+
+function downloadQR(){
+  if(!lastData)return;
+  makeQR(lastData,exportSize,url=>{
+    const a=document.createElement('a');
+    a.href=url;a.download='afriroute-qr-'+type+'-'+exportSize+'px.png';a.click();
+    toast('QR code downloaded ✔ ('+exportSize+'×'+exportSize+' px)');
+  });
+}
+
+function testLink(){
+  if(lastData&&TYPES[type].test)window.open(lastData,'_blank');
+}
+
+function openPoster(){
+  if(!lastData)return;
+  makeQR(lastData,800,url=>{
+    $('#poster-qr').src=url;
+    $('#poster-cta').textContent=TYPES[type].cta;
+    $('#poster-data').textContent=type==='web'?lastData:(type==='wifi'?'AFRiROUTE WiFi':lastData.replace(/^https?:\/\//,'').split('?')[0]);
+    $('#poster').classList.remove('hidden');
+  });
+}
+function closePoster(){$('#poster').classList.add('hidden');}
+
+function init(){
+  $('#type-chips').innerHTML=Object.entries(TYPES).map(([k,v])=>`<button class="tchip ${k==='web'?'active':''}" data-t="${k}" onclick="setType('${k}')">${v.label}</button>`).join('');
+  $('#poster').addEventListener('click',e=>{if(e.target.id==='poster')closePoster();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closePoster();});
+  if(!window.QRCode)$('#lib-warn').classList.remove('hidden');
+  render();
+}
+init();
+</script>
+</body>
+</html>
