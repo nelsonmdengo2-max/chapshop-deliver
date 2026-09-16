@@ -34,10 +34,6 @@
         .modal-box{background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto}
         @keyframes pulse-text { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
         .pulse-text { animation: pulse-text 1.5s ease-in-out infinite; }
-        #sync-bar{position:fixed;bottom:16px;left:16px;z-index:150;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:700;backdrop-filter:blur(8px);transition:all .3s}
-        #sync-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-        #sync-retry{margin-left:4px;padding:3px 10px;border-radius:7px;border:none;cursor:pointer;font-weight:800;font-size:11px;font-family:inherit;background:rgba(239,68,68,.3);color:#fecaca}
-        #sync-retry:hover{background:rgba(239,68,68,.5)}
     </style>
 </head>
 <body class="bg-[#020617] text-white min-h-screen">
@@ -75,13 +71,6 @@
     <!-- APP -->
     <div id="app-screen" class="hidden min-h-screen lg:h-screen flex flex-col lg:flex-row lg:overflow-hidden">
 
-        <!-- LIVE CONNECTION STATUS -->
-        <div id="sync-bar" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4)">
-            <span id="sync-dot" style="background:#fbbf24"></span>
-            <span id="sync-text" style="color:#fde68a">Connecting…</span>
-            <button id="sync-retry" class="hidden" onclick="retryConnection()">RETRY</button>
-        </div>
-
         <!-- SIDEBAR -->
         <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
             <div class="p-6 border-b border-white/[0.08] flex-shrink-0">
@@ -104,7 +93,7 @@
             </nav>
             <div class="p-4 border-t border-white/[0.08] space-y-1 flex-shrink-0">
                 <button onclick="switchTab('profile')" class="sidebar-link w-full text-left" id="nav-profile"><span class="iconify text-lg" data-icon="mdi:account-cog-outline"></span> Settings</button>
-                <a href="https://chapshopdelivery.live" onclick="handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</a>
+                <a href="https://chapshopdelivery.live" onclick="return handleLogout()" class="sidebar-link w-full text-left text-red-400 hover:bg-red-500/10"><span class="iconify text-lg" data-icon="mdi:logout"></span> Logout</a>
             </div>
         </aside>
 
@@ -316,10 +305,6 @@
     <script>
         function escHtml(str) { return String(str === undefined || str === null ? '' : str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-        /* NOTE: the offline-cache line (enablePersistence) that was here before was
-           REMOVED — in some setups it stalls ALL queries and no data loads.
-           Data now loads exactly like the original page (but with faster rendering). */
-
         let allOrders=[],allAgents=[],allMerchants=[],dashFilter='all',currentWsTab='new';
         let myCallsPage=1,myCallsPageSize=20;
         let wsPage=1, wsPageSize=10;
@@ -329,38 +314,9 @@
         var knownOrderIds = new Set(), audioCtx, isOnBreak = false;
         var shipFilter = 'all';
         var lastClaimAttempt = 0;
-        var ordersInitialized = false, dataReady = false, renderQueued = false, activeTab = 'dashboard', appLoaded = false;
-        var syncUnsubs = [], watchdogTimer = null;
+        var ordersInitialized = false, dataReady = false, historyReady = false, renderQueued = false, activeTab = 'dashboard', appLoaded = false, sessionActive = true;
         const myId = function() { return window.currentUser.uid; };
         const DAILY_TARGET = 20;
-
-        /* ================= CONNECTION STATUS BAR ================= */
-        var syncErrors = {};
-        function paintSync() {
-            var bar = document.getElementById('sync-bar');
-            if (!bar) return;
-            var dot = document.getElementById('sync-dot'), txt = document.getElementById('sync-text'), retry = document.getElementById('sync-retry');
-            var keys = Object.keys(syncErrors);
-            if (keys.length) {
-                bar.style.background = 'rgba(239,68,68,.12)'; bar.style.borderColor = 'rgba(239,68,68,.5)';
-                dot.style.background = '#f87171'; txt.style.color = '#fecaca';
-                txt.textContent = syncErrors[keys[0]];
-                retry.classList.remove('hidden');
-            } else if (dataReady) {
-                bar.style.background = 'rgba(16,185,129,.12)'; bar.style.borderColor = 'rgba(16,185,129,.4)';
-                dot.style.background = '#34d399'; txt.style.color = '#a7f3d0';
-                txt.textContent = '● Live — ' + allOrders.length + ' orders';
-                retry.classList.add('hidden');
-            } else {
-                bar.style.background = 'rgba(245,158,11,.12)'; bar.style.borderColor = 'rgba(245,158,11,.4)';
-                dot.style.background = '#fbbf24'; txt.style.color = '#fde68a';
-                txt.textContent = 'Connecting…';
-                retry.classList.add('hidden');
-            }
-        }
-        function setSyncError(key, msg) { syncErrors[key] = msg; paintSync(); }
-        function clearSyncError(key) { delete syncErrors[key]; paintSync(); }
-        function retryConnection() { showT("Reconnecting…"); loadData(); }
 
         /* ================= LOADER ================= */
         function showAuthLoader(text) {
@@ -372,6 +328,16 @@
         function hideAuthLoader() {
             var loader = document.getElementById('auth-loader');
             if(loader) { loader.classList.add('hidden'); loader.classList.remove('flex'); }
+        }
+
+        /* LOGOUT — built into this page so it always works */
+        function handleLogout() {
+            sessionActive = false;
+            showAuthLoader('Logging out...');
+            try {
+                auth.signOut().then(function(){ hideAuthLoader(); }).catch(function(){ hideAuthLoader(); window.location.href = 'https://chapshopdelivery.live'; });
+            } catch(e) { hideAuthLoader(); window.location.href = 'https://chapshopdelivery.live'; }
+            return false; // stay on the login screen
         }
 
         function handleLogin(e) {
@@ -388,8 +354,9 @@
         /* ================= AUTH (single handler) ================= */
         auth.onAuthStateChanged(async user => {
             if (user) {
+                sessionActive = true;
                 showAuthLoader('Loading your account...');
-                var safety = setTimeout(hideAuthLoader, 20000);
+                var safety = setTimeout(hideAuthLoader, 25000);
                 try {
                     const doc = await db.collection('users').doc(user.uid).get();
                     if (doc.exists && doc.data().active) {
@@ -431,64 +398,69 @@
             loadData();
         }
 
+        /* ============ TWO-STAGE LOADING (the speed fix) ============
+           STAGE 1 (fast): only ACTIVE orders (pending/accepted/no_answer/
+           busy/callback) — a tiny query that arrives in seconds.
+           Agents can start calling immediately.
+           STAGE 2 (background): the full order history loads quietly and
+           takes over when ready (dashboard stats, my calls, shipping).   */
         function loadData() {
-            /* Clean up any previous listeners (used by RETRY) */
-            syncUnsubs.forEach(function(u){ try{ u(); }catch(e){} });
-            syncUnsubs = [];
-            dataReady = false; ordersInitialized = false;
-            paintSync();
 
-            var un1 = db.collection('users').where('role', '==', 'call_center').onSnapshot(function(snap) {
-                clearSyncError('agents');
+            db.collection('users').where('role', '==', 'call_center').onSnapshot(function(snap) {
                 allAgents = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
                 scheduleRender();
-            }, function(err) { setSyncError('agents', 'Agents: ' + (err.code || err.message)); });
+            }, function(err) { console.error('Agents listener:', err); });
 
-            var un2 = db.collection('users').where('role', '==', 'merchant').onSnapshot(function(snap) {
-                clearSyncError('merchants');
+            db.collection('users').where('role', '==', 'merchant').onSnapshot(function(snap) {
                 allMerchants = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
-            }, function(err) { setSyncError('merchants', 'Merchants: ' + (err.code || err.message)); });
+            }, function(err) { console.error('Merchants listener:', err); });
 
-            var un3 = db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
-                clearSyncError('orders');
+            /* STAGE 1 — fast lane */
+            var unActive = db.collection('orders')
+                .where('status', 'in', ['pending', 'accepted', 'no_answer', 'busy', 'callback_requested'])
+                .onSnapshot(function(snap) {
+                    if (historyReady) return; // full lane already took over
+                    allOrders = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
+                    onDataArrived();
+                }, function(err) { console.error('Active orders listener:', err); });
+
+            /* STAGE 2 — full history, takes over when it arrives */
+            db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
+                historyReady = true;
+                try { unActive(); } catch(e) {} // retire the fast lane
                 allOrders = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
-
-                if (!dataReady) { dataReady = true; hideAuthLoader(); paintSync(); }
-
-                if (ordersInitialized) {
-                    allOrders.forEach(function(o) { if(o.status === 'accepted' && o.ccAssignedTo === myId() && !knownOrderIds.has(o.id)) playDing(); });
-                }
-                knownOrderIds = new Set(allOrders.map(function(o) { return o.id; }));
-                ordersInitialized = true;
-
-                // BACKGROUND AUTO-CLAIM (with cooldown)
-                var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
-                var unassignedExists = allOrders.some(function(o) {
-                    return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo);
-                });
-                var now = Date.now();
-                if(currentWsTab === 'new' && !isOnBreak && myActive.length === 0 && (now - lastClaimAttempt > 1500)) {
-                    lastClaimAttempt = now;
-                    if(unassignedExists) { claimNextOrder(); } else { autoClaimRetry(); }
-                }
-
-                updateDashboard();
-                renderActivePanel(activeTab);
+                onDataArrived();
             }, function(err) {
-                hideAuthLoader();
-                setSyncError('orders', 'Orders: ' + (err.code || err.message));
+                console.error('Orders listener:', err);
+                if (sessionActive) showT("Orders: " + (err.code || err.message), "error");
             });
-
-            syncUnsubs.push(un1, un2, un3);
-
-            /* Watchdog: if nothing arrives in 30s, tell the agent clearly */
-            clearTimeout(watchdogTimer);
-            watchdogTimer = setTimeout(function() {
-                if (!dataReady) setSyncError('timeout', 'No data received — click RETRY');
-            }, 30000);
         }
 
-        /* ================= SMART RENDERING (only visible tab refreshes) ================= */
+        function onDataArrived() {
+            if (!dataReady) { dataReady = true; hideAuthLoader(); }
+
+            if (ordersInitialized) {
+                allOrders.forEach(function(o) { if(o.status === 'accepted' && o.ccAssignedTo === myId() && !knownOrderIds.has(o.id)) playDing(); });
+            }
+            knownOrderIds = new Set(allOrders.map(function(o) { return o.id; }));
+            ordersInitialized = true;
+
+            // auto-claim
+            var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
+            var unassignedExists = allOrders.some(function(o) {
+                return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo);
+            });
+            var now = Date.now();
+            if(currentWsTab === 'new' && !isOnBreak && myActive.length === 0 && (now - lastClaimAttempt > 1500)) {
+                lastClaimAttempt = now;
+                if(unassignedExists) { claimNextOrder(); } else { autoClaimRetry(); }
+            }
+
+            updateDashboard();
+            renderActivePanel(activeTab);
+        }
+
+        /* ================= SMART RENDERING ================= */
         function renderActivePanel(t) {
             if (!dataReady) return;
             if (t === 'dashboard') updateDashboard();
@@ -566,8 +538,9 @@
             }).length;
             document.getElementById('cc-commission-text').textContent = 'TZS ' + (monthlyConfirmed * COMMISSION_PER_CONFIRMATION).toLocaleString();
 
-            renderLeaderboard();
-            renderAgentOfMonth();
+            /* leaderboard + agent of month wait for the full history
+               (they need old orders to be correct) */
+            if (historyReady) { renderLeaderboard(); renderAgentOfMonth(); }
         }
 
         function switchWs(tab) {
@@ -1284,11 +1257,6 @@
             db.collection('users').doc(myId()).update({ agentStatus: isOnBreak ? 'break' : 'online' }).catch(function(){});
         }
 
-        // AUTH LOADER wiring
-        document.addEventListener('click', function(e) {
-            var btn = e.target.closest('[onclick*="handleLogout"]');
-            if(btn) { showAuthLoader('Logging out...'); setTimeout(hideAuthLoader, 3000); }
-        });
         var toastEl = document.getElementById('toast');
         if(toastEl) {
             var observer = new MutationObserver(function() { if (toastEl.classList.contains('show')) { hideAuthLoader(); } });
