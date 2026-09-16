@@ -34,6 +34,10 @@
         .modal-box{background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px;max-width:500px;width:100%;max-height:85vh;overflow-y:auto}
         @keyframes pulse-text { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
         .pulse-text { animation: pulse-text 1.5s ease-in-out infinite; }
+        #sync-bar{position:fixed;bottom:16px;left:16px;z-index:150;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:700;backdrop-filter:blur(8px);transition:all .3s}
+        #sync-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+        #sync-retry{margin-left:4px;padding:3px 10px;border-radius:7px;border:none;cursor:pointer;font-weight:800;font-size:11px;font-family:inherit;background:rgba(239,68,68,.3);color:#fecaca}
+        #sync-retry:hover{background:rgba(239,68,68,.5)}
     </style>
 </head>
 <body class="bg-[#020617] text-white min-h-screen">
@@ -44,7 +48,6 @@
             <div class="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin"></div>
         </div>
         <p id="auth-loader-text" class="mt-5 text-slate-400 text-sm font-semibold tracking-wide pulse-text">Loading...</p>
-        <p class="mt-2 text-slate-600 text-xs">Offline cache enabled — next logins open much faster</p>
     </div>
 
     <div id="toast" class="toast bg-[#0f172a] border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
@@ -71,6 +74,13 @@
 
     <!-- APP -->
     <div id="app-screen" class="hidden min-h-screen lg:h-screen flex flex-col lg:flex-row lg:overflow-hidden">
+
+        <!-- LIVE CONNECTION STATUS -->
+        <div id="sync-bar" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4)">
+            <span id="sync-dot" style="background:#fbbf24"></span>
+            <span id="sync-text" style="color:#fde68a">Connecting…</span>
+            <button id="sync-retry" class="hidden" onclick="retryConnection()">RETRY</button>
+        </div>
 
         <!-- SIDEBAR -->
         <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
@@ -306,10 +316,9 @@
     <script>
         function escHtml(str) { return String(str === undefined || str === null ? '' : str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-        /* ================= SPEED FIX #1: Firestore offline cache =================
-           After the FIRST login, all orders are cached on the computer.
-           Next logins show everything almost instantly from cache, then sync. */
-        try { if (typeof db !== 'undefined' && db.enablePersistence) { db.enablePersistence({ synchronizeTabs: true }).catch(function(){}); } } catch(e) {}
+        /* NOTE: the offline-cache line (enablePersistence) that was here before was
+           REMOVED — in some setups it stalls ALL queries and no data loads.
+           Data now loads exactly like the original page (but with faster rendering). */
 
         let allOrders=[],allAgents=[],allMerchants=[],dashFilter='all',currentWsTab='new';
         let myCallsPage=1,myCallsPageSize=20;
@@ -321,10 +330,39 @@
         var shipFilter = 'all';
         var lastClaimAttempt = 0;
         var ordersInitialized = false, dataReady = false, renderQueued = false, activeTab = 'dashboard', appLoaded = false;
+        var syncUnsubs = [], watchdogTimer = null;
         const myId = function() { return window.currentUser.uid; };
         const DAILY_TARGET = 20;
 
-        /* ================= LOADER HELPERS ================= */
+        /* ================= CONNECTION STATUS BAR ================= */
+        var syncErrors = {};
+        function paintSync() {
+            var bar = document.getElementById('sync-bar');
+            if (!bar) return;
+            var dot = document.getElementById('sync-dot'), txt = document.getElementById('sync-text'), retry = document.getElementById('sync-retry');
+            var keys = Object.keys(syncErrors);
+            if (keys.length) {
+                bar.style.background = 'rgba(239,68,68,.12)'; bar.style.borderColor = 'rgba(239,68,68,.5)';
+                dot.style.background = '#f87171'; txt.style.color = '#fecaca';
+                txt.textContent = syncErrors[keys[0]];
+                retry.classList.remove('hidden');
+            } else if (dataReady) {
+                bar.style.background = 'rgba(16,185,129,.12)'; bar.style.borderColor = 'rgba(16,185,129,.4)';
+                dot.style.background = '#34d399'; txt.style.color = '#a7f3d0';
+                txt.textContent = '● Live — ' + allOrders.length + ' orders';
+                retry.classList.add('hidden');
+            } else {
+                bar.style.background = 'rgba(245,158,11,.12)'; bar.style.borderColor = 'rgba(245,158,11,.4)';
+                dot.style.background = '#fbbf24'; txt.style.color = '#fde68a';
+                txt.textContent = 'Connecting…';
+                retry.classList.add('hidden');
+            }
+        }
+        function setSyncError(key, msg) { syncErrors[key] = msg; paintSync(); }
+        function clearSyncError(key) { delete syncErrors[key]; paintSync(); }
+        function retryConnection() { showT("Reconnecting…"); loadData(); }
+
+        /* ================= LOADER ================= */
         function showAuthLoader(text) {
             var loader = document.getElementById('auth-loader');
             if(!loader) return;
@@ -347,11 +385,11 @@
             });
         }
 
-        /* ================= SINGLE auth handler (removed the duplicate) ================= */
+        /* ================= AUTH (single handler) ================= */
         auth.onAuthStateChanged(async user => {
             if (user) {
                 showAuthLoader('Loading your account...');
-                var safety = setTimeout(hideAuthLoader, 15000); // never freeze forever
+                var safety = setTimeout(hideAuthLoader, 20000);
                 try {
                     const doc = await db.collection('users').doc(user.uid).get();
                     if (doc.exists && doc.data().active) {
@@ -382,12 +420,10 @@
             document.getElementById('header-avatar').textContent = (window.currentUser.name || 'A').charAt(0).toUpperCase();
             document.getElementById('set-name').value = window.currentUser.name || '';
             document.getElementById('set-email').value = window.currentUser.email || '';
-            /* BUG FIX: restore break status saved in the profile */
             isOnBreak = (window.currentUser.agentStatus === 'break');
             applyBreakUI();
         }
 
-        /* Idempotent loader-start (safe even if core.js also calls it) */
         function onAppLoaded() {
             if (appLoaded) return;
             appLoaded = true;
@@ -396,21 +432,29 @@
         }
 
         function loadData() {
-            db.collection('users').where('role', '==', 'call_center').onSnapshot(function(snap) {
+            /* Clean up any previous listeners (used by RETRY) */
+            syncUnsubs.forEach(function(u){ try{ u(); }catch(e){} });
+            syncUnsubs = [];
+            dataReady = false; ordersInitialized = false;
+            paintSync();
+
+            var un1 = db.collection('users').where('role', '==', 'call_center').onSnapshot(function(snap) {
+                clearSyncError('agents');
                 allAgents = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
                 scheduleRender();
-            });
+            }, function(err) { setSyncError('agents', 'Agents: ' + (err.code || err.message)); });
 
-            db.collection('users').where('role', '==', 'merchant').onSnapshot(function(snap) {
+            var un2 = db.collection('users').where('role', '==', 'merchant').onSnapshot(function(snap) {
+                clearSyncError('merchants');
                 allMerchants = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
-            });
+            }, function(err) { setSyncError('merchants', 'Merchants: ' + (err.code || err.message)); });
 
-            db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
+            var un3 = db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
+                clearSyncError('orders');
                 allOrders = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
 
-                if (!dataReady) { dataReady = true; hideAuthLoader(); }  // ← first data arrived, dismiss loader
+                if (!dataReady) { dataReady = true; hideAuthLoader(); paintSync(); }
 
-                /* BUG FIX: only play the "new order" ding for NEW assignments, not all existing ones after refresh */
                 if (ordersInitialized) {
                     allOrders.forEach(function(o) { if(o.status === 'accepted' && o.ccAssignedTo === myId() && !knownOrderIds.has(o.id)) playDing(); });
                 }
@@ -432,13 +476,19 @@
                 renderActivePanel(activeTab);
             }, function(err) {
                 hideAuthLoader();
-                showT("Connection problem — retrying automatically...", "error");
+                setSyncError('orders', 'Orders: ' + (err.code || err.message));
             });
+
+            syncUnsubs.push(un1, un2, un3);
+
+            /* Watchdog: if nothing arrives in 30s, tell the agent clearly */
+            clearTimeout(watchdogTimer);
+            watchdogTimer = setTimeout(function() {
+                if (!dataReady) setSyncError('timeout', 'No data received — click RETRY');
+            }, 30000);
         }
 
-        /* ================= SPEED FIX #2: smart rendering =================
-           Only the tab you are LOOKING AT gets re-rendered. Before, every
-           single change rebuilt every table on the page. */
+        /* ================= SMART RENDERING (only visible tab refreshes) ================= */
         function renderActivePanel(t) {
             if (!dataReady) return;
             if (t === 'dashboard') updateDashboard();
@@ -465,7 +515,7 @@
             document.getElementById('panel-' + t).classList.remove('hidden');
             document.getElementById('nav-' + t).classList.add('active');
             if(window.innerWidth < 1024) toggleSidebar();
-            renderActivePanel(t);   // ← render on demand when the tab opens (fast)
+            renderActivePanel(t);
         }
 
         function getDateFilter(filter) {
@@ -477,7 +527,6 @@
             return s;
         }
 
-        /* BUG FIX: no longer relies on the broken global `event` */
         function filterDash(f, el) {
             dashFilter = f;
             document.querySelectorAll('.dash-btn').forEach(function(b) { b.className = 'dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'; });
@@ -496,7 +545,6 @@
             document.getElementById('d-scheduled').textContent = my.filter(function(o) { return o.callOutcome === 'callback_requested'; }).length;
             document.getElementById('d-outregion').textContent = my.filter(function(o) { return o.callOutcome === 'out_of_region'; }).length;
             document.getElementById('d-wrong').textContent = my.filter(function(o) { return o.callOutcome === 'wrong_number'; }).length;
-            /* BUG FIX: Delivered/Returned now respect the agent + date filter like all other cards */
             document.getElementById('d-delivered').textContent = my.filter(function(o) { return o.status === 'delivered'; }).length;
             document.getElementById('d-returned').textContent = my.filter(function(o) { return o.status === 'returned'; }).length;
             var todayStart = new Date(); todayStart.setHours(0,0,0,0);
@@ -517,6 +565,9 @@
                 return false;
             }).length;
             document.getElementById('cc-commission-text').textContent = 'TZS ' + (monthlyConfirmed * COMMISSION_PER_CONFIRMATION).toLocaleString();
+
+            renderLeaderboard();
+            renderAgentOfMonth();
         }
 
         function switchWs(tab) {
@@ -534,9 +585,7 @@
         function getCustomerHistory(phone) { return allOrders.filter(function(o) { return o.customerPhone === phone && o.processedBy; }); }
         function fmtDur(s){if(!s||s<=0)return'0s';if(s<60)return Math.round(s)+'s';var m=Math.floor(s/60),sec=Math.round(s%60);return m+'m '+sec+'s'}
 
-        /* ================= BUG FIX: preserve agent's typing across re-renders =================
-           Before, if another agent updated ANY order while you were typing notes,
-           your notes/outcome were wiped. Now they are saved & restored. */
+        /* Preserve agent's typing (notes/outcome/date) across re-renders */
         function captureWsState() {
             var st = {};
             document.querySelectorAll('[id^="outcome-"]').forEach(function(sel) {
@@ -618,7 +667,7 @@
 
                 var waMsg = encodeURIComponent('Habari! Ninakupigia simu kutoka ChapShop Delivery kuhusu agizo lako la ' + (o.itemName || 'bidhaa yako') + '. Tafadhali niambie wakati upatikanapo.');
                 var cleanPhone = (o.customerPhone || '').replace(/[^0-9]/g, '');
-                var imgSrc = String(o.productImage || '').replace(/'/g, '%27'); // safe for onclick + src
+                var imgSrc = String(o.productImage || '').replace(/'/g, '%27');
 
                 var html = '<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-5 hover:border-cyan-500/30 transition-colors">';
                 if(currentWsTab === 'new') {
@@ -660,7 +709,7 @@
                 return html;
             }).join('');
 
-            restoreWsState(savedState);   // ← bring back what the agent was typing
+            restoreWsState(savedState);
             updateWsPagination(totalWsOrders, wsStartIdx, wsEndIdx);
         }
 
@@ -698,7 +747,6 @@
             if(retries.length === 0) return;
             var orderToRetry = retries[0];
             try {
-                /* BUG FIX: transaction = atomic claim, no double-claiming between agents */
                 var ref = db.collection('orders').doc(orderToRetry.id);
                 var ok = await db.runTransaction(async function(t) {
                     var snap = await t.get(ref);
@@ -742,7 +790,6 @@
                 });
 
                 for (let i = 0; i < docs.length; i++) {
-                    /* BUG FIX: transaction = only ONE agent can win each order */
                     var ref = docs[i].ref;
                     var won = await db.runTransaction(async function(t) {
                         var snap = await t.get(ref);
@@ -765,8 +812,6 @@
         function toggleSchedule(val, id) { var box = document.getElementById('schedule-box-'+id); if(box) box.classList.toggle('hidden', val !== 'callback_requested'); }
         function addQuickNote(id, text) { var ta = document.getElementById('notes-'+id); if(!ta) return; if(ta.value.trim() !== '') { ta.value += ', ' + text; } else { ta.value = text; } }
 
-        /* BUG FIX: viewImg was called but never existed — clicking a product image broke.
-           Now it opens the image in a clean modal. */
         function viewImg(src) {
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:420px;padding:12px">';
             h += '<img src="' + escHtml(src) + '" style="width:100%;border-radius:12px" alt="Product image">';
@@ -800,10 +845,6 @@
             renderWorkspace();
         }
 
-        /* BUG FIX: recordings are now actually saved (before, the audio was
-           recorded then thrown away). Uploaded to Firebase Storage and the URL
-           saved on the order (callRecordingUrl — the field your merchant page
-           already displays). If Storage is not set up, it skips safely. */
         async function stopTimer() {
             clearInterval(timerInterval); timerInterval = null;
             var duration = timerSeconds;
@@ -822,7 +863,7 @@
                             var snap = await task;
                             var url = await snap.ref.getDownloadURL();
                             resolve(url);
-                        } catch (e) { resolve(null); } // Storage not configured → skip silently
+                        } catch (e) { resolve(null); }
                     };
                     try { mediaRecorder.stop(); } catch(e) { resolve(null); }
                 });
@@ -838,7 +879,7 @@
                 } catch(e) { console.error("Error saving call duration:", e); }
             }
             activeTimerId = null;
-            if (activeTab === 'workspace') renderWorkspace(); // BUG FIX: button now resets properly
+            if (activeTab === 'workspace') renderWorkspace();
             return duration;
         }
 
@@ -852,8 +893,6 @@
             showT("WhatsApp verification opened!");
         }
 
-        /* BUG FIX: now waits for the timer to fully save before updating the order,
-           so the last call's duration is never lost */
         async function handleFormSubmit(id, btn) {
             try {
                 var outcome = document.getElementById('outcome-'+id).value;
@@ -1212,14 +1251,8 @@
             c.innerHTML = '<div class="flex flex-col md:flex-row items-center justify-between gap-4"><div class="flex items-center gap-4"><span class="text-4xl">👑</span><div><div class="text-[10px] text-yellow-400 uppercase font-bold tracking-wider">Top Call Center Agent - ' + now.toLocaleString('default', { month: 'long' }) + '</div><div class="text-xl font-extrabold text-yellow-400">' + escHtml(winner.name) + (isMe ? ' (You!) 🎉' : '') + '</div></div></div><div class="grid grid-cols-3 gap-6 text-center w-full md:w-auto"><div><div class="text-lg font-extrabold text-green-400">' + winner.delivered + '</div><div class="text-[10px] text-slate-500 uppercase">Delivered</div></div><div><div class="text-lg font-extrabold text-cyan-400">' + winner.confRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Confirm Rate</div></div><div><div class="text-lg font-extrabold text-violet-400">' + winner.delRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Delivery Rate</div></div></div></div>';
         }
 
-        /* PATCH: dashboard renders leaderboard + agent of month (they were rendered
-           twice per change before — one more slowdown removed) */
-        var _updateDashboard = updateDashboard;
-        updateDashboard = function() { _updateDashboard(); renderLeaderboard(); renderAgentOfMonth(); };
-
         function initAudio() {
             try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
-            /* Chrome blocks sound until the first click — resume on first interaction */
             document.addEventListener('click', function once() {
                 if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             }, { once: true });
