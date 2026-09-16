@@ -6,7 +6,7 @@
         <title>Call Center — ChapShop Delivery</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#020617">
-    <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEhaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
+    <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzA2YjZkNCIvPjxwYXRoIGQ9Ik04IDIybDQtNmgtM2w1LThoLTRsNi0xMCA2IDEwaC00bDUgOGgtM2w0IDZ6IiBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwyKSIvPjwvc3ZnPg==">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -44,6 +44,7 @@
             <div class="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin"></div>
         </div>
         <p id="auth-loader-text" class="mt-5 text-slate-400 text-sm font-semibold tracking-wide pulse-text">Loading...</p>
+        <p class="mt-2 text-slate-600 text-xs">Offline cache enabled — next logins open much faster</p>
     </div>
 
     <div id="toast" class="toast bg-[#0f172a] border border-cyan-500/30 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
@@ -70,7 +71,7 @@
 
     <!-- APP -->
     <div id="app-screen" class="hidden min-h-screen lg:h-screen flex flex-col lg:flex-row lg:overflow-hidden">
-        
+
         <!-- SIDEBAR -->
         <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-white/[0.08] z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col">
             <div class="p-6 border-b border-white/[0.08] flex-shrink-0">
@@ -83,7 +84,7 @@
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2">Main</div>
                 <button onclick="switchTab('dashboard')" class="sidebar-link active w-full text-left" id="nav-dashboard"><span class="iconify text-lg" data-icon="mdi:view-dashboard-outline"></span> Dashboard</button>
                 <button onclick="switchTab('workspace')" class="sidebar-link w-full text-left" id="nav-workspace"><span class="iconify text-lg" data-icon="mdi:phone-message-outline"></span> Workspace</button>
-                
+
                 <div class="text-[10px] font-bold text-slate-600 uppercase px-3 mb-2 mt-4 pt-4 border-t border-white/[0.05]">Tracking</div>
                 <button onclick="switchTab('mycalls')" class="sidebar-link w-full text-left" id="nav-mycalls"><span class="iconify text-lg" data-icon="mdi:phone-log"></span> My Handled Calls</button>
                 <button onclick="switchTab('shipping')" class="sidebar-link w-full text-left" id="nav-shipping"><span class="iconify text-lg" data-icon="mdi:truck-fast-outline"></span> Shipping Tracking</button>
@@ -115,8 +116,8 @@
                     <div class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold text-xs" id="header-avatar">A</div>
                     <span id="header-name" class="text-sm font-semibold text-white hidden sm:block">Agent</span>
                 </div>
-            </header> 
-            
+            </header>
+
             <div class="p-6 md:p-8 flex-1 overflow-y-auto min-h-0">
 
                 <!-- DASHBOARD -->
@@ -124,11 +125,11 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <h2 class="text-xl font-bold text-white">Agent Dashboard</h2>
                         <div class="flex gap-2 flex-wrap">
-                            <button onclick="filterDash('all')" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">All Time</button>
-                            <button onclick="filterDash('today')" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Today</button>
-                            <button onclick="filterDash('week')" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Week</button>
-                            <button onclick="filterDash('month')" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Month</button>
-                            <button onclick="filterDash('year')" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Year</button>
+                            <button onclick="filterDash('all', this)" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">All Time</button>
+                            <button onclick="filterDash('today', this)" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Today</button>
+                            <button onclick="filterDash('week', this)" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Week</button>
+                            <button onclick="filterDash('month', this)" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Month</button>
+                            <button onclick="filterDash('year', this)" class="dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">This Year</button>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
@@ -176,7 +177,7 @@
                     </div>
                     <button onclick="forceClaim()" class="mb-4 w-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold py-2 rounded-xl hover:bg-yellow-500/30 transition-colors flex items-center justify-center gap-2 text-sm"><span class="iconify" data-icon="mdi:rocket-launch"></span> Force Claim Next Order</button>
                     <div id="ws-content" class="space-y-4"></div>
-                    
+
                     <!-- PAGINATION FOOTER -->
                     <div class="flex flex-col md:flex-row gap-3 mt-4 items-center justify-between text-xs text-slate-400">
                         <div class="flex items-center gap-2">
@@ -216,8 +217,7 @@
                             </thead>
                             <tbody id="mycalls-table" class="divide-y divide-white/[0.05]"></tbody>
                         </table>
-                    </div>
-                    <div class="flex flex-col md:flex-row gap-3 mt-4 items-center justify-between text-xs text-slate-400">
+                    </div>   <div class="flex flex-col md:flex-row gap-3 mt-4 items-center justify-between text-xs text-slate-400">
                         <div class="flex items-center gap-2">
                             <span>Rows per page:</span>
                             <select id="mycalls-page-size" onchange="changeMyCallsPageSize(this.value)" class="bg-white/[0.05] border border-white/[0.1] rounded-lg px-2 py-1 text-white focus:outline-none">
@@ -241,13 +241,13 @@
                         <input type="text" id="ship-search" oninput="renderShipping()" placeholder="Search by Order ID, Phone, or Name..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500/50">
                     </div>
                     <div class="flex gap-2 mb-4 flex-wrap">
-                        <button onclick="filterShipping('all')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">All</button>
-                        <button onclick="filterShipping('confirmed')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Received</button>
-                        <button onclick="filterShipping('preparing')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Preparing</button>
-                        <button onclick="filterShipping('out_for_delivery')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">In Transit</button>
-                        <button onclick="filterShipping('delivered')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Delivered</button>
-                        <button onclick="filterShipping('returned')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Returned</button>
-                        <button onclick="filterShipping('cancelled')" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Cancelled</button>
+                        <button onclick="filterShipping('all', this)" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">All</button>
+                        <button onclick="filterShipping('confirmed', this)" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Received</button>
+                        <button onclick="filterShipping('preparing', this)" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Preparing</button>
+                        <button onclick="filterShipping('out_for_delivery', this)" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">In Transit</button>
+                        <button onclick="filterShipping('delivered', this)" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Delivered</button>
+                        <button onclick="filterShipping('returned', this)" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Returned</button>
+                        <button onclick="filterShipping('cancelled', this)" class="ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]">Cancelled</button>
                     </div>
                     <div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-x-auto">
                         <table class="w-full text-sm text-left min-w-[1100px]">
@@ -304,7 +304,12 @@
     </div>
 
     <script>
-        function escHtml(str) { return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+        function escHtml(str) { return String(str === undefined || str === null ? '' : str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+        /* ================= SPEED FIX #1: Firestore offline cache =================
+           After the FIRST login, all orders are cached on the computer.
+           Next logins show everything almost instantly from cache, then sync. */
+        try { if (typeof db !== 'undefined' && db.enablePersistence) { db.enablePersistence({ synchronizeTabs: true }).catch(function(){}); } } catch(e) {}
 
         let allOrders=[],allAgents=[],allMerchants=[],dashFilter='all',currentWsTab='new';
         let myCallsPage=1,myCallsPageSize=20;
@@ -314,42 +319,86 @@
         var mediaRecorder = null, audioChunks = [];
         var knownOrderIds = new Set(), audioCtx, isOnBreak = false;
         var shipFilter = 'all';
-        var lastClaimAttempt = 0; // Timestamp of the last claim attempt
+        var lastClaimAttempt = 0;
+        var ordersInitialized = false, dataReady = false, renderQueued = false, activeTab = 'dashboard', appLoaded = false;
         const myId = function() { return window.currentUser.uid; };
         const DAILY_TARGET = 20;
 
+        /* ================= LOADER HELPERS ================= */
+        function showAuthLoader(text) {
+            var loader = document.getElementById('auth-loader');
+            if(!loader) return;
+            document.getElementById('auth-loader-text').innerText = text;
+            loader.classList.remove('hidden'); loader.classList.add('flex');
+        }
+        function hideAuthLoader() {
+            var loader = document.getElementById('auth-loader');
+            if(loader) { loader.classList.add('hidden'); loader.classList.remove('flex'); }
+        }
+
         function handleLogin(e) {
             e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
+            var btn = e.target.querySelector('button[type="submit"]');
             btn.innerHTML = 'Signing in...'; btn.disabled = true;
+            showAuthLoader('Signing in...');
             auth.signInWithEmailAndPassword(e.target.email.value, e.target.password.value).catch(err => {
+                hideAuthLoader();
                 showT(err.message, "error"); btn.innerHTML = 'Sign In'; btn.disabled = false;
             });
-        } auth.onAuthStateChanged(async user => {
+        }
+
+        /* ================= SINGLE auth handler (removed the duplicate) ================= */
+        auth.onAuthStateChanged(async user => {
             if (user) {
-                const doc = await db.collection('users').doc(user.uid).get();
-                if (doc.exists && doc.data().active) {
-                    window.currentUser = { uid: user.uid, ...doc.data() };
-                    document.getElementById('header-name').textContent = window.currentUser.name || 'Agent';
-                    document.getElementById('header-avatar').textContent = (window.currentUser.name || 'A').charAt(0).toUpperCase();
-                    document.getElementById('set-name').value = window.currentUser.name || '';
-                    document.getElementById('set-email').value = window.currentUser.email || '';
-                    document.getElementById('login-screen').classList.add('hidden');
-                    document.getElementById('app-screen').classList.remove('hidden');
-                    initAudio();
-                    loadData();
-                } else { auth.signOut(); }
+                showAuthLoader('Loading your account...');
+                var safety = setTimeout(hideAuthLoader, 15000); // never freeze forever
+                try {
+                    const doc = await db.collection('users').doc(user.uid).get();
+                    if (doc.exists && doc.data().active) {
+                        window.currentUser = { uid: user.uid, ...doc.data() };
+                        fillProfileUI();
+                        document.getElementById('login-screen').classList.add('hidden');
+                        document.getElementById('app-screen').classList.remove('hidden');
+                        showAuthLoader('Loading your workspace...');
+                        onAppLoaded();
+                    } else {
+                        clearTimeout(safety); hideAuthLoader();
+                        showT("Access Denied.", "error");
+                        auth.signOut();
+                    }
+                } catch(e) {
+                    clearTimeout(safety); hideAuthLoader();
+                    showT("Could not load account: " + e.message, "error");
+                }
             } else {
+                hideAuthLoader();
                 document.getElementById('login-screen').classList.remove('hidden');
                 document.getElementById('app-screen').classList.add('hidden');
             }
         });
 
+        function fillProfileUI() {
+            document.getElementById('header-name').textContent = window.currentUser.name || 'Agent';
+            document.getElementById('header-avatar').textContent = (window.currentUser.name || 'A').charAt(0).toUpperCase();
+            document.getElementById('set-name').value = window.currentUser.name || '';
+            document.getElementById('set-email').value = window.currentUser.email || '';
+            /* BUG FIX: restore break status saved in the profile */
+            isOnBreak = (window.currentUser.agentStatus === 'break');
+            applyBreakUI();
+        }
+
+        /* Idempotent loader-start (safe even if core.js also calls it) */
+        function onAppLoaded() {
+            if (appLoaded) return;
+            appLoaded = true;
+            initAudio();
+            loadData();
+        }
+
         function loadData() {
             db.collection('users').where('role', '==', 'call_center').onSnapshot(function(snap) {
                 allAgents = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
-                renderLeaderboard();
-                renderAgentOfMonth();
+                scheduleRender();
             });
 
             db.collection('users').where('role', '==', 'merchant').onSnapshot(function(snap) {
@@ -358,36 +407,65 @@
 
             db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(function(snap) {
                 allOrders = snap.docs.map(function(d) { return {id: d.id, ...d.data()}; });
-                allOrders.forEach(function(o) { if(o.status === 'accepted' && o.ccAssignedTo === myId() && !knownOrderIds.has(o.id)) playDing(); });
+
+                if (!dataReady) { dataReady = true; hideAuthLoader(); }  // ← first data arrived, dismiss loader
+
+                /* BUG FIX: only play the "new order" ding for NEW assignments, not all existing ones after refresh */
+                if (ordersInitialized) {
+                    allOrders.forEach(function(o) { if(o.status === 'accepted' && o.ccAssignedTo === myId() && !knownOrderIds.has(o.id)) playDing(); });
+                }
                 knownOrderIds = new Set(allOrders.map(function(o) { return o.id; }));
-                
-                // BACKGROUND AUTO-CLAIM with Timestamp Cooldown
+                ordersInitialized = true;
+
+                // BACKGROUND AUTO-CLAIM (with cooldown)
                 var myActive = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
-                var unassignedExists = allOrders.some(function(o) { 
-                    return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo); 
+                var unassignedExists = allOrders.some(function(o) {
+                    return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo);
                 });
-                var now = Date.now(); 
+                var now = Date.now();
                 if(currentWsTab === 'new' && !isOnBreak && myActive.length === 0 && (now - lastClaimAttempt > 1500)) {
                     lastClaimAttempt = now;
-                    if(unassignedExists) {
-                        claimNextOrder(); 
-                    } else {
-                        autoClaimRetry(); // No new orders? Auto-claim a "No Reply" order!
-                    }
+                    if(unassignedExists) { claimNextOrder(); } else { autoClaimRetry(); }
                 }
 
-                updateDashboard(); renderWorkspace(); renderShipping(); renderPerformance(); renderMyCalls();
+                updateDashboard();
+                renderActivePanel(activeTab);
+            }, function(err) {
+                hideAuthLoader();
+                showT("Connection problem — retrying automatically...", "error");
             });
         }
 
+        /* ================= SPEED FIX #2: smart rendering =================
+           Only the tab you are LOOKING AT gets re-rendered. Before, every
+           single change rebuilt every table on the page. */
+        function renderActivePanel(t) {
+            if (!dataReady) return;
+            if (t === 'dashboard') updateDashboard();
+            else if (t === 'workspace') renderWorkspace();
+            else if (t === 'mycalls') renderMyCalls();
+            else if (t === 'shipping') renderShipping();
+            else if (t === 'performance') renderPerformance();
+        }
+        function scheduleRender() {
+            if (renderQueued || !dataReady) return;
+            renderQueued = true;
+            setTimeout(function() {
+                renderQueued = false;
+                updateDashboard();
+                renderActivePanel(activeTab);
+            }, 200);
+        }
+
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebar-overlay').classList.toggle('hidden'); }
-        function switchTab(t) { 
-            document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.add('hidden'); }); 
-            document.querySelectorAll('.sidebar-link').forEach(function(l) { l.classList.remove('active'); }); 
-            document.getElementById('panel-' + t).classList.remove('hidden'); 
-            document.getElementById('nav-' + t).classList.add('active'); 
-            if(window.innerWidth < 1024) toggleSidebar(); 
-            if(t === 'mycalls') renderMyCalls(); 
+        function switchTab(t) {
+            activeTab = t;
+            document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.add('hidden'); });
+            document.querySelectorAll('.sidebar-link').forEach(function(l) { l.classList.remove('active'); });
+            document.getElementById('panel-' + t).classList.remove('hidden');
+            document.getElementById('nav-' + t).classList.add('active');
+            if(window.innerWidth < 1024) toggleSidebar();
+            renderActivePanel(t);   // ← render on demand when the tab opens (fast)
         }
 
         function getDateFilter(filter) {
@@ -399,14 +477,16 @@
             return s;
         }
 
-        function filterDash(f) {
+        /* BUG FIX: no longer relies on the broken global `event` */
+        function filterDash(f, el) {
             dashFilter = f;
             document.querySelectorAll('.dash-btn').forEach(function(b) { b.className = 'dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'; });
-            event.target.className = 'dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
+            if(el) el.className = 'dash-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
             updateDashboard();
         }
 
         function updateDashboard() {
+            if (!dataReady) return;
             var start = getDateFilter(dashFilter);
             var my = allOrders.filter(function(o) { return o.processedBy === myId() && (!start || (o.updatedAt && o.updatedAt.toDate() >= start)); });
             document.getElementById('d-new').textContent = allOrders.filter(function(o) { return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo); }).length;
@@ -416,16 +496,16 @@
             document.getElementById('d-scheduled').textContent = my.filter(function(o) { return o.callOutcome === 'callback_requested'; }).length;
             document.getElementById('d-outregion').textContent = my.filter(function(o) { return o.callOutcome === 'out_of_region'; }).length;
             document.getElementById('d-wrong').textContent = my.filter(function(o) { return o.callOutcome === 'wrong_number'; }).length;
+            /* BUG FIX: Delivered/Returned now respect the agent + date filter like all other cards */
             document.getElementById('d-delivered').textContent = my.filter(function(o) { return o.status === 'delivered'; }).length;
             document.getElementById('d-returned').textContent = my.filter(function(o) { return o.status === 'returned'; }).length;
             var todayStart = new Date(); todayStart.setHours(0,0,0,0);
             var todayConfirmed = allOrders.filter(function(o) { return o.processedBy === myId() && o.callOutcome === 'confirmed' && o.updatedAt && o.updatedAt.toDate() >= todayStart; }).length;
             document.getElementById('target-text').textContent = todayConfirmed + '/' + DAILY_TARGET;
             document.getElementById('target-bar').style.width = Math.min(100, (todayConfirmed/DAILY_TARGET)*100) + '%';
-            
-                // Calculate commission based ONLY on orders confirmed this month
+
             var now = new Date();
-            var monthlyConfirmed = allOrders.filter(function(o) { 
+            var monthlyConfirmed = allOrders.filter(function(o) {
                 if(o.processedBy === myId() && o.callOutcome === 'confirmed') {
                     if(o.updatedAt) {
                         try {
@@ -436,22 +516,17 @@
                 }
                 return false;
             }).length;
-            
-            var commission = monthlyConfirmed * COMMISSION_PER_CONFIRMATION;
-            document.getElementById('cc-commission-text').textContent = 'TZS ' + commission.toLocaleString();
-            
-            renderLeaderboard(); 
-            renderAgentOfMonth();
+            document.getElementById('cc-commission-text').textContent = 'TZS ' + (monthlyConfirmed * COMMISSION_PER_CONFIRMATION).toLocaleString();
         }
 
         function switchWs(tab) {
             currentWsTab = tab;
-            wsPage = 1; // Reset to page 1 when switching tabs
+            wsPage = 1;
             document.querySelectorAll('.ws-tab').forEach(function(t) { t.classList.remove('active'); });
             document.getElementById('ws-tab-' + tab).classList.add('active');
             renderWorkspace();
         }
-        
+
         function changeWsPageSize(size) { wsPageSize = parseInt(size); wsPage = 1; renderWorkspace(); }
         function nextWsPage() { wsPage++; renderWorkspace(); }
         function prevWsPage() { wsPage--; renderWorkspace(); }
@@ -459,48 +534,67 @@
         function getCustomerHistory(phone) { return allOrders.filter(function(o) { return o.customerPhone === phone && o.processedBy; }); }
         function fmtDur(s){if(!s||s<=0)return'0s';if(s<60)return Math.round(s)+'s';var m=Math.floor(s/60),sec=Math.round(s%60);return m+'m '+sec+'s'}
 
+        /* ================= BUG FIX: preserve agent's typing across re-renders =================
+           Before, if another agent updated ANY order while you were typing notes,
+           your notes/outcome were wiped. Now they are saved & restored. */
+        function captureWsState() {
+            var st = {};
+            document.querySelectorAll('[id^="outcome-"]').forEach(function(sel) {
+                var id = sel.id.replace('outcome-','');
+                var ta = document.getElementById('notes-'+id), dt = document.getElementById('date-'+id);
+                st[id] = { outcome: sel.value || '', notes: ta ? ta.value : '', date: dt ? dt.value : '' };
+            });
+            return st;
+        }
+        function restoreWsState(st) {
+            Object.keys(st).forEach(function(id) {
+                var s = st[id];
+                if (s.outcome) {
+                    var sel = document.getElementById('outcome-'+id);
+                    if (sel) { sel.value = s.outcome; toggleSchedule(s.outcome, id); }
+                }
+                var ta = document.getElementById('notes-'+id); if (ta && s.notes) ta.value = s.notes;
+                var dt = document.getElementById('date-'+id); if (dt && s.date) dt.value = s.date;
+            });
+        }
+
         function renderWorkspace() {
             var c = document.getElementById('ws-content');
+            if (!dataReady) { c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">Loading orders...</p></div>'; return; }
+            var savedState = captureWsState();
             var now = new Date();
             var search = (document.getElementById('ws-search').value || '').toLowerCase();
             var list = [];
 
             if(currentWsTab === 'new') {
                 list = allOrders.filter(function(o) { return o.status === 'accepted' && o.ccAssignedTo === myId(); });
-                
-                var unassignedExists = allOrders.some(function(o) { 
-                    return o.status === 'pending' || (o.status === 'accepted' && !o.ccAssignedTo); 
-                });
 
                 if(list.length === 0) {
-                    list = allOrders.filter(function(o) { 
+                    list = allOrders.filter(function(o) {
                         var isMine = (o.processedBy === myId() || o.ccAssignedTo === myId());
                         if(!isMine) return false;
                         if(o.status === 'no_answer') return true;
-                        if(o.status === 'callback_requested' && o.scheduledDate) {
-                            var schedDate = o.scheduledDate.toDate();
-                            var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                            var schedMid = new Date(schedDate.getFullYear(), schedDate.getMonth(), schedDate.getDate());
-                            if(schedMid <= todayMid) return true;
-                        }
+                        try {
+                            if(o.status === 'callback_requested' && o.scheduledDate) {
+                                var schedDate = o.scheduledDate.toDate();
+                                var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                var schedMid = new Date(schedDate.getFullYear(), schedDate.getMonth(), schedDate.getDate());
+                                if(schedMid <= todayMid) return true;
+                            }
+                        } catch(e) { return false; }
                         return false;
-                    }).sort(function(a, b) { return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0); }).slice(0, 1);
+                    }).sort(function(a, b) { return ((a.updatedAt && a.updatedAt.seconds) || 0) - ((b.updatedAt && b.updatedAt.seconds) || 0); }).slice(0, 1);
                 }
-
-                if(!list.length) { 
-                    c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>';
-                    return; 
-                }
-           } else if(currentWsTab === 'retry') {
-                list = allOrders.filter(function(o) { 
-                    // Remove the mine-only filter — show all agents' no-reply orders
-                    return (o.status === 'no_answer' || o.status === 'busy') || 
-                    (o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() <= now);
+                if(!list.length) { c.innerHTML = '<div class="text-center py-12"><div class="animate-spin inline-block text-cyan-400 text-3xl mb-3"><span class="iconify" data-icon="mdi:loading"></span></div><p class="text-slate-500">No active order. Searching for the next customer...</p></div>'; updateWsPagination(0,0,0); return; }
+            } else if(currentWsTab === 'retry') {
+                list = allOrders.filter(function(o) {
+                    if (o.status === 'no_answer' || o.status === 'busy') return true;
+                    try { return (o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() <= now); } catch(e) { return false; }
                 });
-                if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No retry orders right now.</p>'; return; }
+                if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No retry orders right now.</p>'; updateWsPagination(0,0,0); return; }
             } else if(currentWsTab === 'scheduled') {
-                list = allOrders.filter(function(o) { return (o.processedBy === myId() || o.ccAssignedTo === myId()) && o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() > now; });
-                if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No scheduled callbacks.</p>'; return; }
+                list = allOrders.filter(function(o) { try { return (o.processedBy === myId() || o.ccAssignedTo === myId()) && o.status === 'callback_requested' && o.scheduledDate && o.scheduledDate.toDate() > now; } catch(e) { return false; } });
+                if(!list.length) { c.innerHTML = '<p class="text-slate-500 text-center py-12">No scheduled callbacks.</p>'; updateWsPagination(0,0,0); return; }
             }
 
             if(search) {
@@ -521,32 +615,33 @@
                 var history = getCustomerHistory(o.customerPhone);
                 var badHistoryCount = history.filter(function(x) { return ['returned', 'no_answer', 'cancelled', 'wrong_number'].includes(x.status); }).length;
                 var riskAlert = badHistoryCount >= 2 ? '<div class="mb-3 p-2 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-400 font-bold flex items-center gap-2"><span class="iconify text-lg" data-icon="mdi:alert-octagon"></span> ⚠️ HIGH RISK CUSTOMER: Has ' + badHistoryCount + ' past failed/cancelled orders. Confirm carefully!</div>' : '';
-                
+
                 var waMsg = encodeURIComponent('Habari! Ninakupigia simu kutoka ChapShop Delivery kuhusu agizo lako la ' + (o.itemName || 'bidhaa yako') + '. Tafadhali niambie wakati upatikanapo.');
                 var cleanPhone = (o.customerPhone || '').replace(/[^0-9]/g, '');
-                
+                var imgSrc = String(o.productImage || '').replace(/'/g, '%27'); // safe for onclick + src
+
                 var html = '<div class="bg-white/[0.02] border border-white/[0.08] rounded-2xl p-5 hover:border-cyan-500/30 transition-colors">';
                 if(currentWsTab === 'new') {
                     var benefit = o.productDesc ? o.productDesc : 'kutatua hitaji lako';
                     html += '<div class="bg-cyan-500/5 border border-cyan-500/10 rounded-xl p-3 mb-4 text-xs text-cyan-200/80 italic break-words whitespace-normal">';
                     html += '<div class="flex items-center gap-2 mb-1 text-cyan-400 font-bold not-italic"><span class="iconify" data-icon="mdi:script-text-outline"></span> Script ya Kupigia (Call Script)</div>';
-                    html += '"Habari, jina langu ni ' + (window.currentUser.name || 'Agent') + ' napiga simu kutoka ChapShop Delivery. Je, ninaongea na ' + (o.customerName || '') + '? Umeagiza ' + (o.itemName || 'bidhaa') + ' ambayo itakusaidia ' + benefit + '. Kiasi cha kulipia ni TZS ' + Number(o.totalAmount || 0).toLocaleString() + '. Je, uko tayari kuipokea na kulipa pesa taslimu leo?"';
+                    html += '"Habari, jina langu ni ' + escHtml(window.currentUser.name || 'Agent') + ' napiga simu kutoka ChapShop Delivery. Je, ninaongea na ' + escHtml(o.customerName || '') + '? Umeagiza ' + escHtml(o.itemName || 'bidhaa') + ' ambayo itakusaidia ' + escHtml(benefit) + '. Kiasi cha kulipia ni TZS ' + Number(o.totalAmount || 0).toLocaleString() + '. Je, uko tayari kuipokea na kulipa pesa taslimu leo?"';
                     html += '</div>';
                 }
                 html += '<div class="flex flex-col md:flex-row justify-between gap-4 mb-4">';
-                html += '<div><div class="flex items-center gap-3 mb-1"><span class="font-mono text-cyan-400 font-bold">#' + o.id.slice(-6).toUpperCase() + '</span>' + getStatusBadge(o.status) + (o.scheduledDate ? '<span class="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">📅 ' + o.scheduledDate.toDate().toLocaleDateString() + '</span>' : '') + '<button onclick="openCcEditOrder(\'' + o.id + '\')" class="ml-auto text-xs text-yellow-400 hover:underline">Edit Details</button></div>';
-                html += '<div class="flex flex-wrap items-center gap-2 mb-2"><span class="text-xs font-bold text-cyan-300 bg-cyan-500/10 px-2 py-1 rounded">🏪 ' + (o.merchantName || 'Unknown') + '</span><span class="text-slate-500 text-xs">• ' + formatDate(o.createdAt) + '</span>';
+                html += '<div><div class="flex items-center gap-3 mb-1"><span class="font-mono text-cyan-400 font-bold">#' + o.id.slice(-6).toUpperCase() + '</span>' + getStatusBadge(o.status) + (o.scheduledDate ? '<span class="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">📅 ' + new Date(o.scheduledDate.toDate()).toLocaleDateString() + '</span>' : '') + '<button onclick="openCcEditOrder(\'' + o.id + '\')" class="ml-auto text-xs text-yellow-400 hover:underline">Edit Details</button></div>';
+                html += '<div class="flex flex-wrap items-center gap-2 mb-2"><span class="text-xs font-bold text-cyan-300 bg-cyan-500/10 px-2 py-1 rounded">🏪 ' + escHtml(o.merchantName || 'Unknown') + '</span><span class="text-slate-500 text-xs">• ' + formatDate(o.createdAt) + '</span>';
                 html += '<button type="button" onclick="sendWhatsAppVerification(\'' + o.id + '\')" class="ml-auto text-xs font-bold text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-1 rounded hover:bg-green-500/20">Send WA Verify</button>';
                 html += '</div></div>';
-                html += '<div class="text-right"><div class="text-lg font-bold text-white">TZS ' + Number(o.totalAmount).toLocaleString() + '</div><div class="text-xs text-slate-500">' + o.itemName + ' x' + o.qty + '</div></div>';
+                html += '<div class="text-right"><div class="text-lg font-bold text-white">TZS ' + Number(o.totalAmount).toLocaleString() + '</div><div class="text-xs text-slate-500">' + escHtml(o.itemName) + ' x' + o.qty + '</div></div>';
                 html += '</div>';
                 html += riskAlert;
-                html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-3 bg-black/20 rounded-xl"><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Customer</div><div class="text-white text-sm font-medium">' + o.customerName + '</div></div><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Phone</div><div class="flex items-center gap-2"><a href="tel:' + o.customerPhone + '" class="text-cyan-400 text-sm font-medium hover:underline">' + o.customerPhone + '</a><a href="https://wa.me/' + cleanPhone + '?text=' + waMsg + '" target="_blank" class="text-green-400 hover:text-green-300"><span class="iconify text-base" data-icon="mdi:whatsapp"></span></a></div></div><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Address</div><div class="text-slate-300 text-sm">' + (o.customerCity || 'N/A') + ', ' + (o.customerAddress || 'N/A') + '</div></div></div>';
+                html += '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-3 bg-black/20 rounded-xl"><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Customer</div><div class="text-white text-sm font-medium">' + escHtml(o.customerName) + '</div></div><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Phone</div><div class="flex items-center gap-2"><a href="tel:' + escHtml(o.customerPhone) + '" class="text-cyan-400 text-sm font-medium hover:underline">' + escHtml(o.customerPhone) + '</a><a href="https://wa.me/' + cleanPhone + '?text=' + waMsg + '" target="_blank" class="text-green-400 hover:text-green-300"><span class="iconify text-base" data-icon="mdi:whatsapp"></span></a></div></div><div><div class="text-[10px] text-slate-500 uppercase font-bold mb-1">Address</div><div class="text-slate-300 text-sm">' + escHtml(o.customerCity || 'N/A') + ', ' + escHtml(o.customerAddress || 'N/A') + '</div></div></div>';
                 html += '<div class="flex gap-4 mb-4 p-3 bg-cyan-500/5 border border-cyan-500/10 rounded-xl items-start">';
-                html += (o.productImage ? '<div onclick="viewImg(\'' + o.productImage + '\')" class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 overflow-hidden border border-white/10 cursor-pointer hover:border-cyan-500/50 transition-all"><img src="' + o.productImage + '" class="w-full h-full object-cover"></div>' : '<div class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 flex items-center justify-center border border-white/10"><span class="iconify text-4xl text-slate-600" data-icon="mdi:package-variant"></span></div>');
-                html += '<div class="flex-1"><div class="text-[10px] text-cyan-400 uppercase font-bold mb-1">Product Ordered</div><div class="text-white text-sm font-bold">' + (o.itemName || o.productName || 'Unknown') + '</div><div class="text-xs text-slate-400 mt-1 line-clamp-2">' + (o.productDesc || 'No description provided.') + '</div></div>';
+                html += (o.productImage ? '<div onclick="viewImg(\'' + imgSrc + '\')" class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 overflow-hidden border border-white/10 cursor-pointer hover:border-cyan-500/50 transition-all"><img src="' + imgSrc + '" class="w-full h-full object-cover"></div>' : '<div class="w-24 h-24 rounded-xl bg-slate-800 flex-shrink-0 flex items-center justify-center border border-white/10"><span class="iconify text-4xl text-slate-600" data-icon="mdi:package-variant"></span></div>');
+                html += '<div class="flex-1"><div class="text-[10px] text-cyan-400 uppercase font-bold mb-1">Product Ordered</div><div class="text-white text-sm font-bold">' + escHtml(o.itemName || o.productName || 'Unknown') + '</div><div class="text-xs text-slate-400 mt-1 line-clamp-2">' + escHtml(o.productDesc || 'No description provided.') + '</div></div>';
                 html += '</div>';
-                
+
                 var timerHtml = '';
                 if (o.id === activeTimerId) {
                     var m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
@@ -559,14 +654,17 @@
                 html += '<form class="space-y-3 pt-4 border-t border-white/[0.05]"><div class="flex flex-col sm:flex-row gap-3">'+timerHtml+'<select id="outcome-' + o.id + '" onchange="toggleSchedule(this.value, \'' + o.id + '\')" class="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white"><option value="" disabled selected>-- Select Outcome --</option><option value="confirmed">✅ Confirmed</option><option value="no_answer">📞 No Reply</option><option value="wrong_number">❌ Wrong Number</option><option value="out_of_region">🗺️ Out of Region</option><option value="cancelled">❌ Cancelled</option><option value="callback_requested">📅 Schedule Callback</option></select></div>';
                 html += '<div id="schedule-box-' + o.id + '" class="hidden bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl"><label class="text-xs font-bold text-indigo-400 uppercase">Callback Date</label><input type="datetime-local" id="date-' + o.id + '" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white"></div>';
                 html += '<div class="flex flex-wrap gap-2 mb-2"><button type="button" onclick="addQuickNote(\''+o.id+'\', \'Order by mistake\')" class="quick-tag">Order by mistake</button><button type="button" onclick="addQuickNote(\''+o.id+'\', \'No need again\')" class="quick-tag">No need again</button><button type="button" onclick="addQuickNote(\''+o.id+'\', \'Customer will call back\')" class="quick-tag">Customer will call back</button></div>';
-                html += '<textarea id="notes-' + o.id + '" rows="2" placeholder="Add call notes here..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white resize-none">' + (o.callNotes || '') + '</textarea>';
+                html += '<textarea id="notes-' + o.id + '" rows="2" placeholder="Add call notes here..." class="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white resize-none">' + escHtml(o.callNotes || '') + '</textarea>';
                 html += '<div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:ml-auto"><button type="button" onclick="handleDownsell(\'' + o.id + '\')" class="w-full sm:w-auto bg-purple-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-purple-400 flex items-center justify-center gap-2 text-sm cursor-pointer"><span class="iconify" data-icon="mdi:arrow-down-bold-circle-outline"></span> Downsell</button><button type="button" onclick="handleFormSubmit(\'' + o.id + '\', this)" class="w-full sm:w-auto bg-cyan-500 text-white font-semibold px-8 py-3 rounded-xl hover:bg-cyan-400 flex items-center justify-center gap-2 text-sm cursor-pointer"><span class="iconify" data-icon="mdi:check"></span> Update Order</button></div>';
                 html += '</form></div>';
                 return html;
             }).join('');
-            
+
+            restoreWsState(savedState);   // ← bring back what the agent was typing
             updateWsPagination(totalWsOrders, wsStartIdx, wsEndIdx);
-        } function updateWsPagination(total, start, end) {
+        }
+
+        function updateWsPagination(total, start, end) {
             var info = document.getElementById('ws-page-info');
             var prevBtn = document.getElementById('ws-prev-btn');
             var nextBtn = document.getElementById('ws-next-btn');
@@ -580,88 +678,102 @@
             nextBtn.disabled = (wsPage >= totalPages);
         }
 
-        function forceClaim() {
-            lastClaimAttempt = 0; // Reset the timer
-            claimNextOrder(true); // Force it to ignore active orders
-        }
+        function forceClaim() { lastClaimAttempt = 0; claimNextOrder(true); }
 
         async function autoClaimRetry() {
             var now = new Date();
             var retries = allOrders.filter(function(o) {
                 if(o.status === 'no_answer' || o.status === 'busy') return true;
-                if(o.status === 'callback_requested' && o.scheduledDate) {
-                    var schedDate = o.scheduledDate.toDate();
-                    var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    var schedMid = new Date(schedDate.getFullYear(), schedDate.getMonth(), schedDate.getDate());
-                    if(schedMid <= todayMid) return true;
-                }
-                return false;
-            }).sort(function(a, b) { return (a.updatedAt?.seconds || 0) - (b.updatedAt?.seconds || 0); });
-
-            if(retries.length > 0) {
-                var orderToRetry = retries[0];
                 try {
-                    await db.collection('orders').doc(orderToRetry.id).update({
+                    if(o.status === 'callback_requested' && o.scheduledDate) {
+                        var schedDate = o.scheduledDate.toDate();
+                        var todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        var schedMid = new Date(schedDate.getFullYear(), schedDate.getMonth(), schedDate.getDate());
+                        if(schedMid <= todayMid) return true;
+                    }
+                } catch(e) { return false; }
+                return false;
+            }).sort(function(a, b) { return ((a.updatedAt && a.updatedAt.seconds) || 0) - ((b.updatedAt && b.updatedAt.seconds) || 0); });
+
+            if(retries.length === 0) return;
+            var orderToRetry = retries[0];
+            try {
+                /* BUG FIX: transaction = atomic claim, no double-claiming between agents */
+                var ref = db.collection('orders').doc(orderToRetry.id);
+                var ok = await db.runTransaction(async function(t) {
+                    var snap = await t.get(ref);
+                    if (!snap.exists) return false;
+                    var d = snap.data();
+                    var stillRetry = (d.status === 'no_answer' || d.status === 'busy') ||
+                        (d.status === 'callback_requested' && d.scheduledDate && d.scheduledDate.toDate() <= now);
+                    if (!stillRetry) return false;
+                    t.update(ref, {
                         status: 'accepted',
                         ccAssignedTo: myId(),
                         ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                         timeline: firebase.firestore.FieldValue.arrayUnion({ status: 'accepted', at: new Date().toISOString(), by: window.currentUser.name, note: 'Auto-claimed for retry' })
                     });
-                    showT("Re-attempting No Reply order!", "success");
-                    playDing();
-                } catch (err) {
-                    console.error("Error auto-claiming retry: ", err);
-                }
-            }
+                    return true;
+                });
+                if (ok) { showT("Re-attempting No Reply order!", "success"); playDing(); }
+            } catch (err) { console.error("Error auto-claiming retry: ", err); }
         }
 
         async function claimNextOrder(isForced) {
             var now = Date.now();
-            if (!isForced && now - lastClaimAttempt < 1500) return; // 1.5s cooldown to prevent spamming
+            if (!isForced && now - lastClaimAttempt < 1500) return;
             lastClaimAttempt = now;
 
             try {
-                // Look for 'pending' orders first
                 const q = await db.collection('orders').where('status', '==', 'pending').limit(20).get();
                 let docs = q.docs;
 
-                // If none, look for unassigned 'accepted' orders
                 if (docs.length === 0) {
                     const q2 = await db.collection('orders').where('status', '==', 'accepted').limit(20).get();
                     docs = q2.docs.filter(function(d) { return !d.data().ccAssignedTo; });
                 }
+                if (docs.length === 0) return;
 
-                if (docs.length === 0) return; // No orders to claim
-
-                // Sort to find the oldest one
                 docs = docs.sort(function(a, b) {
                     const aT = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
                     const bT = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
                     return aT - bT;
                 });
 
-                let claimed = false;
                 for (let i = 0; i < docs.length; i++) {
-                    const doc = docs[i];
-                    const orderData = doc.data();
-                    
-                    if (!orderData.ccAssignedTo) {
-                        await db.collection('orders').doc(doc.id).update({
-                            ccAssignedTo: myId(), 
+                    /* BUG FIX: transaction = only ONE agent can win each order */
+                    var ref = docs[i].ref;
+                    var won = await db.runTransaction(async function(t) {
+                        var snap = await t.get(ref);
+                        if (!snap.exists) return false;
+                        var d = snap.data();
+                        if (d.ccAssignedTo) return false;
+                        if (d.status !== 'pending' && d.status !== 'accepted') return false;
+                        t.update(ref, {
+                            ccAssignedTo: myId(),
                             ccAssignedAt: firebase.firestore.FieldValue.serverTimestamp(),
                             status: 'accepted'
                         });
-                        showT("New order assigned to you!", "success");
-                        claimed = true;
-                        break; 
-                    }
+                        return true;
+                    });
+                    if (won) { showT("New order assigned to you!", "success"); return; }
                 }
-            } catch (err) {
-                console.error("Error claiming order: ", err);
-            }
-        } function toggleSchedule(val, id) { document.getElementById('schedule-box-'+id).classList.toggle('hidden', val !== 'callback_requested'); }
-        function addQuickNote(id, text) { var ta = document.getElementById('notes-'+id); if(ta.value.trim() !== '') { ta.value += ', ' + text; } else { ta.value = text; } }
+            } catch (err) { console.error("Error claiming order: ", err); }
+        }
+
+        function toggleSchedule(val, id) { var box = document.getElementById('schedule-box-'+id); if(box) box.classList.toggle('hidden', val !== 'callback_requested'); }
+        function addQuickNote(id, text) { var ta = document.getElementById('notes-'+id); if(!ta) return; if(ta.value.trim() !== '') { ta.value += ', ' + text; } else { ta.value = text; } }
+
+        /* BUG FIX: viewImg was called but never existed — clicking a product image broke.
+           Now it opens the image in a clean modal. */
+        function viewImg(src) {
+            var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:420px;padding:12px">';
+            h += '<img src="' + escHtml(src) + '" style="width:100%;border-radius:12px" alt="Product image">';
+            h += '<div style="text-align:center;margin-top:10px"><button onclick="this.closest(\'.modal-overlay\').remove()" style="background:#334155;color:#fff;border:none;padding:8px 20px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">Close</button></div>';
+            h += '</div></div>';
+            document.body.insertAdjacentHTML('beforeend', h);
+        }
 
         async function startTimer(id) {
             if(timerInterval) { showT("Finish current call first", "error"); return; }
@@ -671,35 +783,62 @@
             if(localIdx !== -1) { allOrders[localIdx].callAttempts = (allOrders[localIdx].callAttempts || 0) + 1; }
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
+                try { mediaRecorder = new MediaRecorder(stream); } catch(e) { mediaRecorder = null; }
                 audioChunks = [];
-                mediaRecorder.ondataavailable = event => { if (event.data.size > 0) audioChunks.push(event.data); };
-                mediaRecorder.start();
+                if (mediaRecorder) {
+                    mediaRecorder.ondataavailable = function(event) { if (event.data.size > 0) audioChunks.push(event.data); };
+                    mediaRecorder.start();
+                }
             } catch(err) { console.error("Mic error:", err); }
-            timerInterval = setInterval(() => { 
-                timerSeconds++; 
-                const m = Math.floor(timerSeconds / 60).toString().padStart(2, '0'); 
-                const s = (timerSeconds % 60).toString().padStart(2, '0'); 
-                const disp = document.getElementById('timer-display-'+id);
-                if(disp) disp.textContent = `${m}:${s}`; 
+            timerInterval = setInterval(function() {
+                timerSeconds++;
+                var m = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
+                var s = (timerSeconds % 60).toString().padStart(2, '0');
+                var disp = document.getElementById('timer-display-'+id);
+                if(disp) disp.textContent = m + ':' + s;
             }, 1000);
+            renderWorkspace();
         }
 
+        /* BUG FIX: recordings are now actually saved (before, the audio was
+           recorded then thrown away). Uploaded to Firebase Storage and the URL
+           saved on the order (callRecordingUrl — the field your merchant page
+           already displays). If Storage is not set up, it skips safely. */
         async function stopTimer() {
-            clearInterval(timerInterval); timerInterval = null; 
-            var duration = timerSeconds; 
-            timerSeconds = 0; 
-            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+            clearInterval(timerInterval); timerInterval = null;
+            var duration = timerSeconds;
+            timerSeconds = 0;
+            var recId = activeTimerId;
+            var uploadPromise = (async function() {
+                if (!mediaRecorder || mediaRecorder.state === 'inactive' || !recId || duration < 3) return null;
+                return await new Promise(function(resolve) {
+                    mediaRecorder.onstop = async function() {
+                        try { mediaRecorder.stream.getTracks().forEach(function(track){ track.stop(); }); } catch(e) {}
+                        if (!audioChunks.length) return resolve(null);
+                        try {
+                            var blob = new Blob(audioChunks, { type: 'audio/webm' });
+                            var storage = firebase.storage();
+                            var task = storage.ref('call_recordings/' + recId + '_' + Date.now() + '.webm').put(blob);
+                            var snap = await task;
+                            var url = await snap.ref.getDownloadURL();
+                            resolve(url);
+                        } catch (e) { resolve(null); } // Storage not configured → skip silently
+                    };
+                    try { mediaRecorder.stop(); } catch(e) { resolve(null); }
+                });
+            })();
+            mediaRecorder = null; audioChunks = [];
+
+            if (recId) {
+                try {
+                    var recUrl = await uploadPromise;
+                    var upd = { callDuration: firebase.firestore.FieldValue.increment(duration) };
+                    if (recUrl) upd.callRecordingUrl = recUrl;
+                    await db.collection('orders').doc(recId).update(upd);
+                } catch(e) { console.error("Error saving call duration:", e); }
             }
-            if(activeTimerId) {
-                await db.collection('orders').doc(activeTimerId).update({ callDuration: firebase.firestore.FieldValue.increment(duration) }).catch(function(e){ console.error("Error saving duration:", e); });
-                var btn = document.getElementById('timer-btn-'+activeTimerId), label = document.getElementById('timer-label-'+activeTimerId), display = document.getElementById('timer-display-'+activeTimerId);
-                if(btn) { btn.classList.add('bg-green-500/20', 'text-green-400', 'border-green-500/30'); btn.classList.remove('bg-red-500/20', 'text-red-400', 'border-red-500/30'); label.textContent = 'Start Call'; }
-                if(display) { display.classList.add('hidden'); display.classList.remove('sm:flex'); }
-            }
-            activeTimerId = null; 
+            activeTimerId = null;
+            if (activeTab === 'workspace') renderWorkspace(); // BUG FIX: button now resets properly
             return duration;
         }
 
@@ -713,44 +852,44 @@
             showT("WhatsApp verification opened!");
         }
 
-        function handleFormSubmit(id, btn) {
+        /* BUG FIX: now waits for the timer to fully save before updating the order,
+           so the last call's duration is never lost */
+        async function handleFormSubmit(id, btn) {
             try {
                 var outcome = document.getElementById('outcome-'+id).value;
                 var notes = document.getElementById('notes-'+id).value;
                 var dateVal = document.getElementById('date-'+id) ? document.getElementById('date-'+id).value : null;
-                
+
                 if(!outcome) { showT("Select outcome", "error"); return; }
                 if(outcome === 'callback_requested' && !dateVal) { showT("Pick a date", "error"); return; }
-                
-                if(activeTimerId === id) { stopTimer(); }
-                
-                btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Updating...'; 
-                btn.disabled = true; 
-                
-                var updateData = { 
-                    status: outcome, 
-                    callOutcome: outcome, 
-                    callNotes: notes, 
-                    processedBy: myId(), 
-                    processedByName: window.currentUser.name, 
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
+
+                if(activeTimerId === id) { await stopTimer(); }
+
+                btn.innerHTML = '<span class="iconify animate-spin" data-icon="mdi:loading"></span> Updating...';
+                btn.disabled = true;
+
+                var updateData = {
+                    status: outcome,
+                    callOutcome: outcome,
+                    callNotes: notes,
+                    processedBy: myId(),
+                    processedByName: window.currentUser.name,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 updateData.timeline = firebase.firestore.FieldValue.arrayUnion({ status: outcome, at: new Date().toISOString(), by: window.currentUser.name, note: notes });
                 if(outcome === 'callback_requested' && dateVal) { updateData.scheduledDate = firebase.firestore.Timestamp.fromDate(new Date(dateVal)); }
-                
-                db.collection('orders').doc(id).update(updateData).then(function() { 
-                    showT("Order updated!"); 
-                    btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order'; 
-                    btn.disabled = false; 
-                }).catch(function(err) { 
-                    showT("Error: " + err.message, "error"); 
-                    btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order'; 
-                    btn.disabled = false; 
+
+                db.collection('orders').doc(id).update(updateData).then(function() {
+                    showT("Order updated!");
+                }).catch(function(err) {
+                    showT("Error: " + err.message, "error");
+                    btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order';
+                    btn.disabled = false;
                 });
-            } catch(e) { 
-                showT("Error: " + e.message, "error"); 
-                btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order'; 
-                btn.disabled = false; 
+            } catch(e) {
+                showT("Error: " + e.message, "error");
+                btn.innerHTML = '<span class="iconify" data-icon="mdi:check"></span> Update Order';
+                btn.disabled = false;
             }
         }
 
@@ -764,7 +903,7 @@
             if(confirm("Confirm downsell order to TZS " + newPrice.toLocaleString() + " and mark as CONFIRMED?")) {
                 db.collection('orders').doc(orderId).update({
                     totalAmount: newPrice,
-                    status: 'confirmed', 
+                    status: 'confirmed',
                     callOutcome: 'confirmed',
                     callNotes: 'Downsell accepted at TZS ' + newPrice,
                     processedBy: myId(),
@@ -775,15 +914,16 @@
             }
         }
 
-        function filterShipping(f) {
+        function filterShipping(f, el) {
             shipFilter = f;
             document.querySelectorAll('.ship-btn').forEach(function(b) { b.className = 'ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/[0.05] text-slate-400 border border-white/[0.1]'; });
-            event.target.className = 'ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
+            if(el) el.className = 'ship-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30';
             renderShipping();
         }
 
         function renderShipping() {
             var tb = document.getElementById('shipping-table');
+            if (!dataReady) { tb.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-8">Loading...</td></tr>'; return; }
             var search = (document.getElementById('ship-search').value || '').toLowerCase();
             var shipped = allOrders.filter(function(o) { return o.processedBy === myId() && ['confirmed', 'preparing', 'out_for_delivery', 'delivered', 'returned', 'cancelled'].includes(o.status); });
             if(shipFilter !== 'all') { shipped = shipped.filter(function(o) { return o.status === shipFilter; }); }
@@ -792,17 +932,19 @@
             tb.innerHTML = shipped.map(function(o) {
                 return '<tr class="hover:bg-white/[0.02]">' +
                     '<td class="px-4 py-3 font-mono text-cyan-400 text-xs cursor-pointer hover:underline" onclick="viewShippingHistory(\'' + o.id + '\')">#' + o.id.slice(-6).toUpperCase() + '</td>' +
-                    '<td class="px-4 py-3 text-sm text-cyan-300 font-medium">' + (o.merchantName || 'N/A') + '</td>' +
-                    '<td class="px-4 py-3 text-sm">' + o.customerName + '</td>' +
-                    '<td class="px-4 py-3 text-xs text-slate-300">' + o.itemName + ' x' + o.qty + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-cyan-300 font-medium">' + escHtml(o.merchantName || 'N/A') + '</td>' +
+                    '<td class="px-4 py-3 text-sm">' + escHtml(o.customerName) + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-300">' + escHtml(o.itemName) + ' x' + o.qty + '</td>' +
                     '<td class="px-4 py-3 text-sm font-semibold">TZS ' + Number(o.totalAmount).toLocaleString() + '</td>' +
-                    '<td class="px-4 py-3 text-sm text-orange-400 font-medium">' + (o.processedByName || '—') + '</td>' +
-                    '<td class="px-4 py-3 text-sm text-violet-300 font-medium">' + (o.riderName || 'Unassigned') + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-orange-400 font-medium">' + escHtml(o.processedByName || '—') + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-violet-300 font-medium">' + escHtml(o.riderName || 'Unassigned') + '</td>' +
                     '<td class="px-4 py-3">' + getStatusBadge(o.status) + '</td>' +
                     '<td class="px-4 py-3 text-xs text-slate-500">' + formatDate(o.updatedAt) + '</td>' +
                 '</tr>';
             }).join('');
-        }  function viewShippingHistory(id) {
+        }
+
+        function viewShippingHistory(id) {
             var o = allOrders.find(function(x) { return x.id === id; });
             if(!o) return;
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
@@ -810,14 +952,14 @@
             h += '<div class="space-y-4">';
             h += '<div class="bg-white/[0.02] p-4 rounded-xl border border-white/[0.05]">';
             h += '<div class="flex justify-between mb-2"><span class="text-slate-400 text-sm">Order ID</span><span class="text-cyan-400 font-mono font-bold text-sm">#' + o.id.slice(-6).toUpperCase() + '</span></div>';
-            h += '<div class="flex justify-between mb-2"><span class="text-slate-400 text-sm">Customer</span><span class="text-white text-sm font-medium">' + (o.customerName||'') + '</span></div>';
-            h += '<div class="flex justify-between"><span class="text-slate-400 text-sm">Item</span><span class="text-white text-sm font-medium">' + (o.itemName||'') + ' x' + (o.qty||1) + '</span></div>';
+            h += '<div class="flex justify-between mb-2"><span class="text-slate-400 text-sm">Customer</span><span class="text-white text-sm font-medium">' + escHtml(o.customerName||'') + '</span></div>';
+            h += '<div class="flex justify-between"><span class="text-slate-400 text-sm">Item</span><span class="text-white text-sm font-medium">' + escHtml(o.itemName||'') + ' x' + (o.qty||1) + '</span></div>';
             h += '</div>';
             h += '<div class="text-xs font-bold text-slate-500 uppercase mb-3">Tracking Timeline</div>';
-            h += '<div class="space-y-0">'; 
+            h += '<div class="space-y-0">';
             if (o.timeline && o.timeline.length > 0) {
                 o.timeline.slice().reverse().forEach(function(t) {
-                    h += '<div class="flex gap-4"><div class="flex flex-col items-center"><div class="w-3 h-3 rounded-full bg-cyan-400 mt-1.5 flex-shrink-0"></div><div class="w-px h-full bg-white/[0.05] mt-1"></div></div><div class="pb-5"><div class="text-slate-400 text-xs">' + formatDate(t.at) + '</div><div class="text-white font-semibold text-sm mt-0.5">' + (t.status || 'updated').replace(/_/g,' ').toUpperCase() + '</div>' + (t.by ? '<div class="text-orange-400 text-xs mt-0.5">By: ' + t.by + '</div>' : '') + (t.note ? '<div class="text-slate-500 italic text-xs mt-1">"' + t.note + '"</div>' : '') + '</div></div>';
+                    h += '<div class="flex gap-4"><div class="flex flex-col items-center"><div class="w-3 h-3 rounded-full bg-cyan-400 mt-1.5 flex-shrink-0"></div><div class="w-px h-full bg-white/[0.05] mt-1"></div></div><div class="pb-5"><div class="text-slate-400 text-xs">' + escHtml(formatDate(t.at)) + '</div><div class="text-white font-semibold text-sm mt-0.5">' + escHtml(String(t.status || 'updated').replace(/_/g,' ').toUpperCase()) + '</div>' + (t.by ? '<div class="text-orange-400 text-xs mt-0.5">By: ' + escHtml(t.by) + '</div>' : '') + (t.note ? '<div class="text-slate-500 italic text-xs mt-1">"' + escHtml(t.note) + '"</div>' : '') + '</div></div>';
                 });
             } else {
                 h += '<p class="text-slate-500 text-sm text-center py-4">No history recorded yet for this order.</p>';
@@ -837,9 +979,9 @@
             document.getElementById('p-rate').textContent = rate + '%';
             document.getElementById('p-time').textContent = avgTime > 60 ? Math.floor(avgTime/60) + 'm ' + (avgTime%60) + 's' : avgTime + 's';
             var c = document.getElementById('p-history');
-            var recent = my.filter(function(o) { return o.updatedAt; }).sort(function(a,b) { return (b.updatedAt.seconds||0) - (a.updatedAt.seconds||0); }).slice(0, 30);
+            var recent = my.filter(function(o) { return o.updatedAt; }).sort(function(a,b) { return ((b.updatedAt && b.updatedAt.seconds) || 0) - ((a.updatedAt && a.updatedAt.seconds) || 0); }).slice(0, 30);
             if(!recent.length) { c.innerHTML = '<p class="text-slate-500 text-center">No history yet.</p>'; return; }
-            c.innerHTML = recent.map(function(o) { return '<div class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl"><div class="flex items-center gap-3"><span class="font-mono text-cyan-400 text-xs">#' + o.id.slice(-6).toUpperCase() + '</span><span class="text-sm text-slate-300">' + o.customerName + '</span></div><div class="flex items-center gap-3"><span class="text-xs text-slate-500">' + (o.callDuration || 0) + 's</span>' + getStatusBadge(o.status) + '</div></div>'; }).join('');
+            c.innerHTML = recent.map(function(o) { return '<div class="flex items-center justify-between p-3 bg-white/[0.02] border border-white/[0.05] rounded-xl"><div class="flex items-center gap-3"><span class="font-mono text-cyan-400 text-xs">#' + o.id.slice(-6).toUpperCase() + '</span><span class="text-sm text-slate-300">' + escHtml(o.customerName) + '</span></div><div class="flex items-center gap-3"><span class="text-xs text-slate-500">' + (o.callDuration || 0) + 's</span>' + getStatusBadge(o.status) + '</div></div>'; }).join('');
         }
 
         async function saveProfile() { try { await db.collection('users').doc(myId()).update({ name: document.getElementById('set-name').value }); document.getElementById('header-name').textContent = document.getElementById('set-name').value; showT("Profile Saved!"); } catch(e) { showT(e.message, "error"); } }
@@ -853,7 +995,7 @@
         });
 
         function openCcCreateOrder() {
-            var mOpts = allMerchants.length ? allMerchants.map(function(m){return '<option value="'+m.id+'" class="bg-slate-900">'+(m.shopName||m.name)+'</option>'}).join('') : '<option value="">No merchants found</option>';
+            var mOpts = allMerchants.length ? allMerchants.map(function(m){return '<option value="'+m.id+'" class="bg-slate-900">'+escHtml(m.shopName||m.name)+'</option>'}).join('') : '<option value="">No merchants found</option>';
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:600px">';
             h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">New Phone Order</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
             h += '<form id="cc-create-form" class="space-y-4">';
@@ -893,11 +1035,11 @@
             var h = '<div class="modal-overlay" onclick="if(event.target===this)this.remove()"><div class="modal-box" style="max-width:500px">';
             h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Order #'+o.id.slice(-6).toUpperCase()+'</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
             h += '<form id="cc-edit-form" class="space-y-4">';
-            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name</label><input type="text" id="ce-cname" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerName||'')+'"></div>';
-            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><input type="tel" id="ce-cphone" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerPhone||'')+'"></div>';
-            h += '<div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">City</label><input type="text" id="ce-ccity" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerCity||'')+'"></div><div><label class="text-xs font-semibold text-slate-400 uppercase">Qty</label><input type="number" id="ce-qty" min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.qty||1)+'"></div></div>';
-            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Address</label><input type="text" id="ce-caddress" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.customerAddress||'')+'"></div>';
-            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Item Name</label><input type="text" id="ce-item" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.itemName||'')+'"></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Customer Name</label><input type="text" id="ce-cname" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+escHtml(o.customerName||'')+'"></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><input type="tel" id="ce-cphone" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+escHtml(o.customerPhone||'')+'"></div>';
+            h += '<div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">City</label><input type="text" id="ce-ccity" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+escHtml(o.customerCity||'')+'"></div><div><label class="text-xs font-semibold text-slate-400 uppercase">Qty</label><input type="number" id="ce-qty" min="1" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.qty||1)+'"></div></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Address</label><input type="text" id="ce-caddress" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+escHtml(o.customerAddress||'')+'"></div>';
+            h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Item Name</label><input type="text" id="ce-item" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+escHtml(o.itemName||'')+'"></div>';
             h += '<div class="grid grid-cols-2 gap-4"><div><label class="text-xs font-semibold text-slate-400 uppercase">Unit Price</label><input type="number" id="ce-price" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white" value="'+(o.productPrice||0)+'"></div><div><label class="text-xs font-semibold text-slate-400 uppercase">Total Amount</label><input type="number" id="ce-total" min="0" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-cyan-400 font-bold" value="'+(o.totalAmount||0)+'"></div></div>';
             h += '<button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 text-sm mt-2">Save Changes</button>';
             h += '</form></div></div>';
@@ -918,10 +1060,11 @@
 
         function renderMyCalls() {
             var tb = document.getElementById('mycalls-table');
+            if (!dataReady) { tb.innerHTML = '<tr><td colspan="9" class="text-center text-slate-500 py-8">Loading...</td></tr>'; return; }
             var search = (document.getElementById('mycalls-search').value || '').toLowerCase();
             var myHandled = allOrders.filter(function(o) { return o.processedBy === myId(); });
             if(search) { myHandled = myHandled.filter(function(o) { return o.id.toLowerCase().includes(search) || (o.customerPhone && o.customerPhone.includes(search)) || (o.customerName && o.customerName.toLowerCase().includes(search)); }); }
-            myHandled.sort(function(a,b) { return (b.updatedAt && b.updatedAt.seconds || 0) - (a.updatedAt && a.updatedAt.seconds || 0); });
+            myHandled.sort(function(a,b) { return ((b.updatedAt && b.updatedAt.seconds) || 0) - ((a.updatedAt && a.updatedAt.seconds) || 0); });
             var total = myHandled.length;
             var totalPages = Math.ceil(total / myCallsPageSize);
             if (myCallsPage > totalPages && totalPages > 0) myCallsPage = totalPages;
@@ -933,19 +1076,20 @@
             tb.innerHTML = paginatedItems.map(function(o) {
                 return '<tr class="hover:bg-white/[0.02]">' +
                     '<td class="px-4 py-3 font-mono text-cyan-400 text-xs">#' + o.id.slice(-6).toUpperCase() + '</td>' +
-                    '<td class="px-4 py-3 text-sm text-cyan-300 font-medium">' + (o.merchantName || 'N/A') + '</td>' +
-                    '<td class="px-4 py-3 text-sm"><div class="text-white font-medium">' + (o.customerName || '') + '</div><div class="text-xs text-slate-500">' + (o.customerPhone || '') + '</div></td>' +
-                    '<td class="px-4 py-3 text-xs text-slate-300">' + (o.itemName || '') + ' x' + (o.qty || 1) + '</td>' +
+                    '<td class="px-4 py-3 text-sm text-cyan-300 font-medium">' + escHtml(o.merchantName || 'N/A') + '</td>' +
+                    '<td class="px-4 py-3 text-sm"><div class="text-white font-medium">' + escHtml(o.customerName || '') + '</div><div class="text-xs text-slate-500">' + escHtml(o.customerPhone || '') + '</div></td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-300">' + escHtml(o.itemName || '') + ' x' + (o.qty || 1) + '</td>' +
                     '<td class="px-4 py-3 text-sm font-semibold">TZS ' + Number(o.totalAmount).toLocaleString() + '</td>' +
                     '<td class="px-4 py-3">' + getStatusBadge(o.status) + '</td>' +
-                    '<td class="px-4 py-3 text-xs text-slate-400 max-w-[200px] truncate" title="' + (o.callNotes || '') + '">' + (o.callNotes || '—') + '</td>' +
+                    '<td class="px-4 py-3 text-xs text-slate-400 max-w-[200px] truncate" title="' + escHtml(o.callNotes || '') + '">' + escHtml(o.callNotes || '—') + '</td>' +
                     '<td class="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">' + formatDate(o.updatedAt) + '</td>' +
                     '<td class="px-4 py-3 text-center"><div class="flex gap-2 justify-center"><button onclick="openCcEditOrder(\'' + o.id + '\')" class="bg-blue-500/20 text-blue-400 border border-blue-500/30 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-blue-500/30 cursor-pointer">Edit</button><button onclick="openEditCallStatus(\'' + o.id + '\')" class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-yellow-500/30 cursor-pointer">Status</button></div></td>' +
                 '</tr>';
             }).join('');
-            var actualEnd = Math.min(end, total);
-            updateMyCallsPagination(total, start + 1, actualEnd);
-        } function updateMyCallsPagination(totalCount, start, end) {
+            updateMyCallsPagination(total, start + 1, Math.min(end, total));
+        }
+
+        function updateMyCallsPagination(totalCount, start, end) {
             var info = document.getElementById('mycalls-pagination-info');
             var prevBtn = document.getElementById('mycalls-prev-btn');
             var nextBtn = document.getElementById('mycalls-next-btn');
@@ -969,7 +1113,7 @@
             h += '<div class="flex items-center justify-between mb-5"><h3 class="text-lg font-bold text-white">Edit Call Status</h3><button onclick="this.closest(\'.modal-overlay\').remove()" class="text-slate-500 hover:text-white"><span class="iconify text-xl" data-icon="mdi:close"></span></button></div>';
             h += '<div class="bg-white/[0.02] p-4 rounded-xl border border-white/[0.05] mb-4">';
             h += '<div class="flex justify-between mb-2"><span class="text-slate-400 text-sm">Order ID</span><span class="text-cyan-400 font-mono font-bold text-sm">#' + o.id.slice(-6).toUpperCase() + '</span></div>';
-            h += '<div class="flex justify-between"><span class="text-slate-400 text-sm">Customer</span><span class="text-white text-sm font-medium">' + (o.customerName || '') + '</span></div>';
+            h += '<div class="flex justify-between"><span class="text-slate-400 text-sm">Customer</span><span class="text-white text-sm font-medium">' + escHtml(o.customerName || '') + '</span></div>';
             h += '</div>';
             h += '<form id="edit-call-status-form" class="space-y-4">';
             h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Change Status To</label>';
@@ -981,7 +1125,7 @@
             h += '<input type="datetime-local" id="ecs-date" class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500/50">';
             h += '</div>';
             h += '<div><label class="text-xs font-semibold text-slate-400 uppercase">Update Notes</label>';
-            h += '<textarea id="ecs-notes" rows="2" placeholder="Add call notes here..." class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 resize-none">' + (o.callNotes || '') + '</textarea></div>';
+            h += '<textarea id="ecs-notes" rows="2" placeholder="Add call notes here..." class="w-full mt-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500/50 resize-none">' + escHtml(o.callNotes || '') + '</textarea></div>';
             h += '<button type="submit" class="w-full bg-cyan-500 text-white font-bold py-3 rounded-xl hover:bg-cyan-400 text-sm mt-2">Save Changes</button>';
             h += '</form></div></div>';
             document.body.insertAdjacentHTML('beforeend', h);
@@ -1006,9 +1150,10 @@
         function downloadShiftReport() {
             var myHandled = allOrders.filter(function(o) { return o.processedBy === myId(); });
             if(!myHandled.length) return showT("No calls to export", "error");
+            var q = function(v){ return '"' + String(v === undefined || v === null ? '' : v).replace(/"/g,'""') + '"'; };
             var csv = 'Order ID,Customer Name,Phone,Item,Amount,Status,Call Duration (s),Notes,Date\n';
             myHandled.forEach(function(o) {
-                csv += ['#' + o.id.slice(-6).toUpperCase(), '"' + (o.customerName || '') + '"', '"' + (o.customerPhone || '') + '"', '"' + (o.itemName || '') + '"', o.totalAmount || 0, o.status || '', o.callDuration || 0, '"' + (o.callNotes || '').replace(/"/g, '""') + '"', o.updatedAt ? formatDate(o.updatedAt) : ''].join(',') + '\n';
+                csv += ['#' + o.id.slice(-6).toUpperCase(), q(o.customerName), q(o.customerPhone), q(o.itemName), o.totalAmount || 0, o.status || '', o.callDuration || 0, q(o.callNotes), o.updatedAt ? formatDate(o.updatedAt) : ''].join(',') + '\n';
             });
             var blob = new Blob([csv], { type: 'text/csv' });
             var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'shift_report_' + new Date().toISOString().slice(0,10) + '.csv'; a.click();
@@ -1028,11 +1173,11 @@
             sorted.slice(0, 5).forEach(function(a, i) {
                 var isMe = a.id === myId();
                 var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i+1);
-                html += '<div class="flex items-center justify-between p-2 rounded-lg ' + (isMe ? 'bg-cyan-500/10 border border-cyan-500/20' : 'bg-white/[0.02]') + '"><div class="flex items-center gap-3"><span class="text-lg font-bold w-6 text-center ' + (i<3?'':'text-slate-500') + '">' + medal + '</span><span class="text-sm font-medium ' + (isMe ? 'text-cyan-400' : 'text-slate-300') + '">' + a.name + ' ' + (isMe ? '(You)' : '') + '</span></div><span class="text-sm font-bold ' + (isMe ? 'text-cyan-400' : 'text-white') + '">' + a.count + ' Confirmed</span></div>';
+                html += '<div class="flex items-center justify-between p-2 rounded-lg ' + (isMe ? 'bg-cyan-500/10 border border-cyan-500/20' : 'bg-white/[0.02]') + '"><div class="flex items-center gap-3"><span class="text-lg font-bold w-6 text-center ' + (i<3?'':'text-slate-500') + '">' + medal + '</span><span class="text-sm font-medium ' + (isMe ? 'text-cyan-400' : 'text-slate-300') + '">' + escHtml(a.name) + (isMe ? ' (You)' : '') + '</span></div><span class="text-sm font-bold ' + (isMe ? 'text-cyan-400' : 'text-white') + '">' + a.count + ' Confirmed</span></div>';
             });
             if(currentAgentRank > 5) {
                 var myData = sorted.find(function(a) { return a.id === myId(); });
-                html += '<div class="flex items-center justify-between p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 mt-2 border-dashed"><div class="flex items-center gap-3"><span class="text-lg font-bold w-6 text-center text-slate-500">' + currentAgentRank + '</span><span class="text-sm font-medium text-cyan-400">' + myData.name + ' (You)</span></div><span class="text-sm font-bold text-cyan-400">' + myData.count + ' Confirmed</span></div>';
+                if (myData) html += '<div class="flex items-center justify-between p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 mt-2 border-dashed"><div class="flex items-center gap-3"><span class="text-lg font-bold w-6 text-center text-slate-500">' + currentAgentRank + '</span><span class="text-sm font-medium text-cyan-400">' + escHtml(myData.name) + ' (You)</span></div><span class="text-sm font-bold text-cyan-400">' + myData.count + ' Confirmed</span></div>';
             }
             c.innerHTML = html || '<p class="text-slate-500 text-sm">No data yet.</p>';
         }
@@ -1045,7 +1190,7 @@
             var stats = {};
             allAgents.forEach(function(a) { stats[a.id] = { id: a.id, name: a.name || 'Agent', processed: 0, confirmed: 0, delivered: 0 }; });
             allOrders.forEach(function(o) {
-                if (!o.processedBy || !o.updatedAt || o.updatedAt.toDate() < monthStart) return;
+                if (!o.processedBy || !o.updatedAt || !o.updatedAt.toDate || o.updatedAt.toDate() < monthStart) return;
                 if (stats[o.processedBy]) {
                     stats[o.processedBy].processed++;
                     if (o.callOutcome === 'confirmed') { stats[o.processedBy].confirmed++; }
@@ -1055,7 +1200,7 @@
             var ranked = Object.values(stats).map(function(s) {
                 var confRate = s.processed > 0 ? Math.round((s.confirmed / s.processed) * 100) : 0;
                 var delRate = s.confirmed > 0 ? Math.round((s.delivered / s.confirmed) * 100) : 0;
-                var score = (s.delivered * 1000) + (delRate * 10) + confRate; 
+                var score = (s.delivered * 1000) + (delRate * 10) + confRate;
                 return Object.assign(s, { confRate: confRate, delRate: delRate, score: score });
             }).sort(function(a, b) { return b.score - a.score; });
             var winner = ranked[0];
@@ -1064,21 +1209,34 @@
                 c.innerHTML = '<div class="text-center text-slate-400 text-sm py-4">No data for this month yet. Start calling to become the Agent of the Month!</div>';
                 return;
             }
-            c.innerHTML = '<div class="flex flex-col md:flex-row items-center justify-between gap-4"><div class="flex items-center gap-4"><span class="text-4xl">👑</span><div><div class="text-[10px] text-yellow-400 uppercase font-bold tracking-wider">Top Call Center Agent - ' + now.toLocaleString('default', { month: 'long' }) + '</div><div class="text-xl font-extrabold text-yellow-400">' + winner.name + ' ' + (isMe ? '(You!) 🎉' : '') + '</div></div></div><div class="grid grid-cols-3 gap-6 text-center w-full md:w-auto"><div><div class="text-lg font-extrabold text-green-400">' + winner.delivered + '</div><div class="text-[10px] text-slate-500 uppercase">Delivered</div></div><div><div class="text-lg font-extrabold text-cyan-400">' + winner.confRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Confirm Rate</div></div><div><div class="text-lg font-extrabold text-violet-400">' + winner.delRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Delivery Rate</div></div></div></div>';
+            c.innerHTML = '<div class="flex flex-col md:flex-row items-center justify-between gap-4"><div class="flex items-center gap-4"><span class="text-4xl">👑</span><div><div class="text-[10px] text-yellow-400 uppercase font-bold tracking-wider">Top Call Center Agent - ' + now.toLocaleString('default', { month: 'long' }) + '</div><div class="text-xl font-extrabold text-yellow-400">' + escHtml(winner.name) + (isMe ? ' (You!) 🎉' : '') + '</div></div></div><div class="grid grid-cols-3 gap-6 text-center w-full md:w-auto"><div><div class="text-lg font-extrabold text-green-400">' + winner.delivered + '</div><div class="text-[10px] text-slate-500 uppercase">Delivered</div></div><div><div class="text-lg font-extrabold text-cyan-400">' + winner.confRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Confirm Rate</div></div><div><div class="text-lg font-extrabold text-violet-400">' + winner.delRate + '%</div><div class="text-[10px] text-slate-500 uppercase">Delivery Rate</div></div></div></div>';
         }
 
-        function initAudio() { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        function playDing() {
-            if(!audioCtx) return;
-            var o = audioCtx.createOscillator(); var g = audioCtx.createGain();
-            o.connect(g); g.connect(audioCtx.destination);
-            o.type = 'sine'; o.frequency.setValueAtTime(880, audioCtx.currentTime); o.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.1);
-            g.gain.setValueAtTime(0.3, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-            o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.4);
+        /* PATCH: dashboard renders leaderboard + agent of month (they were rendered
+           twice per change before — one more slowdown removed) */
+        var _updateDashboard = updateDashboard;
+        updateDashboard = function() { _updateDashboard(); renderLeaderboard(); renderAgentOfMonth(); };
+
+        function initAudio() {
+            try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+            /* Chrome blocks sound until the first click — resume on first interaction */
+            document.addEventListener('click', function once() {
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            }, { once: true });
         }
-        function toggleBreak() {
-            isOnBreak = !isOnBreak;
+        function playDing() {
+            if(!audioCtx || audioCtx.state !== 'running') return;
+            try {
+                var o = audioCtx.createOscillator(); var g = audioCtx.createGain();
+                o.connect(g); g.connect(audioCtx.destination);
+                o.type = 'sine'; o.frequency.setValueAtTime(880, audioCtx.currentTime); o.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.1);
+                g.gain.setValueAtTime(0.3, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.4);
+            } catch(e) {}
+        }
+        function applyBreakUI() {
             var btn = document.getElementById('break-btn'), dot = document.getElementById('break-dot'), txt = document.getElementById('break-text');
+            if(!btn) return;
             if(isOnBreak) {
                 btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-yellow-500/20 border border-yellow-500/30 text-xs font-bold text-yellow-400 transition-all';
                 dot.className = 'w-2 h-2 rounded-full bg-yellow-400'; txt.textContent = 'On Break';
@@ -1086,46 +1244,23 @@
                 btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/30 text-xs font-bold text-green-400 transition-all';
                 dot.className = 'w-2 h-2 rounded-full bg-green-400'; txt.textContent = 'Online';
             }
+        }
+        function toggleBreak() {
+            isOnBreak = !isOnBreak;
+            applyBreakUI();
             db.collection('users').doc(myId()).update({ agentStatus: isOnBreak ? 'break' : 'online' }).catch(function(){});
         }
-function showAuthLoader(text) {
-            var loader = document.getElementById('auth-loader');
-            if(!loader) return;
-            document.getElementById('auth-loader-text').innerText = text;
-            loader.classList.remove('hidden');
-            loader.classList.add('flex');
-        }
-        function hideAuthLoader() {
-            var loader = document.getElementById('auth-loader');
-            if(loader) { loader.classList.add('hidden'); loader.classList.remove('flex'); }
-        }
-        function onAppLoaded() {
-            hideAuthLoader();
-            if (window.currentUser.role !== 'call_center') { showT("Access Denied.", "error"); auth.signOut(); return; }
-            document.getElementById('header-name').textContent = window.currentUser.name || 'Agent';
-            document.getElementById('header-avatar').textContent = (window.currentUser.name || 'A').charAt(0).toUpperCase();
-            document.getElementById('set-name').value = window.currentUser.name || '';
-            document.getElementById('set-email').value = window.currentUser.email || '';
-            initAudio();
-            loadData();
-        }
 
-        // BULLETPROOF AUTH LOADER LOGIC
-        document.addEventListener('DOMContentLoaded', function() {
-            var loginForm = document.querySelector('#login-screen form');
-            if(loginForm) { loginForm.addEventListener('submit', function(e) { showAuthLoader('Signing in...'); }); }
-        });
+        // AUTH LOADER wiring
         document.addEventListener('click', function(e) {
             var btn = e.target.closest('[onclick*="handleLogout"]');
-            if(btn) { showAuthLoader('Logging out...'); }
+            if(btn) { showAuthLoader('Logging out...'); setTimeout(hideAuthLoader, 3000); }
         });
-        firebase.auth().onAuthStateChanged(function(user) { hideAuthLoader(); });
         var toastEl = document.getElementById('toast');
         if(toastEl) {
             var observer = new MutationObserver(function() { if (toastEl.classList.contains('show')) { hideAuthLoader(); } });
             observer.observe(toastEl, { attributes: true });
         }
-
     </script>
 </body>
 </html>
